@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -28,6 +28,8 @@ const App = () => {
         <Route path="/property/:id/:slug?" element={<PropertyDetailPage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/adminlogin" element={<Navigate to="/admin/login" replace />} />
+        <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
         <Route
           path="/dashboard"
           element={

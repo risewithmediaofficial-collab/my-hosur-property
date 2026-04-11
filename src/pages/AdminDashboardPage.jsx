@@ -143,9 +143,9 @@ const AdminDashboardPage = () => {
   };
 
   return (
-    <div className="mx-auto max-w-7xl flex flex-col md:flex-row min-h-[80vh] gap-6 px-4 py-8 md:px-8">
+    <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 shrink-0 bg-white rounded-2xl border border-clay/60 p-4 shadow-sm h-fit">
+      <aside className="hidden md:block w-80 bg-white border-r border-clay/60 p-6 shadow-sm fixed h-screen top-0 left-0 overflow-y-auto">
         <h1 className="mb-6 text-xl font-bold inline-flex items-center gap-2 px-2 text-ink">
           <ClipboardDocumentCheckIcon className="h-6 w-6 text-sage" /> Admin Panel
         </h1>
@@ -173,7 +173,7 @@ const AdminDashboardPage = () => {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 space-y-6">
+      <main className="md:ml-80 w-full overflow-y-auto h-screen bg-gray-50 py-8 px-4 md:px-8 space-y-6">
         {activeTab === "overview" && (
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {Object.entries(metrics).map(([k, v]) => (

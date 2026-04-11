@@ -89,11 +89,13 @@ const ListingPage = () => {
   };
 
   return (
-    <main className="mx-auto grid max-w-7xl gap-6 px-4 py-8 md:grid-cols-[280px_1fr] md:px-8">
-      <FilterSidebar
-        filters={filters}
-        setFilters={setFilters}
-        clearFilters={() =>
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Filter Sidebar */}
+      <div className="hidden md:block w-80 bg-white border-r border-clay/60 p-4 shadow-sm fixed h-screen top-0 left-0 overflow-y-auto">
+        <FilterSidebar
+          filters={filters}
+          setFilters={setFilters}
+          clearFilters={() =>
           setFilters({
             intent: "",
             search: "",
@@ -114,9 +116,11 @@ const ListingPage = () => {
             limit: 12,
           })
         }
-      />
+        />
+      </div>
 
-      <section>
+      {/* Main Content */}
+      <section className="md:ml-80 w-full overflow-y-auto h-screen bg-gray-50 py-8 px-4 md:px-8">
         <div className="mb-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Property Listings</h1>
           <p className="text-sm text-ink/65">{data.total || data.items.length} properties</p>
@@ -132,7 +136,7 @@ const ListingPage = () => {
           {data.page < data.totalPages ? "Loading more..." : "No more properties"}
         </div>
       </section>
-    </main>
+    </div>
   );
 };
 
