@@ -2,7 +2,7 @@ const FilterSidebar = ({ filters, setFilters, clearFilters }) => {
   const update = (key, value) => setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
 
   return (
-    <div className=\"space-y-4\">
+    <div className="space-y-4">
       <h3 className="text-sm font-extrabold uppercase tracking-wide text-ink/80">Filters</h3>
       <input
         className="soft-input w-full rounded-lg px-3 py-2 text-sm"
