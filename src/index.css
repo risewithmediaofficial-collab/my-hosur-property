@@ -1,0 +1,203 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color: #1f2a44;
+  background: #f4f9ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  
+  margin: 0;
+  font-family: "Manrope", ui-sans-serif, system-ui;
+  background:
+    radial-gradient(circle at 12% 2%, rgba(167, 198, 237, 0.22), rgba(244, 249, 255, 0) 42%),
+    radial-gradient(circle at 88% 0%, rgba(191, 229, 240, 0.34), rgba(244, 249, 255, 0) 46%),
+    linear-gradient(160deg, #f7fbff 0%, #f2f8ff 100%);
+  color: #1f2a44;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid #e4eefb;
+  box-shadow: 0 12px 30px rgba(68, 105, 156, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.neo-panel {
+  background: #f6fbff;
+  box-shadow:
+    8px 8px 22px rgba(111, 145, 187, 0.16),
+    -8px -8px 22px rgba(255, 255, 255, 0.95);
+}
+
+.neo-inset {
+  background: #f6fbff;
+  box-shadow:
+    inset 6px 6px 14px rgba(106, 140, 182, 0.14),
+    inset -6px -6px 14px rgba(255, 255, 255, 0.92);
+}
+
+.neo-btn {
+  background: #f6fbff;
+  box-shadow:
+    6px 6px 14px rgba(113, 146, 186, 0.2),
+    -6px -6px 14px rgba(255, 255, 255, 0.92);
+  transition: all 180ms ease;
+}
+
+.neo-btn:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    8px 8px 16px rgba(113, 146, 186, 0.24),
+    -8px -8px 16px rgba(255, 255, 255, 0.95);
+}
+
+.soft-input {
+  background: #ffffff;
+  border: 1px solid #d7e6f8;
+  box-shadow: inset 0 1px 2px rgba(31, 63, 106, 0.05);
+}
+
+.soft-input:focus {
+  outline: none;
+  border-color: #8bc3e6;
+  box-shadow: 0 0 0 3px rgba(139, 195, 230, 0.22);
+}
+
+.form-modern input,
+.form-modern select,
+.form-modern textarea {
+  background: #ffffff;
+  border: 1px solid #d7e6f8;
+  box-shadow: inset 0 1px 2px rgba(31, 63, 106, 0.05);
+}
+
+.form-modern input:focus,
+.form-modern select:focus,
+.form-modern textarea:focus {
+  outline: none;
+  border-color: #8bc3e6;
+  box-shadow: 0 0 0 3px rgba(139, 195, 230, 0.22);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes shineSweep {
+  0% {
+    transform: translateX(-130%);
+  }
+  100% {
+    transform: translateX(160%);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeUp 500ms ease both;
+}
+
+.animate-float-slow {
+  animation: floatSlow 3.6s ease-in-out infinite;
+}
+
+.uiverse-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.uiverse-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0));
+  transform: translateX(-130%);
+  pointer-events: none;
+}
+
+.uiverse-card:hover::after {
+  animation: shineSweep 900ms ease;
+}
+
+.uiverse-btn {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.uiverse-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.28), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.uiverse-btn:hover::before {
+  opacity: 1;
+}
+
+.uiverse-btn:hover {
+  transform: translateY(-1px);
+}
+
+.content-card {
+  border-radius: 1rem;
+  border: 1px solid #e1edf9;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(247, 251, 255, 0.9));
+  box-shadow: 0 12px 24px rgba(70, 108, 156, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.content-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  padding: 0.32rem 0.68rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #2c4a72;
+  background: rgba(167, 198, 237, 0.34);
+}
