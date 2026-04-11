@@ -90,141 +90,182 @@ const HomePage = () => {
   }, [debouncedSearch, search.intent, search.city, search.propertyType, search.maxPrice]);
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8 md:px-8">
-      <section className="glass-panel uiverse-card animate-fade-up rounded-3xl border border-white/70 bg-gradient-to-br from-white/55 to-[#e9eef4] p-5 md:p-12">
-        <h1 className="max-w-2xl text-2xl font-extrabold leading-tight md:text-5xl">Find your next home in a calm, professional flow.</h1>
-        <p className="mt-3 max-w-2xl text-xs text-ink/75 md:text-base">Search verified sale and rent properties with role-based support for buyers, owners, agents, and admins.</p>
-        <div className="mt-5 flex flex-wrap gap-1.5">
-          {Object.entries(intentMeta).map(([key, meta]) => {
-            const Icon = meta.icon;
-            return (
-            <button
-              key={key}
-              onClick={() => setSearch((p) => ({ ...p, intent: key }))}
-              className={`uiverse-btn inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold ${search.intent === key ? "bg-ink text-stone" : "neo-btn text-ink"}`}
-            >
-              <Icon className="h-3.5 w-3.5" />
-              {meta.label}
-            </button>
-            );
-          })}
+    <main className="mx-auto max-w-7xl px-4 py-12 md:px-8 space-y-12">
+      {/* Hero Section */}
+      <section className="rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 p-8 md:p-16 text-white shadow-lg overflow-hidden relative">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'}}></div>
         </div>
+        <div className="relative z-10">
+          <h1 className="max-w-3xl text-3xl md:text-5xl font-bold leading-tight">
+            Find your next home in a calm, professional flow.
+          </h1>
+          <p className="mt-4 max-w-2xl text-lg text-blue-100">
+            Search verified sale and rent properties with role-based support for buyers, owners, agents, and admins.
+          </p>
+          
+          {/* Intent Selection */}
+          <div className="mt-8 flex flex-wrap gap-2">
+            {Object.entries(intentMeta).map(([key, meta]) => {
+              const Icon = meta.icon;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setSearch((p) => ({ ...p, intent: key }))}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition ${
+                    search.intent === key 
+                      ? "bg-white text-blue-700 shadow-lg" 
+                      : "bg-white/20 text-white hover:bg-white/30"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {meta.label}
+                </button>
+              );
+            })}
+          </div>
 
-        <div className="neo-panel mt-6 grid bg-white/40 gap-2 rounded-2xl p-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
-          <input className="soft-input rounded-lg px-3 py-2 text-sm w-full" placeholder="Locality / Project" value={search.search} onChange={(e) => setSearch((p) => ({ ...p, search: e.target.value }))} />
-          <input className="soft-input rounded-lg px-3 py-2 text-sm w-full" placeholder="City" value={search.city} onChange={(e) => setSearch((p) => ({ ...p, city: e.target.value }))} />
-          <select className="soft-input rounded-lg px-3 py-2 text-sm w-full" value={search.propertyType} onChange={(e) => setSearch((p) => ({ ...p, propertyType: e.target.value }))}>
-            <option value="">Property Type</option>
-            <option>Apartment</option>
-            <option>Villa</option>
-            <option>Independent House</option>
-            <option>Plot</option>
-            <option>Commercial</option>
-          </select>
-          <input className="soft-input rounded-lg px-3 py-2 text-sm w-full" type="number" placeholder="Budget upto" value={search.maxPrice} onChange={(e) => setSearch((p) => ({ ...p, maxPrice: e.target.value }))} />
-          <button
-            onClick={() => (search.intent === "sell" ? navigate("/post-property") : navigate(`/listings?${queryString}`))}
-            className="uiverse-btn inline-flex items-center justify-center gap-1.5 rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-stone sm:col-span-2 lg:col-span-1 w-full"
-          >
-            <SparklesIcon className="h-4 w-4" />
-            {search.intent === "sell" ? "Post Property" : "Search"}
-          </button>
+          {/* Search Form */}
+          <div className="mt-8 grid gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 border border-white/20">
+            <input 
+              className="rounded-lg px-4 py-3 text-sm bg-white/95 text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-white" 
+              placeholder="Locality / Project" 
+              value={search.search} 
+              onChange={(e) => setSearch((p) => ({ ...p, search: e.target.value }))} 
+            />
+            <input 
+              className="rounded-lg px-4 py-3 text-sm bg-white/95 text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-white" 
+              placeholder="City" 
+              value={search.city} 
+              onChange={(e) => setSearch((p) => ({ ...p, city: e.target.value }))} 
+            />
+              <select 
+              className="rounded-lg px-4 py-3 text-sm bg-white/95 text-slate-900 focus:outline-none focus:ring-2 focus:ring-white" 
+              value={search.propertyType} 
+              onChange={(e) => setSearch((p) => ({ ...p, propertyType: e.target.value }))}
+            >
+              <option value="">Property Type</option>
+              <option>Apartment</option>
+              <option>Villa</option>
+              <option>Independent House</option>
+              <option>Plot</option>
+              <option>Commercial</option>
+            </select>
+            <input 
+              className="rounded-lg px-4 py-3 text-sm bg-white/95 text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-white" 
+              type="number" 
+              placeholder="Budget upto" 
+              value={search.maxPrice} 
+              onChange={(e) => setSearch((p) => ({ ...p, maxPrice: e.target.value }))} 
+            />
+            <button
+              onClick={() => (search.intent === "sell" ? navigate("/post-property") : navigate(`/listings?${queryString}`))}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-blue-700 px-4 py-3 text-sm font-bold hover:bg-blue-50 transition sm:col-span-2 lg:col-span-1 w-full shadow-lg"
+            >
+              <SparklesIcon className="h-4 w-4" />
+              {search.intent === "sell" ? "Post Property" : "Search"}
+            </button>
+          </div>
         </div>
       </section>
 
-      <section className="mt-10">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Featured Listings</h2>
-          <Link to="/listings" className="text-sm font-semibold text-sage">View all</Link>
+      {/* Featured Listings */}
+      <section>
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-3xl font-bold text-slate-900">Featured Listings</h2>
+          <Link to="/listings" className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition">View all →</Link>
         </div>
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {featured.map((item) => <PropertyCard key={item._id} item={item} />)}
         </div>
       </section>
 
-      <section className="glass-panel mt-10 rounded-3xl border border-white/70 bg-[#f1f4f8]/90 p-7">
-        <div className="flex items-center gap-3">
-          <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#e5eef8] text-[#2d5b88]">
-            <ChartBarSquareIcon className="h-5 w-5" />
+      {/* Workflow Section */}
+      <section className="rounded-2xl bg-slate-50 p-8 md:p-12 border border-slate-200">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
+            <ChartBarSquareIcon className="h-6 w-6" />
           </div>
-          <h2 className="text-3xl font-extrabold leading-tight text-[#1f2937] md:text-4xl">Property Platform Workflow</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900">Property Platform Workflow</h2>
         </div>
-        <p className="mt-2 text-sm text-ink/70 md:text-base">A simple, transparent path from discovery to lead closure.</p>
-        <div className="mt-5 grid gap-4 md:grid-cols-4">
+        <p className="text-slate-600 mb-8 text-lg">A simple, transparent path from discovery to lead closure.</p>
+        <div className="grid gap-6 md:grid-cols-4">
           {workflowSteps.map((step) => {
             const Icon = step.icon;
             return (
-              <article key={step.id} className="content-card group rounded-2xl bg-white/85 px-4 py-4 transition hover:-translate-y-0.5">
-                <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-[11px] font-extrabold text-slate-700">{step.id}</span>
-                  <Icon className="h-4 w-4 text-[#2d5b88]" />
-                  Workflow Step
+              <div key={step.id} className="group rounded-xl bg-white p-6 shadow-sm border border-slate-200 hover:shadow-lg hover:-translate-y-1 transition">
+                <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white font-bold text-sm mb-4">
+                  {step.id}
                 </div>
-                <h3 className="mt-3 text-lg font-bold leading-snug text-[#222b3a] md:text-xl">{step.title}</h3>
-                <p className="mt-2 text-sm text-[#5a6777]">Structured action to keep discovery and conversion clear.</p>
-              </article>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{step.title}</h3>
+                <p className="text-sm text-slate-600">Structured action to keep discovery and conversion clear.</p>
+              </div>
             );
           })}
         </div>
       </section>
 
-      <section className="mt-10">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Explore Homes, Villas & Plots</h2>
-          <span className="content-chip">Curated Visual Picks</span>
+      {/* Showcase Section */}
+      <section>
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-3xl font-bold text-slate-900">Explore Homes, Villas & Plots</h2>
+          <span className="inline-flex px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">Curated Visual Picks</span>
         </div>
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-3">
           {showcaseItems.map((item) => (
-            <article key={item.title} className="glass-panel uiverse-card overflow-hidden rounded-2xl border border-white/70 bg-white/90 shadow-soft">
-              <div className="h-52 overflow-hidden">
-                <img src={item.image} alt={item.title} className="h-full w-full object-cover transition duration-500 hover:scale-105" loading="lazy" />
+            <article key={item.title} className="group overflow-hidden rounded-xl shadow-sm border border-slate-200 hover:shadow-lg transition bg-white">
+              <div className="h-52 overflow-hidden bg-slate-200">
+                <img src={item.image} alt={item.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-110" loading="lazy" />
               </div>
-              <div className="p-4">
-                <h3 className="text-lg font-bold text-ink">{item.title}</h3>
-                <p className="mt-1 text-sm text-ink/70">{item.subtitle}</p>
+              <div className="p-5">
+                <h3 className="text-lg font-bold text-slate-900">{item.title}</h3>
+                <p className="mt-1 text-sm text-slate-600">{item.subtitle}</p>
               </div>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="glass-panel mt-10 rounded-3xl border border-white/70 bg-white/85 p-7">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Why Users Choose MyHosurProperty</h2>
-          <span className="content-chip">Professional Experience</span>
+      {/* Features Section */}
+      <section className="rounded-2xl bg-slate-50 p-8 md:p-12 border border-slate-200">
+        <div className="mb-8 flex items-center justify-between flex-col sm:flex-row gap-4">
+          <h2 className="text-3xl font-bold text-slate-900">Why Users Choose MyHosurProperty</h2>
+          <span className="inline-flex px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">Professional Experience</span>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-3">
           {featureCards.map((feature) => {
             const Icon = feature.icon;
             return (
-              <article key={feature.title} className="content-card rounded-2xl p-5">
-                <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/30 text-[#2d5b88]">
+              <div key={feature.title} className="rounded-xl bg-white p-6 shadow-sm border border-slate-200 hover:shadow-lg transition">
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
                   <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="mt-3 text-lg font-bold text-ink">{feature.title}</h3>
-                <p className="mt-1 text-sm text-ink/70">{feature.description}</p>
-              </article>
+                <h3 className="mt-4 text-lg font-bold text-slate-900">{feature.title}</h3>
+                <p className="mt-2 text-sm text-slate-600">{feature.description}</p>
+              </div>
             );
           })}
         </div>
       </section>
 
-      <section className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-        <article className="content-card p-5 text-center">
-          <p className="text-sm font-semibold text-ink/70">Active Search Users</p>
-          <p className="mt-1 text-3xl font-extrabold text-ink">25K+</p>
-        </article>
-        <article className="content-card p-5 text-center">
-          <p className="text-sm font-semibold text-ink/70">Verified Listings</p>
-          <p className="mt-1 text-3xl font-extrabold text-ink">8K+</p>
-        </article>
-        <article className="content-card p-5 text-center">
-          <p className="text-sm font-semibold text-ink/70">Monthly Lead Requests</p>
-          <p className="mt-1 text-3xl font-extrabold text-ink">12K+</p>
-        </article>
+      {/* Stats Section */}
+      <section className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+        <div className="rounded-xl bg-white p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition">
+          <p className="text-sm font-medium text-slate-600">Active Search Users</p>
+          <p className="mt-2 text-4xl font-bold text-blue-600">25K+</p>
+        </div>
+        <div className="rounded-xl bg-white p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition">
+          <p className="text-sm font-medium text-slate-600">Verified Listings</p>
+          <p className="mt-2 text-4xl font-bold text-blue-600">8K+</p>
+        </div>
+        <div className="rounded-xl bg-white p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition">
+          <p className="text-sm font-medium text-slate-600">Monthly Lead Requests</p>
+          <p className="mt-2 text-4xl font-bold text-blue-600">12K+</p>
+        </div>
       </section>
     </main>
   );
 };
+
 
 export default HomePage;

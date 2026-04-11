@@ -4,6 +4,14 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 :root {
   color: #1f2a44;
   background: #f4f9ff;
@@ -14,7 +22,6 @@
 }
 
 body {
-  
   margin: 0;
   font-family: "Manrope", ui-sans-serif, system-ui;
   background:

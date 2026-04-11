@@ -19,60 +19,64 @@ import ProtectedRoute from "./components/ProtectedRoute";
 const App = () => {
   return (
     <BrowserRouter>
-      <Toaster position="top-right" toastOptions={{ duration: 2500 }} />
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/listings" element={<ListingPage />} />
-        <Route path="/property/:id/:slug?" element={<PropertyDetailPage />} />
-        <Route path="/auth" element={<AuthPage />} />
-        <Route path="/admin/login" element={<AdminLoginPage />} />
-        <Route path="/adminlogin" element={<Navigate to="/admin/login" replace />} />
-        <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardRouterPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/dashboard"
-          element={
-            <ProtectedRoute roles={["admin"]}>
-              <AdminDashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/plans"
-          element={
-            <ProtectedRoute>
-              <PlansPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/post-property"
-          element={
-            <ProtectedRoute>
-              <PostPropertyPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/edit-property/:id"
-          element={
-            <ProtectedRoute>
-              <EditPropertyPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-      <Footer />
+      <div className="flex min-h-screen flex-col">
+        <Toaster position="top-right" toastOptions={{ duration: 2500 }} />
+        <Navbar />
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/listings" element={<ListingPage />} />
+            <Route path="/property/:id/:slug?" element={<PropertyDetailPage />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/adminlogin" element={<Navigate to="/admin/login" replace />} />
+            <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardRouterPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <AdminDashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/plans"
+              element={
+                <ProtectedRoute>
+                  <PlansPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/post-property"
+              element={
+                <ProtectedRoute>
+                  <PostPropertyPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edit-property/:id"
+              element={
+                <ProtectedRoute>
+                  <EditPropertyPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
     </BrowserRouter>
   );
 };
