@@ -16,6 +16,11 @@ router.get("/applications/posting-access", ctrl.listPostingAccessApplications);
 router.get("/users", ctrl.listUsers);
 router.patch("/users/:id/posting-access", [body("enabled").isBoolean()], validate, ctrl.updatePostingAccess);
 router.patch("/users/:id/status", [body("status").isIn(["active", "deactivated"])], validate, ctrl.toggleUserStatus);
+router.patch("/users/:id/notes", [body("notes").optional().isString()], validate, ctrl.updateUserNotes);
+router.post("/users/email", [
+  body("subject").notEmpty().withMessage("Subject is required"),
+  body("message").notEmpty().withMessage("Message is required")
+], validate, ctrl.sendAdminEmail);
 router.get("/leads", ctrl.listAllLeads);
 router.get("/customer-requests", ctrl.listCustomerRequests);
 router.get("/lead-unlocks", ctrl.listLeadUnlocks);

@@ -50,6 +50,7 @@ const propertySchema = new mongoose.Schema(
     listingContact: {
       name: { type: String, trim: true },
       phone: { type: String, trim: true },
+      email: { type: String, trim: true, lowercase: true },
     },
     localityInsights: {
       rating: { type: Number, default: 4.1 },

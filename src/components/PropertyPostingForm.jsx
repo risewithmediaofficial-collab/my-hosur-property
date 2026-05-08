@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import useAuth from "../hooks/useAuth";
 import { createProperty, uploadPropertyFiles } from "../services/api/propertyApi";
+import { sendPropertyAlertEmail } from "../services/emailService";
 
 const defaultForm = {
   title: "",
   description: "",
   contactName: "",
   contactPhone: "",
+  contactEmail: "",
   houseAddress: "",
   city: "Hosur",
   area: "",
@@ -62,16 +64,19 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
   const remainingPosts = Math.max((user?.activePlan?.listingLimit || 0) - (user?.activePlan?.listingsUsed || 0), 0);
 
+  const canPostForFree = hasActivePlan && hasPostingQuota;
+
+
   useEffect(() => {
     refreshProfile?.().catch(() => {});
   }, [refreshProfile]);
 
   useEffect(() => {
-    if (!isAdmin && hasPostingAccess && (!hasActivePlan || !hasPostingQuota) && !initialData) {
-      toast.error("You need an active plan with remaining credits to post property.");
+    if (!isAdmin && hasPostingAccess && !canPostForFree && !initialData) {
+      toast.error("Your free 30-day posting period has ended or no plan credits left. Buy a plan to post.");
       navigate("/plans");
     }
-  }, [hasActivePlan, hasPostingQuota, isAdmin, hasPostingAccess, navigate, initialData]);
+  }, [canPostForFree, isAdmin, hasPostingAccess, navigate, initialData]);
 
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -150,6 +155,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         listingContact: {
           name: form.contactName,
           phone: form.contactPhone,
+          email: form.contactEmail || user?.email || "",
         },
         location: {
           city: (form.city || "Hosur").trim(),
@@ -188,16 +194,16 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         </div>
       )}
 
-      {hasPostingAccess && !isAdmin && !hasActivePlan && !initialData && (
+      {hasPostingAccess && !isAdmin && !canPostForFree && !initialData && (
         <div className="neo-inset rounded-xl p-4">
-          <p className="text-sm text-ink/75">You need an active paid plan to post property. Please buy a plan from the Plans page.</p>
+          <p className="text-sm text-ink/75">Your free 30-day period has expired or your plan credits are used up. Buy a plan to continue posting properties.</p>
           <button onClick={() => navigate("/plans")} className="mt-3 rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-stone shadow-soft">
             Go To Plans
           </button>
         </div>
       )}
 
-      {hasPostingAccess && (isAdmin || hasActivePlan || initialData) && (
+      {hasPostingAccess && (isAdmin || canPostForFree || initialData) && (
         <form onSubmit={submitProperty} className="space-y-4">
           {!initialData && !isAdmin && (
             <div className="neo-inset rounded-xl p-4 text-sm text-ink/80">
@@ -251,6 +257,10 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
                   <label className="block">
                     <span className="mb-1 block text-sm font-semibold text-ink/80">Mobile Number <span className="text-red-500">*</span></span>
                     <input className="w-full rounded-lg border border-clay px-3 py-2" placeholder="Mobile Number" type="tel" value={form.contactPhone} onChange={(e) => update("contactPhone", e.target.value)} required />
+                  </label>
+                  <label className="block md:col-span-2">
+                    <span className="mb-1 block text-sm font-semibold text-ink/80">Email ID <span className="text-red-500">*</span></span>
+                    <input className="w-full rounded-lg border border-clay px-3 py-2" placeholder="Contact Email" type="email" value={form.contactEmail} onChange={(e) => update("contactEmail", e.target.value)} required />
                   </label>
                 </div>
               </div>

@@ -3,6 +3,12 @@ const Property = require("../models/Property");
 const User = require("../models/User");
 const cache = require("../config/cache");
 const buildPagination = require("../utils/paginate");
+const sendEmail = require("../utils/sendEmail");
+const {
+  newPropertyEmail,
+  inquiryConfirmationEmail,
+  adminPropertyNotificationEmail,
+} = require("../utils/emailTemplates");
 
 const propertyValidators = [
   body("title").trim().notEmpty(),
@@ -246,6 +252,102 @@ const createProperty = async (req, res) => {
     $inc: { "activePlan.listingsUsed": 1 },
   });
 
+  // Send Confirmation Email to Owner
+  try {
+    const ownerEmailHtml = require("../utils/emailTemplates").baseEmailLayout(
+      `
+      <h2 style="margin:0 0 4px;font-size:20px;font-weight:700;color:#1E293B;">
+        Property Published Successfully! ✓
+      </h2>
+      <div style="width:40px;height:3px;background:#2563EB;border-radius:2px;margin:12px 0 20px;"></div>
+      
+      <p style="margin:0 0 16px;color:#64748B;line-height:1.7;">
+        Congratulations ${user.name}! Your property <strong>"${property.title}"</strong> is now live on MyHosurProperty.
+      </p>
+
+      <div style="background:#EFF6FF;padding:16px;border-radius:8px;margin:20px 0;border-left:4px solid #2563EB;">
+        <p style="margin:0;color:#1E293B;font-weight:600;">📝 Property Details</p>
+        <p style="margin:8px 0 0;color:#64748B;font-size:13px;">
+          Type: ${property.propertyType} | Listing: ${property.listingType} | Status: Pending Review
+        </p>
+      </div>
+
+      <p style="margin:16px 0;color:#64748B;">
+        Your property is being promoted to potential buyers and tenants. Keep track of inquiries and responses in your dashboard.
+      </p>
+
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+        <tr>
+          <td align="center">
+            <a href="${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard/properties"
+               style="display:inline-block;background:linear-gradient(135deg,#2563EB 0%,#1D4ED8 100%);color:#FFFFFF;font-size:15px;font-weight:700;text-decoration:none;padding:12px 36px;border-radius:8px;box-shadow:0 4px 14px rgba(37,99,235,0.35);">
+              View Your Property
+            </a>
+          </td>
+        </tr>
+      </table>
+      `,
+      "✓ Property Live"
+    );
+
+    await sendEmail({
+      to: user.email,
+      subject: `✓ Your property "${property.title}" is now live on MyHosurProperty!`,
+      html: ownerEmailHtml,
+    });
+    console.log(`[createProperty] Confirmation email sent to ${user.email}`);
+  } catch (err) {
+    console.error("[createProperty] Owner notification failed:", err.message);
+  }
+
+  // Send Admin Notification for Pending Properties (only if not admin posting)
+  if (req.user.role !== "admin" && property.status === "pending") {
+    try {
+      const adminEmails = (await User.find({ role: "admin" }).select("email")).map((a) => a.email);
+      if (adminEmails.length > 0) {
+        const adminNotifHtml = adminPropertyNotificationEmail(property, user);
+        await sendEmail({
+          to: adminEmails[0],
+          subject: `[REVIEW] New Property: ${property.title} - Pending Approval`,
+          html: adminNotifHtml,
+          bcc: adminEmails.slice(1),
+        });
+        console.log(`[createProperty] Admin notification sent to admins`);
+      }
+    } catch (err) {
+      console.error("[createProperty] Admin notification failed:", err.message);
+    }
+  }
+
+  // Notify Relevant Buyers About New Property (async, non-blocking)
+  try {
+    const relevantBuyers = await User.find({
+      role: "buyer",
+      "recentSearches": {
+        $elemMatch: {
+          city: property.location?.city,
+        },
+      },
+    }).limit(50);
+
+    if (relevantBuyers.length > 0) {
+      for (const buyer of relevantBuyers) {
+        try {
+          const buyerEmailHtml = newPropertyEmail(buyer, property, 0);
+          await sendEmail({
+            to: buyer.email,
+            subject: `🏠 New ${property.propertyType} Available in ${property.location?.city}!`,
+            html: buyerEmailHtml,
+          });
+        } catch (e) {
+          console.error(`Failed to send new property notification to ${buyer.email}:`, e.message);
+        }
+      }
+    }
+  } catch (err) {
+    console.error("[createProperty] Buyer notifications failed:", err.message);
+  }
+
   cache.flushAll();
   return res.status(201).json({
     ...property.toObject(),
@@ -284,13 +386,22 @@ const deleteProperty = async (req, res) => {
 
 const featured = async (req, res) => {
   const now = new Date();
-  const items = await Property.find({
+
+  let items = await Property.find({
     status: "approved",
-    $or: [{ featuredUntil: { $gt: now } }, { featuredUntil: { $exists: false } }],
+    featuredUntil: { $gt: now },
   })
     .populate("ownerId", "name role")
     .sort({ featuredUntil: -1, promotionalScore: -1, createdAt: -1 })
     .limit(8);
+
+  // Fall back to the latest approved inventory when no active boosts exist.
+  if (!items.length) {
+    items = await Property.find({ status: "approved" })
+      .populate("ownerId", "name role")
+      .sort({ promotionalScore: -1, createdAt: -1 })
+      .limit(8);
+  }
 
   res.json({ items });
 };

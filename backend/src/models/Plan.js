@@ -14,13 +14,15 @@ const planSchema = new mongoose.Schema(
     featuredBoost: { type: Boolean, default: false },
     category: {
       type: String,
-      enum: ["seller_listing", "buyer_premium", "broker_leads"],
+      enum: ["seller_listing", "buyer_premium", "broker_leads", "database_access"],
       default: "seller_listing",
     },
     targetRole: {
-      type: String,
-      enum: ["buyer", "seller", "agent", "broker", "builder", "all"],
-      default: "all",
+      type: [{
+        type: String,
+        enum: ["buyer", "customer", "seller", "agent", "broker", "builder", "all"]
+      }],
+      default: ["all"],
     },
     contactUnlocks: { type: Number, default: 0 },
     leadCredits: { type: Number, default: 0 },

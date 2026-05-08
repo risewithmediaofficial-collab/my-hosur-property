@@ -168,7 +168,8 @@ backend/
 Create `.env` from root `.env.example`:
 
 ```env
-VITE_API_BASE_URL=http://localhost:5000/api
+VITE_API_BASE_URL=/api
+VITE_API_PROXY_TARGET=http://localhost:5001
 ```
 
 ### 2) Backend env
@@ -191,7 +192,7 @@ npm run dev:full
 ```
 
 - Frontend: `http://localhost:5173`
-- Backend: `http://localhost:5000`
+- Backend: `http://localhost:5001`
 
 ## Notes for Production Hardening
 - Replace simulated OTP/payment with real providers (Twilio/Razorpay/Stripe).

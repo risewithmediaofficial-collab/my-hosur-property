@@ -11,6 +11,12 @@ const getImageUrl = (path) => {
 export const fetchFeaturedProperties = async () => (await apiClient.get("/properties/featured")).data;
 export const fetchProperties = async (params, token) =>
   (await apiClient.get("/properties", { params, ...(token ? withAuth(token) : {}) })).data;
+
+export const fetchHomeProperties = async () => {
+  const featured = await fetchFeaturedProperties();
+  if (featured?.items?.length) return featured;
+  return fetchProperties({ limit: 8 });
+};
 export const fetchPropertyById = async (id, token) => {
   try {
     const config = token ? withAuth(token) : {};
@@ -44,4 +50,3 @@ export const uploadPropertyFiles = async (token, files) => {
     documents: response.data.documents?.map(getImageUrl) || [],
   };
 };
-

@@ -8,6 +8,10 @@ export const updateUserPostingAccess = async (token, userId, enabled) =>
   (await apiClient.patch(`/admin/users/${userId}/posting-access`, { enabled }, withAuth(token))).data;
 export const toggleUserStatus = async (token, userId, status) =>
   (await apiClient.patch(`/admin/users/${userId}/status`, { status }, withAuth(token))).data;
+export const updateAdminUserNotes = async (token, userId, notes) =>
+  (await apiClient.patch(`/admin/users/${userId}/notes`, { notes }, withAuth(token))).data;
+export const sendAdminEmail = async (token, payload) =>
+  (await apiClient.post("/admin/users/email", payload, withAuth(token))).data;
 export const fetchAdminPropertyApplications = async (token, params) =>
   (await apiClient.get("/admin/applications/properties", { ...withAuth(token), params })).data;
 export const fetchAdminPostingAccessApplications = async (token, params) =>

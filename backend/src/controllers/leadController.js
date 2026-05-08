@@ -1,7 +1,8 @@
 const Lead = require("../models/Lead");
 const Property = require("../models/Property");
 const User = require("../models/User");
-const { sendMail } = require("../config/mail");
+const sendEmail = require("../utils/sendEmail");
+const { inquiryConfirmationEmail, baseEmailLayout } = require("../utils/emailTemplates");
 
 
 
@@ -78,33 +79,94 @@ const createLead = async (req, res) => {
         : "Property Inquiry";
 
   try {
-    await sendMail({
+    // ── Email to Property Owner ──
+    const ownerEmailHtml = baseEmailLayout(
+      `
+      <h2 style="margin:0 0 4px;font-size:20px;font-weight:700;color:#1E293B;">
+        New ${intentLabel} Received 📨
+      </h2>
+      <div style="width:40px;height:3px;background:#F59E0B;border-radius:2px;margin:12px 0 20px;"></div>
+
+      <p style="margin:0 0 16px;color:#64748B;">
+        A buyer has shown interest in your property and sent you an inquiry.
+      </p>
+
+      <div style="background:#FEF3C7;padding:16px;border-radius:8px;margin:20px 0;border-left:4px solid #F59E0B;">
+        <p style="margin:0;color:#92400E;font-weight:600;">🏠 Property: ${property.title}</p>
+        <p style="margin:8px 0 0;color:#92400E;font-size:13px;">Location: ${property.location?.area}, ${property.location?.city}</p>
+      </div>
+
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;">
+        <tr style="background:#F8FAFC;">
+          <td style="padding:12px 16px;border-right:1px solid #E2E8F0;font-weight:600;color:#64748B;width:40%;">Buyer Name</td>
+          <td style="padding:12px 16px;color:#1E293B;">${req.user.name}</td>
+        </tr>
+        <tr>
+          <td style="padding:12px 16px;border-right:1px solid #E2E8F0;font-weight:600;color:#64748B;">Type</td>
+          <td style="padding:12px 16px;color:#1E293B;">${intentLabel}</td>
+        </tr>
+        <tr style="background:#F8FAFC;">
+          <td style="padding:12px 16px;border-right:1px solid #E2E8F0;font-weight:600;color:#64748B;">Contact</td>
+          <td style="padding:12px 16px;">
+            <a href="mailto:${req.user.email}" style="color:#2563EB;text-decoration:none;">${req.user.email}</a>
+            <br/>
+            <a href="tel:${req.user.phone}" style="color:#2563EB;text-decoration:none;">${req.user.phone}</a>
+          </td>
+        </tr>
+        ${
+          req.body.message
+            ? `
+            <tr>
+              <td colspan="2" style="padding:12px 16px;border-top:1px solid #E2E8F0;">
+                <p style="margin:0 0 8px;font-weight:600;color:#64748B;font-size:12px;">MESSAGE</p>
+                <p style="margin:0;color:#1E293B;font-size:13px;line-height:1.6;white-space:pre-wrap;">${req.body.message}</p>
+              </td>
+            </tr>
+            `
+            : ""
+        }
+      </table>
+
+      <p style="margin:16px 0;color:#64748B;font-size:13px;">
+        <strong>Lead ID:</strong> ${lead._id}
+      </p>
+
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+        <tr>
+          <td align="center">
+            <a href="${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard/inquiries"
+               style="display:inline-block;background:linear-gradient(135deg,#2563EB 0%,#1D4ED8 100%);color:#FFFFFF;font-size:15px;font-weight:700;text-decoration:none;padding:12px 36px;border-radius:8px;">
+              View in Dashboard
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:16px 0 0;color:#64748B;font-size:12px;">
+        Respond quickly to increase your chances of conversion. Check your dashboard for more details.
+      </p>
+      `,
+      `📨 New Inquiry`
+    );
+
+    await sendEmail({
       to: property.ownerId.email,
-      subject: `${intentLabel} - ${property.title}`,
-      text: [
-        `A customer has requested regarding your property.`,
-        `Property: ${property.title}`,
-        `Intent: ${lead.intentType}`,
-        `Buyer Name: ${req.user.name || "N/A"}`,
-        `Buyer Email: ${req.user.email || "N/A"}`,
-        `Buyer Phone: ${req.user.phone || "N/A"}`,
-        `Message: ${req.body.message || "No message provided"}`,
-        `Lead ID: ${lead._id}`,
-      ].join("\n"),
+      subject: `📨 ${intentLabel} - ${property.title}`,
+      html: ownerEmailHtml,
     });
 
-    await sendMail({
+    // ── Email to Buyer (Confirmation) ──
+    const buyerEmailHtml = inquiryConfirmationEmail(req.user, property, lead._id);
+
+    await sendEmail({
       to: req.user.email,
-      subject: `Your request was sent - ${property.title}`,
-      text: [
-        `Your ${lead.intentType} request has been sent to the property poster.`,
-        `Property: ${property.title}`,
-        `Owner/Agent: ${property.ownerId.name || "Property poster"}`,
-        `We will notify you on updates.`,
-      ].join("\n"),
+      subject: `✓ Your inquiry was sent - ${property.title}`,
+      html: buyerEmailHtml,
     });
+
+    console.log(`[createLead] Confirmation emails sent for lead ${lead._id}`);
   } catch (err) {
-    console.error("Mail error:", err.message);
+    console.error("[createLead] Email failed:", err.message);
   }
 
   return res.status(201).json({ lead, message: "Lead captured and owner notified" });

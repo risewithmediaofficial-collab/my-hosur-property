@@ -22,7 +22,10 @@ const AdminLoginPage = () => {
       toast.success("Admin login successful");
       navigate("/admin/dashboard");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Admin login failed");
+      toast.error(
+        error.response?.data?.message ||
+          "Unable to reach the admin login service. Check that the project backend is running."
+      );
     } finally {
       setLoading(false);
     }

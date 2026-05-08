@@ -49,7 +49,7 @@ const EditPropertyPage = () => {
           images: p.images || [],
           documents: p.documents || [],
         });
-      } catch (error) {
+      } catch {
         toast.error("Failed to load property details");
         navigate("/dashboard");
       } finally {
@@ -68,7 +68,14 @@ const EditPropertyPage = () => {
   if (!property) return null;
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-12 md:px-8">
+    <main className="w-full space-y-8 px-4 py-8 sm:px-5 md:py-12 lg:px-6">
+      <section className="site-section p-8 md:p-10">
+        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">Listing management</p>
+        <h1 className="mt-2 text-4xl font-extrabold tracking-tight text-slate-900">Edit your property details</h1>
+        <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600">
+          Update pricing, media, location, and listing information from one professional form.
+        </p>
+      </section>
       <PropertyPostingForm 
         heading="Edit Property Details" 
         initialData={property} 

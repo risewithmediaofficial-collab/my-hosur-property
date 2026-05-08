@@ -1,11 +1,15 @@
 import { currency } from "../utils/format";
 
 const PlanCard = ({ plan, onSelect, active }) => (
-  <article className={`rounded-2xl border p-5 ${active ? "border-sage bg-sage/5" : "border-clay bg-white"}`}>
+  <article className={`rounded-[24px] border p-5 shadow-sm ${active ? "border-blue-600 bg-blue-600 text-white" : "border-slate-200 bg-white text-slate-900"}`}>
     <h3 className="text-lg font-bold">{plan.name}</h3>
-    <p className="mt-2 text-2xl font-extrabold text-sage">{currency(plan.price)}</p>
-    <p className="mt-2 text-sm text-ink/70">{plan.listingLimit} listings, {plan.durationDays} days</p>
-    <button onClick={() => onSelect(plan)} className="mt-4 w-full rounded-lg bg-ink py-2 text-sm font-semibold text-stone">
+    <p className={`mt-2 text-2xl font-extrabold ${active ? "text-white" : "text-slate-900"}`}>{currency(plan.price)}</p>
+    <p className={`mt-2 text-sm ${active ? "text-slate-300" : "text-slate-600"}`}>{plan.listingLimit} listings, {plan.durationDays} days</p>
+    <button
+      type="button"
+      onClick={() => onSelect(plan)}
+      className={`mt-4 w-full rounded-2xl py-3 text-sm font-semibold transition ${active ? "bg-white text-blue-700" : "bg-blue-600 text-white hover:bg-blue-700"}`}
+    >
       {active ? "Selected" : "Select Plan"}
     </button>
   </article>

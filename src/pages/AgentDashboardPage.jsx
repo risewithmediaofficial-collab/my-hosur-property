@@ -13,6 +13,8 @@ import {
   verifyLeadPackPayment
 } from "../services/api/customerRequestApi";
 import { loadExternalScript } from "../utils/loadExternalScript";
+import DashboardSidebar from "../components/DashboardSidebar";
+import Loader from "../components/Loader";
 
 const fmt = (d) => new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 
@@ -25,7 +27,7 @@ const AgentDashboardPage = () => {
   const [leads, setLeads] = useState([]);
   const [customerRequests, setCustomerRequests] = useState([]);
   const [customerLeadCredits, setCustomerLeadCredits] = useState(0);
-  const [leadUnlockPrice, setLeadUnlockPrice] = useState(200);
+  const [leadUnlockPrice] = useState(200);
   const [loading, setLoading] = useState(true);
 
   const [tab, setTab] = useState("overview");
@@ -170,121 +172,110 @@ const AgentDashboardPage = () => {
   ];
 
   if (loading) return (
-    <main className="mx-auto max-w-7xl px-4 py-12 md:px-8">
-      <div className="flex h-64 items-center justify-center gap-3 text-ink/60">
-        Loading dashboard...
+    <main className="min-h-screen bg-slate-50 pt-6 md:pl-80">
+      <div className="mx-auto max-w-7xl px-4 py-8 md:px-8">
+        <Loader text="Loading dashboard..." />
       </div>
     </main>
   );
 
   return (
-    <main className="mx-auto max-w-7xl space-y-6 px-4 py-8 md:px-8">
-      <header className="rounded-2xl bg-gradient-to-r from-ink via-ink/90 to-ink/80 p-6 text-white shadow-lg">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-medium opacity-75">Agent / Broker Panel</p>
-            <h1 className="text-2xl font-extrabold">{user?.name}</h1>
-            <p className="mt-1 text-sm opacity-60 capitalize">{user?.role} Dashboard</p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <AgentStatPill label="Listings" value={properties.length} icon="🏠" />
-            <AgentStatPill label="Leads" value={leads.length} icon="👥" />
-            <div className="rounded-xl bg-sage/20 border border-sage/20 px-4 py-2 text-center backdrop-blur">
-                <p className="text-[10px] font-bold uppercase opacity-70">Lead Credits</p>
-                <p className="text-xl font-extrabold text-sage">{customerLeadCredits}</p>
-                <button onClick={onBuyPack} className="mt-1 text-[9px] font-bold underline hover:text-white transition-colors">Buy 5 (Rs.300)</button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <nav className="flex flex-wrap gap-1 rounded-xl border border-clay/60 bg-white p-1 shadow-soft">
-        {tabs.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={`flex-1 min-w-[80px] rounded-lg py-2 text-sm font-semibold transition-all ${tab === t.key ? "bg-ink text-white shadow" : "text-ink/60 hover:text-ink"}`}
-          >
-            {t.icon} {t.label}
-          </button>
-        ))}
-      </nav>
-
+    <DashboardSidebar
+      title={user?.name || "Agent"}
+      subtitle="Agent / Broker Panel"
+      description="Manage your listings, leads, and customer requirements from a cleaner, easier-to-access workspace."
+      stats={[
+        { label: "Total Listings", value: properties.length, icon: "🏠" },
+        { label: "Active Leads", value: leads.length, icon: "👥" },
+        { label: "Lead Credits", value: customerLeadCredits, icon: "🎟️" },
+      ]}
+      navItems={tabs.map((item) => ({
+        key: item.key,
+        label: item.label,
+        icon: item.icon,
+        active: tab === item.key,
+        badge: item.key === "requests" && customerRequests.length ? customerRequests.length : undefined,
+        onClick: setTab,
+      }))}
+    >
       {tab === "overview" && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            { label: "Total Listings", value: properties.length, icon: "🏠", color: "from-blue-500 to-blue-700" },
-            { label: "Active Leads", value: leads.length, icon: "👥", color: "from-emerald-500 to-emerald-700" },
-            { label: "Lead Credits", value: customerLeadCredits, icon: "🎫", color: "from-sage to-[#27ae60]" },
-          ].map(({ label, value, icon, color }) => (
-            <div key={label} className={`rounded-2xl bg-gradient-to-br ${color} p-5 text-white shadow`}>
-              <p className="text-2xl">{icon}</p>
-              <p className="mt-2 text-3xl font-extrabold">{value}</p>
-              <p className="mt-0.5 text-sm opacity-80">{label}</p>
-            </div>
-          ))}
+        <div className="space-y-6">
+          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { label: "Total Listings", value: properties.length, icon: "🏠", color: "from-blue-500 to-blue-700" },
+              { label: "Active Leads", value: leads.length, icon: "👥", color: "from-emerald-500 to-emerald-700" },
+              { label: "Lead Credits", value: customerLeadCredits, icon: "🎟️", color: "from-sage to-[#27ae60]" },
+            ].map(({ label, value, icon, color }) => (
+              <div key={label} className={`dashboard-shell bg-gradient-to-br ${color} p-5 text-white`}>
+                <p className="text-2xl">{icon}</p>
+                <p className="mt-4 text-4xl font-extrabold">{value}</p>
+                <p className="mt-2 text-sm opacity-90">{label}</p>
+              </div>
+            ))}
+          </section>
 
-          {/* New Top-up Card */}
-          <div className="rounded-2xl border-2 border-dashed border-sage/50 bg-sage/5 p-5 flex flex-col justify-between hover:bg-sage/10 transition-colors group">
-             <div>
-                <h3 className="font-bold text-ink flex items-center gap-2">
-                    <span className="text-xl">⚡</span> Get More Credits
-                </h3>
-                <p className="mt-1 text-xs text-ink/60">Unlock blurred leads & customer requirements instantly.</p>
-             </div>
-             <button 
-                onClick={onBuyPack} 
-                className="mt-4 w-full rounded-xl bg-sage py-2.5 text-xs font-extrabold text-white shadow-soft group-hover:scale-[1.02] transition-transform"
-             >
-                Pay Rs.300 for 5 Credits
-             </button>
-          </div>
+          <section className="dashboard-shell p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">Lead Credits & Unlocks</h2>
+                <p className="mt-2 text-sm text-slate-600">Unlock customer inquiries and property leads with a single credit pack.</p>
+              </div>
+              <button onClick={onBuyPack} className="dashboard-primary px-5 py-3 text-sm">
+                Buy 5 Credits @ Rs.300
+              </button>
+            </div>
+          </section>
         </div>
       )}
 
       {tab === "listings" && (
-        <section className="rounded-2xl border border-clay/70 bg-white p-6 shadow-soft">
-          <h2 className="mb-4 text-lg font-bold">Manage Listings</h2>
+        <section className="dashboard-shell p-6">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">Manage Listings</h2>
+              <p className="text-sm text-slate-600">Edit, boost, and review the properties you currently publish.</p>
+            </div>
+            <button onClick={() => navigate("/post-property")} className="dashboard-primary px-4 py-2 text-sm">
+              Post New Listing
+            </button>
+          </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full text-left text-sm">
+            <table className="dashboard-table min-w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-clay text-ink/60">
-                  <th className="py-2 pr-4 font-semibold">Image</th>
-                  <th className="py-2 pr-4 font-semibold">Title</th>
-                  <th className="py-2 pr-4 font-semibold">City</th>
-                  <th className="py-2 pr-4 font-semibold">Status</th>
-                  <th className="py-2 pr-4 font-semibold">Price</th>
-                  <th className="py-2 pr-4 font-semibold text-right">Action</th>
+                <tr>
+                  <th>Image</th>
+                  <th>Title</th>
+                  <th>City</th>
+                  <th>Status</th>
+                  <th>Price</th>
+                  <th className="text-right">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {properties.map((p) => (
-                  <tr key={p._id} className="border-b border-clay/60 align-middle hover:bg-stone/30 transition-colors">
-                    <td className="py-2">
-                       <img 
-                        src={p.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=120&q=80"} 
-                        alt="Property" 
-                        className="h-10 w-10 rounded-md object-cover border border-clay" 
-                       />
+                  <tr key={p._id}>
+                    <td>
+                      <img src={p.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=120&q=80"} alt="Property" className="h-12 w-12 rounded-xl object-cover border border-slate-200" />
                     </td>
-                    <td className="py-2.5 pr-4 font-medium">{p.title}</td>
-                    <td className="py-2.5 pr-4 text-ink/70">{p.location?.city}</td>
-                    <td className="py-2.5 pr-4"><StatusBadge status={p.status} /></td>
-                    <td className="py-2.5 pr-4">Rs.{(p.price || 0).toLocaleString("en-IN")}</td>
-                    <td className="py-2.5 text-right space-x-2">
-                      <button onClick={() => onPromote(p._id)} className="rounded-md bg-sage px-3 py-1 text-xs font-semibold text-white hover:opacity-90 transition-opacity">
-                        ⚡ Boost
+                    <td className="font-medium text-slate-900">{p.title}</td>
+                    <td>{p.location?.city}</td>
+                    <td><StatusBadge status={p.status} /></td>
+                    <td>Rs.{(p.price || 0).toLocaleString("en-IN")}</td>
+                    <td className="space-x-2 text-right">
+                      <button onClick={() => onPromote(p._id)} className="dashboard-primary px-3 py-2 text-xs">
+                        Boost
                       </button>
-                      <button 
-                        onClick={() => navigate(`/edit-property/${p._id}`)} 
-                        className="rounded-md border border-clay bg-white px-3 py-1 text-xs font-semibold text-ink/70 hover:bg-stone transition-all"
-                      >
+                      <button onClick={() => navigate(`/edit-property/${p._id}`)} className="dashboard-secondary px-3 py-2 text-xs">
                         Edit
                       </button>
                     </td>
                   </tr>
                 ))}
-                {properties.length === 0 && <tr><td colSpan={6} className="py-8 text-center text-ink/50">No listings yet</td></tr>}
+                {properties.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center text-slate-500">No listings yet</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -292,75 +283,79 @@ const AgentDashboardPage = () => {
       )}
 
       {tab === "leads" && (
-        <section className="rounded-2xl border border-clay/70 bg-white p-6 shadow-soft">
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-clay pb-4">
-             <div className="space-y-1">
-                <h2 className="text-xl font-bold">Property Inquiries (Inbox)</h2>
-                <p className="text-xs text-ink/50 italic italic">First 5 property leads are free. Beyond that, purchase lead credits to read contact details.</p>
-             </div>
-             <div className="flex items-center gap-3">
-                <div className="text-right">
-                    <p className="text-[10px] font-bold text-ink/50 uppercase">Credits</p>
-                    <p className="text-lg font-extrabold text-sage">{customerLeadCredits}</p>
-                </div>
-                <button onClick={onBuyPack} className="rounded-xl bg-sage px-4 py-2 text-xs font-bold text-white shadow-soft">Buy 5 (Rs.300)</button>
-             </div>
+        <section className="dashboard-shell p-6">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">Property Inquiries</h2>
+              <p className="text-sm text-slate-600">View incoming buyer leads and unlock contact data as needed.</p>
+            </div>
+            <div className="dashboard-subpanel px-4 py-3 text-sm font-semibold text-slate-900">
+              Credits: {customerLeadCredits}
+            </div>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full text-left text-sm">
+            <table className="dashboard-table min-w-full text-left text-sm">
               <thead>
                 <tr className="text-ink/60">
-                  <th className="py-2 pr-4 font-bold">Property</th>
-                  <th className="py-2 pr-4 font-bold">Contact Info</th>
-                  <th className="py-2 pr-4 font-bold">Intent</th>
-                  <th className="py-2 pr-4 font-bold">Status</th>
-                  <th className="py-2 text-right font-bold">Action</th>
+                  <th className="py-3 pr-4 font-semibold">Property</th>
+                  <th className="py-3 pr-4 font-semibold">Contact</th>
+                  <th className="py-3 pr-4 font-semibold">Intent</th>
+                  <th className="py-3 pr-4 font-semibold">Status</th>
+                  <th className="py-3 text-right font-semibold">Action</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-clay/20">
                 {leads.map((l) => (
-                  <tr key={l._id} className="border-b border-clay/60 hover:bg-stone/30 transition-colors align-middle">
+                  <tr key={l._id} className="hover:bg-slate-50 transition-colors align-middle">
                     <td className="py-4 pr-4">
-                        <p className="font-bold text-ink">{l.propertyId?.title || "—"}</p>
-                        <p className="text-[10px] text-ink/50">{fmt(l.createdAt)}</p>
+                      <p className="font-semibold text-ink">{l.propertyId?.title || "—"}</p>
+                      <p className="text-xs text-ink/50">{fmt(l.createdAt)}</p>
                     </td>
                     <td className="py-4 pr-4">
-                      <div className={`transition-all ${!l.isUnlockedByOwner ? 'blur-[4px] select-none pointer-events-none opacity-40' : ''}`}>
-                          <p className="font-bold">{l.contactInfo?.name}</p>
-                          <p className="text-xs text-ink/70">{l.contactInfo?.phone}</p>
-                          <p className="text-xs text-ink/50">{l.contactInfo?.email}</p>
+                      <div className={`${!l.isUnlockedByOwner ? "blur-sm grayscale opacity-40" : ""}`}>
+                        <p className="font-bold text-ink">{l.contactInfo?.name}</p>
+                        <p className="text-xs text-ink/70">{l.contactInfo?.phone}</p>
+                        <p className="text-xs text-ink/70">{l.contactInfo?.email}</p>
                       </div>
                       {!l.isUnlockedByOwner && (
-                         <button onClick={() => onUnlockInboxLead(l._id)} className="mt-1 text-[10px] font-bold text-sage underline hover:text-green-700">Unlock (1 Credit)</button>
+                        <button onClick={() => onUnlockInboxLead(l._id)} className="mt-2 text-[11px] font-semibold text-blue-700 underline hover:text-blue-800">
+                          Unlock Contact
+                        </button>
                       )}
                     </td>
                     <td className="py-4 pr-4">
-                      <span className="px-2 py-0.5 rounded bg-stone text-[10px] font-bold uppercase">{l.intentType}</span>
-                      {l.contactInfo?.message && <p className="mt-1 text-[10px] text-ink/50 italic max-w-[150px] truncate">"{l.contactInfo.message}"</p>}
+                      <p className="rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold uppercase text-ink/70">{l.intentType}</p>
+                      {l.contactInfo?.message && <p className="mt-1 text-xs text-ink/50 italic">"{l.contactInfo.message}"</p>}
                     </td>
                     <td className="py-4 pr-4">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${l.status === 'approved' ? 'bg-green-100 text-green-700' : l.status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
+                      <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase ${l.status === "approved" ? "bg-emerald-100 text-emerald-700" : l.status === "pending" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}>
                         {l.status}
                       </span>
                     </td>
-                    <td className="py-4 text-right">
-                       <div className="flex justify-end gap-1.5 flex-col items-end">
-                            {l.status === "pending" && (
-                                <div className="flex gap-1.5">
-                                    <button onClick={() => onLeadAction(l._id, "approved")} className="rounded-md bg-sage px-3 py-1 text-xs font-bold text-white shadow-sm hover:opacity-90">Approve</button>
-                                    <button onClick={() => onLeadAction(l._id, "rejected")} className="rounded-md bg-ink px-3 py-1 text-xs font-bold text-white shadow-sm hover:opacity-90">Reject</button>
-                                </div>
-                            )}
-                            {!l.isUnlockedByOwner && (
-                                <button onClick={() => onUnlockInboxLead(l._id)} className="rounded-md bg-stone border border-clay px-3 py-1 text-[10px] font-bold text-ink hover:bg-clay/20 transition-all">
-                                    Unlock Rs.300/5 pkg
-                                </button>
-                            )}
-                       </div>
+                    <td className="py-4 text-right space-y-2">
+                      {l.status === "pending" && (
+                        <div className="flex flex-wrap justify-end gap-2">
+                          <button onClick={() => onLeadAction(l._id, "approved")} className="rounded-2xl bg-sage px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-600 transition">
+                            Approve
+                          </button>
+                          <button onClick={() => onLeadAction(l._id, "rejected")} className="rounded-2xl bg-ink px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition">
+                            Reject
+                          </button>
+                        </div>
+                      )}
+                      {!l.isUnlockedByOwner && (
+                        <button onClick={() => onUnlockInboxLead(l._id)} className="rounded-2xl border border-clay/30 bg-slate-50 px-3 py-2 text-[11px] font-semibold text-ink hover:bg-slate-100 transition">
+                          Unlock Lead
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
-                {leads.length === 0 && <tr><td colSpan={5} className="py-12 text-center text-ink/50 border-t border-dashed border-clay">No inquiries received yet.</td></tr>}
+                {leads.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="py-12 text-center text-slate-500">No inquiries received yet.</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -368,83 +363,40 @@ const AgentDashboardPage = () => {
       )}
 
       {tab === "requests" && isBroker && (
-        <section className="rounded-2xl border border-clay/70 bg-white p-6 shadow-soft">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-            <div className="space-y-1">
-                <h2 className="text-xl font-bold">Customer Requirements</h2>
-                <p className="text-xs text-ink/50 italic italic">Marketplace leads: Unlock contact details using credits.</p>
-            </div>
-            <div className="flex items-center gap-3">
-                <div className="text-right">
-                    <p className="text-[10px] font-bold text-ink/50 uppercase">Credits</p>
-                    <p className="text-lg font-extrabold text-sage">{customerLeadCredits}</p>
-                </div>
-                <button onClick={onBuyPack} className="rounded-xl bg-sage px-4 py-2 text-xs font-bold text-white shadow-soft">Buy 5 (Rs.300)</button>
-            </div>
-          </div>
-          <div className="space-y-4">
-            {customerRequests.map((item) => (
-              <div key={item._id} className="group relative rounded-2xl border border-clay/60 bg-white p-5 hover:border-sage/40 hover:shadow-soft transition-all overflow-hidden">
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div className="space-y-2 flex-1 min-w-[240px]">
-                    <div className="flex items-center gap-2">
-                        <span className="rounded-full bg-stone px-2 py-0.5 text-[10px] font-bold text-ink/70">{item.propertyType}</span>
-                        <h3 className="font-bold text-ink">{item.location?.area}, {item.location?.city}</h3>
-                    </div>
-                    <p className="text-sm font-semibold text-sage">Budget: Rs.{(item.budgetMin || 0).toLocaleString()} - Rs.{(item.budgetMax || 0).toLocaleString()}</p>
-                    
-                    <div className={`mt-3 grid grid-cols-2 gap-4 transition-all ${!item.isContactUnlocked ? 'blur-[5px] select-none pointer-events-none grayscale opacity-40' : ''}`}>
-                       <div className="space-y-0.5">
-                           <p className="text-[10px] font-bold text-ink/40 uppercase">Customer Name</p>
-                           <p className="text-sm font-bold">{item.customerName}</p>
-                       </div>
-                       <div className="space-y-0.5">
-                           <p className="text-[10px] font-bold text-ink/40 uppercase">Phone / Email</p>
-                           <p className="text-sm font-bold">{item.contactDetails?.phone || "N/A"}</p>
-                       </div>
-                    </div>
-
-                    {item.additionalRequirements && <p className="mt-3 text-xs text-ink/50 italic leading-relaxed">"{item.additionalRequirements}"</p>}
+        <section className="space-y-4">
+          {customerRequests.map((item) => (
+            <div key={item._id} className="dashboard-shell p-6 transition hover:shadow-lg">
+              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div className="space-y-3">
+                  <div className="flex flex-wrap items-center gap-2 text-sm text-ink/70">
+                    <span className="rounded-full bg-slate-100 px-2 py-1">{item.propertyType}</span>
+                    <span>{item.location?.area}, {item.location?.city}</span>
                   </div>
-                  
-                  <div className="flex flex-col gap-2 min-w-[140px]">
-                    <button onClick={() => onSendMatch(item._id)} className="rounded-xl border border-clay py-2 text-xs font-bold hover:bg-stone shadow-sm">
-                      Send Property Match
+                  <h2 className="text-xl font-bold text-slate-900">Customer Requirement</h2>
+                  <p className="text-sm text-slate-600">Budget: Rs.{(item.budgetMin || 0).toLocaleString()} - Rs.{(item.budgetMax || 0).toLocaleString()}</p>
+                  {item.additionalRequirements && <p className="text-sm italic text-slate-500">{item.additionalRequirements}</p>}
+                </div>
+                <div className="space-y-2 min-w-[180px]">
+                  <button onClick={() => onSendMatch(item._id)} className="dashboard-secondary w-full px-4 py-3 text-sm">
+                    Send Match
+                  </button>
+                  {!item.isContactUnlocked && (
+                    <button onClick={() => onUnlockCustomerRequest(item._id)} className="dashboard-primary w-full px-4 py-3 text-sm">
+                      {customerLeadCredits > 0 ? "Unlock (1 Credit)" : `Unlock Rs.${leadUnlockPrice}`}
                     </button>
-                    {!item.isContactUnlocked && (
-                      <button onClick={() => onUnlockCustomerRequest(item._id)} className="rounded-xl bg-ink py-2 text-xs font-bold text-stone shadow-md hover:bg-slate-800">
-                         {customerLeadCredits > 0 ? `Unlock (1 Credit)` : `Unlock Rs.${leadUnlockPrice}`}
-                      </button>
-                    )}
-                  </div>
+                  )}
                 </div>
-                {/* Visual Lock Overlay for Blurred items */}
-                {!item.isContactUnlocked && (
-                    <div className="absolute right-4 bottom-4 opacity-10">
-                        <svg className="h-12 w-12 text-ink" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L8 5h3v9h2V5h3L12 1zM11 16h2v2h-2v-2zM11 20h2v2h-2v-2z"/></svg> 
-                    </div>
-                )}
               </div>
-            ))}
-            {customerRequests.length === 0 && (
-               <div className="py-20 text-center glass-panel rounded-3xl border border-dashed border-clay">
-                  <p className="text-ink/40 font-medium">No customer requirements found in this area.</p>
-               </div>
-            )}
-          </div>
+            </div>
+          ))}
+          {customerRequests.length === 0 && (
+            <div className="dashboard-empty p-10 text-center">No customer requirements found.</div>
+          )}
         </section>
       )}
-    </main>
+    </DashboardSidebar>
   );
 };
-
-const AgentStatPill = ({ label, value, icon }) => (
-  <div className="rounded-xl bg-white/10 px-4 py-2 text-center backdrop-blur">
-    <p className="text-lg">{icon}</p>
-    <p className="text-xl font-extrabold">{value}</p>
-    <p className="text-[10px] font-medium opacity-70">{label}</p>
-  </div>
-);
 
 const StatusBadge = ({ status }) => {
   const map = { approved: "bg-green-100 text-green-700", pending: "bg-amber-100 text-amber-700", rejected: "bg-red-100 text-red-700" };

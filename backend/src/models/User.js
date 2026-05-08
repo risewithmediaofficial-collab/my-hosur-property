@@ -6,6 +6,8 @@ const userSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     phone: { type: String, trim: true },
+    address: { type: String, trim: true },
+    adminNotes: { type: String, trim: true },
     password: { type: String, required: true, minlength: 6 },
     role: {
       type: String,
@@ -18,6 +20,10 @@ const userSchema = new mongoose.Schema(
       default: "active",
     },
     canPostProperty: { type: Boolean, default: false },
+    freePost: {
+      used: { type: Boolean, default: false },
+      expiresAt: { type: Date, default: null },
+    },
     savedProperties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property" }],
     recentSearches: [
       {

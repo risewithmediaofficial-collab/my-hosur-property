@@ -7,16 +7,30 @@ const ImageGallery = ({ images = [] }) => {
   const [active, setActive] = useState(safeImages[0]);
 
   return (
-    <div className="space-y-3">
-      <div className="w-full aspect-[4/3] sm:h-96 rounded-2xl overflow-hidden shadow-soft">
-        <img src={active} alt="Property" className="h-full w-full object-cover" />
+    <div className="space-y-4">
+      <div className="overflow-hidden rounded-[30px] border border-slate-200 bg-white shadow-sm">
+        <div className="aspect-[4/3] w-full overflow-hidden bg-slate-100">
+          <img src={active} alt="Property" className="h-full w-full object-cover" />
+        </div>
       </div>
-      <div className="flex gap-2 overflow-x-auto pb-2 snap-x hide-scrollbar">
-        {safeImages.slice(0, 8).map((img) => (
-          <button key={img} className="shrink-0 w-20 h-20 overflow-hidden rounded-xl snap-start border-2 border-transparent hover:border-sage focus:border-sage transition" onClick={() => setActive(img)}>
-            <img src={img} alt="Preview" className="h-full w-full object-cover" loading="lazy" />
-          </button>
-        ))}
+
+      <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
+        {safeImages.slice(0, 8).map((img) => {
+          const isActive = active === img;
+
+          return (
+            <button
+              key={img}
+              type="button"
+              onClick={() => setActive(img)}
+              className={`shrink-0 overflow-hidden rounded-2xl border transition ${
+                isActive ? "border-blue-600 shadow-sm" : "border-slate-200 hover:border-blue-300"
+              }`}
+            >
+              <img src={img} alt="Preview" className="h-20 w-24 object-cover" loading="lazy" />
+            </button>
+          );
+        })}
       </div>
     </div>
   );

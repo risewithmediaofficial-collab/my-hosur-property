@@ -1,19 +1,20 @@
 import { useState } from "react";
-import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import { primaryNavLinks } from "../constants/navigation";
 import {
-  BuildingOffice2Icon,
   ArrowRightOnRectangleIcon,
+  Bars3Icon,
+  BuildingOffice2Icon,
+  CurrencyRupeeIcon,
   HomeIcon,
   InformationCircleIcon,
-  CurrencyRupeeIcon,
   KeyIcon,
   PlusCircleIcon,
   Squares2X2Icon,
-  Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { Squares2X2Icon as Squares2X2SolidIcon } from "@heroicons/react/24/solid";
 
 const navIconMap = {
   Home: HomeIcon,
@@ -22,6 +23,7 @@ const navIconMap = {
   Buy: KeyIcon,
   Rent: BuildingOffice2Icon,
   "Post Property": PlusCircleIcon,
+  Properties: BuildingOffice2Icon,
 };
 
 const Navbar = () => {
@@ -29,145 +31,177 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const dashboardPath = user?.role === "admin" ? "/admin/dashboard" : "/dashboard";
+
+  const closeMenu = () => setMobileMenuOpen(false);
 
   const onLogout = () => {
     logout();
-    setMobileMenuOpen(false);
+    closeMenu();
     navigate("/");
   };
 
+  const renderDesktopLink = (item) => {
+    const Icon = navIconMap[item.label] || HomeIcon;
+
+    return (
+      <NavLink
+        key={item.to}
+        to={item.to}
+        className={({ isActive }) =>
+          `group inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+            isActive
+              ? "bg-blue-600 text-white shadow-[0_10px_24px_rgba(37,99,235,0.22)]"
+              : "text-slate-600 hover:bg-blue-50 hover:text-blue-700"
+          }`
+        }
+      >
+        {({ isActive }) => (
+          <>
+            <Icon className={`h-4 w-4 ${isActive ? "text-white" : "text-blue-400 group-hover:text-blue-600"}`} />
+            <span>{item.label}</span>
+          </>
+        )}
+      </NavLink>
+    );
+  };
+
+  const renderMobileLink = (item) => {
+    const Icon = navIconMap[item.label] || HomeIcon;
+    const isActive = location.pathname === item.to;
+
+    return (
+      <NavLink
+        key={item.to}
+        to={item.to}
+        onClick={closeMenu}
+        className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+          isActive ? "bg-blue-600 text-white" : "text-slate-700 hover:bg-blue-50 hover:text-blue-700"
+        }`}
+      >
+        <Icon className={`h-5 w-5 ${isActive ? "text-white" : "text-blue-500"}`} />
+        <span>{item.label}</span>
+      </NavLink>
+    );
+  };
+
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-sm shadow-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-8">
-        {/* Logo */}
-        <NavLink to="/" onClick={() => setMobileMenuOpen(false)} className="inline-flex items-center gap-2 font-bold text-lg text-slate-900 hover:text-blue-600 transition">
-          <div className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-md">
+    <header className="sticky top-0 z-50 border-b border-blue-100/80 bg-white/96 backdrop-blur-xl">
+      <div className="flex w-full items-center justify-between gap-3 px-4 py-3 sm:px-5 lg:px-6">
+        <NavLink to="/" onClick={closeMenu} className="inline-flex min-w-0 items-center gap-3 text-slate-900">
+          <div className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[1.1rem] bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-[0_12px_28px_rgba(37,99,235,0.24)]">
             <BuildingOffice2Icon className="h-5 w-5" />
           </div>
-          MyHosurProperty
+          <div className="min-w-0">
+            <p className="truncate text-lg font-extrabold tracking-tight text-slate-900">MyHosurProperty</p>
+            <p className="truncate text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-500">Real Estate</p>
+          </div>
         </NavLink>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-2 md:flex">
-          {primaryNavLinks.map((item) => {
-            const Icon = navIconMap[item.label] || HomeIcon;
-            return (
+        <nav className="hidden items-center gap-2 rounded-full border border-blue-100 bg-blue-50/70 px-2 py-2 lg:flex">
+          {primaryNavLinks.map(renderDesktopLink)}
+        </nav>
+
+        <div className="hidden items-center gap-3 lg:flex">
+          {isAuthenticated ? (
+            <>
               <NavLink
-                key={item.to}
-                to={item.to}
+                to={dashboardPath}
                 className={({ isActive }) =>
-                  `inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition ${
-                    isActive 
-                      ? "bg-blue-100 text-blue-700" 
-                      : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                  `group inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+                    isActive
+                      ? "bg-blue-600 text-white shadow-[0_10px_24px_rgba(37,99,235,0.22)]"
+                      : "border border-blue-100 bg-white text-slate-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
                   }`
                 }
               >
-                <Icon className="h-4 w-4" />
-                {item.label}
+                {({ isActive }) => {
+                  const DashboardIcon = isActive ? Squares2X2SolidIcon : Squares2X2Icon;
+                  return (
+                    <>
+                      <DashboardIcon className="h-4 w-4" />
+                      <span>{["agent", "broker"].includes(user?.role) ? "Broker Dashboard" : "Dashboard"}</span>
+                    </>
+                  );
+                }}
               </NavLink>
-            );
-          })}
-        </nav>
-
-        {/* Desktop Auth/Dashboard Buttons */}
-        <div className="hidden items-center gap-2 md:flex">
-          {isAuthenticated ? (
-            <>
-              <NavLink 
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white font-medium text-sm hover:bg-blue-700 transition shadow-sm" 
-                to={user?.role === "admin" ? "/admin/dashboard" : "/dashboard"}
-              >
-                <Squares2X2Icon className="h-4 w-4" />
-                {["agent", "broker"].includes(user?.role) ? "Broker" : "Dashboard"}
-              </NavLink>
-              <button 
-                onClick={onLogout} 
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium text-sm hover:bg-slate-50 transition"
+              <button
+                onClick={onLogout}
+                className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
               >
                 <ArrowRightOnRectangleIcon className="h-4 w-4" />
                 Logout
               </button>
             </>
           ) : (
-            <NavLink 
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white font-medium text-sm hover:bg-blue-700 transition shadow-sm" 
+            <NavLink
               to="/auth"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(37,99,235,0.2)] transition hover:from-blue-700 hover:to-blue-800"
             >
               <ArrowRightOnRectangleIcon className="h-4 w-4" />
-              Login / Signup
+              Sign in
             </NavLink>
           )}
         </div>
 
-        {/* Mobile Toggle Button */}
         <button
-          className="md:hidden p-2 text-slate-700 rounded-lg hover:bg-slate-100 transition"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          type="button"
+          className="inline-flex rounded-2xl border border-blue-100 bg-white p-2.5 text-slate-700 transition hover:bg-blue-50 lg:hidden"
+          onClick={() => setMobileMenuOpen((value) => !value)}
         >
           {mobileMenuOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
         </button>
       </div>
 
-      {/* Mobile Menu Dropdown */}
-      {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-white border-t border-slate-200 shadow-lg z-40">
-          <div className="px-4 py-4 flex flex-col gap-3">
-            <nav className="flex flex-col gap-1">
-              {primaryNavLinks.map((item) => {
-                const Icon = navIconMap[item.label] || HomeIcon;
-                const isActive = location.pathname === item.to;
-                return (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition ${
-                      isActive 
-                        ? "bg-blue-100 text-blue-700" 
-                        : "text-slate-700 hover:bg-slate-100"
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" />
-                    {item.label}
-                  </NavLink>
-                );
-              })}
-            </nav>
-            
-            <div className="border-t border-slate-200 pt-3 flex flex-col gap-2">
+      {mobileMenuOpen ? (
+        <div className="border-t border-blue-100 bg-white lg:hidden">
+          <div className="flex flex-col gap-3 px-4 py-4 sm:px-5">
+            <nav className="flex flex-col gap-2">{primaryNavLinks.map(renderMobileLink)}</nav>
+            <div className="border-t border-blue-100 pt-3">
               {isAuthenticated ? (
-                <>
-                  <NavLink 
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-blue-600 text-white font-medium text-sm hover:bg-blue-700 transition" 
-                    to={user?.role === "admin" ? "/admin/dashboard" : "/dashboard"}
+                <div className="flex flex-col gap-2">
+                  <NavLink
+                    to={dashboardPath}
+                    onClick={closeMenu}
+                    className={({ isActive }) =>
+                      `flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                        isActive ? "bg-blue-600 text-white" : "border border-blue-100 bg-white text-slate-700 hover:bg-blue-50 hover:text-blue-700"
+                      }`
+                    }
                   >
-                    <Squares2X2Icon className="h-5 w-5" />
-                    {["agent", "broker"].includes(user?.role) ? "Broker Dashboard" : "My Dashboard"}
+                    {({ isActive }) => {
+                      const DashboardIcon = isActive ? Squares2X2SolidIcon : Squares2X2Icon;
+                      return (
+                        <>
+                          <DashboardIcon className="h-5 w-5" />
+                          <span>{["agent", "broker"].includes(user?.role) ? "Broker Dashboard" : "Dashboard"}</span>
+                        </>
+                      );
+                    }}
                   </NavLink>
-                  <button 
-                    onClick={onLogout} 
-                    className="flex justify-center items-center gap-2 px-4 py-3 rounded-lg border border-slate-300 text-slate-700 font-medium text-sm hover:bg-slate-50 transition"
+                  <button
+                    type="button"
+                    onClick={onLogout}
+                    className="flex items-center justify-center gap-2 rounded-2xl border border-blue-100 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-blue-50"
                   >
                     <ArrowRightOnRectangleIcon className="h-5 w-5" />
                     Logout
                   </button>
-                </>
+                </div>
               ) : (
-                <NavLink 
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex justify-center items-center gap-2 px-4 py-3 rounded-lg bg-blue-600 text-white font-medium text-sm hover:bg-blue-700 transition" 
+                <NavLink
                   to="/auth"
+                  onClick={closeMenu}
+                  className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3 text-sm font-semibold text-white"
                 >
                   <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                  Login / Signup
+                  Sign in / Create account
                 </NavLink>
               )}
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </header>
   );
 };

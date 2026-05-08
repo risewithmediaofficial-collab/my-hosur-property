@@ -1,63 +1,81 @@
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { UserIcon } from "@heroicons/react/24/outline";
+import { ShieldCheckIcon, UserIcon } from "@heroicons/react/24/outline";
 
 const ContactModal = ({ open, onClose, onSubmit, value, setValue, contact, intentType, user }) => (
   <Dialog open={open} onClose={onClose} className="relative z-50">
-    <div className="fixed inset-0 bg-black/40" aria-hidden="true" />
+    <div className="fixed inset-0 bg-slate-950/45 backdrop-blur-sm" aria-hidden="true" />
     <div className="fixed inset-0 flex items-center justify-center p-4">
-      <DialogPanel className="glass-panel w-full max-w-md rounded-2xl border border-white/70 bg-white/60 p-6 shadow-soft animate-fade-in">
-        <DialogTitle className="text-xl font-bold text-ink">
-          {intentType === "brochure" ? "Request Property Brochure" : "Contact Request"}
-        </DialogTitle>
-        
-        {user && (
-          <div className="mt-4 p-4 bg-sage/5 rounded-xl border border-sage/10 space-y-2">
-             <p className="text-[10px] font-bold text-sage uppercase tracking-wider">You are sharing your details</p>
-             <div className="flex items-center justify-between text-sm">
-                <span className="text-ink/60 font-semibold italic">Name:</span>
-                <span className="font-bold text-ink">{user.name}</span>
-             </div>
-             <div className="flex items-center justify-between text-sm">
-                <span className="text-ink/60 font-semibold italic">Mobile:</span>
-                <span className="font-bold text-ink">{user.phone}</span>
-             </div>
-             <p className="text-[9px] text-ink/40 italic">A contact request with these details will be sent to the owner for approval.</p>
+      <DialogPanel className="w-full max-w-lg rounded-[28px] border border-slate-200 bg-white p-6 shadow-2xl sm:p-7">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">
+              {intentType === "brochure" ? "Brochure request" : "Contact request"}
+            </p>
+            <DialogTitle className="mt-2 text-2xl font-bold text-slate-900">
+              {intentType === "brochure" ? "Request property brochure" : "Request owner contact"}
+            </DialogTitle>
           </div>
-        )}
-
-        {intentType !== "brochure" && contact && (
-          <div className="mt-4 p-4 bg-ink/5 rounded-xl border border-ink/5 flex items-center gap-4">
-             <div className="p-3 bg-white rounded-full shadow-sm">
-                <UserIcon className="h-6 w-6 text-sage" />
-             </div>
-             <div>
-                <p className="text-sm font-bold text-ink">Requesting from: {contact.name || "Poster"}</p>
-                <p className="text-xs text-ink/60">A contact request will be sent for approval.</p>
-             </div>
+          <div className="rounded-full bg-slate-100 p-2 text-slate-500">
+            <ShieldCheckIcon className="h-5 w-5" />
           </div>
-        )}
+        </div>
 
-        {intentType === "brochure" ? (
-          <p className="mt-2 text-sm text-ink/70">Please provide your details below to receive the property brochure and layout plans.</p>
-        ) : (
-          <p className="mt-2 text-xs text-ink/60 italic italic">The owner's mobile number will be revealed on the property page once they approve your request.</p>
-        )}
+        <p className="mt-3 text-sm leading-6 text-slate-600">
+          {intentType === "brochure"
+            ? "We will send your request so the brochure and project information can be shared with you."
+            : "Your contact request will be sent to the property owner for approval before details are revealed."}
+        </p>
+
+        {user ? (
+          <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-4">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">Your shared details</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div>
+                <p className="text-xs text-slate-500">Name</p>
+                <p className="text-sm font-semibold text-slate-900">{user.name}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Mobile</p>
+                <p className="text-sm font-semibold text-slate-900">{user.phone}</p>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {intentType !== "brochure" && contact ? (
+          <div className="mt-4 flex items-center gap-4 rounded-3xl border border-slate-200 bg-white p-4">
+            <div className="rounded-full bg-slate-100 p-3 text-slate-600">
+              <UserIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-900">{contact.name || "Poster"}</p>
+              <p className="text-xs text-slate-500">The owner will review your request before contact is shared.</p>
+            </div>
+          </div>
+        ) : null}
 
         <div className="mt-5">
-           <label className="block text-xs font-bold text-ink/70 uppercase mb-2">Send a message (Optional)</label>
-           <textarea
-            className="soft-input w-full rounded-lg p-3 text-sm border border-clay/40 bg-white/50 focus:bg-white transition-all outline-none"
-            rows="3"
-            placeholder={intentType === "brochure" ? "I'd like to receive the brochure for this property." : "Hi, I am interested in this property. Please share your contact details."}
+          <label className="mb-2 block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+            Message
+          </label>
+          <textarea
+            className="site-input min-h-[120px] resize-none"
+            placeholder={
+              intentType === "brochure"
+                ? "I would like to receive the brochure for this property."
+                : "Hi, I am interested in this property. Please share the contact details."
+            }
             value={value}
             onChange={(e) => setValue(e.target.value)}
           />
         </div>
 
-        <div className="mt-6 flex justify-end gap-3">
-          <button className="px-5 py-2 text-sm font-bold text-ink/70 hover:bg-stone rounded-lg transition-all" onClick={onClose}>Cancel</button>
-          <button className="rounded-lg bg-ink px-6 py-2.5 text-sm font-bold text-stone shadow-md hover:bg-[#2c3e50] transition-all" onClick={onSubmit}>
-            {intentType === "brochure" ? "Get Brochure" : "Send Contact Request"}
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <button type="button" className="site-button-secondary px-5 py-3 text-sm" onClick={onClose}>
+            Cancel
+          </button>
+          <button type="button" className="site-button-primary px-5 py-3 text-sm" onClick={onSubmit}>
+            {intentType === "brochure" ? "Send brochure request" : "Send contact request"}
           </button>
         </div>
       </DialogPanel>

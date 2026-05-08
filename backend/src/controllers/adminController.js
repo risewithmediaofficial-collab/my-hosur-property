@@ -7,6 +7,9 @@ const LeadUnlock = require("../models/LeadUnlock");
 const Notification = require("../models/Notification");
 const SystemSetting = require("../models/SystemSetting");
 const buildPagination = require("../utils/paginate");
+const sendEmail = require("../utils/sendEmail");
+const { sendBulkEmail } = require("../utils/sendEmail");
+const generateHtmlEmail = require("../utils/emailFormatter");
 
 const getDateDaysAgo = (days = 0) => {
   const d = new Date();
@@ -226,7 +229,7 @@ const listUsers = async (req, res) => {
   const [total, items] = await Promise.all([
     User.countDocuments(query),
     User.find(query)
-      .select("name email role status phone canPostProperty contactAccess leadCredits activePlan createdAt")
+      .select("name email role status phone address adminNotes canPostProperty contactAccess leadCredits activePlan createdAt")
       .populate("activePlan.planId", "name category")
       .sort("-createdAt")
       .skip(skip)
@@ -316,6 +319,17 @@ const toggleUserStatus = async (req, res) => {
   user.status = status;
   await user.save();
   return res.json({ message: `User status updated to ${status}`, user });
+};
+
+const updateUserNotes = async (req, res) => {
+  const { id } = req.params;
+  const { notes } = req.body;
+  const user = await User.findById(id);
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  user.adminNotes = notes;
+  await user.save();
+  return res.json({ message: "User notes updated", user });
 };
 
 const listAllLeads = async (req, res) => {
@@ -509,6 +523,90 @@ const getRecentActivity = async (req, res) => {
   });
 };
 
+const sendAdminEmail = async (req, res) => {
+  try {
+    const { userIds, subject, message, isBroadcast } = req.body;
+    
+    if (!subject || !message) {
+      return res.status(400).json({ message: "Subject and message are required" });
+    }
+
+    // Get recipient email addresses
+    let emails = [];
+    let recipientName = "User";
+
+    if (isBroadcast) {
+      const users = await User.find({ status: "active" }).select("email name");
+      emails = users.map(u => u.email).filter(Boolean);
+      recipientName = "Valued Member";
+    } else if (userIds && userIds.length > 0) {
+      const users = await User.find({ _id: { $in: userIds } }).select("email name");
+      emails = users.map(u => u.email).filter(Boolean);
+      if (users.length > 0) {
+        recipientName = users[0].name || "User";
+      }
+    }
+
+    if (emails.length === 0) {
+      return res.status(400).json({ message: "No valid email addresses found." });
+    }
+
+    // Generate email HTML content
+    const htmlContent = generateHtmlEmail({
+      name: recipientName,
+      title: subject,
+      message: message,
+      buttonText: "Visit Dashboard",
+      buttonUrl: process.env.CLIENT_URL || "http://localhost:5173",
+      type: "general",
+    });
+
+    // Send emails via EmailJS
+    if (emails.length === 1) {
+      // Single email
+      const result = await sendEmail({
+        to: emails[0],
+        subject: subject,
+        html: htmlContent,
+        text: message, // Fallback plain text
+      });
+      
+      if (!result) {
+        return res.status(500).json({ 
+          message: "Failed to send email. Check server logs for EmailJS errors.",
+          details: "Email service returned an error. Verify EMAILJS credentials."
+        });
+      }
+    } else {
+      // Bulk emails
+      const results = await sendBulkEmail({
+        to: emails,
+        subject: subject,
+        html: htmlContent,
+        text: message,
+      });
+
+      const successCount = results.filter(r => r).length;
+      if (successCount === 0) {
+        return res.status(500).json({ 
+          message: "Failed to send emails. Check server logs for details.",
+          details: "All email sends failed. Verify EMAILJS configuration."
+        });
+      }
+    }
+
+    return res.json({ 
+      message: `Email sent successfully to ${emails.length} user(s).` 
+    });
+  } catch (error) {
+    console.error("[sendAdminEmail] Error:", error.message);
+    return res.status(500).json({ 
+      message: "Error sending email", 
+      error: error.message 
+    });
+  }
+};
+
 module.exports = {
   getMetrics,
   getDashboardOverview,
@@ -518,6 +616,7 @@ module.exports = {
   listUsers,
   updatePostingAccess,
   toggleUserStatus,
+  updateUserNotes,
   listAllLeads,
   assignLeadToBroker,
   updateLeadAssignmentStatus,
@@ -527,4 +626,5 @@ module.exports = {
   getLeadPricing,
   updateLeadPricing,
   getRecentActivity,
+  sendAdminEmail,
 };
