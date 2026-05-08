@@ -361,7 +361,7 @@ const HomePage = () => {
 
                 <div
                   ref={setFloatingCardRef}
-                  className="absolute -right-4 bottom-10 max-w-[190px] rounded-[1.4rem] border border-blue-100 bg-blue-600 p-4 text-white shadow-2xl"
+                  className="absolute right-4 top-6 max-w-[190px] rounded-[1.4rem] border border-blue-200 bg-blue-600 p-4 text-white shadow-2xl sm:right-6 sm:top-6"
                 >
                   <p className="flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-blue-100">
                     <StarIcon className="h-4 w-4" />
