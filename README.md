@@ -175,6 +175,16 @@ VITE_API_PROXY_TARGET=http://localhost:5001
 ### 2) Backend env
 Create `backend/.env` from `backend/.env.example` and set real values.
 
+Recommended backend vars:
+
+```env
+HOST=0.0.0.0
+CLIENT_URL=https://my-hosur-property.onrender.com
+CORS_ORIGINS=https://my-hosur-property.onrender.com,http://localhost:5173,http://localhost:5174
+MONGO_URI=your_mongodb_connection_string
+MONGO_DB_NAME=myhosurproperty
+```
+
 ### 3) Install
 ```bash
 npm install
@@ -201,3 +211,27 @@ npm run dev:full
 - Add rate limiting, CSRF strategy, audit logs.
 - Move image uploads to object storage (S3/Cloudinary).
 - Add test suites (unit + integration + e2e).
+
+## Render Deployment
+
+Backend service:
+
+- Root Directory: `backend`
+- Build Command: `npm install`
+- Start Command: `npm start`
+- Required env vars:
+  - `NODE_ENV=production`
+  - `HOST=0.0.0.0`
+  - `PORT=10000` (or leave Render default)
+  - `CLIENT_URL=https://my-hosur-property.onrender.com`
+  - `CORS_ORIGINS=https://my-hosur-property.onrender.com,http://localhost:5173,http://localhost:5174`
+  - `MONGO_URI=...`
+  - `MONGO_DB_NAME=myhosurproperty`
+  - `JWT_SECRET=...`
+
+Frontend service:
+
+- Build Command: `npm install && npm run build`
+- Publish Directory: `dist`
+- Required env var:
+  - `VITE_API_BASE_URL=https://your-backend-service.onrender.com/api`
