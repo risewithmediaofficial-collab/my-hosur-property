@@ -37,18 +37,7 @@ const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...envOrigins])];
 app.use(helmet());
 app.use(
   cors({
-    origin(origin, callback) {
-      // Allow non-browser requests such as health checks and server-to-server calls.
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      return callback(new Error(`CORS blocked for origin: ${origin}`));
-    },
+    origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],

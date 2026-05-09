@@ -3,15 +3,13 @@ import apiClient, { withAuth } from "./client";
 const getImageUrl = (path) => {
   if (!path) return "";
   if (path.startsWith("http")) return path;
-  const apiUrl = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, "");
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim().replace(/\/+$/, "") || "/api";
-  const baseUrl = apiUrl || apiBaseUrl.replace(/\/api$/, "");
+  const baseUrl = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, "");
   return `${baseUrl}${path}`;
 };
 
-export const fetchFeaturedProperties = async () => (await apiClient.get("/properties/featured")).data;
+export const fetchFeaturedProperties = async () => (await apiClient.get("/api/properties/featured")).data;
 export const fetchProperties = async (params, token) =>
-  (await apiClient.get("/properties", { params, ...(token ? withAuth(token) : {}) })).data;
+  (await apiClient.get("/api/properties", { params, ...(token ? withAuth(token) : {}) })).data;
 
 export const fetchHomeProperties = async () => {
   const featured = await fetchFeaturedProperties();
@@ -21,7 +19,7 @@ export const fetchHomeProperties = async () => {
 export const fetchPropertyById = async (id, token) => {
   try {
     const config = token ? withAuth(token) : {};
-    const response = await apiClient.get(`/properties/${id}`, config);
+    const response = await apiClient.get(`/api/properties/${id}`, config);
     console.log("Fetched property response:", response.data);
     return response.data;
   } catch (error) {
@@ -29,15 +27,15 @@ export const fetchPropertyById = async (id, token) => {
     throw error;
   }
 };
-export const fetchMyProperties = async (token) => (await apiClient.get("/properties/mine", withAuth(token))).data;
-export const createProperty = async (token, payload) => (await apiClient.post("/properties", payload, withAuth(token))).data;
-export const updateProperty = async (token, id, payload) => (await apiClient.put(`/properties/${id}`, payload, withAuth(token))).data;
-export const deleteProperty = async (token, id) => (await apiClient.delete(`/properties/${id}`, withAuth(token))).data;
-export const promoteProperty = async (token, id) => (await apiClient.post(`/properties/${id}/promote`, {}, withAuth(token))).data;
+export const fetchMyProperties = async (token) => (await apiClient.get("/api/properties/mine", withAuth(token))).data;
+export const createProperty = async (token, payload) => (await apiClient.post("/api/properties", payload, withAuth(token))).data;
+export const updateProperty = async (token, id, payload) => (await apiClient.put(`/api/properties/${id}`, payload, withAuth(token))).data;
+export const deleteProperty = async (token, id) => (await apiClient.delete(`/api/properties/${id}`, withAuth(token))).data;
+export const promoteProperty = async (token, id) => (await apiClient.post(`/api/properties/${id}/promote`, {}, withAuth(token))).data;
 export const uploadPropertyFiles = async (token, files) => {
   const formData = new FormData();
   files.forEach((file) => formData.append("files", file));
-  const response = await apiClient.post("/properties/upload", formData, {
+  const response = await apiClient.post("/api/properties/upload", formData, {
     ...withAuth(token),
     headers: {
       ...withAuth(token).headers,
