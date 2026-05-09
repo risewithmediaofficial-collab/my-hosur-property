@@ -3,8 +3,9 @@ import apiClient, { withAuth } from "./client";
 const getImageUrl = (path) => {
   if (!path) return "";
   if (path.startsWith("http")) return path;
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "/api";
-  const baseUrl = apiBaseUrl.replace("/api", "");
+  const apiUrl = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, "");
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim().replace(/\/+$/, "") || "/api";
+  const baseUrl = apiUrl || apiBaseUrl.replace(/\/api$/, "");
   return `${baseUrl}${path}`;
 };
 
