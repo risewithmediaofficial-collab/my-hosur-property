@@ -6,7 +6,7 @@ const FilterSidebar = ({ filters, setFilters, clearFilters }) => {
   return (
     <div className="space-y-5">
       <div>
-        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">Refine search</p>
+        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#8b6b3f]">Refine search</p>
         <h3 className="mt-2 text-lg font-bold text-slate-900">Property filters</h3>
       </div>
 
@@ -82,12 +82,12 @@ const FilterSidebar = ({ filters, setFilters, clearFilters }) => {
           </select>
         </div>
 
-        <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700">
+        <label className="flex items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm font-medium text-slate-700">
           <input
             type="checkbox"
             checked={filters.verified === "true"}
             onChange={(e) => update("verified", e.target.checked ? "true" : "")}
-            className="h-4 w-4 rounded border-slate-300"
+            className="h-4 w-4 rounded border-slate-300 accent-slate-900"
           />
           Verified listings only
         </label>

@@ -1,12 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ArrowTopRightOnSquareIcon,
   CheckBadgeIcon,
   DocumentTextIcon,
   MapPinIcon,
   PhoneIcon,
+  SparklesIcon,
 } from "@heroicons/react/24/outline";
 import ImageGallery from "../components/ImageGallery";
 import PropertyCard from "../components/PropertyCard";
@@ -15,6 +19,21 @@ import useAuth from "../hooks/useAuth";
 import { checkMyLeadStatus, createLead } from "../services/api/leadApi";
 import { fetchPropertyById } from "../services/api/propertyApi";
 import { currency, formatArea } from "../utils/format";
+
+gsap.registerPlugin(ScrollTrigger);
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 26 },
+  show: (delay = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.72, ease: [0.22, 1, 0.36, 1], delay },
+  }),
+};
+
+const MotionDiv = motion.div;
+const MotionArticle = motion.article;
+const MotionSection = motion.section;
 
 const PropertyDetailPage = () => {
   const { id } = useParams();
@@ -26,6 +45,14 @@ const PropertyDetailPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [inquiryText, setInquiryText] = useState("");
   const [intentType, setIntentType] = useState("contact");
+  const heroRef = useRef(null);
+  const revealRefs = useRef([]);
+
+  const setRevealRef = (node) => {
+    if (node && !revealRefs.current.includes(node)) {
+      revealRefs.current.push(node);
+    }
+  };
 
   const handleSubmitInquiry = async () => {
     if (!token) {
@@ -76,6 +103,46 @@ const PropertyDetailPage = () => {
     }
   }, [id, token]);
 
+  useEffect(() => {
+    if (loading || error || !data.property) return undefined;
+
+    const ctx = gsap.context(() => {
+      if (heroRef.current) {
+        gsap.fromTo(
+          heroRef.current.querySelectorAll("[data-property-hero]"),
+          { opacity: 0, y: 28 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.88,
+            ease: "power3.out",
+            stagger: 0.1,
+          }
+        );
+      }
+
+      revealRefs.current.forEach((node, index) => {
+        gsap.fromTo(
+          node,
+          { opacity: 0, y: 34 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            delay: index * 0.04,
+            scrollTrigger: {
+              trigger: node,
+              start: "top 84%",
+            },
+          }
+        );
+      });
+    });
+
+    return () => ctx.revert();
+  }, [data.property, error, loading]);
+
   if (loading) {
     return (
       <main className="w-full px-4 py-10 sm:px-5 lg:px-6">
@@ -120,109 +187,135 @@ const PropertyDetailPage = () => {
   const isApproved = myLead?.status === "approved" || String(p.ownerId?._id || p.ownerId) === String(user?._id);
   const isPending = myLead?.status === "pending";
   const localityEntries = Object.entries(data.localityInsights || {}).filter(([key]) => key !== "notes");
+  const statusPills = [
+    p.verification?.isVerified ? "Verified listing" : "",
+    p.verification?.reraId ? `RERA ${p.verification.reraId}` : "",
+    p.possessionStatus || "",
+  ].filter(Boolean);
 
   return (
-    <main className="w-full space-y-8 px-4 py-8 sm:px-5 lg:px-6">
-      <section className="grid gap-8 lg:grid-cols-[1.28fr_0.72fr]">
-        <ImageGallery images={p.images} />
-
-        <aside className="site-section p-6 md:p-7">
-          <div className="flex flex-wrap gap-2">
-            {p.verification?.isVerified ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-                <CheckBadgeIcon className="h-4 w-4 text-blue-600" />
-                Verified listing
-              </span>
-            ) : null}
-            {p.verification?.reraId ? (
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                RERA: {p.verification.reraId}
-              </span>
-            ) : null}
-            {p.possessionStatus ? (
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                {p.possessionStatus}
-              </span>
-            ) : null}
+    <main className="w-full space-y-6 px-4 py-6 sm:px-5 lg:px-6">
+      <section
+        ref={heroRef}
+        className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.92),rgba(248,243,236,0.88))] p-5 shadow-[0_24px_60px_rgba(15,23,42,0.09)] md:p-6 lg:p-8"
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(245,200,128,0.16),transparent_22%),radial-gradient(circle_at_86%_16%,rgba(59,130,246,0.11),transparent_20%)]" />
+        <div className="relative grid gap-8 lg:grid-cols-[1.22fr_0.78fr]">
+          <div data-property-hero className="min-w-0">
+            <div className="mb-4 flex flex-wrap gap-2">
+              {statusPills.map((pill, index) => (
+                <span
+                  key={`${pill}-${index}`}
+                  className="inline-flex items-center gap-2 rounded-full border border-[#eadbc4] bg-[#fff8ef] px-3 py-1.5 text-xs font-semibold text-[#8b6b3f]"
+                >
+                  <CheckBadgeIcon className="h-4 w-4 text-[#b98a53]" />
+                  {pill}
+                </span>
+              ))}
+            </div>
+            <ImageGallery images={p.images} />
           </div>
 
-          <h1 className="mt-5 text-3xl font-bold tracking-tight text-slate-900">{p.title}</h1>
-          <p className="mt-3 inline-flex items-center gap-2 text-sm text-slate-600">
-            <MapPinIcon className="h-4 w-4 text-slate-400" />
-            {p.location?.area}, {p.location?.city}
-          </p>
-          <p className="mt-2 text-sm font-medium text-slate-500">
-            Listed by {p.ownerId?.name || "Owner"} ({p.ownerId?.role || p.listingSource || "owner"})
-          </p>
+          <aside data-property-hero className="site-section h-fit p-6 md:p-7">
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#8b6b3f]">
+              <SparklesIcon className="h-4 w-4" />
+              Property overview
+            </div>
 
-          <div className="mt-6 rounded-[26px] border border-slate-200 bg-slate-50 p-5">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Price</p>
-            <p className="mt-2 text-4xl font-extrabold tracking-tight text-slate-900">{currency(p.price)}</p>
-          </div>
+            <h1 className="mt-4 font-['Fraunces'] text-4xl leading-[1.08] tracking-[-0.04em] text-slate-900">{p.title}</h1>
+            <p className="mt-4 inline-flex items-center gap-2 text-sm text-slate-600">
+              <MapPinIcon className="h-4 w-4 text-slate-400" />
+              {p.location?.area}, {p.location?.city}
+            </p>
+            <p className="mt-2 text-sm font-medium text-slate-500">
+              Listed by {p.ownerId?.name || "Owner"} ({p.ownerId?.role || p.listingSource || "owner"})
+            </p>
 
-          <div className="mt-6 space-y-3">
-            {isApproved ? (
-              <div className="rounded-[24px] border border-slate-200 bg-white p-5">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Approved contact details</p>
-                <p className="mt-3 text-lg font-bold text-slate-900">{modalContact.name}</p>
-                <p className="mt-1 text-xl font-bold text-slate-900">{modalContact.phone}</p>
-                <p className="mt-1 text-sm text-slate-500">{modalContact.email}</p>
+            <div className="mt-6 rounded-[1.6rem] border border-slate-200/70 bg-white/78 p-5">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Price</p>
+              <p className="mt-2 text-4xl font-semibold tracking-tight text-slate-900">{currency(p.price)}</p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-[1.15rem] border border-white/80 bg-[#fff8ef] px-4 py-3">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#8b6b3f]">Property type</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-900">{p.propertyType || "Residential"}</p>
+                </div>
+                <div className="rounded-[1.15rem] border border-white/80 bg-white px-4 py-3">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Listing type</p>
+                  <p className="mt-2 text-sm font-semibold capitalize text-slate-900">{p.listingType || "sale"}</p>
+                </div>
               </div>
-            ) : isPending ? (
-              <button type="button" disabled className="w-full rounded-2xl border border-slate-200 bg-slate-100 py-3 text-sm font-semibold text-slate-500">
-                Contact request pending approval
-              </button>
-            ) : (
+            </div>
+
+            <div className="mt-6 space-y-3">
+              {isApproved ? (
+                <div className="rounded-[1.6rem] border border-slate-200/70 bg-white/82 p-5">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Approved contact details</p>
+                  <p className="mt-3 text-lg font-semibold text-slate-900">{modalContact.name}</p>
+                  <p className="mt-1 text-xl font-semibold text-slate-900">{modalContact.phone}</p>
+                  <p className="mt-1 text-sm text-slate-500">{modalContact.email}</p>
+                </div>
+              ) : isPending ? (
+                <button type="button" disabled className="w-full rounded-2xl border border-slate-200 bg-slate-100 py-3 text-sm font-semibold text-slate-500">
+                  Contact request pending approval
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIntentType("contact");
+                    setModalOpen(true);
+                  }}
+                  className="site-button-primary flex w-full items-center justify-center gap-2 px-5 py-3.5 text-sm"
+                >
+                  <PhoneIcon className="h-4 w-4" />
+                  Request mobile number / call
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={() => {
-                  setIntentType("contact");
+                  setIntentType("brochure");
                   setModalOpen(true);
                 }}
-                className="site-button-primary flex w-full items-center justify-center gap-2 px-5 py-3.5 text-sm"
+                className="site-button-secondary flex w-full items-center justify-center gap-2 px-5 py-3.5 text-sm"
               >
-                <PhoneIcon className="h-4 w-4" />
-                Request mobile number / call
+                <DocumentTextIcon className="h-4 w-4" />
+                Request brochure
               </button>
-            )}
 
-            <button
-              type="button"
-              onClick={() => {
-                setIntentType("brochure");
-                setModalOpen(true);
-              }}
-              className="site-button-secondary flex w-full items-center justify-center gap-2 px-5 py-3.5 text-sm"
-            >
-              <DocumentTextIcon className="h-4 w-4" />
-              Request brochure
-            </button>
-
-            {p.virtualTourUrl ? (
-              <a
-                href={p.virtualTourUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-blue-700 transition hover:text-blue-800"
-              >
-                <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-                Open virtual tour
-              </a>
-            ) : null}
-          </div>
-        </aside>
+              {p.virtualTourUrl ? (
+                <a
+                  href={p.virtualTourUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900 transition hover:text-[#8b6b3f]"
+                >
+                  <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+                  Open virtual tour
+                </a>
+              ) : null}
+            </div>
+          </aside>
+        </div>
       </section>
 
-      <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-        <article className="site-section p-6 md:p-8">
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">Overview</p>
-          <h2 className="mt-2 text-2xl font-bold text-slate-900">About this property</h2>
+      <section ref={setRevealRef} className="grid gap-6 lg:grid-cols-[1.02fr_0.98fr]">
+        <MotionArticle
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.15 }}
+          variants={fadeUp}
+          className="site-section p-6 md:p-8"
+        >
+          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#8b6b3f]">Overview</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">About this property</h2>
           <p className="mt-4 text-sm leading-8 text-slate-600">{p.description}</p>
 
           <h3 className="mt-8 text-sm font-bold uppercase tracking-[0.2em] text-slate-500">Key facts</h3>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {keyFacts.map((fact) => (
-              <div key={fact.label} className="rounded-[22px] border border-slate-200 bg-white px-4 py-4">
+              <div key={fact.label} className="rounded-[1.45rem] border border-slate-200/70 bg-white/80 px-4 py-4">
                 <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">{fact.label}</p>
                 <p className="mt-2 text-sm font-semibold text-slate-900">{fact.value}</p>
               </div>
@@ -234,55 +327,78 @@ const PropertyDetailPage = () => {
               <h3 className="mt-8 text-sm font-bold uppercase tracking-[0.2em] text-slate-500">Nearby facilities</h3>
               <div className="mt-4 flex flex-wrap gap-2">
                 {p.nearbyFacilities.map((facility) => (
-                  <span key={facility} className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700">
+                  <span key={facility} className="rounded-full border border-[#eadbc4] bg-[#fff8ef] px-3 py-1.5 text-xs font-semibold text-[#8b6b3f]">
                     {facility}
                   </span>
                 ))}
               </div>
             </>
           ) : null}
-        </article>
+        </MotionArticle>
 
-        <article className="site-section p-4 md:p-5">
-          <h2 className="px-2 pt-2 text-2xl font-bold text-slate-900">Map view</h2>
+        <MotionArticle
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.15 }}
+          variants={fadeUp}
+          className="site-section p-4 md:p-5"
+        >
+          <h2 className="px-2 pt-2 text-3xl font-semibold tracking-tight text-slate-900">Map view</h2>
+          <p className="px-2 pt-2 text-sm text-slate-500">See how the property sits within the surrounding Hosur pocket.</p>
           <iframe
             title="Google map"
-            className="mt-4 h-80 w-full rounded-[24px] border-0"
+            className="mt-4 h-[26rem] w-full rounded-[1.7rem] border-0"
             loading="lazy"
             src={`https://maps.google.com/maps?q=${mapQuery}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
           />
-        </article>
+        </MotionArticle>
       </section>
 
-      <section className="site-section p-6 md:p-8">
-        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">Locality insights</p>
-        <h2 className="mt-2 text-2xl font-bold text-slate-900">Signals around the area</h2>
+      <MotionSection
+        ref={setRevealRef}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.15 }}
+        variants={fadeUp}
+        className="site-section p-6 md:p-8"
+      >
+        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#8b6b3f]">Locality insights</p>
+        <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">Signals around the area</h2>
 
         {localityEntries.length ? (
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {localityEntries.map(([key, value]) => (
-              <div key={key} className="rounded-[22px] border border-slate-200 bg-white p-4 text-center">
+              <div key={key} className="rounded-[1.45rem] border border-slate-200/70 bg-white/80 p-4 text-center">
                 <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">{key}</p>
-                <p className="mt-2 text-xl font-bold text-slate-900">{value}</p>
+                <p className="mt-2 text-xl font-semibold text-slate-900">{value}</p>
               </div>
             ))}
           </div>
         ) : null}
 
-        <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600">{data.localityInsights?.notes}</p>
-      </section>
+        <p className="mt-5 max-w-3xl text-sm leading-8 text-slate-600">{data.localityInsights?.notes}</p>
+      </MotionSection>
 
-      <section className="space-y-5">
+      <section ref={setRevealRef} className="space-y-5">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">More options</p>
-            <h2 className="mt-2 text-2xl font-bold text-slate-900">Similar properties</h2>
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#8b6b3f]">More options</p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Similar properties</h2>
           </div>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {data.similar.map((item) => (
-            <PropertyCard key={item._id} item={item} />
+          {data.similar.map((item, index) => (
+            <MotionDiv
+              key={item._id}
+              initial={{ opacity: 0, y: 22 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.5, delay: Math.min(index * 0.04, 0.16) }}
+              whileHover={{ y: -6 }}
+            >
+              <PropertyCard item={item} />
+            </MotionDiv>
           ))}
         </div>
       </section>

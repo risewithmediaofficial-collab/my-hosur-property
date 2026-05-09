@@ -8,9 +8,9 @@ const ImageGallery = ({ images = [] }) => {
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-[30px] border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-[32px] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(249,245,238,0.86))] shadow-[0_24px_56px_rgba(15,23,42,0.1)]">
         <div className="aspect-[4/3] w-full overflow-hidden bg-slate-100">
-          <img src={active} alt="Property" className="h-full w-full object-cover" />
+          <img src={active} alt="Property" className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]" />
         </div>
       </div>
 
@@ -24,7 +24,9 @@ const ImageGallery = ({ images = [] }) => {
               type="button"
               onClick={() => setActive(img)}
               className={`shrink-0 overflow-hidden rounded-2xl border transition ${
-                isActive ? "border-blue-600 shadow-sm" : "border-slate-200 hover:border-blue-300"
+                isActive
+                  ? "border-slate-900 shadow-[0_14px_28px_rgba(15,23,42,0.12)]"
+                  : "border-white/70 bg-white/75 hover:border-[#d7b88b]"
               }`}
             >
               <img src={img} alt="Preview" className="h-20 w-24 object-cover" loading="lazy" />

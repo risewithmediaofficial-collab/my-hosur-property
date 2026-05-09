@@ -34,9 +34,11 @@ const Navbar = () => {
   const dashboardPath = user?.role === "admin" ? "/admin/dashboard" : "/dashboard";
 
   const closeMenu = () => setMobileMenuOpen(false);
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   const onLogout = () => {
     logout();
+    scrollToTop();
     closeMenu();
     navigate("/");
   };
@@ -48,17 +50,18 @@ const Navbar = () => {
       <NavLink
         key={item.to}
         to={item.to}
+        onClick={scrollToTop}
         className={({ isActive }) =>
           `group inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition ${
             isActive
-              ? "bg-blue-600 text-white shadow-[0_10px_24px_rgba(37,99,235,0.22)]"
-              : "text-slate-600 hover:bg-blue-50 hover:text-blue-700"
+              ? "bg-slate-900 text-white shadow-[0_16px_30px_rgba(15,23,42,0.16)]"
+              : "text-slate-600 hover:bg-[#fff9f0] hover:text-slate-900"
           }`
         }
       >
         {({ isActive }) => (
           <>
-            <Icon className={`h-4 w-4 ${isActive ? "text-white" : "text-blue-400 group-hover:text-blue-600"}`} />
+            <Icon className={`h-4 w-4 ${isActive ? "text-white" : "text-[#b98a53] group-hover:text-slate-900"}`} />
             <span>{item.label}</span>
           </>
         )}
@@ -74,31 +77,41 @@ const Navbar = () => {
       <NavLink
         key={item.to}
         to={item.to}
-        onClick={closeMenu}
+        onClick={() => {
+          scrollToTop();
+          closeMenu();
+        }}
         className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-          isActive ? "bg-blue-600 text-white" : "text-slate-700 hover:bg-blue-50 hover:text-blue-700"
+          isActive ? "bg-slate-900 text-white" : "text-slate-700 hover:bg-[#fff9f0] hover:text-slate-900"
         }`}
       >
-        <Icon className={`h-5 w-5 ${isActive ? "text-white" : "text-blue-500"}`} />
+        <Icon className={`h-5 w-5 ${isActive ? "text-white" : "text-[#b98a53]"}`} />
         <span>{item.label}</span>
       </NavLink>
     );
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-blue-100/80 bg-white/96 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-white/40 bg-[rgba(252,250,247,0.82)] backdrop-blur-2xl">
       <div className="flex w-full items-center justify-between gap-3 px-4 py-3 sm:px-5 lg:px-6">
-        <NavLink to="/" onClick={closeMenu} className="inline-flex min-w-0 items-center gap-3 text-slate-900">
-          <div className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[1.1rem] bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-[0_12px_28px_rgba(37,99,235,0.24)]">
+        <NavLink
+          to="/"
+          onClick={() => {
+            scrollToTop();
+            closeMenu();
+          }}
+          className="inline-flex min-w-0 items-center gap-3 text-slate-900"
+        >
+          <div className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[1.15rem] border border-white/60 bg-[linear-gradient(145deg,#111827,#334155)] text-white shadow-[0_18px_36px_rgba(15,23,42,0.22)]">
             <BuildingOffice2Icon className="h-5 w-5" />
           </div>
           <div className="min-w-0">
             <p className="truncate text-lg font-extrabold tracking-tight text-slate-900">MyHosurProperty</p>
-            <p className="truncate text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-500">Real Estate</p>
+            <p className="truncate text-[11px] font-semibold uppercase tracking-[0.28em] text-[#9a7441]">Real Estate</p>
           </div>
         </NavLink>
 
-        <nav className="hidden items-center gap-2 rounded-full border border-blue-100 bg-blue-50/70 px-2 py-2 lg:flex">
+        <nav className="hidden items-center gap-2 rounded-full border border-white/60 bg-white/68 px-2 py-2 shadow-[0_14px_34px_rgba(15,23,42,0.05)] lg:flex">
           {primaryNavLinks.map(renderDesktopLink)}
         </nav>
 
@@ -107,11 +120,12 @@ const Navbar = () => {
             <>
               <NavLink
                 to={dashboardPath}
+                onClick={scrollToTop}
                 className={({ isActive }) =>
                   `group inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition ${
                     isActive
-                      ? "bg-blue-600 text-white shadow-[0_10px_24px_rgba(37,99,235,0.22)]"
-                      : "border border-blue-100 bg-white text-slate-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                      ? "bg-slate-900 text-white shadow-[0_16px_30px_rgba(15,23,42,0.18)]"
+                      : "border border-slate-200/70 bg-white/80 text-slate-700 hover:border-[#d7b88b] hover:bg-[#fff9f0] hover:text-slate-900"
                   }`
                 }
               >
@@ -127,7 +141,7 @@ const Navbar = () => {
               </NavLink>
               <button
                 onClick={onLogout}
-                className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/80 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-[#d7b88b] hover:bg-[#fff9f0] hover:text-slate-900"
               >
                 <ArrowRightOnRectangleIcon className="h-4 w-4" />
                 Logout
@@ -136,7 +150,8 @@ const Navbar = () => {
           ) : (
             <NavLink
               to="/auth"
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(37,99,235,0.2)] transition hover:from-blue-700 hover:to-blue-800"
+              onClick={scrollToTop}
+              className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#111827,#334155)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_18px_34px_rgba(15,23,42,0.2)] transition hover:translate-y-[-1px]"
             >
               <ArrowRightOnRectangleIcon className="h-4 w-4" />
               Sign in
@@ -146,7 +161,7 @@ const Navbar = () => {
 
         <button
           type="button"
-          className="inline-flex rounded-2xl border border-blue-100 bg-white p-2.5 text-slate-700 transition hover:bg-blue-50 lg:hidden"
+          className="inline-flex rounded-2xl border border-white/60 bg-white/80 p-2.5 text-slate-700 shadow-[0_8px_18px_rgba(15,23,42,0.05)] transition hover:bg-[#fff9f0] lg:hidden"
           onClick={() => setMobileMenuOpen((value) => !value)}
         >
           {mobileMenuOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
@@ -154,18 +169,21 @@ const Navbar = () => {
       </div>
 
       {mobileMenuOpen ? (
-        <div className="border-t border-blue-100 bg-white lg:hidden">
+        <div className="border-t border-white/60 bg-[rgba(252,250,247,0.94)] lg:hidden">
           <div className="flex flex-col gap-3 px-4 py-4 sm:px-5">
             <nav className="flex flex-col gap-2">{primaryNavLinks.map(renderMobileLink)}</nav>
-            <div className="border-t border-blue-100 pt-3">
+            <div className="border-t border-slate-200/70 pt-3">
               {isAuthenticated ? (
                 <div className="flex flex-col gap-2">
                   <NavLink
                     to={dashboardPath}
-                    onClick={closeMenu}
+                    onClick={() => {
+                      scrollToTop();
+                      closeMenu();
+                    }}
                     className={({ isActive }) =>
                       `flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-                        isActive ? "bg-blue-600 text-white" : "border border-blue-100 bg-white text-slate-700 hover:bg-blue-50 hover:text-blue-700"
+                        isActive ? "bg-slate-900 text-white" : "border border-slate-200/80 bg-white/80 text-slate-700 hover:bg-[#fff9f0] hover:text-slate-900"
                       }`
                     }
                   >
@@ -182,7 +200,7 @@ const Navbar = () => {
                   <button
                     type="button"
                     onClick={onLogout}
-                    className="flex items-center justify-center gap-2 rounded-2xl border border-blue-100 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-blue-50"
+                    className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200/80 bg-white/80 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-[#fff9f0]"
                   >
                     <ArrowRightOnRectangleIcon className="h-5 w-5" />
                     Logout
@@ -191,8 +209,11 @@ const Navbar = () => {
               ) : (
                 <NavLink
                   to="/auth"
-                  onClick={closeMenu}
-                  className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3 text-sm font-semibold text-white"
+                  onClick={() => {
+                    scrollToTop();
+                    closeMenu();
+                  }}
+                  className="flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#111827,#334155)] px-4 py-3 text-sm font-semibold text-white"
                 >
                   <ArrowRightOnRectangleIcon className="h-5 w-5" />
                   Sign in / Create account

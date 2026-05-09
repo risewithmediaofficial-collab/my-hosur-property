@@ -238,16 +238,16 @@ const HomePage = () => {
   const featuredListings = featured.slice(0, 4);
 
   return (
-    <main className="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(96,165,250,0.18),_transparent_26%),radial-gradient(circle_at_85%_10%,_rgba(191,219,254,0.7),_transparent_24%),linear-gradient(180deg,#f7fbff_0%,#eef5ff_45%,#f8fbff_100%)]">
+    <main className="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(245,200,128,0.18),_transparent_24%),radial-gradient(circle_at_85%_10%,_rgba(191,219,254,0.36),_transparent_22%),linear-gradient(180deg,#fbf8f2_0%,#f6f1ea_45%,#f8f4ed_100%)]">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.88),transparent_70%)]" />
 
       <section className="site-shell relative px-4 pb-6 pt-0 sm:px-5 lg:px-6">
         <div
           ref={heroRef}
-          className="overflow-hidden rounded-[2rem] border border-blue-100/80 bg-white px-4 py-6 shadow-[0_18px_40px_rgba(37,99,235,0.08)] sm:px-6 sm:py-8 lg:px-8 lg:py-10"
+          className="overflow-hidden rounded-[2rem] border border-white/70 bg-white/86 px-4 py-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)] sm:px-6 sm:py-8 lg:px-8 lg:py-10"
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(59,130,246,0.14),transparent_24%),radial-gradient(circle_at_82%_22%,rgba(191,219,254,0.48),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.98),rgba(239,246,255,0.94))]" />
-          <div className="absolute inset-0 opacity-60 [background-image:linear-gradient(rgba(37,99,235,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.05)_1px,transparent_1px)] [background-size:48px_48px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(245,200,128,0.18),transparent_24%),radial-gradient(circle_at_82%_22%,rgba(191,219,254,0.22),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.98),rgba(248,243,236,0.94))]" />
+          <div className="absolute inset-0 opacity-50 [background-image:linear-gradient(rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.04)_1px,transparent_1px)] [background-size:48px_48px]" />
 
           <div className="relative grid items-start gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
             <div className="max-w-3xl">
@@ -256,12 +256,11 @@ const HomePage = () => {
                 initial="hidden"
                 animate="show"
                 variants={fadeUp}
-                className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.26em] text-blue-700"
+                className="inline-flex items-center gap-2 rounded-full border border-[#eadbc4] bg-[#fff8ef] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.26em] text-[#8b6b3f]"
               >
                 <SparklesIcon className="h-4 w-4" />
-                Reimagined Hosur property experience
+                Premium Hosur property experience
               </MotionDiv>
-
               <MotionHeading
                 data-hero-item
                 initial="hidden"
@@ -295,7 +294,7 @@ const HomePage = () => {
               >
                 <Link
                   to="/listings"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#f5c06b] px-5 py-3.5 text-sm font-semibold text-slate-950 transition hover:bg-[#f8cf89]"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800"
                 >
                   Explore premium listings
                   <ArrowRightIcon className="h-4 w-4" />
@@ -310,9 +309,9 @@ const HomePage = () => {
 
               <div data-hero-item className="mt-8 grid gap-3 sm:grid-cols-3">
                 {premiumMetrics.map((metric) => (
-                  <div key={metric.label} className="rounded-[1.6rem] border border-blue-100 bg-blue-50/70 p-4">
+                  <div key={metric.label} className="rounded-[1.6rem] border border-white/70 bg-white/76 p-4">
                     <p className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">{metric.value}</p>
-                    <p className="mt-2 text-sm font-semibold text-blue-700">{metric.label}</p>
+                    <p className="mt-2 text-sm font-semibold text-[#8b6b3f]">{metric.label}</p>
                     <p className="mt-1 text-xs leading-6 text-slate-600">{metric.note}</p>
                   </div>
                 ))}
@@ -321,10 +320,10 @@ const HomePage = () => {
 
             <div className="relative">
               <div ref={artworkRef} className="relative mx-auto max-w-[560px]">
-                  <div className="absolute -left-8 top-10 hidden h-28 w-28 rounded-full bg-blue-200/70 blur-3xl sm:block" />
-                <div className="absolute -right-10 bottom-10 hidden h-32 w-32 rounded-full bg-sky-200/70 blur-3xl sm:block" />
+                  <div className="absolute -left-8 top-10 hidden h-28 w-28 rounded-full bg-amber-200/70 blur-3xl sm:block" />
+                <div className="absolute -right-10 bottom-10 hidden h-32 w-32 rounded-full bg-sky-100/90 blur-3xl sm:block" />
 
-                <div className="overflow-hidden rounded-[2rem] border border-blue-100 bg-white p-3 shadow-[0_22px_56px_rgba(37,99,235,0.12)]">
+                <div className="overflow-hidden rounded-[2rem] border border-white/70 bg-white/88 p-3 shadow-[0_24px_60px_rgba(15,23,42,0.1)]">
                   <div className="overflow-hidden rounded-[1.6rem]">
                     <img
                       src="https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1600&q=80"
@@ -335,15 +334,15 @@ const HomePage = () => {
                   </div>
 
                   <div className="mt-3 grid gap-3 sm:grid-cols-[1.1fr_0.9fr]">
-                    <div className="rounded-[1.4rem] border border-blue-100 bg-blue-50 p-4 text-slate-900">
+                    <div className="rounded-[1.4rem] border border-white/70 bg-[#fff8ef] p-4 text-slate-900">
                       <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Featured pocket</p>
                       <h3 className="mt-2 text-xl font-semibold">Bagalur Road premium belt</h3>
                       <p className="mt-2 text-sm leading-6 text-slate-600">
                         Spacious villas, newer apartment launches, and quicker road connectivity driving premium demand.
                       </p>
                     </div>
-                    <div className="rounded-[1.4rem] border border-blue-100 bg-slate-900 p-4 text-white">
-                      <p className="text-xs uppercase tracking-[0.24em] text-blue-200">Market watch</p>
+                    <div className="rounded-[1.4rem] border border-slate-800 bg-slate-900 p-4 text-white">
+                      <p className="text-xs uppercase tracking-[0.24em] text-[#f3d8af]">Market watch</p>
                       <p className="mt-3 text-3xl font-semibold text-white">+18%</p>
                       <p className="mt-2 text-sm leading-6 text-slate-300">Demand growth in premium localities this quarter.</p>
                     </div>
@@ -352,7 +351,7 @@ const HomePage = () => {
 
                 <div
                   ref={setFloatingCardRef}
-                  className="absolute -left-4 top-8 max-w-[180px] rounded-[1.4rem] border border-blue-100 bg-white p-4 text-slate-900 shadow-2xl"
+                  className="absolute -left-4 top-8 max-w-[180px] rounded-[1.4rem] border border-white/70 bg-white/90 p-4 text-slate-900 shadow-2xl"
                 >
                   <p className="text-xs uppercase tracking-[0.22em] text-slate-500">New launch</p>
                   <p className="mt-2 text-lg font-semibold">Lake-view residences</p>
@@ -361,22 +360,22 @@ const HomePage = () => {
 
                 <div
                   ref={setFloatingCardRef}
-                  className="absolute right-4 top-6 max-w-[190px] rounded-[1.4rem] border border-blue-200 bg-blue-600 p-4 text-white shadow-2xl sm:right-6 sm:top-6"
+                  className="absolute right-4 top-6 max-w-[190px] rounded-[1.4rem] border border-slate-800 bg-slate-900 p-4 text-white shadow-2xl sm:right-6 sm:top-6"
                 >
-                  <p className="flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-blue-100">
+                  <p className="flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-[#f3d8af]">
                     <StarIcon className="h-4 w-4" />
                     Buyer favorite
                   </p>
                   <p className="mt-2 text-lg font-semibold">Fastest inquiry flow</p>
-                  <p className="mt-1 text-xs leading-5 text-blue-50">Shortlisted homes now feel easier to compare and contact.</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-300">Shortlisted homes now feel easier to compare and contact.</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div data-hero-item className="relative mt-8 grid gap-4 rounded-[1.75rem] border border-blue-100 bg-blue-50/70 p-4 lg:grid-cols-[1.1fr_0.9fr]">
+          <div data-hero-item className="relative mt-8 grid gap-4 rounded-[1.75rem] border border-white/70 bg-white/72 p-4 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-700">Premium search flow</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#8b6b3f]">Premium search flow</p>
               <h2 className="mt-2 text-2xl font-semibold text-slate-900 sm:text-3xl">Search faster, shortlist smarter, contact cleaner.</h2>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
                 A premium landing page deserves an equally polished search panel, so we reworked the first interaction into something calmer and more useful.
@@ -385,7 +384,7 @@ const HomePage = () => {
 
             <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
               {premiumSignals.map((item) => (
-                <div key={item.label} className="rounded-[1.2rem] border border-blue-100 bg-white px-4 py-3 text-sm text-slate-700">
+                <div key={item.label} className="rounded-[1.2rem] border border-white/70 bg-white/84 px-4 py-3 text-sm text-slate-700">
                   <p className="text-[10px] uppercase tracking-[0.24em] text-slate-500">{item.label}</p>
                   <p className="mt-2 leading-6">{item.value}</p>
                 </div>
@@ -398,7 +397,7 @@ const HomePage = () => {
       <section className="site-shell px-4 pb-6 sm:px-5 lg:px-6">
         <div
           ref={setRevealRef}
-          className="grid gap-5 rounded-[2rem] border border-blue-100/80 bg-white/88 px-4 py-5 shadow-[0_18px_38px_rgba(37,99,235,0.08)] sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8"
+          className="grid gap-5 rounded-[2rem] border border-white/70 bg-white/86 px-4 py-5 shadow-[0_22px_54px_rgba(15,23,42,0.07)] sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8"
         >
           <div className="rounded-[1.6rem] border border-[#eedfca] bg-[linear-gradient(145deg,#faf5ec,#fffdfa)] p-5 sm:p-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#8b6b3f]">Start here</p>
@@ -438,7 +437,7 @@ const HomePage = () => {
             </div>
           </div>
 
-          <div className="rounded-[1.6rem] border border-blue-100/70 bg-white p-5 sm:p-6">
+          <div className="rounded-[1.6rem] border border-white/70 bg-white/88 p-5 sm:p-6">
             <div className="grid gap-4">
               <div>
                 <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Locality or project</label>
@@ -526,7 +525,7 @@ const HomePage = () => {
         </div>
 
         <div ref={setRevealRef} className="mt-6 grid gap-6 lg:grid-cols-[0.86fr_1.14fr]">
-          <div className="overflow-hidden rounded-[2rem] border border-blue-100 bg-[linear-gradient(135deg,#2563eb,#1e40af)] text-white shadow-[0_22px_60px_rgba(37,99,235,0.18)]">
+          <div className="overflow-hidden rounded-[2rem] border border-slate-800 bg-[linear-gradient(135deg,#111827,#334155)] text-white shadow-[0_24px_60px_rgba(15,23,42,0.18)]">
             <div className="relative h-full min-h-[320px] overflow-hidden p-6">
               <img
                 src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1400&q=80"
@@ -534,10 +533,10 @@ const HomePage = () => {
                 className="absolute inset-0 h-full w-full object-cover opacity-30"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(37,99,235,0.18),rgba(30,64,175,0.88))]" />
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.16),rgba(15,23,42,0.88))]" />
               <div className="relative flex h-full flex-col justify-between">
                 <div>
-                  <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/12 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-blue-100">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/12 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-[#f3d8af]">
                     <BoltIcon className="h-4 w-4" />
                     This month&apos;s spotlight
                   </span>
@@ -554,7 +553,7 @@ const HomePage = () => {
                       <div key={item.title} className="rounded-[1.35rem] border border-white/15 bg-white/12 p-4 backdrop-blur-sm">
                         <div className="flex items-start gap-3">
                           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10">
-                            <Icon className="h-5 w-5 text-blue-100" />
+                            <Icon className="h-5 w-5 text-[#f3d8af]" />
                           </div>
                           <div>
                             <p className="text-sm font-semibold text-white">{item.title}</p>
@@ -623,8 +622,8 @@ const HomePage = () => {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-blue-100 bg-[linear-gradient(135deg,#dbeafe,#eff6ff)] p-6 text-slate-900 shadow-[0_18px_42px_rgba(37,99,235,0.1)]">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-700">Momentum section</p>
+            <div className="rounded-[2rem] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(255,248,238,0.92))] p-6 text-slate-900 shadow-[0_18px_42px_rgba(15,23,42,0.08)]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#8b6b3f]">Motion system</p>
               <h3 className="mt-2 text-3xl font-semibold">Built to feel more like a luxury product than a classifieds board.</h3>
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 {[
@@ -632,7 +631,7 @@ const HomePage = () => {
                   { value: "GSAP", label: "Scroll-based reveal rhythm" },
                   { value: "Tailwind", label: "Sharper premium surfaces" },
                 ].map((item) => (
-                  <div key={item.label} className="rounded-[1.2rem] border border-blue-100 bg-white p-4">
+                  <div key={item.label} className="rounded-[1.2rem] border border-white/70 bg-white/84 p-4">
                     <p className="text-lg font-semibold text-slate-900">{item.value}</p>
                     <p className="mt-2 text-xs leading-6 text-slate-600">{item.label}</p>
                   </div>
@@ -687,13 +686,13 @@ const HomePage = () => {
           whileInView="show"
           viewport={{ once: true, amount: 0.3 }}
           variants={fadeUp}
-          className="overflow-hidden rounded-[2rem] border border-blue-100/80 bg-[linear-gradient(135deg,#ffffff_0%,#eff6ff_48%,#dbeafe_100%)] px-4 py-6 shadow-[0_18px_40px_rgba(37,99,235,0.08)] sm:px-6 sm:p-8 lg:px-8 lg:py-10"
+          className="overflow-hidden rounded-[2rem] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.94)_0%,rgba(255,248,238,0.92)_48%,rgba(239,246,255,0.86)_100%)] px-4 py-6 shadow-[0_22px_54px_rgba(15,23,42,0.08)] sm:px-6 sm:p-8 lg:px-8 lg:py-10"
         >
           <div className="grid gap-8 lg:grid-cols-[1fr_0.8fr] lg:items-center">
             <div>
-              <p className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/80 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-700">
+              <p className="inline-flex items-center gap-2 rounded-full border border-[#eadbc4] bg-white/80 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#8b6b3f]">
                 <SparklesIcon className="h-4 w-4" />
-                Landing page refreshed
+                Crafted for a premium first impression
               </p>
               <h2 className="mt-4 font-['Fraunces'] text-4xl leading-tight tracking-[-0.03em] text-slate-900 sm:text-5xl">
                 Ready to explore Hosur with a UI that finally feels premium?
