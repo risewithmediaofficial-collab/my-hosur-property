@@ -246,23 +246,13 @@ const HomePage = () => {
         >
           <div className="relative grid items-start gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
             <div className="max-w-3xl">
-              <MotionDiv
-                data-hero-item
-                initial="hidden"
-                animate="show"
-                variants={fadeUp}
-                className="inline-flex items-center gap-2 rounded-full border border-[#eadbc4] bg-[#fff8ef] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.26em] text-[#8b6b3f]"
-              >
-                <SparklesIcon className="h-4 w-4" />
-                Premium Hosur property experience
-              </MotionDiv>
               <MotionHeading
                 data-hero-item
                 initial="hidden"
                 animate="show"
                 custom={0.08}
                 variants={fadeUp}
-                className="mt-5 max-w-4xl font-['Fraunces'] text-4xl leading-[1.02] tracking-[-0.04em] text-slate-900 sm:text-5xl lg:text-7xl"
+                className="max-w-4xl font-['Fraunces'] text-4xl leading-[1.02] tracking-[-0.04em] text-slate-900 sm:text-5xl lg:text-7xl"
               >
                 Discover a sharper, more premium way to search property in Hosur.
               </MotionHeading>

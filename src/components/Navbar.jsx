@@ -52,16 +52,16 @@ const Navbar = () => {
         to={item.to}
         onClick={scrollToTop}
         className={({ isActive }) =>
-          `group inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+          `group inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition ${
             isActive
-              ? "bg-slate-900 text-white shadow-[0_16px_30px_rgba(15,23,42,0.16)]"
-              : "text-slate-600 hover:bg-[#fff9f0] hover:text-slate-900"
+              ? "border-slate-900 bg-transparent text-slate-900"
+              : "border-transparent bg-transparent text-slate-500 hover:border-slate-200 hover:text-slate-900"
           }`
         }
       >
         {({ isActive }) => (
           <>
-            <Icon className={`h-4 w-4 ${isActive ? "text-white" : "text-[#b98a53] group-hover:text-slate-900"}`} />
+            <Icon className={`h-4 w-4 ${isActive ? "text-slate-900" : "text-[#b98a53] group-hover:text-slate-900"}`} />
             <span>{item.label}</span>
           </>
         )}
@@ -81,11 +81,11 @@ const Navbar = () => {
           scrollToTop();
           closeMenu();
         }}
-        className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-          isActive ? "bg-slate-900 text-white" : "text-slate-700 hover:bg-[#fff9f0] hover:text-slate-900"
+        className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
+          isActive ? "border-slate-900 bg-transparent text-slate-900" : "border-transparent bg-transparent text-slate-600 hover:border-slate-200 hover:text-slate-900"
         }`}
       >
-        <Icon className={`h-5 w-5 ${isActive ? "text-white" : "text-[#b98a53]"}`} />
+        <Icon className={`h-5 w-5 ${isActive ? "text-slate-900" : "text-[#b98a53]"}`} />
         <span>{item.label}</span>
       </NavLink>
     );
@@ -111,7 +111,7 @@ const Navbar = () => {
           </div>
         </NavLink>
 
-        <nav className="hidden items-center gap-2 rounded-full border border-white/60 bg-white/68 px-2 py-2 shadow-[0_14px_34px_rgba(15,23,42,0.05)] lg:flex">
+        <nav className="hidden items-center gap-2 rounded-full border border-slate-200/80 bg-transparent px-2 py-2 lg:flex">
           {primaryNavLinks.map(renderDesktopLink)}
         </nav>
 
@@ -122,10 +122,10 @@ const Navbar = () => {
                 to={dashboardPath}
                 onClick={scrollToTop}
                 className={({ isActive }) =>
-                  `group inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+                  `group inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition ${
                     isActive
-                      ? "bg-slate-900 text-white shadow-[0_16px_30px_rgba(15,23,42,0.18)]"
-                      : "border border-slate-200/70 bg-white/80 text-slate-700 hover:border-[#d7b88b] hover:bg-[#fff9f0] hover:text-slate-900"
+                      ? "border-slate-900 bg-transparent text-slate-900"
+                      : "border-slate-200/80 bg-transparent text-slate-600 hover:border-slate-300 hover:text-slate-900"
                   }`
                 }
               >
@@ -182,8 +182,8 @@ const Navbar = () => {
                       closeMenu();
                     }}
                     className={({ isActive }) =>
-                      `flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-                        isActive ? "bg-slate-900 text-white" : "border border-slate-200/80 bg-white/80 text-slate-700 hover:bg-[#fff9f0] hover:text-slate-900"
+                      `flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
+                        isActive ? "border-slate-900 bg-transparent text-slate-900" : "border-slate-200/80 bg-transparent text-slate-700 hover:border-slate-300 hover:text-slate-900"
                       }`
                     }
                   >
