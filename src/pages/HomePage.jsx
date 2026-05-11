@@ -238,17 +238,12 @@ const HomePage = () => {
   const featuredListings = featured.slice(0, 4);
 
   return (
-    <main className="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(245,200,128,0.18),_transparent_24%),radial-gradient(circle_at_85%_10%,_rgba(191,219,254,0.36),_transparent_22%),linear-gradient(180deg,#fbf8f2_0%,#f6f1ea_45%,#f8f4ed_100%)]">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.88),transparent_70%)]" />
-
+    <main className="relative overflow-hidden bg-white">
       <section className="site-shell relative px-4 pb-6 pt-0 sm:px-5 lg:px-6">
         <div
           ref={heroRef}
           className="overflow-hidden rounded-[2rem] border border-white/70 bg-white/86 px-4 py-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)] sm:px-6 sm:py-8 lg:px-8 lg:py-10"
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(245,200,128,0.18),transparent_24%),radial-gradient(circle_at_82%_22%,rgba(191,219,254,0.22),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.98),rgba(248,243,236,0.94))]" />
-          <div className="absolute inset-0 opacity-50 [background-image:linear-gradient(rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.04)_1px,transparent_1px)] [background-size:48px_48px]" />
-
           <div className="relative grid items-start gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
             <div className="max-w-3xl">
               <MotionDiv

@@ -14,9 +14,9 @@ body,
 
 :root {
   color: #111827;
-  background: #f6f2eb;
-  --site-bg: #f6f2eb;
-  --site-bg-soft: #fbf8f2;
+  background: #ffffff;
+  --site-bg: #ffffff;
+  --site-bg-soft: #ffffff;
   --site-surface: rgba(255, 255, 255, 0.78);
   --site-surface-strong: rgba(255, 255, 255, 0.92);
   --site-border: rgba(148, 163, 184, 0.22);
@@ -40,11 +40,7 @@ body,
 body {
   margin: 0;
   font-family: "Manrope", ui-sans-serif, system-ui;
-  background:
-    radial-gradient(circle at top left, rgba(243, 214, 171, 0.32), transparent 24%),
-    radial-gradient(circle at 85% 12%, rgba(191, 219, 254, 0.24), transparent 22%),
-    radial-gradient(circle at 50% 100%, rgba(226, 232, 240, 0.38), transparent 30%),
-    linear-gradient(180deg, #fcfaf7 0%, #f6f1ea 48%, #f8f5ef 100%);
+  background: #ffffff;
   color: var(--site-ink);
 }
 
@@ -231,7 +227,7 @@ textarea {
 .site-section {
   border-radius: 2rem;
   border: 1px solid var(--site-border);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.78));
+  background: #ffffff;
   box-shadow: var(--site-shadow);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
@@ -240,7 +236,7 @@ textarea {
 .site-panel {
   border-radius: 1.6rem;
   border: 1px solid rgba(148, 163, 184, 0.16);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(250, 247, 241, 0.88));
+  background: #ffffff;
   box-shadow: 0 18px 42px rgba(15, 23, 42, 0.06);
 }
 
