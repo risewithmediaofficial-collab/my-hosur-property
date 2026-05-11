@@ -1,9 +1,13 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { currency, formatArea, slugify } from "../utils/format";
 import { ArrowRightIcon, CheckBadgeIcon, MapPinIcon, RectangleStackIcon, UserIcon } from "@heroicons/react/24/outline";
 
+const FALLBACK_PROPERTY_IMAGE =
+  "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=900&q=60";
+
 const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
-  const image = item.images?.[0] || "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=900&q=60";
+  const [cardImage, setCardImage] = useState(item.images?.[0] || FALLBACK_PROPERTY_IMAGE);
   const href = `/property/${item._id}/${slugify(item.title)}`;
   const badges = [
     item.verification?.isVerified ? "Verified" : "",
@@ -15,10 +19,11 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
     <article className="group overflow-hidden rounded-[30px] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(249,245,238,0.9))] shadow-[0_20px_44px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_26px_56px_rgba(15,23,42,0.12)]">
       <div className="relative h-56 overflow-hidden">
         <img
-          src={image}
+          src={cardImage}
           alt={item.title}
           className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
           loading="lazy"
+          onError={() => setCardImage(FALLBACK_PROPERTY_IMAGE)}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/18 to-transparent" />
         <div className="absolute left-4 top-4">

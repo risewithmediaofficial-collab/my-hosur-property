@@ -1,16 +1,24 @@
 import { useState } from "react";
 
+const FALLBACK_PROPERTY_IMAGE =
+  "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=60";
+
 const ImageGallery = ({ images = [] }) => {
   const safeImages = images.length
     ? images
-    : ["https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=60"];
+    : [FALLBACK_PROPERTY_IMAGE];
   const [active, setActive] = useState(safeImages[0]);
 
   return (
     <div className="space-y-4">
       <div className="overflow-hidden rounded-[32px] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(249,245,238,0.86))] shadow-[0_24px_56px_rgba(15,23,42,0.1)]">
         <div className="aspect-[4/3] w-full overflow-hidden bg-slate-100">
-          <img src={active} alt="Property" className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]" />
+          <img
+            src={active}
+            alt="Property"
+            className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
+            onError={() => setActive(FALLBACK_PROPERTY_IMAGE)}
+          />
         </div>
       </div>
 
@@ -29,7 +37,15 @@ const ImageGallery = ({ images = [] }) => {
                   : "border-white/70 bg-white/75 hover:border-[#d7b88b]"
               }`}
             >
-              <img src={img} alt="Preview" className="h-20 w-24 object-cover" loading="lazy" />
+              <img
+                src={img}
+                alt="Preview"
+                className="h-20 w-24 object-cover"
+                loading="lazy"
+                onError={(event) => {
+                  event.currentTarget.src = FALLBACK_PROPERTY_IMAGE;
+                }}
+              />
             </button>
           );
         })}

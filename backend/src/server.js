@@ -6,6 +6,7 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const app = require("./app");
 const connectDB = require("./config/db");
+const ensurePlansSeeded = require("./utils/ensurePlansSeeded");
 const { verifyMailConnection } = require("./utils/sendEmail");
 
 const PORT = process.env.PORT || 3001;
@@ -21,6 +22,7 @@ const start = async () => {
     console.log(`[boot] Client URL: ${process.env.CLIENT_URL || "not set"}`);
 
     await connectDB();
+    await ensurePlansSeeded();
 
     const mailReady = await verifyMailConnection();
     console.log(`[boot] Mail verification status: ${mailReady ? "ready" : "skipped or failed"}`);

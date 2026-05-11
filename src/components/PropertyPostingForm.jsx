@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import useAuth from "../hooks/useAuth";
-import { createProperty, uploadPropertyFiles } from "../services/api/propertyApi";
-import { sendPropertyAlertEmail } from "../services/emailService";
+import { createProperty, updateProperty, uploadPropertyFiles } from "../services/api/propertyApi";
 
 const defaultForm = {
   title: "",
@@ -423,7 +422,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
               <h3 className="text-lg font-bold text-ink">Confirm & Publish</h3>
               <p className="font-semibold">Publishing workflow:</p>
               <ul className="list-disc pl-5 space-y-1">
-                <li>Listing will be reviewed by admin before appearing in global search feed.</li>
+                <li>Listing will be published live and shown on the home page after you complete posting.</li>
                 <li>Buyers can contact via inquiry/callback/visit actions based on your credits.</li>
                 <li>You can edit these details anytime from your dashboard.</li>
               </ul>

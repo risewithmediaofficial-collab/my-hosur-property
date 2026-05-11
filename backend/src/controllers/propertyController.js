@@ -9,6 +9,7 @@ const {
   inquiryConfirmationEmail,
   adminPropertyNotificationEmail,
 } = require("../utils/emailTemplates");
+const { normalizeUploadList } = require("../utils/uploadPaths");
 
 const propertyValidators = [
   body("title").trim().notEmpty(),
@@ -227,6 +228,8 @@ const createProperty = async (req, res) => {
 
   const payload = {
     ...req.body,
+    images: normalizeUploadList(req.body.images),
+    documents: normalizeUploadList(req.body.documents),
     ownerId: req.user._id,
     ownerType,
     listingSource: req.body.listingSource || defaultSource,
@@ -243,7 +246,7 @@ const createProperty = async (req, res) => {
             isVerified: false,
             reraId: req.body?.verification?.reraId || req.body?.reraId,
           },
-    status: req.user.role === "admin" ? "approved" : "pending",
+    status: "approved",
   };
 
   const property = await Property.create(payload);
@@ -268,7 +271,7 @@ const createProperty = async (req, res) => {
       <div style="background:#EFF6FF;padding:16px;border-radius:8px;margin:20px 0;border-left:4px solid #2563EB;">
         <p style="margin:0;color:#1E293B;font-weight:600;">📝 Property Details</p>
         <p style="margin:8px 0 0;color:#64748B;font-size:13px;">
-          Type: ${property.propertyType} | Listing: ${property.listingType} | Status: Pending Review
+          Type: ${property.propertyType} | Listing: ${property.listingType} | Status: Live
         </p>
       </div>
 
@@ -300,23 +303,20 @@ const createProperty = async (req, res) => {
     console.error("[createProperty] Owner notification failed:", err.message);
   }
 
-  // Send Admin Notification for Pending Properties (only if not admin posting)
-  if (req.user.role !== "admin" && property.status === "pending") {
-    try {
-      const adminEmails = (await User.find({ role: "admin" }).select("email")).map((a) => a.email);
-      if (adminEmails.length > 0) {
-        const adminNotifHtml = adminPropertyNotificationEmail(property, user);
-        await sendEmail({
-          to: adminEmails[0],
-          subject: `[REVIEW] New Property: ${property.title} - Pending Approval`,
-          html: adminNotifHtml,
-          bcc: adminEmails.slice(1),
-        });
-        console.log(`[createProperty] Admin notification sent to admins`);
-      }
-    } catch (err) {
-      console.error("[createProperty] Admin notification failed:", err.message);
+  try {
+    const adminEmails = (await User.find({ role: "admin" }).select("email")).map((a) => a.email);
+    if (adminEmails.length > 0) {
+      const adminNotifHtml = adminPropertyNotificationEmail(property, user);
+      await sendEmail({
+        to: adminEmails[0],
+        subject: `[LIVE] New Property: ${property.title}`,
+        html: adminNotifHtml,
+        bcc: adminEmails.slice(1),
+      });
+      console.log("[createProperty] Admin notification sent to admins");
     }
+  } catch (err) {
+    console.error("[createProperty] Admin notification failed:", err.message);
   }
 
   // Notify Relevant Buyers About New Property (async, non-blocking)
@@ -362,10 +362,12 @@ const updateProperty = async (req, res) => {
   const canEdit = req.user.role === "admin" || String(property.ownerId) === String(req.user._id);
   if (!canEdit) return res.status(403).json({ message: "Forbidden" });
 
-  Object.assign(property, req.body);
-  if (req.user.role !== "admin") {
-    property.status = "pending";
-  }
+  Object.assign(property, {
+    ...req.body,
+    images: normalizeUploadList(req.body.images),
+    documents: normalizeUploadList(req.body.documents),
+  });
+  property.status = "approved";
   await property.save();
 
   cache.flushAll();

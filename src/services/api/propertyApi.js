@@ -1,15 +1,38 @@
 import apiClient, { withAuth } from "./client";
 
+const FALLBACK_PROPERTY_IMAGE =
+  "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=900&q=60";
+
 const getImageUrl = (path) => {
   if (!path) return "";
   if (path.startsWith("http")) return path;
+  if (import.meta.env.DEV) return path;
   const baseUrl = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, "");
-  return `${baseUrl}${path}`;
+  return baseUrl ? `${baseUrl}${path}` : path;
 };
 
-export const fetchFeaturedProperties = async () => (await apiClient.get("/api/properties/featured")).data;
+const normalizeProperty = (item) => {
+  if (!item) return item;
+
+  const images = (item.images || []).map(getImageUrl).filter(Boolean);
+  const documents = (item.documents || []).map(getImageUrl).filter(Boolean);
+
+  return {
+    ...item,
+    images: images.length ? images : [FALLBACK_PROPERTY_IMAGE],
+    documents,
+  };
+};
+
+const normalizePropertyResponse = (payload) => ({
+  ...payload,
+  items: (payload?.items || []).map(normalizeProperty),
+});
+
+export const fetchFeaturedProperties = async () =>
+  normalizePropertyResponse((await apiClient.get("/api/properties/featured")).data);
 export const fetchProperties = async (params, token) =>
-  (await apiClient.get("/api/properties", { params, ...(token ? withAuth(token) : {}) })).data;
+  normalizePropertyResponse((await apiClient.get("/api/properties", { params, ...(token ? withAuth(token) : {}) })).data);
 
 export const fetchHomeProperties = async () => {
   const featured = await fetchFeaturedProperties();
@@ -20,16 +43,22 @@ export const fetchPropertyById = async (id, token) => {
   try {
     const config = token ? withAuth(token) : {};
     const response = await apiClient.get(`/api/properties/${id}`, config);
-    console.log("Fetched property response:", response.data);
-    return response.data;
+    return {
+      ...response.data,
+      property: normalizeProperty(response.data?.property),
+      similar: (response.data?.similar || []).map(normalizeProperty),
+    };
   } catch (error) {
     console.error("Error fetching property:", error.response?.data || error.message);
     throw error;
   }
 };
-export const fetchMyProperties = async (token) => (await apiClient.get("/api/properties/mine", withAuth(token))).data;
-export const createProperty = async (token, payload) => (await apiClient.post("/api/properties", payload, withAuth(token))).data;
-export const updateProperty = async (token, id, payload) => (await apiClient.put(`/api/properties/${id}`, payload, withAuth(token))).data;
+export const fetchMyProperties = async (token) =>
+  normalizePropertyResponse((await apiClient.get("/api/properties/mine", withAuth(token))).data);
+export const createProperty = async (token, payload) =>
+  normalizeProperty((await apiClient.post("/api/properties", payload, withAuth(token))).data);
+export const updateProperty = async (token, id, payload) =>
+  normalizeProperty((await apiClient.put(`/api/properties/${id}`, payload, withAuth(token))).data);
 export const deleteProperty = async (token, id) => (await apiClient.delete(`/api/properties/${id}`, withAuth(token))).data;
 export const promoteProperty = async (token, id) => (await apiClient.post(`/api/properties/${id}/promote`, {}, withAuth(token))).data;
 export const uploadPropertyFiles = async (token, files) => {

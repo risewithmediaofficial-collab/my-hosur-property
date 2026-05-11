@@ -4,6 +4,7 @@ const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 const sendEmail = require("../utils/sendEmail");
 const generateHtmlEmail = require("../utils/emailFormatter");
+const { sendWelcomeTemplateEmail } = require("../utils/sendEmailJs");
 
 const buildFreeOnboardingPack = () => {
   const resetAt = new Date();
@@ -74,25 +75,11 @@ const sanitizeUser = (user) => ({
 const getClientUrl = () => process.env.CLIENT_URL || "http://localhost:5173";
 
 const sendWelcomeEmail = async (user, providerLabel = "signing up") => {
-  const htmlContent = generateHtmlEmail({
-    name: user.name,
-    title: "Welcome to MyHosurProperty!",
-    message: `Thank you for ${providerLabel}. Your account is ready to use. You can now post properties, unlock leads, and connect with other users on our platform.`,
-    buttonText: "View Dashboard",
-    buttonUrl: getClientUrl(),
-    type: "welcome",
-  });
-
-  const result = await sendEmail({
-    to: user.email,
-    subject: "Welcome to MyHosurProperty - Your Account is Ready!",
-    html: htmlContent,
-    text: "Welcome to MyHosurProperty! Your account is ready to use.",
-  });
-
-  if (!result) {
-    throw new Error("Welcome email send returned no result");
+  const emailJsResult = await sendWelcomeTemplateEmail(user, providerLabel);
+  if (emailJsResult) {
+    return emailJsResult;
   }
+  throw new Error("Welcome email send failed via EmailJS");
 };
 
 const sendLoginAlert = async (user) => {
