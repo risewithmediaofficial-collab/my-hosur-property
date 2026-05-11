@@ -18,7 +18,7 @@ const DashboardSidebar = ({ title, subtitle, description, navItems = [], childre
                   type="button"
                   onClick={() => item.onClick?.(item.key)}
                   className={`flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold transition ${
-                    item.active ? "bg-blue-600 text-white shadow-sm" : "text-slate-600 hover:bg-blue-50 hover:text-blue-700 hover:shadow-sm"
+                    item.active ? "bg-[#b98a53] text-white shadow-sm" : "text-slate-600 hover:bg-[#fff8ef] hover:text-[#8b6b3f] hover:shadow-sm"
                   }`}
                 >
                   <span className="flex min-w-0 flex-1 items-center gap-3">
@@ -26,7 +26,7 @@ const DashboardSidebar = ({ title, subtitle, description, navItems = [], childre
                     <span className="min-w-0 truncate">{item.label}</span>
                   </span>
                   {item.badge ? (
-                    <span className={`ml-2 rounded-full px-2 py-0.5 text-[10px] font-bold ${item.active ? "bg-white/15 text-white" : "bg-blue-100 text-blue-700"}`}>
+                    <span className={`ml-2 rounded-full px-2 py-0.5 text-[10px] font-bold ${item.active ? "bg-white/15 text-white" : "bg-[#f5e8d4] text-[#8b6b3f]"}`}>
                       {item.badge}
                     </span>
                   ) : null}
@@ -41,8 +41,8 @@ const DashboardSidebar = ({ title, subtitle, description, navItems = [], childre
         </div>
       </aside>
 
-      <div className="w-full border-b border-slate-200 bg-white/90 px-4 py-3 shadow-sm backdrop-blur md:hidden">
-        <div className="mb-3 rounded-[24px] border border-blue-100 bg-white px-4 py-4 shadow-sm">
+      <div className="w-full border-b border-slate-200 bg-white px-4 py-3 md:hidden">
+        <div className="mb-3 rounded-[24px] border border-[#f0e0c9] bg-white px-4 py-4 shadow-sm">
           <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">{subtitle}</p>
           <h1 className="mt-1 text-xl font-extrabold text-slate-900">{title}</h1>
           {description ? <p className="mt-2 text-sm leading-6 text-slate-500">{description}</p> : null}
@@ -54,10 +54,10 @@ const DashboardSidebar = ({ title, subtitle, description, navItems = [], childre
               type="button"
               onClick={() => item.onClick?.(item.key)}
               className={`flex-shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition ${
-                item.active ? "bg-blue-600 text-white shadow-sm" : "bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-700"
+                item.active ? "bg-[#b98a53] text-white shadow-sm" : "bg-slate-100 text-slate-600 hover:bg-[#fff8ef] hover:text-[#8b6b3f]"
               }`}
             >
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1.5 whitespace-nowrap">
                 {item.icon ? <span>{item.icon}</span> : null}
                 {item.label}
                 {item.badge ? <span className="rounded-full bg-white/15 px-1.5 py-0.5 text-[9px] font-bold">{item.badge}</span> : null}

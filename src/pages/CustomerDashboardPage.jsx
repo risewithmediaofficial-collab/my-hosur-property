@@ -8,7 +8,7 @@ import { fetchMyNotifications, markNotificationRead } from "../services/api/noti
 
 const STATUS_CONFIG = {
   open: { label: "Open", cls: "bg-slate-100 text-slate-700" },
-  matched: { label: "Matched", cls: "bg-blue-100 text-blue-700" },
+  matched: { label: "Matched", cls: "bg-[#f5e8d4] text-[#8b6b3f]" },
   closed: { label: "Closed", cls: "bg-slate-200 text-slate-500" },
 };
 
@@ -139,7 +139,7 @@ const CustomerDashboardPage = () => {
           <section className="dashboard-shell p-6 md:p-7">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="dashboard-kicker text-blue-600">Customer activity</p>
+                <p className="dashboard-kicker text-[#8b6b3f]">Customer activity</p>
                 <h2 className="mt-3 text-3xl font-extrabold text-slate-900">Welcome, {user?.name}</h2>
                 <p className="mt-2 text-sm text-slate-600">
                   Post property requirements, monitor responses from property owners and agents, and stay on top of every follow-up.
@@ -196,7 +196,7 @@ const CustomerDashboardPage = () => {
                           </div>
                           <div className="text-right">
                             <p className="text-xs text-slate-500">{fmtDate(item.createdAt)}</p>
-                            <p className="mt-1 text-xs font-semibold text-blue-700">{item.matchedAgents?.length || 0} matches</p>
+                            <p className="mt-1 text-xs font-semibold text-[#8b6b3f]">{item.matchedAgents?.length || 0} matches</p>
                           </div>
                         </div>
                       </div>
@@ -334,7 +334,7 @@ const CustomerDashboardPage = () => {
                       </div>
                       <div className="text-right">
                         <p className="text-xs text-slate-500">{fmtDate(item.createdAt)}</p>
-                        <p className="mt-2 text-xs font-semibold text-blue-700">
+                        <p className="mt-2 text-xs font-semibold text-[#8b6b3f]">
                           {item.matchedAgents?.length || 0} agent / owner responses
                         </p>
                       </div>
@@ -375,13 +375,13 @@ const CustomerDashboardPage = () => {
                 <div key={item._id} className="dashboard-shell p-5">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-blue-700">Requirement Match</p>
+                      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8b6b3f]">Requirement Match</p>
                       <h3 className="mt-2 text-lg font-semibold text-slate-900">
                         {item.propertyType} in {item.location?.area}, {item.location?.city}
                       </h3>
                       <p className="mt-1 text-sm text-slate-600">{formatBudget(item.budgetMin, item.budgetMax)}</p>
                     </div>
-                    <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+                    <span className="rounded-full bg-[#f5e8d4] px-3 py-1 text-xs font-semibold text-[#8b6b3f]">
                       {item.matchedAgents?.length || 0} matches
                     </span>
                   </div>
@@ -440,7 +440,7 @@ const CustomerDashboardPage = () => {
               <div
                 key={item._id}
                 className={`rounded-2xl border p-4 transition-all ${
-                  item.readAt ? "border-slate-200 bg-slate-50" : "border-blue-200 bg-blue-50/60 shadow-sm"
+                  item.readAt ? "border-slate-200 bg-slate-50" : "border-[#eadbc4] bg-[#fff8ef] shadow-sm"
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">

@@ -298,7 +298,7 @@ const AdminDashboardPage = () => {
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="inline-flex items-center gap-2 text-lg font-bold"><UsersIcon className="h-5 w-5 text-sage" />Registered Users ({metrics.users || users.length})</h2>
                 <div className="flex gap-2">
-                  <button onClick={() => openEmailModal("all")} className="rounded-lg bg-ink px-3 py-1.5 text-xs text-white hover:bg-blue-700 shadow-soft">
+                  <button onClick={() => openEmailModal("all")} className="rounded-lg bg-ink px-3 py-1.5 text-xs text-white shadow-soft hover:bg-[#8b6b3f]">
                     📧 Broadcast Email
                   </button>
                   <button onClick={exportToExcel} className="rounded-lg bg-green-600 px-3 py-1.5 text-xs text-white hover:bg-green-700 shadow-soft">

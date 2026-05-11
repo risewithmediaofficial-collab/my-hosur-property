@@ -31,6 +31,9 @@ body,
   --site-primary: #0f172a;
   --site-primary-soft: #1f2937;
   --site-blue: #3b82f6;
+  --site-brown: #b98a53;
+  --site-brown-deep: #8b6b3f;
+  --site-brown-soft: #f5e8d4;
 }
 
 * {
@@ -98,8 +101,8 @@ textarea {
 
 .soft-input:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  border-color: rgba(185, 138, 83, 0.55);
+  box-shadow: 0 0 0 3px rgba(185, 138, 83, 0.14);
 }
 
 .form-modern input,
@@ -114,8 +117,8 @@ textarea {
 .form-modern select:focus,
 .form-modern textarea:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  border-color: rgba(185, 138, 83, 0.55);
+  box-shadow: 0 0 0 3px rgba(185, 138, 83, 0.14);
 }
 
 @keyframes fadeUp {
@@ -339,7 +342,7 @@ textarea {
 .dashboard-subpanel {
   border-radius: 1.25rem;
   border: 1px solid #e2e8f0;
-  background: #f8fbff;
+  background: #fcfaf7;
 }
 
 .dashboard-stat {
@@ -386,7 +389,7 @@ textarea {
 }
 
 .dashboard-table tbody tr:hover td {
-  background: rgba(239, 246, 255, 0.45);
+  background: rgba(245, 232, 212, 0.3);
 }
 
 .dashboard-empty {
@@ -401,16 +404,16 @@ textarea {
   align-items: center;
   justify-content: center;
   border-radius: 1rem;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background: linear-gradient(135deg, var(--site-brown), var(--site-brown-deep));
   color: #fff;
   font-weight: 700;
-  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.18);
+  box-shadow: 0 12px 28px rgba(185, 138, 83, 0.22);
   transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
 .dashboard-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 16px 32px rgba(37, 99, 235, 0.22);
+  box-shadow: 0 16px 32px rgba(185, 138, 83, 0.26);
 }
 
 .dashboard-secondary {
@@ -418,17 +421,17 @@ textarea {
   align-items: center;
   justify-content: center;
   border-radius: 1rem;
-  border: 1px solid #d6e5fb;
+  border: 1px solid rgba(185, 138, 83, 0.28);
   background: #fff;
-  color: #1d4ed8;
+  color: var(--site-brown-deep);
   font-weight: 700;
   transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
 }
 
 .dashboard-secondary:hover {
   transform: translateY(-1px);
-  border-color: #93c5fd;
-  background: #eff6ff;
+  border-color: rgba(185, 138, 83, 0.5);
+  background: rgba(255, 248, 238, 0.94);
 }
 
 .hide-scrollbar {
@@ -489,7 +492,7 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid #2563eb;
+  outline: 2px solid var(--site-brown);
   outline-offset: 2px;
 }
 

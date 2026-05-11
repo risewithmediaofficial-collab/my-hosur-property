@@ -162,7 +162,7 @@ const UserDashboardPage = () => {
           <section className="dashboard-shell p-6 md:p-7">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="dashboard-kicker text-blue-600">Welcome back</p>
+                <p className="dashboard-kicker text-[#8b6b3f]">Welcome back</p>
                 <h2 className="mt-3 text-3xl font-extrabold text-slate-900">Hi, {user?.name}</h2>
                 <p className="mt-2 text-sm text-slate-600">Your dashboard gives you quick access to listings, buyer leads, payments and saved homes.</p>
               </div>
@@ -197,7 +197,7 @@ const UserDashboardPage = () => {
                   <h3 className="text-xl font-bold text-slate-900">Action required</h3>
                   <p className="text-sm text-slate-600">You have pending buyer requests waiting for your approval.</p>
                 </div>
-                <span className="rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700">{pendingLeads.length} pending</span>
+                <span className="rounded-full bg-[#fff8ef] px-4 py-2 text-sm font-semibold text-[#8b6b3f]">{pendingLeads.length} pending</span>
               </div>
               <div className="mt-6 space-y-3">
                 {pendingLeads.map((l) => (
@@ -292,7 +292,7 @@ const UserDashboardPage = () => {
                 </div>
                 <div className={`mt-4 rounded-2xl p-4 ${!l.isUnlockedByOwner ? "bg-white/80 blur-sm grayscale opacity-60" : "bg-white"}`}>
                   <p className="text-sm text-slate-600">{l.contactInfo?.phone} | {l.contactInfo?.email}</p>
-                  {!l.isUnlockedByOwner && <button onClick={() => onUnlockLead(l._id)} className="mt-2 text-xs font-semibold text-blue-700 underline">Unlock Contact</button>}
+                  {!l.isUnlockedByOwner && <button onClick={() => onUnlockLead(l._id)} className="mt-2 text-xs font-semibold text-[#8b6b3f] underline">Unlock Contact</button>}
                 </div>
               </div>
             ))}

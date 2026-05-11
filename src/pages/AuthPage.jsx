@@ -376,7 +376,7 @@ const AuthPage = () => {
         }
         .auth-mode-btn.is-active {
           background: #ffffff;
-          color: #0f172a;
+          color: #8b6b3f;
           box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
         }
 
@@ -452,8 +452,8 @@ const AuthPage = () => {
           transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
         .auth-input-shell:focus-within {
-          border-color: #2563eb;
-          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+          border-color: #b98a53;
+          box-shadow: 0 0 0 3px rgba(185, 138, 83, 0.14);
         }
         .auth-input-icon {
           position: absolute;
@@ -515,7 +515,7 @@ const AuthPage = () => {
           min-height: 58px;
           border: none;
           border-radius: 16px;
-          background: #2563eb;
+          background: #b98a53;
           color: #ffffff;
           font-size: 16px;
           font-weight: 700;
@@ -525,7 +525,7 @@ const AuthPage = () => {
           transition: background 0.18s ease, opacity 0.18s ease;
         }
         .auth-submit:hover:not(:disabled) {
-          background: #1d4ed8;
+          background: #8b6b3f;
         }
         .auth-submit:disabled {
           opacity: 0.7;
@@ -556,7 +556,7 @@ const AuthPage = () => {
           border: none;
           background: transparent;
           padding: 0;
-          color: #2563eb;
+          color: #8b6b3f;
           font-size: 13px;
           font-weight: 700;
           cursor: pointer;
@@ -578,8 +578,27 @@ const AuthPage = () => {
         .auth-security-icon {
           width: 16px;
           height: 16px;
-          color: #2563eb;
+          color: #b98a53;
           flex-shrink: 0;
+        }
+
+        @media (max-width: 560px) {
+          .auth-topbar,
+          .auth-support-row {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+          .auth-support-actions {
+            width: 100%;
+            justify-content: space-between;
+          }
+          .auth-mode-btn {
+            padding: 11px 12px;
+            font-size: 13px;
+          }
+          .auth-title {
+            font-size: 2rem;
+          }
         }
 
         @keyframes spin {

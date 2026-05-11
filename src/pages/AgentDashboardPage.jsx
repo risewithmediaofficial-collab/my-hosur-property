@@ -318,7 +318,7 @@ const AgentDashboardPage = () => {
                         <p className="text-xs text-ink/70">{l.contactInfo?.email}</p>
                       </div>
                       {!l.isUnlockedByOwner && (
-                        <button onClick={() => onUnlockInboxLead(l._id)} className="mt-2 text-[11px] font-semibold text-blue-700 underline hover:text-blue-800">
+                        <button onClick={() => onUnlockInboxLead(l._id)} className="mt-2 text-[11px] font-semibold text-[#8b6b3f] underline hover:text-[#6f5331]">
                           Unlock Contact
                         </button>
                       )}
@@ -338,7 +338,7 @@ const AgentDashboardPage = () => {
                           <button onClick={() => onLeadAction(l._id, "approved")} className="rounded-2xl bg-sage px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-600 transition">
                             Approve
                           </button>
-                          <button onClick={() => onLeadAction(l._id, "rejected")} className="rounded-2xl bg-ink px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition">
+                          <button onClick={() => onLeadAction(l._id, "rejected")} className="rounded-2xl bg-ink px-3 py-2 text-xs font-semibold text-white transition hover:bg-slate-700">
                             Reject
                           </button>
                         </div>
