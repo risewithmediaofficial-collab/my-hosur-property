@@ -360,7 +360,7 @@ const HomePage = () => {
 
                 <div
                   ref={setFloatingCardRef}
-                  className="absolute right-4 top-6 max-w-[190px] rounded-[1.4rem] border border-slate-800 bg-slate-900 p-4 text-white shadow-2xl sm:right-6 sm:top-6"
+                  className="absolute right-4 top-6 hidden max-w-[190px] rounded-[1.4rem] border border-slate-800 bg-slate-900 p-4 text-white shadow-2xl sm:block sm:right-6 sm:top-6"
                 >
                   <p className="flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-[#f3d8af]">
                     <StarIcon className="h-4 w-4" />

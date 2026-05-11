@@ -206,10 +206,10 @@ const AgentDashboardPage = () => {
               { label: "Active Leads", value: leads.length, icon: "👥", color: "from-emerald-500 to-emerald-700" },
               { label: "Lead Credits", value: customerLeadCredits, icon: "🎟️", color: "from-sage to-[#27ae60]" },
             ].map(({ label, value, icon, color }) => (
-              <div key={label} className={`dashboard-shell bg-gradient-to-br ${color} p-5 text-white`}>
+              <div key={label} className="dashboard-shell border border-slate-200 bg-white p-5 text-slate-900">
                 <p className="text-2xl">{icon}</p>
-                <p className="mt-4 text-4xl font-extrabold">{value}</p>
-                <p className="mt-2 text-sm opacity-90">{label}</p>
+                <p className="mt-4 text-4xl font-extrabold text-slate-900">{value}</p>
+                <p className="mt-2 text-sm text-slate-600">{label}</p>
               </div>
             ))}
           </section>

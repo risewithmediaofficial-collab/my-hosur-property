@@ -2,20 +2,34 @@ const CustomerRequest = require("../models/CustomerRequest");
 const User = require("../models/User");
 const Payment = require("../models/Payment");
 const Notification = require("../models/Notification");
+const Property = require("../models/Property");
 const { body } = require("express-validator");
 const crypto = require("crypto");
 const LeadUnlock = require("../models/LeadUnlock");
 const SystemSetting = require("../models/SystemSetting");
 const { hasRazorpayConfig, razorpay } = require("../config/razorpay");
 
+const CUSTOMER_PROPERTY_TYPES = ["Apartment", "Villa", "Independent House", "Plot", "Commercial", "House"];
+
+const getMatchingPropertyTypes = (propertyType) => {
+  const map = {
+    House: ["Independent House", "Villa", "Apartment"],
+    Apartment: ["Apartment"],
+    Villa: ["Villa"],
+    "Independent House": ["Independent House"],
+    Plot: ["Plot"],
+    Commercial: ["Commercial"],
+  };
+
+  return map[propertyType] || [propertyType];
+};
+
 // Validation middleware
 exports.requestValidators = [
   body("location.city").trim().notEmpty().withMessage("City is required"),
   body("location.area").trim().notEmpty().withMessage("Area is required"),
   body("budgetMax").isNumeric().withMessage("Max budget is required"),
-  body("propertyType")
-    .isIn(["Plot", "House", "Apartment"])
-    .withMessage("Invalid property type"),
+  body("propertyType").isIn(CUSTOMER_PROPERTY_TYPES).withMessage("Invalid property type"),
 ];
 
 // 1. Create Request
@@ -34,18 +48,44 @@ exports.createCustomerRequest = async (req, res, next) => {
     });
     await request.save();
 
-    // Notify agents in the city
-    const agents = await User.find({ role: { $in: ["agent", "broker"] }, "companyInfo.operationCenters": location.city });
-    const notifications = agents.map((agent) => ({
-      userId: agent._id,
-      title: "New Customer Requirement",
-      message: `A buyer is looking for a ${propertyType} in ${location.area}, ${location.city}.`,
-      type: "customer_request",
-      linkId: request._id,
-    }));
-    if (notifications.length > 0) await Notification.insertMany(notifications);
+    const propertyTypeOptions = getMatchingPropertyTypes(propertyType);
+    const cityRegex = new RegExp(`^${String(location.city).trim()}$`, "i");
+    const matchingProperties = await Property.find({
+      status: "approved",
+      propertyType: { $in: propertyTypeOptions },
+      "location.city": cityRegex,
+      ...(budgetMax ? { price: { ...(budgetMin ? { $gte: budgetMin } : {}), $lte: budgetMax } } : {}),
+    })
+      .select("ownerId title propertyType location price")
+      .lean();
 
-    res.status(201).json({ message: "Requirement posted", item: request });
+    const recipientIds = [...new Set(matchingProperties.map((item) => String(item.ownerId)).filter(Boolean))];
+
+    if (recipientIds.length > 0) {
+      await Notification.insertMany(
+        recipientIds.map((recipientId) => ({
+          recipientId,
+          senderId: req.user._id,
+          type: "customer_request",
+          title: "New Customer Requirement",
+          message: `${req.user.name} is looking for a ${propertyType} in ${location.area}, ${location.city}.`,
+          payload: {
+            customerRequestId: request._id,
+            propertyType,
+            city: location.city,
+            area: location.area,
+            budgetMin,
+            budgetMax,
+          },
+        }))
+      );
+    }
+
+    res.status(201).json({
+      message: "Requirement posted and shared with matching property owners/agents",
+      item: request,
+      matchedRecipients: recipientIds.length,
+    });
   } catch (error) {
     next(error);
   }
@@ -54,7 +94,9 @@ exports.createCustomerRequest = async (req, res, next) => {
 // 2. Fetch My Requests (for customers)
 exports.myCustomerRequests = async (req, res, next) => {
   try {
-    const requests = await CustomerRequest.find({ customerId: req.user._id }).sort({ createdAt: -1 });
+    const requests = await CustomerRequest.find({ customerId: req.user._id })
+      .populate("matchedAgents", "name email phone role")
+      .sort({ createdAt: -1 });
     res.json({ items: requests });
   } catch (error) {
     next(error);
@@ -111,19 +153,25 @@ exports.sendMatchNotification = async (req, res, next) => {
     const request = await CustomerRequest.findById(id);
     if (!request) return res.status(404).json({ message: "Not found" });
 
-    // Mark agent as matched
-    if (!request.matchedAgents.includes(req.user._id)) {
+    const alreadyMatched = request.matchedAgents.some((agentId) => String(agentId) === String(req.user._id));
+    if (!alreadyMatched) {
       request.matchedAgents.push(req.user._id);
-      await request.save();
     }
+    request.status = "matched";
+    await request.save();
 
-    // Notify customer
     await Notification.create({
-      userId: request.customerId,
-      title: "Agent Found a Match!",
-      message: `${req.user.name} has a property matching your requirement in ${request.location.area}.`,
+      recipientId: request.customerId,
+      senderId: req.user._id,
+      title: "Property Match Received",
+      message: `${req.user.name} has responded to your ${request.propertyType} requirement in ${request.location.area}, ${request.location.city}.`,
       type: "match",
-      linkId: request._id,
+      payload: {
+        customerRequestId: request._id,
+        propertyType: request.propertyType,
+        city: request.location?.city,
+        area: request.location?.area,
+      },
     });
 
     res.json({ message: "Customer notified", item: request });

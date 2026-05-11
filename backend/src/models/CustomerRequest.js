@@ -14,7 +14,11 @@ const customerRequestSchema = new mongoose.Schema(
     },
     budgetMin: { type: Number, default: 0, min: 0 },
     budgetMax: { type: Number, required: true, min: 0 },
-    propertyType: { type: String, enum: ["Plot", "House", "Apartment"], required: true },
+    propertyType: {
+      type: String,
+      enum: ["Apartment", "Villa", "Independent House", "Plot", "Commercial", "House"],
+      required: true,
+    },
     additionalRequirements: { type: String, trim: true, default: "" },
     status: { type: String, enum: ["open", "matched", "closed"], default: "open" },
     matchedAgents: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
