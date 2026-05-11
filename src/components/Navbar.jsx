@@ -92,7 +92,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/40 bg-[rgba(252,250,247,0.82)] backdrop-blur-2xl">
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white">
       <div className="flex w-full items-center justify-between gap-3 px-4 py-3 sm:px-5 lg:px-6">
         <NavLink
           to="/"
@@ -102,7 +102,7 @@ const Navbar = () => {
           }}
           className="inline-flex min-w-0 items-center gap-3 text-slate-900"
         >
-          <div className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[1.15rem] border border-white/60 bg-[linear-gradient(145deg,#111827,#334155)] text-white shadow-[0_18px_36px_rgba(15,23,42,0.22)]">
+          <div className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[1.15rem] border border-slate-200 bg-slate-800 text-white">
             <BuildingOffice2Icon className="h-5 w-5" />
           </div>
           <div className="min-w-0">
@@ -111,7 +111,7 @@ const Navbar = () => {
           </div>
         </NavLink>
 
-        <nav className="hidden items-center gap-2 rounded-full border border-slate-200/80 bg-transparent px-2 py-2 lg:flex">
+        <nav className="hidden items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-2 lg:flex">
           {primaryNavLinks.map(renderDesktopLink)}
         </nav>
 
@@ -141,7 +141,7 @@ const Navbar = () => {
               </NavLink>
               <button
                 onClick={onLogout}
-                className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/80 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-[#d7b88b] hover:bg-[#fff9f0] hover:text-slate-900"
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-[#d7b88b] hover:bg-[#fff9f0] hover:text-slate-900"
               >
                 <ArrowRightOnRectangleIcon className="h-4 w-4" />
                 Logout
@@ -161,7 +161,7 @@ const Navbar = () => {
 
         <button
           type="button"
-          className="inline-flex rounded-2xl border border-white/60 bg-white/80 p-2.5 text-slate-700 shadow-[0_8px_18px_rgba(15,23,42,0.05)] transition hover:bg-[#fff9f0] lg:hidden"
+          className="inline-flex rounded-2xl border border-slate-200 bg-white p-2.5 text-slate-700 transition hover:bg-[#fff9f0] lg:hidden"
           onClick={() => setMobileMenuOpen((value) => !value)}
         >
           {mobileMenuOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
@@ -169,7 +169,7 @@ const Navbar = () => {
       </div>
 
       {mobileMenuOpen ? (
-        <div className="border-t border-white/60 bg-[rgba(252,250,247,0.94)] lg:hidden">
+        <div className="border-t border-slate-200 bg-white lg:hidden">
           <div className="flex flex-col gap-3 px-4 py-4 sm:px-5">
             <nav className="flex flex-col gap-2">{primaryNavLinks.map(renderMobileLink)}</nav>
             <div className="border-t border-slate-200/70 pt-3">
@@ -183,7 +183,7 @@ const Navbar = () => {
                     }}
                     className={({ isActive }) =>
                       `flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
-                        isActive ? "border-slate-900 bg-transparent text-slate-900" : "border-slate-200/80 bg-transparent text-slate-700 hover:border-slate-300 hover:text-slate-900"
+                        isActive ? "border-slate-900 bg-transparent text-slate-900" : "border-slate-200 bg-transparent text-slate-700 hover:border-slate-300 hover:text-slate-900"
                       }`
                     }
                   >
@@ -200,7 +200,7 @@ const Navbar = () => {
                   <button
                     type="button"
                     onClick={onLogout}
-                    className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200/80 bg-white/80 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-[#fff9f0]"
+                    className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-[#fff9f0]"
                   >
                     <ArrowRightOnRectangleIcon className="h-5 w-5" />
                     Logout
