@@ -151,7 +151,7 @@ const Navbar = () => {
             <NavLink
               to="/auth"
               onClick={scrollToTop}
-              className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#111827,#334155)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_18px_34px_rgba(15,23,42,0.2)] transition hover:translate-y-[-1px]"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-transparent px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
             >
               <ArrowRightOnRectangleIcon className="h-4 w-4" />
               Sign in
@@ -213,7 +213,7 @@ const Navbar = () => {
                     scrollToTop();
                     closeMenu();
                   }}
-                  className="flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#111827,#334155)] px-4 py-3 text-sm font-semibold text-white"
+                  className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-transparent px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
                 >
                   <ArrowRightOnRectangleIcon className="h-5 w-5" />
                   Sign in / Create account
