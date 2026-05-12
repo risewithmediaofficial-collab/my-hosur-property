@@ -152,9 +152,9 @@ const listPropertyApplications = async (req, res) => {
   const { page, limit, skip } = buildPagination(req.query.page, req.query.limit);
   const query = {};
 
-  if (req.query.status) {
+  if (req.query.status && req.query.status !== "all") {
     query.status = req.query.status;
-  } else {
+  } else if (!req.query.status) {
     query.status = "pending";
   }
   if (req.query.city) {

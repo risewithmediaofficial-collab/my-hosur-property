@@ -12,7 +12,6 @@ import {
   fetchAdminPropertyApplications,
   fetchAdminUsers,
   updateAdminLeadPrice,
-  updatePropertyStatus,
   toggleUserStatus,
   updateAdminUserNotes,
   sendAdminEmail,
@@ -20,6 +19,7 @@ import {
 import toast from "react-hot-toast";
 import PropertyPostingForm from "../components/PropertyPostingForm";
 import DashboardSidebar from "../components/DashboardSidebar";
+import { deleteProperty, fetchProperties } from "../services/api/propertyApi";
 import { 
   UsersIcon,
   ChartBarIcon,
@@ -35,7 +35,7 @@ const AdminDashboardPage = () => {
   const [metrics, setMetrics] = useState({});
   const [users, setUsers] = useState([]);
   const [payments, setPayments] = useState([]);
-  const [pending, setPending] = useState([]);
+  const [propertyListings, setPropertyListings] = useState([]);
   const [leads, setLeads] = useState([]);
   const [customerRequests, setCustomerRequests] = useState([]);
   const [leadUnlocks, setLeadUnlocks] = useState([]);
@@ -98,11 +98,11 @@ const AdminDashboardPage = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [metricsRes, usersRes, paymentsRes, pendingRes, leadsRes, customerRequestsRes, leadUnlocksRes, leadPriceRes] = await Promise.allSettled([
+      const [metricsRes, usersRes, paymentsRes, propertyRes, leadsRes, customerRequestsRes, leadUnlocksRes, leadPriceRes] = await Promise.allSettled([
         fetchAdminMetrics(token),
         fetchAdminUsers(token),
         fetchAdminPayments(token),
-        fetchAdminPropertyApplications(token, { status: "pending", limit: 30 }),
+        fetchAdminPropertyApplications(token, { status: "all", limit: 100 }),
         fetchAdminLeads(token, { limit: 50 }),
         fetchAdminCustomerRequests(token, { limit: 50 }),
         fetchAdminLeadUnlocks(token, { limit: 50 }),
@@ -112,7 +112,7 @@ const AdminDashboardPage = () => {
       if (metricsRes.status === "fulfilled") setMetrics(metricsRes.value);
       if (usersRes.status === "fulfilled") setUsers(usersRes.value.items || []);
       if (paymentsRes.status === "fulfilled") setPayments(paymentsRes.value.items || []);
-      if (pendingRes.status === "fulfilled") setPending(pendingRes.value.items || []);
+      if (propertyRes.status === "fulfilled") setPropertyListings(propertyRes.value.items || []);
       if (leadsRes.status === "fulfilled") setLeads(leadsRes.value.items || []);
       if (customerRequestsRes.status === "fulfilled") setCustomerRequests(customerRequestsRes.value.items || []);
       if (leadUnlocksRes.status === "fulfilled") setLeadUnlocks(leadUnlocksRes.value.items || []);
@@ -128,11 +128,9 @@ const AdminDashboardPage = () => {
 
   useEffect(() => {
     if (selectedUser) {
-      import("../services/api/propertyApi").then(({ fetchProperties }) => {
-        fetchProperties({ ownerId: selectedUser._id, status: "all" }, token)
-          .then((res) => setUserProperties(res.items || []))
-          .catch(() => setUserProperties([]));
-      });
+      fetchProperties({ ownerId: selectedUser._id, status: "all" }, token)
+        .then((res) => setUserProperties(res.items || []))
+        .catch(() => setUserProperties([]));
     } else {
       setUserProperties([]);
     }
@@ -149,13 +147,21 @@ const AdminDashboardPage = () => {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  const moderate = async (id, status) => {
+  const openProperty = (propertyId) => {
+    navigate(`/property/${propertyId}`);
+  };
+
+  const onDeleteProperty = async (propertyId, propertyTitle) => {
+    if (!window.confirm(`Delete "${propertyTitle}"? This action cannot be undone.`)) return;
+
     try {
-      await updatePropertyStatus(token, id, status);
-      toast.success(`Property ${status}`);
+      await deleteProperty(token, propertyId);
+      toast.success("Property deleted");
+      setPropertyListings((current) => current.filter((item) => item._id !== propertyId));
+      setUserProperties((current) => current.filter((item) => item._id !== propertyId));
       load();
-    } catch {
-      toast.error("Failed moderation action");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to delete property");
     }
   };
 
@@ -247,7 +253,7 @@ const AdminDashboardPage = () => {
       description="Manage users, listings, leads, payments, and settings from one clean control center."
       stats={[
         { label: "Users", value: metrics.users || users.length || 0 },
-        { label: "Pending Properties", value: pending.length },
+        { label: "Posted Properties", value: propertyListings.length || metrics.properties || 0 },
         { label: "Payments", value: payments.length },
         { label: "Lead Requests", value: leads.length },
       ]}
@@ -430,9 +436,9 @@ const AdminDashboardPage = () => {
 
         {activeTab === "properties" && (
           <section className="dashboard-shell p-6">
-            <h2 className="text-lg font-bold text-slate-900">Pending Property Approval Queue</h2>
+            <h2 className="text-lg font-bold text-slate-900">Posted Properties</h2>
             <p className="mt-1 text-sm text-slate-600">
-              Every property posted by owner/agent/broker/builder appears here first. Only after admin approval it goes live on Home page.
+              Properties go live as soon as users publish them. Open any listing to review it, see who posted it, or delete it from the platform.
             </p>
             <div className="mt-3 overflow-x-auto">
               <table className="dashboard-table min-w-full text-left text-sm">
@@ -440,34 +446,69 @@ const AdminDashboardPage = () => {
                   <tr className="border-b border-clay">
                     <th className="py-2">Image</th>
                     <th className="py-2">Property</th>
-                    <th className="py-2">City</th>
+                    <th className="py-2">Location</th>
                     <th className="py-2">Posted By</th>
+                    <th className="py-2">Status</th>
                     <th className="py-2 text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {pending.map((p) => (
+                  {propertyListings.map((p) => (
                     <tr key={p._id} className="border-b border-clay/60 align-middle">
                       <td className="py-2">
-                         <img 
-                          src={p.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=120&q=80"} 
-                          alt="Property" 
-                          className="h-10 w-10 rounded-md object-cover border border-clay" 
-                         />
+                        <button type="button" onClick={() => openProperty(p._id)} className="block">
+                          <img
+                            src={p.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=120&q=80"}
+                            alt={p.title}
+                            className="h-12 w-12 rounded-md border border-clay object-cover"
+                          />
+                        </button>
                       </td>
-                      <td className="py-2 font-medium">{p.title}</td>
-                      <td className="py-2 text-ink/70">{p.location?.city}</td>
-                      <td className="py-2 text-ink/70">{p.ownerId?.name || "Unknown"} ({p.ownerType || p.ownerId?.role || "user"})</td>
+                      <td className="py-2">
+                        <button type="button" onClick={() => openProperty(p._id)} className="text-left transition hover:text-sage">
+                          <p className="font-medium">{p.title}</p>
+                          <p className="text-xs text-ink/65">
+                            Rs. {Number(p.price || 0).toLocaleString("en-IN")} · {p.propertyType || "Property"} · {p.listingType || "sale"}
+                          </p>
+                          <p className="text-xs text-ink/50">Posted {new Date(p.createdAt).toLocaleDateString("en-IN")}</p>
+                        </button>
+                      </td>
+                      <td className="py-2 text-ink/70">
+                        <p>{p.location?.city || "-"}</p>
+                        <p className="text-xs text-ink/50">{p.location?.area || "-"}</p>
+                      </td>
+                      <td className="py-2 text-ink/70">
+                        <p className="font-medium text-ink">{p.ownerId?.name || "Unknown"}</p>
+                        <p className="text-xs">{p.ownerId?.email || "No email"}</p>
+                        <p className="text-xs capitalize">{p.ownerType || p.ownerId?.role || "user"}</p>
+                      </td>
+                      <td className="py-2">
+                        <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
+                          p.status === "approved"
+                            ? "bg-green-100 text-green-700"
+                            : p.status === "pending"
+                              ? "bg-amber-100 text-amber-700"
+                              : "bg-red-100 text-red-700"
+                        }`}>
+                          {p.status}
+                        </span>
+                      </td>
                       <td className="py-2 text-right">
                         <div className="flex flex-wrap justify-end gap-2">
-                          <button onClick={() => moderate(p._id, "approved")} className="rounded-md bg-sage px-3 py-1 text-xs font-semibold text-white hover:opacity-90">Approve</button>
-                          <button onClick={() => moderate(p._id, "rejected")} className="rounded-md bg-ink px-3 py-1 text-xs font-semibold text-white hover:opacity-90">Reject</button>
-                          <button onClick={() => navigate(`/edit-property/${p._id}`)} className="rounded-md border border-clay bg-white px-3 py-1 text-xs font-semibold hover:bg-stone">Edit</button>
+                          <button onClick={() => openProperty(p._id)} className="rounded-md border border-clay bg-white px-3 py-1 text-xs font-semibold hover:bg-stone">
+                            View
+                          </button>
+                          <button
+                            onClick={() => onDeleteProperty(p._id, p.title)}
+                            className="rounded-md bg-red-600 px-3 py-1 text-xs font-semibold text-white hover:bg-red-700"
+                          >
+                            Delete
+                          </button>
                         </div>
                       </td>
                     </tr>
                   ))}
-                  {pending.length === 0 && <tr><td colSpan={5} className="py-8 text-center text-ink/50">No pending properties</td></tr>}
+                  {propertyListings.length === 0 && <tr><td colSpan={6} className="py-8 text-center text-ink/50">No properties posted yet.</td></tr>}
                 </tbody>
               </table>
             </div>
@@ -613,8 +654,8 @@ const AdminDashboardPage = () => {
                 </div>
                 <div className="bg-stone p-3 rounded-xl border border-clay/50">
                   <p className="text-xs text-ink/60 mb-1">Properties (Total: {selectedUser.propertyStats?.total || 0})</p>
-                  <p className="text-xs font-semibold text-sage">Approved: {selectedUser.propertyStats?.approved || 0}</p>
-                  <p className="text-xs font-semibold text-amber-600 mt-0.5">Pending: {selectedUser.propertyStats?.pending || 0}</p>
+                  <p className="text-xs font-semibold text-sage">Live: {selectedUser.propertyStats?.approved || 0}</p>
+                  <p className="text-xs font-semibold text-amber-600 mt-0.5">Pending/Other: {selectedUser.propertyStats?.pending || 0}</p>
                 </div>
               </div>
 
@@ -661,11 +702,17 @@ const AdminDashboardPage = () => {
                       <div key={p._id} className="flex flex-col gap-2 rounded-xl border border-clay/40 bg-stone p-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                           <p className="text-xs font-bold truncate max-w-[180px]">{p.title}</p>
+                          <p className="text-[10px] text-ink/50">Rs. {Number(p.price || 0).toLocaleString("en-IN")}</p>
                           <p className="text-[10px] text-ink/60">{p.location?.city} — {p.status}</p>
                         </div>
-                        <button onClick={() => { setSelectedUser(null); navigate(`/edit-property/${p._id}`); }} className="text-[10px] font-bold text-ink/80 border border-clay px-2 py-1 rounded-md hover:bg-clay/20">
-                          Edit Detail
-                        </button>
+                        <div className="flex gap-2">
+                          <button onClick={() => { setSelectedUser(null); openProperty(p._id); }} className="text-[10px] font-bold text-ink/80 border border-clay px-2 py-1 rounded-md hover:bg-clay/20">
+                            View Property
+                          </button>
+                          <button onClick={() => onDeleteProperty(p._id, p.title)} className="rounded-md bg-red-600 px-2 py-1 text-[10px] font-bold text-white hover:bg-red-700">
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>

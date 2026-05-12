@@ -20,6 +20,9 @@ backend/.env
 backend/.env.local
 backend/.env.production
 backend/uploads/
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
 
 # Editor directories and files
 .vscode/*

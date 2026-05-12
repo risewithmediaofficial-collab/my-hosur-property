@@ -32,7 +32,13 @@ const hasActivePlan = (user) => {
 };
 
 const buildQuery = (q, user = {}) => {
-  const query = { status: q.status || "approved" };
+  const query = {};
+
+  if (q.status && q.status !== "all") {
+    query.status = q.status;
+  } else if (!q.status) {
+    query.status = "approved";
+  }
 
   if (q.search) {
     query.$text = { $search: q.search };
@@ -115,7 +121,7 @@ const listProperties = async (req, res) => {
     }
   }
 
-  const query = buildQuery(req.query);
+  const query = buildQuery(req.query, req.user);
   const itemsRaw = await Property.find(query).populate("ownerId", "name email phone role");
 
   const itemsWithRank = itemsRaw.map((item) => ({
