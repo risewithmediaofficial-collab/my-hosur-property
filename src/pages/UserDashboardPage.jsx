@@ -10,6 +10,7 @@ import { fetchMyPayments } from "../services/api/paymentApi";
 import { fetchSavedProperties } from "../services/api/userApi";
 import { buyLeadPackIntent, verifyLeadPackPayment } from "../services/api/customerRequestApi";
 import { loadExternalScript } from "../utils/loadExternalScript";
+import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
 import toast from "react-hot-toast";
 
 const SELLER_ROLES = ["seller", "agent", "broker", "builder", "admin"];
@@ -252,7 +253,7 @@ const UserDashboardPage = () => {
                 <tbody>
                   {myProperties.map((p) => (
                     <tr key={p._id}>
-                      <td><img src={p.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=120&q=80"} alt="Property" className="h-10 w-10 rounded-xl object-cover border border-slate-200" /></td>
+                      <td><img src={p.images?.[0] || PROPERTY_PLACEHOLDER_IMAGE} alt="Property" className="h-10 w-10 rounded-xl object-cover border border-slate-200" /></td>
                       <td className="font-medium text-slate-900">{p.title}</td>
                       <td>{p.location?.city}</td>
                       <td><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">{p.status}</span></td>

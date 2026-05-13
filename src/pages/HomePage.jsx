@@ -607,22 +607,6 @@ const HomePage = () => {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(255,248,238,0.92))] p-6 text-slate-900 shadow-[0_18px_42px_rgba(15,23,42,0.08)]">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#8b6b3f]">Motion system</p>
-              <h3 className="mt-2 text-3xl font-semibold">Built to feel more like a luxury product than a classifieds board.</h3>
-              <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                {[
-                  { value: "Framer Motion", label: "Layered entry transitions" },
-                  { value: "GSAP", label: "Scroll-based reveal rhythm" },
-                  { value: "Tailwind", label: "Sharper premium surfaces" },
-                ].map((item) => (
-                  <div key={item.label} className="rounded-[1.2rem] border border-white/70 bg-white/84 p-4">
-                    <p className="text-lg font-semibold text-slate-900">{item.value}</p>
-                    <p className="mt-2 text-xs leading-6 text-slate-600">{item.label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
 
           <div className="grid gap-6">

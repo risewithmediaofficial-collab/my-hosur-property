@@ -7,6 +7,8 @@ import { loginUser, requestOtp, signupUser, socialLogin, verifyOtp } from "../se
 import useAuth from "../hooks/useAuth";
 import { loadExternalScript } from "../utils/loadExternalScript";
 
+const MotionDiv = motion.div;
+
 const fade = {
   hidden: { opacity: 0, y: 24 },
   show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } },
@@ -23,17 +25,17 @@ const item = {
 };
 
 const Field = ({ label, icon: Icon, ...props }) => (
-  <motion.div variants={item} className="auth-field-wrap">
+  <MotionDiv variants={item} className="auth-field-wrap">
     <label className="auth-label">{label}</label>
     <div className="auth-input-shell">
       {Icon ? <Icon className="auth-input-icon" /> : null}
       <input className={`auth-input ${Icon ? "auth-input-with-icon" : ""}`} {...props} />
     </div>
-  </motion.div>
+  </MotionDiv>
 );
 
 const SelectField = ({ label, icon: Icon, children, ...props }) => (
-  <motion.div variants={item} className="auth-field-wrap">
+  <MotionDiv variants={item} className="auth-field-wrap">
     <label className="auth-label">{label}</label>
     <div className="auth-input-shell">
       {Icon ? <Icon className="auth-input-icon" /> : null}
@@ -41,7 +43,7 @@ const SelectField = ({ label, icon: Icon, children, ...props }) => (
         {children}
       </select>
     </div>
-  </motion.div>
+  </MotionDiv>
 );
 
 const AuthPage = () => {

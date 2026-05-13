@@ -1,8 +1,5 @@
 import apiClient, { withAuth } from "./client";
 
-const FALLBACK_PROPERTY_IMAGE =
-  "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=900&q=60";
-
 const getImageUrl = (path) => {
   if (!path) return "";
   if (path.startsWith("http")) return path;
@@ -19,7 +16,7 @@ const normalizeProperty = (item) => {
 
   return {
     ...item,
-    images: images.length ? images : [FALLBACK_PROPERTY_IMAGE],
+    images,
     documents,
   };
 };

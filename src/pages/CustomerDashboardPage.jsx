@@ -94,10 +94,6 @@ const CustomerDashboardPage = () => {
   const unreadCount = useMemo(() => notifications.filter((item) => !item.readAt).length, [notifications]);
   const openCount = useMemo(() => requests.filter((item) => item.status === "open").length, [requests]);
   const matchedCount = useMemo(() => requests.filter((item) => item.status === "matched").length, [requests]);
-  const totalMatches = useMemo(
-    () => requests.reduce((sum, item) => sum + (item.matchedAgents?.length || 0), 0),
-    [requests]
-  );
   const matchNotifications = useMemo(
     () => notifications.filter((item) => item.type === "match"),
     [notifications]

@@ -6,7 +6,6 @@ const buildPagination = require("../utils/paginate");
 const sendEmail = require("../utils/sendEmail");
 const {
   newPropertyEmail,
-  inquiryConfirmationEmail,
   adminPropertyNotificationEmail,
 } = require("../utils/emailTemplates");
 const { normalizeUploadList } = require("../utils/uploadPaths");
@@ -25,13 +24,7 @@ const propertyValidators = [
   body("location.area").trim().notEmpty(),
 ];
 
-const hasActivePlan = (user) => {
-  const plan = user?.activePlan;
-  if (!plan?.expiresAt) return false;
-  return new Date(plan.expiresAt) >= new Date();
-};
-
-const buildQuery = (q, user = {}) => {
+const buildQuery = (q) => {
   const query = {};
 
   if (q.status && q.status !== "all") {
@@ -121,7 +114,7 @@ const listProperties = async (req, res) => {
     }
   }
 
-  const query = buildQuery(req.query, req.user);
+  const query = buildQuery(req.query);
   const itemsRaw = await Property.find(query).populate("ownerId", "name email phone role");
 
   const itemsWithRank = itemsRaw.map((item) => ({

@@ -1,6 +1,5 @@
 const CustomerRequest = require("../models/CustomerRequest");
 const User = require("../models/User");
-const Payment = require("../models/Payment");
 const Notification = require("../models/Notification");
 const Property = require("../models/Property");
 const { body } = require("express-validator");
@@ -116,8 +115,6 @@ exports.listForAgents = async (req, res, next) => {
     if (city) filter["location.city"] = new RegExp(city, "i");
 
     const requests = await CustomerRequest.find(filter).sort({ createdAt: -1 }).lean();
-
-    const agentIdStr = String(req.user._id);
 
     // Fetch unlocks to see which ones this agent paid for
     const unlocks = await LeadUnlock.find({

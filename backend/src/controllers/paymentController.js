@@ -4,39 +4,77 @@ const Plan = require("../models/Plan");
 const User = require("../models/User");
 const { hasRazorpayConfig, razorpay } = require("../config/razorpay");
 
+const isPlanActive = (activePlan) =>
+  Boolean(activePlan?.expiresAt && new Date(activePlan.expiresAt) >= new Date());
+
+const addDays = (date, days) => {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+};
+
 const activateUserPlan = async (payment) => {
   const plan = payment.planId;
-  const expires = new Date();
-  expires.setDate(expires.getDate() + plan.durationDays);
+  const user = await User.findById(payment.userId);
+  if (!user) return;
 
-  const update = {
-    canPostProperty: true,
-    activePlan: {
-      planId: plan._id,
-      expiresAt: expires,
-      listingLimit: plan.listingLimit,
-      listingsUsed: 0,
-      isBoosted: plan.featuredBoost,
-      contactUnlocks: plan.contactUnlocks || 0,
-      leadCredits: plan.leadCredits || 0,
-      boostDays: plan.boostDays || 7,
-    },
-    contactAccess: {
-      monthlyLimit: Math.max(plan.contactUnlocks || 0, 3),
-      usedCount: 0,
-      resetAt: expires,
-      isPremium: (plan.contactUnlocks || 0) > 0,
-    },
+  const currentPlan = user.activePlan?.toObject ? user.activePlan.toObject() : { ...(user.activePlan || {}) };
+  const hasCurrentActivePlan = isPlanActive(currentPlan);
+  const carryForwardListings = hasCurrentActivePlan
+    ? Math.max((currentPlan.listingLimit || 0) - (currentPlan.listingsUsed || 0), 0)
+    : 0;
+  const carryForwardUnlocks = hasCurrentActivePlan ? Math.max(currentPlan.contactUnlocks || 0, 0) : 0;
+  const carryForwardPlanLeadCredits = hasCurrentActivePlan ? Math.max(currentPlan.leadCredits || 0, 0) : 0;
+  const planBaseDate = hasCurrentActivePlan ? new Date(currentPlan.expiresAt) : new Date();
+  const expiresAt = addDays(planBaseDate, plan.durationDays);
+
+  user.canPostProperty = true;
+
+  if (plan.category === "database_access") {
+    user.contactAccess = {
+      monthlyLimit: Math.max((user.contactAccess?.monthlyLimit || 0) + (plan.contactUnlocks || 0), 3),
+      usedCount: user.contactAccess?.usedCount || 0,
+      resetAt:
+        user.contactAccess?.resetAt && new Date(user.contactAccess.resetAt) >= new Date()
+          ? user.contactAccess.resetAt
+          : expiresAt,
+      isPremium: true,
+    };
+
+    user.activePlan = {
+      ...currentPlan,
+      expiresAt: hasCurrentActivePlan ? currentPlan.expiresAt : expiresAt,
+      contactUnlocks: Math.max(currentPlan.contactUnlocks || 0, 0) + (plan.contactUnlocks || 0),
+      leadCredits: Math.max(currentPlan.leadCredits || 0, 0) + (plan.leadCredits || 0),
+    };
+
+    await user.save();
+    return;
+  }
+
+  user.activePlan = {
+    planId: plan._id,
+    expiresAt,
+    listingLimit: (plan.listingLimit || 0) + carryForwardListings,
+    listingsUsed: 0,
+    isBoosted: plan.featuredBoost,
+    contactUnlocks: (plan.contactUnlocks || 0) + carryForwardUnlocks,
+    leadCredits: (plan.leadCredits || 0) + carryForwardPlanLeadCredits,
+    boostDays: plan.boostDays || 7,
+  };
+
+  user.contactAccess = {
+    monthlyLimit: Math.max(plan.contactUnlocks || 0, 3),
+    usedCount: 0,
+    resetAt: expiresAt,
+    isPremium: (plan.contactUnlocks || 0) > 0,
   };
 
   if (plan.category === "broker_leads") {
-    update.$inc = { leadCredits: plan.leadCredits || 0 };
+    user.leadCredits = (user.leadCredits || 0) + (plan.leadCredits || 0);
   }
 
-  await User.findByIdAndUpdate(payment.userId, {
-    ...(update.$inc ? { $inc: update.$inc } : {}),
-    $set: update,
-  });
+  await user.save();
 };
 
 const createPaymentIntent = async (req, res) => {

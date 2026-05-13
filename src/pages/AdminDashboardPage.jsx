@@ -20,6 +20,7 @@ import toast from "react-hot-toast";
 import PropertyPostingForm from "../components/PropertyPostingForm";
 import DashboardSidebar from "../components/DashboardSidebar";
 import { deleteProperty, fetchProperties } from "../services/api/propertyApi";
+import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
 import { 
   UsersIcon,
   ChartBarIcon,
@@ -458,7 +459,7 @@ const AdminDashboardPage = () => {
                       <td className="py-2">
                         <button type="button" onClick={() => openProperty(p._id)} className="block">
                           <img
-                            src={p.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=120&q=80"}
+                            src={p.images?.[0] || PROPERTY_PLACEHOLDER_IMAGE}
                             alt={p.title}
                             className="h-12 w-12 rounded-md border border-clay object-cover"
                           />

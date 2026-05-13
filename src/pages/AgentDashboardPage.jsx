@@ -15,6 +15,7 @@ import {
 import { loadExternalScript } from "../utils/loadExternalScript";
 import DashboardSidebar from "../components/DashboardSidebar";
 import Loader from "../components/Loader";
+import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
 
 const fmt = (d) => new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 
@@ -205,7 +206,7 @@ const AgentDashboardPage = () => {
               { label: "Total Listings", value: properties.length, icon: "🏠", color: "from-blue-500 to-blue-700" },
               { label: "Active Leads", value: leads.length, icon: "👥", color: "from-emerald-500 to-emerald-700" },
               { label: "Lead Credits", value: customerLeadCredits, icon: "🎟️", color: "from-sage to-[#27ae60]" },
-            ].map(({ label, value, icon, color }) => (
+            ].map(({ label, value, icon }) => (
               <div key={label} className="dashboard-shell border border-slate-200 bg-white p-5 text-slate-900">
                 <p className="text-2xl">{icon}</p>
                 <p className="mt-4 text-4xl font-extrabold text-slate-900">{value}</p>
@@ -255,7 +256,7 @@ const AgentDashboardPage = () => {
                 {properties.map((p) => (
                   <tr key={p._id}>
                     <td>
-                      <img src={p.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=120&q=80"} alt="Property" className="h-12 w-12 rounded-xl object-cover border border-slate-200" />
+                      <img src={p.images?.[0] || PROPERTY_PLACEHOLDER_IMAGE} alt="Property" className="h-12 w-12 rounded-xl object-cover border border-slate-200" />
                     </td>
                     <td className="font-medium text-slate-900">{p.title}</td>
                     <td>{p.location?.city}</td>

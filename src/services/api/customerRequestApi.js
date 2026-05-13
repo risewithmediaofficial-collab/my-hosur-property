@@ -1,4 +1,4 @@
-import client, { withAuth } from "./client";
+import client from "./client";
 
 export const createCustomerRequest = (token, payload) =>
   client.post("/api/customer-requests", payload, { headers: { Authorization: `Bearer ${token}` } })

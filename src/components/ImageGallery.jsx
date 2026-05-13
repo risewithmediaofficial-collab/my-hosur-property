@@ -1,13 +1,14 @@
-import { useState } from "react";
-
-const FALLBACK_PROPERTY_IMAGE =
-  "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=60";
+import { useEffect, useState } from "react";
+import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
 
 const ImageGallery = ({ images = [] }) => {
-  const safeImages = images.length
-    ? images
-    : [FALLBACK_PROPERTY_IMAGE];
-  const [active, setActive] = useState(safeImages[0]);
+  const safeImages = images.filter(Boolean);
+  const primaryImage = safeImages[0] || PROPERTY_PLACEHOLDER_IMAGE;
+  const [active, setActive] = useState(primaryImage);
+
+  useEffect(() => {
+    setActive(primaryImage);
+  }, [primaryImage]);
 
   return (
     <div className="space-y-4">
@@ -17,7 +18,7 @@ const ImageGallery = ({ images = [] }) => {
             src={active}
             alt="Property"
             className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
-            onError={() => setActive(FALLBACK_PROPERTY_IMAGE)}
+            onError={() => setActive(PROPERTY_PLACEHOLDER_IMAGE)}
           />
         </div>
       </div>
@@ -43,7 +44,7 @@ const ImageGallery = ({ images = [] }) => {
                 className="h-20 w-24 object-cover"
                 loading="lazy"
                 onError={(event) => {
-                  event.currentTarget.src = FALLBACK_PROPERTY_IMAGE;
+                  event.currentTarget.src = PROPERTY_PLACEHOLDER_IMAGE;
                 }}
               />
             </button>
