@@ -14,6 +14,7 @@ import Breadcrumbs from "../components/Breadcrumbs";
 import PropertyCard from "../components/PropertyCard";
 import FilterSidebar from "../components/FilterSidebar";
 import SeoHead from "../components/SeoHead";
+import useBodyScrollLock from "../hooks/useBodyScrollLock";
 import useDebounce from "../hooks/useDebounce";
 import useAuth from "../hooks/useAuth";
 import { fetchProperties } from "../services/api/propertyApi";
@@ -80,6 +81,8 @@ const ListingPage = () => {
   const sentinelRef = useRef(null);
   const heroRef = useRef(null);
   const revealRefs = useRef([]);
+
+  useBodyScrollLock(mobileFilterOpen);
 
   const setRevealRef = (node) => {
     if (node && !revealRefs.current.includes(node)) {
@@ -262,8 +265,8 @@ const ListingPage = () => {
       {mobileFilterOpen ? (
         <div className="fixed inset-0 z-50 flex md:hidden">
           <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm" onClick={() => setMobileFilterOpen(false)} />
-          <aside className="relative ml-auto h-full w-full max-w-sm overflow-y-auto rounded-l-[32px] border-l border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(249,245,238,0.94))] p-5 shadow-[0_28px_80px_rgba(15,23,42,0.2)]">
-            <div className="mb-5 flex items-center justify-between gap-3">
+          <aside className="relative ml-auto flex h-full w-full max-w-[86vw] flex-col overflow-hidden rounded-l-[32px] border-l border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(249,245,238,0.94))] shadow-[0_28px_80px_rgba(15,23,42,0.2)]">
+            <div className="mb-5 flex items-center justify-between gap-3 px-5 pt-5">
               <div className="min-w-0">
                 <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#8b6b3f]">Filters</p>
                 <h2 className="mt-1 text-lg font-bold text-slate-900">Refine search</h2>
@@ -272,14 +275,16 @@ const ListingPage = () => {
                 <XMarkIcon className="h-5 w-5" />
               </button>
             </div>
-            <FilterSidebar
-              filters={filters}
-              setFilters={setFilters}
-              clearFilters={() => {
-                clearFilters();
-                setMobileFilterOpen(false);
-              }}
-            />
+            <div className="flex-1 overflow-y-auto px-5 pb-6">
+              <FilterSidebar
+                filters={filters}
+                setFilters={setFilters}
+                clearFilters={() => {
+                  clearFilters();
+                  setMobileFilterOpen(false);
+                }}
+              />
+            </div>
           </aside>
         </div>
       ) : null}

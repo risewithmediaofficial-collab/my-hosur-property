@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import useBodyScrollLock from "../hooks/useBodyScrollLock";
 import { primaryNavLinks } from "../constants/navigation";
 import {
   ArrowRightOnRectangleIcon,
@@ -32,6 +33,12 @@ const Navbar = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dashboardPath = user?.role === "admin" ? "/admin/dashboard" : "/dashboard";
+
+  useBodyScrollLock(mobileMenuOpen);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const closeMenu = () => setMobileMenuOpen(false);
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
@@ -169,56 +176,58 @@ const Navbar = () => {
       </div>
 
       {mobileMenuOpen ? (
-        <div className="border-t border-slate-200 bg-white lg:hidden">
-          <div className="flex flex-col gap-3 px-4 py-4 sm:px-5">
-            <nav className="flex flex-col gap-2">{primaryNavLinks.map(renderMobileLink)}</nav>
-            <div className="border-t border-slate-200/70 pt-3">
-              {isAuthenticated ? (
-                <div className="flex flex-col gap-2">
+        <div className="border-t border-slate-200 bg-white shadow-[0_18px_38px_rgba(15,23,42,0.08)] lg:hidden">
+          <div className="max-h-[calc(100dvh-4.75rem)] overflow-y-auto px-4 py-4 sm:px-5">
+            <div className="flex flex-col gap-3">
+              <nav className="flex flex-col gap-2">{primaryNavLinks.map(renderMobileLink)}</nav>
+              <div className="border-t border-slate-200/70 pt-3">
+                {isAuthenticated ? (
+                  <div className="flex flex-col gap-2">
+                    <NavLink
+                      to={dashboardPath}
+                      onClick={() => {
+                        scrollToTop();
+                        closeMenu();
+                      }}
+                      className={({ isActive }) =>
+                        `flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
+                          isActive ? "border-slate-900 bg-transparent text-slate-900" : "border-slate-200 bg-transparent text-slate-700 hover:border-slate-300 hover:text-slate-900"
+                        }`
+                      }
+                    >
+                      {({ isActive }) => {
+                        const DashboardIcon = isActive ? Squares2X2SolidIcon : Squares2X2Icon;
+                        return (
+                          <>
+                            <DashboardIcon className="h-5 w-5" />
+                            <span>{["agent", "broker"].includes(user?.role) ? "Broker Dashboard" : "Dashboard"}</span>
+                          </>
+                        );
+                      }}
+                    </NavLink>
+                    <button
+                      type="button"
+                      onClick={onLogout}
+                      className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-[#fff9f0]"
+                    >
+                      <ArrowRightOnRectangleIcon className="h-5 w-5" />
+                      Logout
+                    </button>
+                  </div>
+                ) : (
                   <NavLink
-                    to={dashboardPath}
+                    to="/auth"
                     onClick={() => {
                       scrollToTop();
                       closeMenu();
                     }}
-                    className={({ isActive }) =>
-                      `flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
-                        isActive ? "border-slate-900 bg-transparent text-slate-900" : "border-slate-200 bg-transparent text-slate-700 hover:border-slate-300 hover:text-slate-900"
-                      }`
-                    }
-                  >
-                    {({ isActive }) => {
-                      const DashboardIcon = isActive ? Squares2X2SolidIcon : Squares2X2Icon;
-                      return (
-                        <>
-                          <DashboardIcon className="h-5 w-5" />
-                          <span>{["agent", "broker"].includes(user?.role) ? "Broker Dashboard" : "Dashboard"}</span>
-                        </>
-                      );
-                    }}
-                  </NavLink>
-                  <button
-                    type="button"
-                    onClick={onLogout}
-                    className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-[#fff9f0]"
+                    className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-transparent px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
                   >
                     <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                    Logout
-                  </button>
-                </div>
-              ) : (
-                <NavLink
-                  to="/auth"
-                  onClick={() => {
-                    scrollToTop();
-                    closeMenu();
-                  }}
-                  className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-transparent px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
-                >
-                  <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                  Sign in / Create account
-                </NavLink>
-              )}
+                    Sign in / Create account
+                  </NavLink>
+                )}
+              </div>
             </div>
           </div>
         </div>
