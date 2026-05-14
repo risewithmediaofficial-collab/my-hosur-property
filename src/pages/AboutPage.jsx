@@ -12,6 +12,9 @@ import {
   UserGroupIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
+import Breadcrumbs from "../components/Breadcrumbs";
+import SeoHead from "../components/SeoHead";
+import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -83,6 +86,11 @@ const AboutPage = () => {
     }
   };
 
+  const breadcrumbs = [
+    { label: "Home", to: "/" },
+    { label: "About", to: "/about" },
+  ];
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       if (heroRef.current) {
@@ -123,6 +131,14 @@ const AboutPage = () => {
 
   return (
     <main className="w-full space-y-6 px-4 py-6 sm:px-5 md:space-y-8 md:py-8 lg:px-6">
+      <SeoHead
+        title="About MyHosurProperty"
+        description="Learn how MyHosurProperty helps buyers, sellers, owners, and brokers discover verified property listings in Hosur with stronger trust, cleaner search, and better lead handling."
+        keywords="about MyHosurProperty, Hosur real estate platform, verified property portal in Hosur, Hosur property marketplace"
+        canonicalPath="/about"
+        schema={[buildRealEstateAgentSchema(), buildBreadcrumbSchema(breadcrumbs)]}
+      />
+      <Breadcrumbs items={breadcrumbs} className="px-1" />
       <section
         ref={heroRef}
         className="relative overflow-hidden rounded-[2rem] border border-white/60 bg-[linear-gradient(145deg,rgba(255,255,255,0.9),rgba(248,243,236,0.88))] px-6 py-8 shadow-[0_24px_70px_rgba(15,23,42,0.09)] sm:px-8 lg:px-10 lg:py-10"
@@ -168,9 +184,10 @@ const AboutPage = () => {
               <div className="relative min-h-[280px] overflow-hidden p-6">
                 <img
                   src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1400&q=80"
-                  alt="Modern luxury home exterior"
+                  alt="Modern luxury home exterior symbolizing verified Hosur real estate listings"
                   className="absolute inset-0 h-full w-full object-cover opacity-30"
                   loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.12),rgba(15,23,42,0.86))]" />
                 <div className="relative flex h-full flex-col justify-between">

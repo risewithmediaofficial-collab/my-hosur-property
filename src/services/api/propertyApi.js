@@ -4,7 +4,7 @@ const getImageUrl = (path) => {
   if (!path) return "";
   if (path.startsWith("http")) return path;
   if (import.meta.env.DEV) return path;
-  const baseUrl = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, "");
+  const baseUrl = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL)?.trim().replace(/\/+$/, "");
   return baseUrl ? `${baseUrl}${path}` : path;
 };
 

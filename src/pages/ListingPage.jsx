@@ -10,12 +10,15 @@ import {
   SparklesIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import Breadcrumbs from "../components/Breadcrumbs";
 import PropertyCard from "../components/PropertyCard";
 import FilterSidebar from "../components/FilterSidebar";
+import SeoHead from "../components/SeoHead";
 import useDebounce from "../hooks/useDebounce";
 import useAuth from "../hooks/useAuth";
 import { fetchProperties } from "../services/api/propertyApi";
 import { toggleSavedProperty } from "../services/api/userApi";
+import { buildBreadcrumbSchema, buildCanonicalListingQuery } from "../utils/seo";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -89,8 +92,34 @@ const ListingPage = () => {
     Object.keys(out).forEach((key) => {
       if (out[key] === "") delete out[key];
     });
+    if (out.page === 1) delete out.page;
+    if (out.limit === 12) delete out.limit;
+    if (out.sort === "rank") delete out.sort;
     return out;
   }, [debounced]);
+
+  const listingTitle = useMemo(() => {
+    const type = filters.propertyType ? `${filters.propertyType} ` : "";
+    const intent =
+      filters.intent === "rent" ? "for Rent" : filters.intent === "new-project" ? "New Projects" : "for Sale";
+    const city = filters.city || "Hosur";
+
+    return `${type}Properties ${intent} in ${city}`;
+  }, [filters.city, filters.intent, filters.propertyType]);
+
+  const listingDescription = useMemo(() => {
+    const city = filters.city || "Hosur";
+    const searchLabel = filters.search ? ` matching "${filters.search}"` : "";
+    return `Browse verified ${filters.propertyType || "property"} listings${searchLabel} in ${city}. Compare apartments, villas, plots, and houses with detailed filters, local insights, and direct listing access.`;
+  }, [filters.city, filters.propertyType, filters.search]);
+
+  const breadcrumbs = useMemo(
+    () => [
+      { label: "Home", to: "/" },
+      { label: "Listings", to: "/listings" },
+    ],
+    []
+  );
 
   useEffect(() => {
     const searchParams = new URLSearchParams();
@@ -210,6 +239,13 @@ const ListingPage = () => {
 
   return (
     <div className="flex min-h-screen w-full flex-col gap-5 px-4 py-6 sm:px-5 sm:py-8 md:flex-row md:gap-6 lg:px-6">
+      <SeoHead
+        title={listingTitle}
+        description={listingDescription}
+        keywords={`Hosur property listings, ${filters.propertyType || "property"} in ${filters.city || "Hosur"}, property for sale in Hosur, property for rent in Hosur`}
+        canonicalPath={buildCanonicalListingQuery(filters)}
+        schema={[buildBreadcrumbSchema(breadcrumbs)]}
+      />
       <aside className="sticky top-24 hidden h-[calc(100vh-7rem)] w-80 shrink-0 overflow-y-auto rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(249,245,238,0.84))] p-5 shadow-[0_20px_44px_rgba(15,23,42,0.08)] md:block md:p-6">
         <div className="mb-4 flex items-center justify-between gap-3 md:mb-6">
           <div className="min-w-0">
@@ -249,6 +285,7 @@ const ListingPage = () => {
       ) : null}
 
       <section className="min-w-0 flex-1 space-y-6">
+        <Breadcrumbs items={breadcrumbs} className="px-1" />
         <section
           ref={heroRef}
           className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.92),rgba(248,243,236,0.88))] p-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)] md:p-8"

@@ -2,7 +2,13 @@ import { NavLink } from "react-router-dom";
 import { primaryNavLinks } from "../constants/navigation";
 import { BuildingOffice2Icon, EnvelopeIcon, MapPinIcon, PhoneIcon } from "@heroicons/react/24/outline";
 
-const serviceLinks = ["Buy Property", "Rent Property", "Sell Property", "Post Listing", "Property Valuation"];
+const serviceLinks = [
+  { label: "Buy Property in Hosur", to: "/listings?intent=buy" },
+  { label: "Rent Property in Hosur", to: "/listings?intent=rent" },
+  { label: "New Projects in Hosur", to: "/listings?intent=new-project" },
+  { label: "Post Property Listing", to: "/post-property" },
+  { label: "About MyHosurProperty", to: "/about" },
+];
 
 const Footer = () => (
   <footer className="mt-12 border-t border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.62)_0%,rgba(248,243,236,0.96)_100%)] text-slate-600 backdrop-blur-xl">
@@ -36,13 +42,13 @@ const Footer = () => (
 
         <div className="space-y-4">
           <h4 className="text-xs font-bold uppercase tracking-[0.24em] text-slate-400">Services</h4>
-          <div className="flex flex-col gap-3">
+          <nav className="flex flex-col gap-3" aria-label="Footer services">
             {serviceLinks.map((service) => (
-              <a key={service} href="#" className="text-sm text-slate-500 transition hover:text-slate-900">
-                {service}
-              </a>
+              <NavLink key={service.to} to={service.to} className="text-sm text-slate-500 transition hover:text-slate-900">
+                {service.label}
+              </NavLink>
             ))}
-          </div>
+          </nav>
         </div>
 
         <div className="space-y-4">
@@ -67,9 +73,9 @@ const Footer = () => (
       <div className="mt-10 flex flex-col gap-3 border-t border-slate-200/70 pt-6 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
         <p>Copyright 2026 MyHosurProperty. All rights reserved.</p>
         <div className="flex flex-wrap gap-4">
-          <a href="#" className="transition hover:text-slate-900">Privacy Policy</a>
-          <a href="#" className="transition hover:text-slate-900">Terms of Service</a>
-          <a href="#" className="transition hover:text-slate-900">Cookie Policy</a>
+          <NavLink to="/about" className="transition hover:text-slate-900">About Us</NavLink>
+          <NavLink to="/listings" className="transition hover:text-slate-900">Browse Listings</NavLink>
+          <NavLink to="/auth" className="transition hover:text-slate-900">Sign In</NavLink>
         </div>
       </div>
     </div>

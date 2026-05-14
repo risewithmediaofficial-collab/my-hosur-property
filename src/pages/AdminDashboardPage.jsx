@@ -21,6 +21,7 @@ import PropertyPostingForm from "../components/PropertyPostingForm";
 import DashboardSidebar from "../components/DashboardSidebar";
 import { deleteProperty, fetchProperties } from "../services/api/propertyApi";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
+import { getPropertyImageAlt, getPropertyPath } from "../utils/seo";
 import { 
   UsersIcon,
   ChartBarIcon,
@@ -148,8 +149,8 @@ const AdminDashboardPage = () => {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  const openProperty = (propertyId) => {
-    navigate(`/property/${propertyId}`);
+  const openProperty = (property) => {
+    navigate(getPropertyPath(property));
   };
 
   const onDeleteProperty = async (propertyId, propertyTitle) => {
@@ -457,16 +458,18 @@ const AdminDashboardPage = () => {
                   {propertyListings.map((p) => (
                     <tr key={p._id} className="border-b border-clay/60 align-middle">
                       <td className="py-2">
-                        <button type="button" onClick={() => openProperty(p._id)} className="block">
+                        <button type="button" onClick={() => openProperty(p)} className="block">
                           <img
                             src={p.images?.[0] || PROPERTY_PLACEHOLDER_IMAGE}
-                            alt={p.title}
+                            alt={getPropertyImageAlt(p)}
                             className="h-12 w-12 rounded-md border border-clay object-cover"
+                            loading="lazy"
+                            decoding="async"
                           />
                         </button>
                       </td>
                       <td className="py-2">
-                        <button type="button" onClick={() => openProperty(p._id)} className="text-left transition hover:text-sage">
+                        <button type="button" onClick={() => openProperty(p)} className="text-left transition hover:text-sage">
                           <p className="font-medium">{p.title}</p>
                           <p className="text-xs text-ink/65">
                             Rs. {Number(p.price || 0).toLocaleString("en-IN")} · {p.propertyType || "Property"} · {p.listingType || "sale"}
@@ -496,7 +499,7 @@ const AdminDashboardPage = () => {
                       </td>
                       <td className="py-2 text-right">
                         <div className="flex flex-wrap justify-end gap-2">
-                          <button onClick={() => openProperty(p._id)} className="rounded-md border border-clay bg-white px-3 py-1 text-xs font-semibold hover:bg-stone">
+                          <button onClick={() => openProperty(p)} className="rounded-md border border-clay bg-white px-3 py-1 text-xs font-semibold hover:bg-stone">
                             View
                           </button>
                           <button
@@ -707,7 +710,7 @@ const AdminDashboardPage = () => {
                           <p className="text-[10px] text-ink/60">{p.location?.city} — {p.status}</p>
                         </div>
                         <div className="flex gap-2">
-                          <button onClick={() => { setSelectedUser(null); openProperty(p._id); }} className="text-[10px] font-bold text-ink/80 border border-clay px-2 py-1 rounded-md hover:bg-clay/20">
+                          <button onClick={() => { setSelectedUser(null); openProperty(p); }} className="text-[10px] font-bold text-ink/80 border border-clay px-2 py-1 rounded-md hover:bg-clay/20">
                             View Property
                           </button>
                           <button onClick={() => onDeleteProperty(p._id, p.title)} className="rounded-md bg-red-600 px-2 py-1 text-[10px] font-bold text-white hover:bg-red-700">

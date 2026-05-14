@@ -14,6 +14,7 @@ const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const customerRequestRoutes = require("./routes/customerRequestRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const seoController = require("./controllers/seoController");
 const notFound = require("./middleware/notFound");
 const errorHandler = require("./middleware/errorHandler");
 
@@ -73,6 +74,9 @@ app.get("/api/health", (req, res) =>
     timestamp: new Date().toISOString(),
   })
 );
+
+app.get("/sitemap.xml", seoController.sitemap);
+app.get("/robots.txt", seoController.robots);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/admin-auth", adminAuthRoutes);
