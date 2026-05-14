@@ -19,6 +19,7 @@ import {
 import toast from "react-hot-toast";
 import PropertyPostingForm from "../components/PropertyPostingForm";
 import DashboardSidebar from "../components/DashboardSidebar";
+import useBodyScrollLock from "../hooks/useBodyScrollLock";
 import { deleteProperty, fetchProperties } from "../services/api/propertyApi";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
 import { getPropertyImageAlt, getPropertyPath } from "../utils/seo";
@@ -61,6 +62,8 @@ const AdminDashboardPage = () => {
   const [sendingEmail, setSendingEmail] = useState(false);
 
   const navigate = useNavigate();
+  useBodyScrollLock(Boolean(selectedUser) || emailModalOpen);
+
   const tabs = [
     { id: "overview", label: "Overview", icon: ChartBarIcon },
     { id: "users", label: "Users", icon: UsersIcon },
@@ -630,13 +633,13 @@ const AdminDashboardPage = () => {
 
       {/* View User Modal Overlay */}
       {selectedUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm transition-opacity">
-          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border border-clay/60">
-            <div className="flex justify-between items-center p-5 border-b border-clay bg-stone">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-3 backdrop-blur-sm transition-opacity sm:items-center sm:p-4">
+          <div className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-2xl flex-col overflow-hidden rounded-[28px] border border-clay/60 bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-clay bg-stone p-5">
               <h3 className="font-bold text-lg">User Details</h3>
               <button onClick={() => setSelectedUser(null)} className="text-ink/50 hover:text-ink text-2xl leading-none">&times;</button>
             </div>
-            <div className="p-6 space-y-5">
+            <div className="space-y-5 overflow-y-auto p-5 sm:p-6">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-xl font-extrabold">{selectedUser.name}</p>
@@ -753,15 +756,15 @@ const AdminDashboardPage = () => {
 
       {/* Email Modal */}
       {emailModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/40 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl">
-            <div className="flex items-center justify-between border-b border-clay/50 pb-4">
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/40 p-3 backdrop-blur-sm sm:items-center sm:p-4">
+          <div className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-lg flex-col overflow-hidden rounded-[28px] bg-white shadow-xl">
+            <div className="flex items-center justify-between border-b border-clay/50 px-6 pb-4 pt-6">
               <h2 className="text-xl font-bold">{emailTarget === "all" ? "Broadcast Email to All" : "Send Email to User"}</h2>
               <button onClick={() => setEmailModalOpen(false)} className="text-ink/60 hover:text-ink">
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
-            <form onSubmit={onSendEmail} className="mt-6 flex flex-col gap-4">
+            <form onSubmit={onSendEmail} className="mt-6 flex flex-col gap-4 overflow-y-auto p-6">
               <div>
                 <label className="mb-1 block text-sm font-bold text-ink">Subject</label>
                 <input
@@ -784,7 +787,7 @@ const AdminDashboardPage = () => {
                   placeholder="Type your message here... (HTML tags like <br/> or <b> are supported internally)"
                 />
               </div>
-              <div className="mt-4 flex justify-end gap-3">
+              <div className="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                 <button type="button" onClick={() => setEmailModalOpen(false)} className="rounded-xl px-4 py-2 text-sm font-bold text-ink/70 hover:bg-stone">
                   Cancel
                 </button>

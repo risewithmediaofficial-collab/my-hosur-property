@@ -1,6 +1,6 @@
 const DashboardSidebar = ({ title, subtitle, description, navItems = [], children }) => {
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] bg-transparent">
+    <div className="flex min-h-[calc(100vh-4rem)] flex-col bg-transparent md:flex-row">
       <aside className="sticky top-20 z-10 hidden h-[calc(100vh-5rem)] w-80 shrink-0 overflow-y-auto px-4 pb-6 pt-4 md:flex md:flex-col">
         <div className="dashboard-shell flex h-full flex-col gap-6 p-6">
           <div>
@@ -41,13 +41,13 @@ const DashboardSidebar = ({ title, subtitle, description, navItems = [], childre
         </div>
       </aside>
 
-      <div className="w-full border-b border-slate-200 bg-white px-4 py-3 md:hidden">
+      <div className="sticky top-[4.5rem] z-20 w-full shrink-0 border-b border-slate-200/80 bg-white/95 px-4 py-3 backdrop-blur md:hidden">
         <div className="mb-3 rounded-[24px] border border-[#f0e0c9] bg-white px-4 py-4 shadow-sm">
           <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">{subtitle}</p>
           <h1 className="mt-1 text-xl font-extrabold text-slate-900">{title}</h1>
           {description ? <p className="mt-2 text-sm leading-6 text-slate-500">{description}</p> : null}
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+        <div className="hide-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
           {navItems.map((item) => (
             <button
               key={item.key}
@@ -67,7 +67,7 @@ const DashboardSidebar = ({ title, subtitle, description, navItems = [], childre
         </div>
       </div>
 
-      <main className="min-w-0 flex-1 overflow-auto">
+      <main className="min-w-0 flex-1 overflow-visible md:min-h-0 md:overflow-auto">
         <div className="mx-auto max-w-6xl px-4 py-6 md:px-6 md:py-8 xl:px-8">
           <section className="space-y-6">{children}</section>
         </div>

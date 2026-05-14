@@ -14,11 +14,11 @@ dist-ssr
 
 # Environment variables
 .env
-.env.local
-.env.production
+.env.*
 backend/.env
-backend/.env.local
-backend/.env.production
+backend/.env.*
+!.env.example
+!backend/.env.example
 backend/uploads/
 cypress/screenshots/
 cypress/videos/
