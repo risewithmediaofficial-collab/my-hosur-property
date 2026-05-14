@@ -34,3 +34,4 @@ cypress/downloads/
 *.njsproj
 *.sln
 *.sw?
+.env
