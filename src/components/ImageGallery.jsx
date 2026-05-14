@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
+import { getPropertyImageAlt } from "../utils/seo";
 
-const ImageGallery = ({ images = [] }) => {
+const ImageGallery = ({ images = [], property = {} }) => {
   const safeImages = images.filter(Boolean);
   const primaryImage = safeImages[0] || PROPERTY_PLACEHOLDER_IMAGE;
   const [active, setActive] = useState(primaryImage);
@@ -16,8 +17,9 @@ const ImageGallery = ({ images = [] }) => {
         <div className="aspect-[4/3] w-full overflow-hidden bg-slate-100">
           <img
             src={active}
-            alt="Property"
+            alt={safeImages.length ? getPropertyImageAlt(property, safeImages.indexOf(active)) : "No property image uploaded"}
             className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
+            decoding="async"
             onError={() => setActive(PROPERTY_PLACEHOLDER_IMAGE)}
           />
         </div>
@@ -40,9 +42,10 @@ const ImageGallery = ({ images = [] }) => {
             >
               <img
                 src={img}
-                alt="Preview"
+                alt={getPropertyImageAlt(property, safeImages.indexOf(img))}
                 className="h-20 w-24 object-cover"
                 loading="lazy"
+                decoding="async"
                 onError={(event) => {
                   event.currentTarget.src = PROPERTY_PLACEHOLDER_IMAGE;
                 }}

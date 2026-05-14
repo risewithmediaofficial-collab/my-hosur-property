@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
@@ -12,13 +12,23 @@ import {
   PhoneIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
+import Breadcrumbs from "../components/Breadcrumbs";
 import ImageGallery from "../components/ImageGallery";
 import PropertyCard from "../components/PropertyCard";
 import ContactModal from "../components/ContactModal";
+import SeoHead from "../components/SeoHead";
 import useAuth from "../hooks/useAuth";
 import { checkMyLeadStatus, createLead } from "../services/api/leadApi";
 import { fetchPropertyById } from "../services/api/propertyApi";
 import { currency, formatArea } from "../utils/format";
+import {
+  buildBreadcrumbSchema,
+  buildFaqSchema,
+  buildPropertySlug,
+  buildRealEstateAgentSchema,
+  getPropertyPath,
+  truncateText,
+} from "../utils/seo";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -37,6 +47,7 @@ const MotionSection = motion.section;
 
 const PropertyDetailPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { token, user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -143,6 +154,48 @@ const PropertyDetailPage = () => {
     return () => ctx.revert();
   }, [data.property, error, loading]);
 
+  const p = data.property;
+  const propertyPath = p ? getPropertyPath(p) : "";
+  const propertySlug = p ? buildPropertySlug(p) : "";
+  const breadcrumbs = useMemo(
+    () =>
+      p
+        ? [
+            { label: "Home", to: "/" },
+            { label: "Listings", to: "/listings" },
+            { label: p.location?.city || "Hosur", to: `/listings?city=${encodeURIComponent(p.location?.city || "Hosur")}` },
+            { label: p.title, to: propertyPath },
+          ]
+        : [],
+    [p, propertyPath]
+  );
+  const faqItems = useMemo(() => {
+    if (!p) return [];
+
+    return [
+      {
+        question: `What is the price of ${p.title}?`,
+        answer: `${p.title} is listed at ${currency(p.price)} on MyHosurProperty.`,
+      },
+      {
+        question: `Where is ${p.title} located?`,
+        answer: `${p.title} is located in ${p.location?.area}, ${p.location?.city}.`,
+      },
+      {
+        question: `What type of property is ${p.title}?`,
+        answer: `${p.title} is a ${p.bhk ? `${p.bhk} BHK ` : ""}${p.propertyType} available for ${p.listingType === "rent" ? "rent" : p.listingType === "new-project" ? "new project enquiries" : "sale"}.`,
+      },
+    ];
+  }, [p]);
+
+  useEffect(() => {
+    if (!p || !propertySlug) return;
+
+    if (window.location.pathname !== propertyPath) {
+      navigate(propertyPath, { replace: true });
+    }
+  }, [navigate, p, propertyPath, propertySlug]);
+
   if (loading) {
     return (
       <main className="w-full px-4 py-10 sm:px-5 lg:px-6">
@@ -156,6 +209,11 @@ const PropertyDetailPage = () => {
   if (error || !data.property) {
     return (
       <main className="w-full px-4 py-10 sm:px-5 lg:px-6">
+        <SeoHead
+          title="Property Unavailable"
+          description="This property listing is unavailable or may have been removed from MyHosurProperty."
+          noIndex
+        />
         <div className="site-section flex h-72 flex-col items-center justify-center gap-4 text-center">
           <h1 className="text-2xl font-bold text-slate-900">Property unavailable</h1>
           <p className="max-w-md text-sm leading-7 text-slate-600">{error || "The property you are looking for does not exist."}</p>
@@ -167,7 +225,6 @@ const PropertyDetailPage = () => {
     );
   }
 
-  const p = data.property;
   const mapQuery = encodeURIComponent(`${p.location?.area}, ${p.location?.city}`);
   const keyFacts = [
     { label: "BHK", value: p.bhk || "Studio" },
@@ -195,6 +252,16 @@ const PropertyDetailPage = () => {
 
   return (
     <main className="w-full space-y-6 px-4 py-6 sm:px-5 lg:px-6">
+      <SeoHead
+        title={`${p.title} in ${p.location?.area || p.location?.city || "Hosur"} - ${currency(p.price)}`}
+        description={truncateText(p.description || `${p.propertyType} in ${p.location?.area}, ${p.location?.city} listed on MyHosurProperty.`, 160)}
+        keywords={`${p.title}, ${p.propertyType} in ${p.location?.city}, ${p.location?.area} property, ${p.listingType} property in Hosur, ${p.bhk || ""} BHK ${p.propertyType}`}
+        canonicalPath={propertyPath}
+        image={p.images?.[0]}
+        type="article"
+        schema={[buildRealEstateAgentSchema(), buildBreadcrumbSchema(breadcrumbs), buildFaqSchema(faqItems)]}
+      />
+      <Breadcrumbs items={breadcrumbs} className="px-1" />
       <section
         ref={heroRef}
         className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.92),rgba(248,243,236,0.88))] p-5 shadow-[0_24px_60px_rgba(15,23,42,0.09)] md:p-6 lg:p-8"
@@ -213,7 +280,7 @@ const PropertyDetailPage = () => {
                 </span>
               ))}
             </div>
-            <ImageGallery images={p.images} />
+            <ImageGallery images={p.images} property={p} />
           </div>
 
           <aside data-property-hero className="site-section h-fit p-6 md:p-7">
@@ -400,6 +467,35 @@ const PropertyDetailPage = () => {
               <PropertyCard item={item} />
             </MotionDiv>
           ))}
+        </div>
+      </section>
+
+      <section className="site-section p-6 md:p-8">
+        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#8b6b3f]">Property FAQs</p>
+        <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">Questions buyers usually ask before contacting the owner</h2>
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          {faqItems.map((item) => (
+            <article key={item.question} className="rounded-[1.5rem] border border-slate-200/70 bg-white/85 p-5">
+              <h3 className="text-lg font-semibold text-slate-900">{item.question}</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-600">{item.answer}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="site-section p-6 md:p-8">
+        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#8b6b3f]">Explore more</p>
+        <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">Keep browsing related Hosur property pages</h2>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <Link to="/listings" className="site-button-primary px-5 py-3 text-sm">
+            View all Hosur listings
+          </Link>
+          <Link to={`/listings?city=${encodeURIComponent(p.location?.city || "Hosur")}`} className="site-button-secondary px-5 py-3 text-sm">
+            More property in {p.location?.city || "Hosur"}
+          </Link>
+          <Link to={`/listings?propertyType=${encodeURIComponent(p.propertyType || "")}`} className="site-button-secondary px-5 py-3 text-sm">
+            More {p.propertyType} listings
+          </Link>
         </div>
       </section>
 

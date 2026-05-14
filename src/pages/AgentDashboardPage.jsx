@@ -16,6 +16,7 @@ import { loadExternalScript } from "../utils/loadExternalScript";
 import DashboardSidebar from "../components/DashboardSidebar";
 import Loader from "../components/Loader";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
+import { getPropertyImageAlt } from "../utils/seo";
 
 const fmt = (d) => new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 
@@ -256,7 +257,7 @@ const AgentDashboardPage = () => {
                 {properties.map((p) => (
                   <tr key={p._id}>
                     <td>
-                      <img src={p.images?.[0] || PROPERTY_PLACEHOLDER_IMAGE} alt="Property" className="h-12 w-12 rounded-xl object-cover border border-slate-200" />
+                      <img src={p.images?.[0] || PROPERTY_PLACEHOLDER_IMAGE} alt={getPropertyImageAlt(p)} className="h-12 w-12 rounded-xl object-cover border border-slate-200" loading="lazy" decoding="async" />
                     </td>
                     <td className="font-medium text-slate-900">{p.title}</td>
                     <td>{p.location?.city}</td>

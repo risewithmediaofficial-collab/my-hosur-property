@@ -451,6 +451,15 @@ const uploadAssets = async (req, res) => {
   });
 };
 
+const seoListings = async (_req, res) => {
+  const items = await Property.find({ status: "approved" })
+    .select("title propertyType bhk listingType location featuredUntil createdAt updatedAt")
+    .sort({ updatedAt: -1 })
+    .lean();
+
+  return res.json({ items });
+};
+
 module.exports = {
   propertyValidators,
   listProperties,
@@ -462,4 +471,5 @@ module.exports = {
   myProperties,
   promoteProperty,
   uploadAssets,
+  seoListings,
 };

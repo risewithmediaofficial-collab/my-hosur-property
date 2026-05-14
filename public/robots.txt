@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /auth
+Disallow: /post-property
+Disallow: /edit-property
+Disallow: /plans
+
+Sitemap: https://my-hosur-property.onrender.com/sitemap.xml

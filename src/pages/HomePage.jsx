@@ -21,8 +21,10 @@ import {
   StarIcon,
 } from "@heroicons/react/24/outline";
 import PropertyCard from "../components/PropertyCard";
+import SeoHead from "../components/SeoHead";
 import useDebounce from "../hooks/useDebounce";
 import { fetchHomeProperties } from "../services/api/propertyApi";
+import { buildRealEstateAgentSchema, buildWebsiteSchema } from "../utils/seo";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -239,6 +241,13 @@ const HomePage = () => {
 
   return (
     <main className="relative overflow-hidden bg-white">
+      <SeoHead
+        title="Verified Property Listings in Hosur"
+        description="Discover verified apartments, villas, plots, and houses for sale and rent in Hosur with a faster, cleaner real estate search experience."
+        keywords="Hosur property listings, verified property in Hosur, apartments for sale in Hosur, houses for rent in Hosur, villas in Hosur, plots in Hosur"
+        canonicalPath="/"
+        schema={[buildWebsiteSchema(), buildRealEstateAgentSchema()]}
+      />
       <section className="site-shell relative px-4 pb-6 pt-0 sm:px-5 lg:px-6">
         <div
           ref={heroRef}
@@ -312,9 +321,11 @@ const HomePage = () => {
                   <div className="overflow-hidden rounded-[1.6rem]">
                     <img
                       src="https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1600&q=80"
-                      alt="Luxury home exterior"
+                      alt="Luxury villa exterior representing premium property listings in Hosur"
                       className="h-[420px] w-full object-cover"
-                      loading="lazy"
+                      loading="eager"
+                      fetchPriority="high"
+                      decoding="async"
                     />
                   </div>
 
@@ -514,9 +525,10 @@ const HomePage = () => {
             <div className="relative h-full min-h-[320px] overflow-hidden p-6">
               <img
                 src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1400&q=80"
-                alt="Premium architectural exterior"
+                alt="Premium architectural exterior for featured Hosur real estate listings"
                 className="absolute inset-0 h-full w-full object-cover opacity-30"
                 loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.16),rgba(15,23,42,0.88))]" />
               <div className="relative flex h-full flex-col justify-between">
@@ -622,7 +634,7 @@ const HomePage = () => {
                   }`}
                 >
                   <div className={`overflow-hidden ${index === 0 ? "h-72" : "h-60"}`}>
-                    <img src={item.image} alt={item.title} className="h-full w-full object-cover transition duration-500 hover:scale-105" loading="lazy" />
+                    <img src={item.image} alt={`${item.title} in Hosur real estate collection`} className="h-full w-full object-cover transition duration-500 hover:scale-105" loading="lazy" decoding="async" />
                   </div>
                   <div className="p-5">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#b38a57]">Curated collection</p>

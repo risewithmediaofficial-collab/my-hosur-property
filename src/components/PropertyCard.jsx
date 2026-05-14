@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
-import { currency, formatArea, slugify } from "../utils/format";
+import { currency, formatArea } from "../utils/format";
 import { ArrowRightIcon, CheckBadgeIcon, MapPinIcon, RectangleStackIcon, UserIcon } from "@heroicons/react/24/outline";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
+import { getPropertyImageAlt, getPropertyPath } from "../utils/seo";
 
 const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
-  const href = `/property/${item._id}/${slugify(item.title)}`;
+  const href = getPropertyPath(item);
   const badges = [
     item.verification?.isVerified ? "Verified" : "",
     item.verification?.reraId ? "RERA" : "",
@@ -16,9 +17,10 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
       <div className="relative h-56 overflow-hidden">
         <img
           src={item.images?.[0] || PROPERTY_PLACEHOLDER_IMAGE}
-          alt={item.title}
+          alt={getPropertyImageAlt(item)}
           className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
           loading="lazy"
+          decoding="async"
           onError={(event) => {
             event.currentTarget.src = PROPERTY_PLACEHOLDER_IMAGE;
           }}
@@ -108,6 +110,7 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
             </button>
             <Link
               to={href}
+              aria-label={`View ${item.title} property details`}
               className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 rounded-full bg-[linear-gradient(135deg,#111827,#334155)] px-3.5 sm:px-4 py-2 text-xs font-semibold text-white shadow-[0_10px_24px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(15,23,42,0.22)] text-center"
             >
               View
