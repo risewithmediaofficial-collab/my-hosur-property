@@ -140,6 +140,7 @@ const MotionParagraph = motion.p;
 const HomePage = () => {
   const navigate = useNavigate();
   const [featured, setFeatured] = useState([]);
+  const [featuredLoading, setFeaturedLoading] = useState(true);
   const [search, setSearch] = useState({
     intent: "buy",
     search: "",
@@ -168,7 +169,8 @@ const HomePage = () => {
   useEffect(() => {
     fetchHomeProperties()
       .then((res) => setFeatured(res.items || []))
-      .catch(() => setFeatured([]));
+      .catch(() => setFeatured([]))
+      .finally(() => setFeaturedLoading(false));
   }, []);
 
   useEffect(() => {
@@ -205,19 +207,18 @@ const HomePage = () => {
         });
       });
 
-      revealRefs.current.forEach((node, index) => {
+      revealRefs.current.forEach((node) => {
         gsap.fromTo(
           node,
-          { opacity: 0, y: 48 },
+          { opacity: 0, y: 24 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.9,
+            duration: 0.45,
             ease: "power3.out",
-            delay: index * 0.04,
             scrollTrigger: {
               trigger: node,
-              start: "top 84%",
+              start: "top 92%",
             },
           }
         );
@@ -572,7 +573,7 @@ const HomePage = () => {
               </MotionDiv>
             ))}
 
-            {featuredListings.length === 0 &&
+            {featuredLoading &&
               Array.from({ length: 4 }).map((_, index) => (
                 <div
                   key={`placeholder-${index}`}
@@ -584,6 +585,13 @@ const HomePage = () => {
                   <div className="mt-5 h-11 animate-pulse rounded-2xl bg-[#f6f1ea]" />
                 </div>
               ))}
+
+            {!featuredLoading && featuredListings.length === 0 && (
+              <div className="md:col-span-2 rounded-[1.7rem] border border-dashed border-[#d9c3a0] bg-[#fffaf2] px-6 py-12 text-center shadow-[0_14px_34px_rgba(90,73,49,0.06)]">
+                <p className="text-lg font-semibold text-slate-900">No properties posted yet.</p>
+                <p className="mt-2 text-sm leading-7 text-slate-600">Stay tuned. New verified listings will appear here soon.</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
