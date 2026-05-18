@@ -10,11 +10,24 @@ const {
 } = require("../utils/emailTemplates");
 const { normalizeUploadList } = require("../utils/uploadPaths");
 
+const PROPERTY_TYPES = [
+  "Apartment",
+  "Villa",
+  "Independent House",
+  "Plot",
+  "Commercial",
+  "House",
+  "Office",
+  "Warehouse",
+  "Land",
+  "Industrial Shed",
+];
+
 const propertyValidators = [
   body("title").trim().notEmpty(),
   body("description").trim().isLength({ min: 10 }),
   body("price").isNumeric(),
-  body("propertyType").isIn(["Apartment", "Villa", "Independent House", "Plot", "Commercial"]),
+  body("propertyType").isIn(PROPERTY_TYPES),
   body("listingType").optional().isIn(["sale", "rent", "new-project"]),
   body("furnishingStatus").optional().isIn(["Furnished", "Semi-Furnished", "Unfurnished"]),
   body("listingSource").optional().isIn(["owner", "builder", "agent"]),
@@ -212,11 +225,14 @@ const createProperty = async (req, res) => {
   }
 
   const plan = user.activePlan;
-  if (!plan || !plan.expiresAt || new Date(plan.expiresAt) < new Date()) {
-    return res.status(402).json({ message: "Active listing plan required before posting" });
-  }
-  if ((plan.listingsUsed || 0) >= (plan.listingLimit || 0)) {
-    return res.status(402).json({ message: "Listing limit reached. Upgrade your plan." });
+  const bypassPlanCheck = user.role === "admin";
+  if (!bypassPlanCheck) {
+    if (!plan || !plan.expiresAt || new Date(plan.expiresAt) < new Date()) {
+      return res.status(402).json({ message: "Active listing plan required before posting" });
+    }
+    if ((plan.listingsUsed || 0) >= (plan.listingLimit || 0)) {
+      return res.status(402).json({ message: "Listing limit reached. Upgrade your plan." });
+    }
   }
 
   const ownerType = ["agent", "broker", "builder"].includes(req.user.role) ? req.user.role : "seller";
@@ -250,9 +266,11 @@ const createProperty = async (req, res) => {
 
   const property = await Property.create(payload);
 
-  await User.findByIdAndUpdate(req.user._id, {
-    $inc: { "activePlan.listingsUsed": 1 },
-  });
+  if (!bypassPlanCheck) {
+    await User.findByIdAndUpdate(req.user._id, {
+      $inc: { "activePlan.listingsUsed": 1 },
+    });
+  }
 
   // Send Confirmation Email to Owner
   try {

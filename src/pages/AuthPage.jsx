@@ -153,11 +153,11 @@ const AuthPage = () => {
     <>
       <style>{`
         .auth-page {
-          min-height: 100%;
+          min-height: 100vh;
           display: grid;
           grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
-          background: #f8fafc;
-          font-family: 'Manrope', sans-serif;
+          background: #ffffff;
+          font-family: 'Inter', sans-serif;
         }
         @media (max-width: 900px) {
           .auth-page {
@@ -170,12 +170,16 @@ const AuthPage = () => {
         }
 
         .auth-left {
-          position: relative;
+          position: sticky;
+          top: 0;
+          height: 100vh;
           overflow: hidden;
-          background: linear-gradient(180deg, #1d4ed8 0%, #1e40af 52%, #1e3a8a 100%);
+          background: #f8fafc;
+          border-right: 1px solid #e5e7eb;
           display: flex;
           flex-direction: column;
           justify-content: center;
+          align-items: center;
           padding: 56px 56px 56px;
         }
         .auth-left-img {
@@ -184,28 +188,29 @@ const AuthPage = () => {
           object-fit: cover;
           width: 100%;
           height: 100%;
-          opacity: 0.12;
+          opacity: 0.06;
         }
         .auth-left-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(180deg, rgba(15, 23, 42, 0.24) 0%, rgba(15, 23, 42, 0.88) 100%);
+          background: rgba(255, 255, 255, 0.9);
         }
         .auth-left-content {
           position: relative;
           z-index: 1;
           max-width: 520px;
-          margin-top: -96px;
+          margin: 0 auto;
+          text-align: left;
         }
         .auth-left-logo {
           display: inline-flex;
           align-items: center;
           gap: 8px;
           padding: 8px 12px;
-          border: 1px solid rgba(255, 255, 255, 0.12);
+          border: 1px solid #e5e7eb;
           border-radius: 999px;
-          background: rgba(255, 255, 255, 0.04);
-          color: rgba(255, 255, 255, 0.82);
+          background: #ffffff;
+          color: #555555;
           font-size: 12px;
           font-weight: 700;
           letter-spacing: 2px;
@@ -213,13 +218,13 @@ const AuthPage = () => {
           margin-bottom: 28px;
         }
         .auth-left-logo span {
-          color: #bfdbfe;
+          color: #111111;
         }
         .auth-left-heading {
           margin: 0 0 14px;
           font-size: clamp(30px, 4vw, 52px);
           font-weight: 800;
-          color: #ffffff;
+          color: #111111;
           line-height: 1.08;
           letter-spacing: -1.2px;
           max-width: 440px;
@@ -229,7 +234,7 @@ const AuthPage = () => {
           max-width: 390px;
           font-size: 15px;
           line-height: 1.75;
-          color: rgba(226, 232, 240, 0.68);
+          color: #555555;
         }
         .auth-stats {
           display: grid;
@@ -243,24 +248,24 @@ const AuthPage = () => {
             padding-top: 40px;
           }
           .auth-left-content {
-            margin-top: -150px;
+            margin-top: 0;
           }
         }
         .auth-stat-item {
           padding: 14px 0;
-          border-top: 1px solid rgba(255, 255, 255, 0.14);
+          border-top: 1px solid #e5e7eb;
         }
         .auth-stat-num {
           font-size: 26px;
           line-height: 1;
           font-weight: 700;
-          color: #ffffff;
+          color: #111111;
         }
         .auth-stat-label {
           margin-top: 8px;
           font-size: 11px;
           font-weight: 600;
-          color: rgba(226, 232, 240, 0.56);
+          color: #6b7280;
           text-transform: uppercase;
           letter-spacing: 1px;
         }
@@ -269,9 +274,10 @@ const AuthPage = () => {
           display: flex;
           align-items: flex-start;
           justify-content: center;
-          padding: 24px 28px 40px;
+          padding: 40px 28px 40px;
           overflow-y: auto;
-          background: #f8fafc;
+          background: #ffffff;
+          height: 100vh;
         }
         .auth-card {
           width: 100%;
@@ -285,7 +291,7 @@ const AuthPage = () => {
           border: 1px solid #e2e8f0;
           border-radius: 24px;
           background: #ffffff;
-          box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
+          box-shadow: 0 16px 32px rgba(17, 17, 17, 0.04);
         }
         @media (min-width: 1024px) {
           .auth-card-surface {
@@ -362,7 +368,7 @@ const AuthPage = () => {
           padding: 4px;
           border: 1px solid #e2e8f0;
           border-radius: 16px;
-          background: #f8fafc;
+          background: #f5f5f5;
           margin-bottom: 22px;
         }
         .auth-mode-btn {
@@ -378,8 +384,8 @@ const AuthPage = () => {
         }
         .auth-mode-btn.is-active {
           background: #ffffff;
-          color: #8b6b3f;
-          box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+          color: #111111;
+          box-shadow: 0 8px 18px rgba(17, 17, 17, 0.06);
         }
 
         .auth-heading-wrap {
@@ -454,8 +460,8 @@ const AuthPage = () => {
           transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
         .auth-input-shell:focus-within {
-          border-color: #b98a53;
-          box-shadow: 0 0 0 3px rgba(185, 138, 83, 0.14);
+          border-color: #111111;
+          box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
         }
         .auth-input-icon {
           position: absolute;
@@ -499,7 +505,7 @@ const AuthPage = () => {
           padding: 14px 16px;
           border: 1px solid #e2e8f0;
           border-radius: 16px;
-          background: #f8fafc;
+          background: #fafafa;
           color: #475569;
           font-size: 13px;
           line-height: 1.6;
@@ -517,17 +523,20 @@ const AuthPage = () => {
           min-height: 58px;
           border: none;
           border-radius: 16px;
-          background: #b98a53;
+          background: #111111;
           color: #ffffff;
           font-size: 16px;
           font-weight: 700;
           font-family: inherit;
           letter-spacing: 0.2px;
           cursor: pointer;
-          transition: background 0.18s ease, opacity 0.18s ease;
+          transition: background 0.18s ease, opacity 0.18s ease, transform 0.3s ease, box-shadow 0.3s ease;
+          box-shadow: 0 10px 22px rgba(17, 17, 17, 0.08);
         }
         .auth-submit:hover:not(:disabled) {
-          background: #8b6b3f;
+          background: #222222;
+          transform: translateY(-6px);
+          box-shadow: 0 18px 30px rgba(17, 17, 17, 0.14);
         }
         .auth-submit:disabled {
           opacity: 0.7;
@@ -558,7 +567,7 @@ const AuthPage = () => {
           border: none;
           background: transparent;
           padding: 0;
-          color: #8b6b3f;
+          color: #111111;
           font-size: 13px;
           font-weight: 700;
           cursor: pointer;
@@ -580,7 +589,7 @@ const AuthPage = () => {
         .auth-security-icon {
           width: 16px;
           height: 16px;
-          color: #b98a53;
+          color: #111111;
           flex-shrink: 0;
         }
 

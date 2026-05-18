@@ -1,4 +1,16 @@
 const inputClass = "site-input";
+const propertyTypeOptions = [
+  "Apartment",
+  "Villa",
+  "Independent House",
+  "Plot",
+  "Commercial",
+  "House",
+  "Office",
+  "Warehouse",
+  "Land",
+  "Industrial Shed",
+];
 
 const FilterSidebar = ({ filters, setFilters, clearFilters }) => {
   const update = (key, value) => setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
@@ -6,7 +18,7 @@ const FilterSidebar = ({ filters, setFilters, clearFilters }) => {
   return (
     <div className="space-y-5">
       <div>
-        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#8b6b3f]">Refine search</p>
+        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">Refine search</p>
         <h3 className="mt-2 text-lg font-bold text-slate-900">Property filters</h3>
       </div>
 
@@ -25,11 +37,9 @@ const FilterSidebar = ({ filters, setFilters, clearFilters }) => {
           <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Property type</label>
           <select className={inputClass} value={filters.propertyType} onChange={(e) => update("propertyType", e.target.value)}>
             <option value="">All property types</option>
-            <option>Apartment</option>
-            <option>Villa</option>
-            <option>Independent House</option>
-            <option>Plot</option>
-            <option>Commercial</option>
+            {propertyTypeOptions.map((item) => (
+              <option key={item}>{item}</option>
+            ))}
           </select>
         </div>
 
@@ -45,21 +55,31 @@ const FilterSidebar = ({ filters, setFilters, clearFilters }) => {
 
         <div className="space-y-2">
           <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">BHK range</label>
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              className={inputClass}
-              type="number"
-              placeholder="Min"
-              value={filters.minBhk}
-              onChange={(e) => update("minBhk", e.target.value)}
-            />
-            <input
-              className={inputClass}
-              type="number"
-              placeholder="Max"
-              value={filters.maxBhk}
-              onChange={(e) => update("maxBhk", e.target.value)}
-            />
+          <div className="space-y-3">
+            <div>
+              <div className="mb-2 flex justify-between">
+                <span className="text-xs text-slate-600">Min: {filters.minBhk || 0} BHK</span>
+                <span className="text-xs text-slate-600">Max: {filters.maxBhk || 10} BHK</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="10"
+                value={filters.minBhk || 0}
+                onChange={(e) => update("minBhk", e.target.value)}
+                className="range-slider w-full"
+              />
+            </div>
+            <div>
+              <input
+                type="range"
+                min="0"
+                max="10"
+                value={filters.maxBhk || 10}
+                onChange={(e) => update("maxBhk", e.target.value)}
+                className="range-slider w-full"
+              />
+            </div>
           </div>
         </div>
 
@@ -82,7 +102,7 @@ const FilterSidebar = ({ filters, setFilters, clearFilters }) => {
           </select>
         </div>
 
-        <label className="flex items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm font-medium text-slate-700">
+        <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700">
           <input
             type="checkbox"
             checked={filters.verified === "true"}
@@ -104,21 +124,33 @@ const FilterSidebar = ({ filters, setFilters, clearFilters }) => {
 
         <div className="space-y-2">
           <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Price range (Rs)</label>
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              className={inputClass}
-              type="number"
-              placeholder="Min"
-              value={filters.minPrice}
-              onChange={(e) => update("minPrice", e.target.value)}
-            />
-            <input
-              className={inputClass}
-              type="number"
-              placeholder="Max"
-              value={filters.maxPrice}
-              onChange={(e) => update("maxPrice", e.target.value)}
-            />
+          <div className="space-y-3">
+            <div>
+              <div className="mb-2 flex justify-between">
+                <span className="text-xs text-slate-600">Min: ₹{filters.minPrice ? (filters.minPrice / 100000).toFixed(1) : 0} L</span>
+                <span className="text-xs text-slate-600">Max: ₹{filters.maxPrice ? (filters.maxPrice / 100000).toFixed(1) : 100} L</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="100000000"
+                step="100000"
+                value={filters.minPrice || 0}
+                onChange={(e) => update("minPrice", e.target.value)}
+                className="range-slider w-full"
+              />
+            </div>
+            <div>
+              <input
+                type="range"
+                min="0"
+                max="100000000"
+                step="100000"
+                value={filters.maxPrice || 100000000}
+                onChange={(e) => update("maxPrice", e.target.value)}
+                className="range-slider w-full"
+              />
+            </div>
           </div>
         </div>
 

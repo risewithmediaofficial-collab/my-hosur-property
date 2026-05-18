@@ -185,8 +185,8 @@ const PlansPage = () => {
         key={plan._id || plan.name}
         className={`relative flex h-full flex-col rounded-[30px] border p-6 shadow-sm md:p-7 ${
           isRecommended
-            ? "border-blue-200 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white shadow-[0_20px_44px_rgba(37,99,235,0.18)]"
-            : "border-blue-100 bg-white text-slate-900"
+            ? "border-slate-900 bg-slate-900 text-white shadow-[0_20px_44px_rgba(17,17,17,0.14)]"
+            : "border-slate-200 bg-white text-slate-900"
         }`}
       >
         <div className="flex items-start justify-between gap-4">
@@ -198,7 +198,7 @@ const PlansPage = () => {
             <p className={`mt-2 text-sm leading-6 ${isRecommended ? "text-slate-300" : "text-slate-600"}`}>{plan.subtitle}</p>
           </div>
           {isRecommended ? (
-            <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-white">
+            <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-white">
               Recommended
             </span>
           ) : null}
@@ -209,7 +209,7 @@ const PlansPage = () => {
           {plan.billingLabel ? <span className={`pb-2 text-base font-semibold ${isRecommended ? "text-slate-300" : "text-slate-500"}`}>{plan.billingLabel}</span> : null}
         </div>
 
-        <div className={`mt-6 rounded-[24px] border p-4 ${isRecommended ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50"}`}>
+        <div className={`mt-6 rounded-[24px] border p-4 ${isRecommended ? "border-white/15 bg-black/10" : "border-slate-200 bg-slate-50"}`}>
           <div className={`grid gap-2 text-sm ${isRecommended ? "text-slate-300" : "text-slate-600"}`}>
             {!isDbPack ? (
               <>
@@ -257,8 +257,8 @@ const PlansPage = () => {
           disabled={Boolean(buyingPlanId) || (isActive && !needsRenewal && !isDbPack)}
           className={`mt-auto rounded-2xl px-5 py-3.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
             isRecommended
-              ? "bg-white text-blue-700 hover:bg-blue-50"
-              : "bg-blue-600 text-white hover:bg-blue-700"
+              ? "bg-white text-slate-900 hover:bg-slate-100"
+              : "bg-slate-900 text-white hover:bg-black"
           }`}
         >
           {buyingPlanId === plan._id
@@ -289,21 +289,21 @@ const PlansPage = () => {
           </p>
         </div>
 
-        <div className="overflow-hidden rounded-[32px] border border-blue-100 bg-[linear-gradient(135deg,#2563eb,#1d4ed8)] p-8 text-white shadow-[0_22px_56px_rgba(37,99,235,0.18)] md:p-10">
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-blue-100">Membership benefits</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight">More visibility, stronger lead access, and simpler plan control.</h2>
+        <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_18px_40px_rgba(17,17,17,0.04)] md:p-10">
+          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">Membership benefits</p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-900">More visibility, stronger lead access, and simpler plan control.</h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
-            <div className="rounded-[24px] border border-white/15 bg-white/12 p-4">
-              <p className="text-2xl font-bold text-white">Role-aware</p>
-              <p className="mt-2 text-sm text-blue-100">Plans adapt to how each user works on the platform.</p>
+            <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+              <p className="text-2xl font-bold text-slate-900">Role-aware</p>
+              <p className="mt-2 text-sm text-slate-500">Plans adapt to how each user works on the platform.</p>
             </div>
-            <div className="rounded-[24px] border border-white/15 bg-white/12 p-4">
-              <p className="text-2xl font-bold text-white">Secure</p>
-              <p className="mt-2 text-sm text-blue-100">Payments and activation follow a verified checkout flow.</p>
+            <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+              <p className="text-2xl font-bold text-slate-900">Secure</p>
+              <p className="mt-2 text-sm text-slate-500">Payments and activation follow a verified checkout flow.</p>
             </div>
-            <div className="rounded-[24px] border border-white/15 bg-white/12 p-4">
-              <p className="text-2xl font-bold text-white">Flexible</p>
-              <p className="mt-2 text-sm text-blue-100">Renew, upgrade, or buy special database packages as needed.</p>
+            <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+              <p className="text-2xl font-bold text-slate-900">Flexible</p>
+              <p className="mt-2 text-sm text-slate-500">Renew, upgrade, or buy special database packages as needed.</p>
             </div>
           </div>
         </div>

@@ -1,18 +1,27 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import {
+  BellIcon,
+  ClipboardDocumentListIcon,
+  HomeModernIcon,
+  PlusIcon,
+  Squares2X2Icon,
+} from "@heroicons/react/24/outline";
 import DashboardSidebar from "../components/DashboardSidebar";
 import Loader from "../components/Loader";
 import useAuth from "../hooks/useAuth";
 import { createCustomerRequest, fetchMyCustomerRequests } from "../services/api/customerRequestApi";
 import { fetchMyNotifications, markNotificationRead } from "../services/api/notificationApi";
+import { PROPERTY_REQUEST_TYPES } from "../constants/serviceRequests";
 
 const STATUS_CONFIG = {
   open: { label: "Open", cls: "bg-slate-100 text-slate-700" },
-  matched: { label: "Matched", cls: "bg-[#f5e8d4] text-[#8b6b3f]" },
+  matched: { label: "Matched", cls: "bg-slate-100 text-slate-700" },
   closed: { label: "Closed", cls: "bg-slate-200 text-slate-500" },
 };
 
-const PROPERTY_TYPE_OPTIONS = ["Apartment", "Villa", "Independent House", "Plot", "Commercial"];
+const PROPERTY_TYPE_OPTIONS = PROPERTY_REQUEST_TYPES;
 
 const initialForm = {
   city: "",
@@ -27,7 +36,17 @@ const fmtDate = (value) => new Date(value).toLocaleDateString("en-IN", { day: "2
 const fmtDateTime = (value) => new Date(value).toLocaleString("en-IN");
 const formatBudget = (min, max) => `Rs.${Number(min || 0).toLocaleString("en-IN")} - Rs.${Number(max || 0).toLocaleString("en-IN")}`;
 
+const formatRequestTitle = (item) => {
+  if (item.requestCategory === "loan") return "Loan";
+  if (item.requestCategory === "interior") return `${item.serviceType || "Interior"} Interior`;
+  if (item.requestCategory === "construction") return `${item.serviceType || "Construction"} Construction`;
+  if (item.requestCategory === "property_rent") return `${item.propertyType || "Property"} Rent`;
+  if (item.requestCategory === "property_sell") return `${item.propertyType || "Property"} Sell`;
+  return item.propertyType || "Property";
+};
+
 const CustomerDashboardPage = () => {
+  const navigate = useNavigate();
   const { token, user } = useAuth();
 
   const [requests, setRequests] = useState([]);
@@ -63,13 +82,14 @@ const CustomerDashboardPage = () => {
     try {
       setSubmitting(true);
       await createCustomerRequest(token, {
+        requestCategory: "property_buy",
         location: { city: form.city.trim(), area: form.area.trim() },
         budgetMin: Number(form.budgetMin || 0),
         budgetMax: Number(form.budgetMax || 0),
         propertyType: form.propertyType,
         additionalRequirements: form.additionalRequirements.trim(),
       });
-      toast.success("Requirement submitted and shared with matching property owners/agents.");
+      toast.success("Requirement submitted and shared with matching property owners and agents.");
       setForm(initialForm);
       setShowForm(false);
       loadAll();
@@ -83,8 +103,8 @@ const CustomerDashboardPage = () => {
   const onMarkRead = async (id) => {
     try {
       await markNotificationRead(token, id);
-      setNotifications((prev) =>
-        prev.map((item) => (item._id === id ? { ...item, readAt: new Date().toISOString() } : item))
+      setNotifications((previous) =>
+        previous.map((item) => (item._id === id ? { ...item, readAt: new Date().toISOString() } : item))
       );
     } catch {
       toast.error("Unable to mark notification as read");
@@ -94,10 +114,7 @@ const CustomerDashboardPage = () => {
   const unreadCount = useMemo(() => notifications.filter((item) => !item.readAt).length, [notifications]);
   const openCount = useMemo(() => requests.filter((item) => item.status === "open").length, [requests]);
   const matchedCount = useMemo(() => requests.filter((item) => item.status === "matched").length, [requests]);
-  const matchNotifications = useMemo(
-    () => notifications.filter((item) => item.type === "match"),
-    [notifications]
-  );
+  const matchNotifications = useMemo(() => notifications.filter((item) => item.type === "match"), [notifications]);
   const latestRequests = useMemo(() => requests.slice(0, 3), [requests]);
   const matchedRequests = useMemo(
     () => requests.filter((item) => (item.matchedAgents?.length || 0) > 0 || item.status === "matched"),
@@ -119,11 +136,17 @@ const CustomerDashboardPage = () => {
       title={user?.name || "Customer"}
       subtitle="Customer Dashboard"
       description="Track your requirements, receive property-side responses, and manage dashboard activity from one cleaner workspace."
+      stats={[
+        { label: "Requirements", value: requests.length, icon: <ClipboardDocumentListIcon className="h-4 w-4" /> },
+        { label: "Open", value: openCount, icon: <Squares2X2Icon className="h-4 w-4" /> },
+        { label: "Matches", value: matchedCount, icon: <HomeModernIcon className="h-4 w-4" /> },
+        { label: "Unread", value: unreadCount, icon: <BellIcon className="h-4 w-4" /> },
+      ]}
       navItems={[
-        { key: "overview", label: "Overview", icon: "📊", badge: undefined },
-        { key: "requests", label: "My Requirements", icon: "📋", badge: requests.length || undefined },
-        { key: "matches", label: "Matches", icon: "🏠", badge: matchedCount || undefined },
-        { key: "notifications", label: "Notifications", icon: "🔔", badge: unreadCount || undefined },
+        { key: "overview", label: "Overview", icon: <Squares2X2Icon className="h-4 w-4" />, badge: undefined },
+        { key: "requests", label: "My Requests", icon: <ClipboardDocumentListIcon className="h-4 w-4" />, badge: requests.length || undefined },
+        { key: "matches", label: "Matches", icon: <HomeModernIcon className="h-4 w-4" />, badge: matchedCount || undefined },
+        { key: "notifications", label: "Notifications", icon: <BellIcon className="h-4 w-4" />, badge: unreadCount || undefined },
       ].map((item) => ({
         ...item,
         active: tab === item.key,
@@ -135,9 +158,9 @@ const CustomerDashboardPage = () => {
           <section className="dashboard-shell p-6 md:p-7">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="dashboard-kicker text-[#8b6b3f]">Customer activity</p>
-                <h2 className="mt-3 text-3xl font-extrabold text-slate-900">Welcome, {user?.name}</h2>
-                <p className="mt-2 text-sm text-slate-600">
+                <p className="dashboard-kicker">Customer activity</p>
+                <h2 className="dashboard-display mt-3 text-4xl font-semibold text-slate-900">Welcome, {user?.name}</h2>
+                <p className="dashboard-muted mt-2 text-sm">
                   Post property requirements, monitor responses from property owners and agents, and stay on top of every follow-up.
                 </p>
               </div>
@@ -149,12 +172,12 @@ const CustomerDashboardPage = () => {
 
           <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[
-              { label: "Total Requirements", value: requests.length, color: "from-blue-500 to-blue-700" },
-              { label: "Open Requirements", value: openCount, color: "from-slate-600 to-slate-800" },
-              { label: "Matched Requirements", value: matchedCount, color: "from-emerald-500 to-emerald-700" },
-              { label: "Unread Notifications", value: unreadCount, color: "from-amber-500 to-orange-600" },
+              { label: "Total Requirements", value: requests.length },
+              { label: "Open Requirements", value: openCount },
+              { label: "Matched Requirements", value: matchedCount },
+              { label: "Unread Notifications", value: unreadCount },
             ].map((item) => (
-              <div key={item.label} className="dashboard-shell border border-slate-200 bg-white p-5 text-slate-900">
+              <div key={item.label} className="dashboard-stat p-5 text-slate-900">
                 <p className="text-sm uppercase tracking-[0.18em] text-slate-600">{item.label}</p>
                 <p className="mt-4 text-4xl font-extrabold text-slate-900">{item.value}</p>
               </div>
@@ -165,8 +188,8 @@ const CustomerDashboardPage = () => {
             <div className="dashboard-shell p-6">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900">Recent requirements</h3>
-                  <p className="mt-1 text-sm text-slate-600">Your latest submitted property requirements.</p>
+                  <h3 className="dashboard-display text-2xl font-semibold text-slate-900">Recent requirements</h3>
+                  <p className="dashboard-muted mt-1 text-sm">Your latest submitted property requirements.</p>
                 </div>
                 <button onClick={() => setTab("requests")} className="dashboard-secondary px-4 py-2 text-xs">
                   View all
@@ -185,14 +208,20 @@ const CustomerDashboardPage = () => {
                           <div>
                             <div className="flex items-center gap-2">
                               <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${cfg.cls}`}>{cfg.label}</span>
-                              <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">{item.propertyType}</span>
+                              <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">
+                                {formatRequestTitle(item)}
+                              </span>
                             </div>
-                            <p className="mt-2 font-semibold text-slate-900">{item.location?.city}, {item.location?.area}</p>
-                            <p className="mt-1 text-sm text-slate-600">{formatBudget(item.budgetMin, item.budgetMax)}</p>
+                            <p className="mt-2 font-semibold text-slate-900">
+                              {item.location?.city}, {item.location?.area}
+                            </p>
+                            {item.budgetMin || item.budgetMax ? (
+                              <p className="mt-1 text-sm text-slate-600">{formatBudget(item.budgetMin, item.budgetMax)}</p>
+                            ) : null}
                           </div>
                           <div className="text-right">
                             <p className="text-xs text-slate-500">{fmtDate(item.createdAt)}</p>
-                            <p className="mt-1 text-xs font-semibold text-[#8b6b3f]">{item.matchedAgents?.length || 0} matches</p>
+                            <p className="mt-1 text-xs font-semibold text-slate-700">{item.matchedAgents?.length || 0} matches</p>
                           </div>
                         </div>
                       </div>
@@ -205,8 +234,8 @@ const CustomerDashboardPage = () => {
             <div className="dashboard-shell p-6">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900">Property-side responses</h3>
-                  <p className="mt-1 text-sm text-slate-600">Agents and owners responding to your requirements.</p>
+                  <h3 className="dashboard-display text-2xl font-semibold text-slate-900">Property-side responses</h3>
+                  <p className="dashboard-muted mt-1 text-sm">Agents and owners responding to your requirements.</p>
                 </div>
                 <button onClick={() => setTab("matches")} className="dashboard-secondary px-4 py-2 text-xs">
                   Open matches
@@ -244,50 +273,57 @@ const CustomerDashboardPage = () => {
         <section className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">My Property Requirements</h2>
-              <p className="mt-1 text-sm text-slate-600">Post and manage the requirements you want owners and agents to respond to.</p>
+              <h2 className="dashboard-display text-2xl font-semibold text-slate-900">My Requests</h2>
+              <p className="dashboard-muted mt-1 text-sm">Post and manage property or service requests you want the team to respond to.</p>
             </div>
-            <button onClick={() => setShowForm((value) => !value)} className="dashboard-primary px-4 py-2 text-sm">
-              {showForm ? "Cancel" : "+ New Requirement"}
-            </button>
+            <div className="flex flex-wrap gap-2">
+              <button onClick={() => setShowForm((value) => !value)} className="dashboard-primary px-4 py-2 text-sm">
+                <PlusIcon className="h-4 w-4" />
+                {showForm ? "Cancel" : "Property Requirement"}
+              </button>
+              <button onClick={() => navigate("/request-service")} className="dashboard-secondary px-4 py-2 text-sm">
+                <PlusIcon className="h-4 w-4" />
+                Service Request
+              </button>
+            </div>
           </div>
 
           {showForm ? (
             <form onSubmit={onSubmitRequest} className="dashboard-shell space-y-4 p-6">
-              <h3 className="font-bold text-slate-900">Submit a Requirement</h3>
+              <h3 className="dashboard-display text-2xl font-semibold text-slate-900">Submit a Requirement</h3>
               <div className="grid gap-4 sm:grid-cols-2">
                 <input
-                  className="soft-input rounded-lg px-3 py-2 text-sm"
+                  className="dashboard-control"
                   placeholder="City *"
                   value={form.city}
-                  onChange={(event) => setForm((prev) => ({ ...prev, city: event.target.value }))}
+                  onChange={(event) => setForm((previous) => ({ ...previous, city: event.target.value }))}
                 />
                 <input
-                  className="soft-input rounded-lg px-3 py-2 text-sm"
+                  className="dashboard-control"
                   placeholder="Area *"
                   value={form.area}
-                  onChange={(event) => setForm((prev) => ({ ...prev, area: event.target.value }))}
+                  onChange={(event) => setForm((previous) => ({ ...previous, area: event.target.value }))}
                 />
                 <input
-                  className="soft-input rounded-lg px-3 py-2 text-sm"
+                  className="dashboard-control"
                   type="number"
                   min="0"
                   placeholder="Budget Min"
                   value={form.budgetMin}
-                  onChange={(event) => setForm((prev) => ({ ...prev, budgetMin: event.target.value }))}
+                  onChange={(event) => setForm((previous) => ({ ...previous, budgetMin: event.target.value }))}
                 />
                 <input
-                  className="soft-input rounded-lg px-3 py-2 text-sm"
+                  className="dashboard-control"
                   type="number"
                   min="0"
                   placeholder="Budget Max *"
                   value={form.budgetMax}
-                  onChange={(event) => setForm((prev) => ({ ...prev, budgetMax: event.target.value }))}
+                  onChange={(event) => setForm((previous) => ({ ...previous, budgetMax: event.target.value }))}
                 />
                 <select
-                  className="soft-input rounded-lg px-3 py-2 text-sm"
+                  className="dashboard-control"
                   value={form.propertyType}
-                  onChange={(event) => setForm((prev) => ({ ...prev, propertyType: event.target.value }))}
+                  onChange={(event) => setForm((previous) => ({ ...previous, propertyType: event.target.value }))}
                 >
                   {PROPERTY_TYPE_OPTIONS.map((value) => (
                     <option key={value} value={value}>
@@ -297,10 +333,10 @@ const CustomerDashboardPage = () => {
                 </select>
               </div>
               <textarea
-                className="soft-input w-full min-h-[100px] rounded-lg px-3 py-2 text-sm"
+                className="dashboard-control min-h-[110px]"
                 placeholder="Additional requirements (optional)"
                 value={form.additionalRequirements}
-                onChange={(event) => setForm((prev) => ({ ...prev, additionalRequirements: event.target.value }))}
+                onChange={(event) => setForm((previous) => ({ ...previous, additionalRequirements: event.target.value }))}
               />
               <button disabled={submitting} className="dashboard-primary px-6 py-2.5 text-sm disabled:opacity-60">
                 {submitting ? "Submitting..." : "Submit Requirement"}
@@ -309,7 +345,7 @@ const CustomerDashboardPage = () => {
           ) : null}
 
           {requests.length === 0 ? (
-            <div className="dashboard-empty pt-10 text-center">No requirements submitted yet.</div>
+            <div className="dashboard-empty p-10 text-center">No requirements submitted yet.</div>
           ) : (
             <div className="space-y-4">
               {requests.map((item) => {
@@ -320,17 +356,21 @@ const CustomerDashboardPage = () => {
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
                           <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${cfg.cls}`}>{cfg.label}</span>
-                          <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">{item.propertyType}</span>
+                          <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">
+                            {formatRequestTitle(item)}
+                          </span>
                         </div>
-                        <p className="mt-3 text-lg font-semibold text-slate-900">{item.location?.city}, {item.location?.area}</p>
-                        <p className="mt-1 text-sm text-slate-600">{formatBudget(item.budgetMin, item.budgetMax)}</p>
-                        {item.additionalRequirements ? (
-                          <p className="mt-2 text-sm text-slate-500">{item.additionalRequirements}</p>
+                        <p className="mt-3 text-lg font-semibold text-slate-900">
+                          {item.location?.city}, {item.location?.area}
+                        </p>
+                        {item.budgetMin || item.budgetMax ? (
+                          <p className="mt-1 text-sm text-slate-600">{formatBudget(item.budgetMin, item.budgetMax)}</p>
                         ) : null}
+                        {item.additionalRequirements ? <p className="mt-2 text-sm text-slate-500">{item.additionalRequirements}</p> : null}
                       </div>
                       <div className="text-right">
                         <p className="text-xs text-slate-500">{fmtDate(item.createdAt)}</p>
-                        <p className="mt-2 text-xs font-semibold text-[#8b6b3f]">
+                        <p className="mt-2 text-xs font-semibold text-slate-700">
                           {item.matchedAgents?.length || 0} agent / owner responses
                         </p>
                       </div>
@@ -341,7 +381,7 @@ const CustomerDashboardPage = () => {
                         {item.matchedAgents.map((agent) => (
                           <div key={agent._id} className="dashboard-subpanel p-4">
                             <p className="font-semibold text-slate-900">{agent.name}</p>
-                            <p className="mt-1 text-sm text-slate-600 capitalize">{agent.role}</p>
+                            <p className="mt-1 text-sm capitalize text-slate-600">{agent.role}</p>
                             <p className="mt-1 text-sm text-slate-500">{agent.phone || "Phone not shared yet"}</p>
                             <p className="mt-1 text-sm text-slate-500">{agent.email || "Email not shared yet"}</p>
                           </div>
@@ -359,25 +399,27 @@ const CustomerDashboardPage = () => {
       {tab === "matches" && (
         <section className="space-y-4">
           <div>
-            <h2 className="text-xl font-bold text-slate-900">Matched Responses</h2>
-            <p className="mt-1 text-sm text-slate-600">Owners and agents who responded to the requirements you posted.</p>
+            <h2 className="dashboard-display text-2xl font-semibold text-slate-900">Matched Responses</h2>
+            <p className="dashboard-muted mt-1 text-sm">Owners and agents who responded to the requirements you posted.</p>
           </div>
 
           {matchedRequests.length === 0 ? (
-            <div className="dashboard-empty pt-10 text-center">No property-side responses yet.</div>
+            <div className="dashboard-empty p-10 text-center">No property-side responses yet.</div>
           ) : (
             <div className="space-y-4">
               {matchedRequests.map((item) => (
                 <div key={item._id} className="dashboard-shell p-5">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8b6b3f]">Requirement Match</p>
-                      <h3 className="mt-2 text-lg font-semibold text-slate-900">
-                        {item.propertyType} in {item.location?.area}, {item.location?.city}
+                      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-600">Requirement Match</p>
+                      <h3 className="dashboard-display mt-2 text-xl font-semibold text-slate-900">
+                        {formatRequestTitle(item)} in {item.location?.area}, {item.location?.city}
                       </h3>
-                      <p className="mt-1 text-sm text-slate-600">{formatBudget(item.budgetMin, item.budgetMax)}</p>
+                      {item.budgetMin || item.budgetMax ? (
+                        <p className="mt-1 text-sm text-slate-600">{formatBudget(item.budgetMin, item.budgetMax)}</p>
+                      ) : null}
                     </div>
-                    <span className="rounded-full bg-[#f5e8d4] px-3 py-1 text-xs font-semibold text-[#8b6b3f]">
+                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
                       {item.matchedAgents?.length || 0} matches
                     </span>
                   </div>
@@ -399,7 +441,7 @@ const CustomerDashboardPage = () => {
 
           {matchNotifications.length ? (
             <div className="dashboard-shell p-5">
-              <h3 className="text-lg font-bold text-slate-900">Recent match notifications</h3>
+              <h3 className="dashboard-display text-2xl font-semibold text-slate-900">Recent match notifications</h3>
               <div className="mt-4 space-y-3">
                 {matchNotifications.map((item) => (
                   <div key={item._id} className="dashboard-subpanel p-4">
@@ -426,17 +468,17 @@ const CustomerDashboardPage = () => {
       {tab === "notifications" && (
         <section className="space-y-3">
           <div>
-            <h2 className="text-xl font-bold text-slate-900">Notifications</h2>
-            <p className="mt-1 text-sm text-slate-600">Track every update related to your requirements and account activity.</p>
+            <h2 className="dashboard-display text-2xl font-semibold text-slate-900">Notifications</h2>
+            <p className="dashboard-muted mt-1 text-sm">Track every update related to your requirements and account activity.</p>
           </div>
           {notifications.length === 0 ? (
-            <div className="dashboard-empty pt-10 text-center">No notifications yet.</div>
+            <div className="dashboard-empty p-10 text-center">No notifications yet.</div>
           ) : (
             notifications.map((item) => (
               <div
                 key={item._id}
                 className={`rounded-2xl border p-4 transition-all ${
-                  item.readAt ? "border-slate-200 bg-slate-50" : "border-[#eadbc4] bg-[#fff8ef] shadow-sm"
+                  item.readAt ? "border-slate-200 bg-slate-50" : "border-slate-200 bg-white shadow-sm"
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">

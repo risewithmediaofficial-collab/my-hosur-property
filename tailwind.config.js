@@ -4,14 +4,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: "#1E3A8A",
-        stone: "#F7FBFF",
-        clay: "#A7C6ED",
-        sage: "#8BC3E6",
-        sand: "#BFE5F0",
-        primary: "#A7C6ED",
-        accent: "#8BC3E6",
-        powder: "#BFE5F0",
+        ink: "#111111",
+        stone: "#F5F5F5",
+        clay: "#E5E7EB",
+        sage: "#111111",
+        sand: "#F9FAFB",
+        primary: "#111111",
+        accent: "#111111",
+        powder: "#F3F4F6",
         // Enhanced accessible grays
         text: {
           primary: "#0f172a",
@@ -34,10 +34,10 @@ export default {
         '6xl': ['3.75rem', { lineHeight: '1.1', letterSpacing: '-0.05em' }],
       },
       boxShadow: {
-        soft: "0 12px 28px -16px rgba(53, 89, 136, 0.34)",
+        soft: "0 16px 32px -24px rgba(17, 17, 17, 0.18)",
       },
       fontFamily: {
-        sans: ["Manrope", "ui-sans-serif", "system-ui"],
+        sans: ["Inter", "Poppins", "ui-sans-serif", "system-ui"],
       },
       screens: {
         'xs': '320px',

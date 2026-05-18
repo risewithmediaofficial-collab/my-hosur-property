@@ -13,7 +13,7 @@ const ImageGallery = ({ images = [], property = {} }) => {
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-[32px] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(249,245,238,0.86))] shadow-[0_24px_56px_rgba(15,23,42,0.1)]">
+      <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-[0_18px_36px_rgba(17,17,17,0.06)]">
         <div className="aspect-[4/3] w-full overflow-hidden bg-slate-100">
           <img
             src={active}
@@ -36,8 +36,8 @@ const ImageGallery = ({ images = [], property = {} }) => {
               onClick={() => setActive(img)}
               className={`shrink-0 overflow-hidden rounded-2xl border transition ${
                 isActive
-                  ? "border-slate-900 shadow-[0_14px_28px_rgba(15,23,42,0.12)]"
-                  : "border-white/70 bg-white/75 hover:border-[#d7b88b]"
+                  ? "border-slate-900 shadow-[0_14px_28px_rgba(17,17,17,0.08)]"
+                  : "border-slate-200 bg-white hover:border-slate-900"
               }`}
             >
               <img

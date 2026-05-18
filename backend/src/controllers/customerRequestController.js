@@ -1,159 +1,297 @@
+const crypto = require("crypto");
+const { body } = require("express-validator");
 const CustomerRequest = require("../models/CustomerRequest");
-const User = require("../models/User");
+const LeadUnlock = require("../models/LeadUnlock");
 const Notification = require("../models/Notification");
 const Property = require("../models/Property");
-const { body } = require("express-validator");
-const crypto = require("crypto");
-const LeadUnlock = require("../models/LeadUnlock");
 const SystemSetting = require("../models/SystemSetting");
+const User = require("../models/User");
 const { hasRazorpayConfig, razorpay } = require("../config/razorpay");
 
-const CUSTOMER_PROPERTY_TYPES = ["Apartment", "Villa", "Independent House", "Plot", "Commercial", "House"];
+const REQUEST_CATEGORIES = [
+  "property_buy",
+  "property_sell",
+  "property_rent",
+  "loan",
+  "interior",
+  "construction",
+];
 
-const getMatchingPropertyTypes = (propertyType) => {
-  const map = {
-    House: ["Independent House", "Villa", "Apartment"],
-    Apartment: ["Apartment"],
-    Villa: ["Villa"],
-    "Independent House": ["Independent House"],
-    Plot: ["Plot"],
-    Commercial: ["Commercial"],
-  };
+const PROPERTY_REQUEST_CATEGORIES = ["property_buy", "property_sell", "property_rent"];
 
-  return map[propertyType] || [propertyType];
+const PROPERTY_TYPES = [
+  "Apartment",
+  "Villa",
+  "Independent House",
+  "Plot",
+  "Commercial",
+  "House",
+  "Office",
+  "Warehouse",
+  "Land",
+  "Industrial Shed",
+];
+
+const PROPERTY_MATCH_MAP = {
+  House: ["House", "Independent House", "Villa", "Apartment"],
+  Apartment: ["Apartment"],
+  Villa: ["Villa"],
+  "Independent House": ["Independent House", "House"],
+  Plot: ["Plot", "Land"],
+  Commercial: ["Commercial", "Office"],
+  Office: ["Office", "Commercial"],
+  Warehouse: ["Warehouse"],
+  Land: ["Land", "Plot"],
+  "Industrial Shed": ["Industrial Shed", "Warehouse"],
 };
 
-// Validation middleware
+const SERVICE_TYPE_OPTIONS = {
+  loan: ["Plot Loan", "Private Finance", "House Loan"],
+  interior: ["House", "Office"],
+  construction: ["House", "Commercial"],
+};
+
+const isPropertyRequest = (requestCategory) => PROPERTY_REQUEST_CATEGORIES.includes(requestCategory);
+
+const getMatchingPropertyTypes = (propertyType) => PROPERTY_MATCH_MAP[propertyType] || [propertyType];
+
+const getRequestTitle = (request) => {
+  if (isPropertyRequest(request.requestCategory)) {
+    return `${request.propertyType || "Property"} request`;
+  }
+  if (request.requestCategory === "loan") return "Loan request";
+  if (request.requestCategory === "interior") return `${request.serviceType || "Interior"} interior request`;
+  if (request.requestCategory === "construction") return `${request.serviceType || "Construction"} construction request`;
+  return "Service request";
+};
+
+const getAdminNotificationMessage = (user, request) => {
+  const locationText = `${request.location?.area || "Area"}, ${request.location?.city || "City"}`;
+
+  if (isPropertyRequest(request.requestCategory)) {
+    return `${user.name} submitted a ${request.requestCategory.replace("property_", "")} request for ${request.propertyType || "property"} in ${locationText}.`;
+  }
+
+  if (request.requestCategory === "loan") {
+    return `${user.name} requested a loan consultation in ${locationText}.`;
+  }
+
+  return `${user.name} requested ${request.serviceType || request.requestCategory} service in ${locationText}.`;
+};
+
+const getPropertyNotificationMessage = (user, request) =>
+  `${user.name} is looking for ${request.propertyType || "property"} in ${request.location.area}, ${request.location.city}.`;
+
+const maskContactDetails = (requestInfo, isUnlocked) => ({
+  ...requestInfo,
+  contactDetails: isUnlocked ? requestInfo.contactDetails : { email: "Masked", phone: "Masked" },
+  isContactUnlocked: isUnlocked,
+});
+
 exports.requestValidators = [
   body("location.city").trim().notEmpty().withMessage("City is required"),
   body("location.area").trim().notEmpty().withMessage("Area is required"),
-  body("budgetMax").isNumeric().withMessage("Max budget is required"),
-  body("propertyType").isIn(CUSTOMER_PROPERTY_TYPES).withMessage("Invalid property type"),
+  body("requestCategory").isIn(REQUEST_CATEGORIES).withMessage("Invalid request category"),
+  body("propertyType")
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(PROPERTY_TYPES)
+    .withMessage("Invalid property type"),
+  body("serviceType")
+    .optional({ nullable: true, checkFalsy: true })
+    .trim()
+    .isLength({ min: 2, max: 80 })
+    .withMessage("Invalid service type"),
+  body("budgetMin").optional({ nullable: true, checkFalsy: true }).isNumeric().withMessage("Invalid min budget"),
+  body("budgetMax").optional({ nullable: true, checkFalsy: true }).isNumeric().withMessage("Invalid max budget"),
+  body().custom((value) => {
+    const requestCategory = value.requestCategory;
+
+    if (isPropertyRequest(requestCategory) && !value.propertyType) {
+      throw new Error("Property type is required for property requests");
+    }
+
+    if (requestCategory === "property_rent" && !["House", "Office", "Commercial", "Warehouse", "Land", "Industrial Shed"].includes(value.propertyType)) {
+      throw new Error("Invalid rent property type");
+    }
+
+    if (["interior", "construction"].includes(requestCategory) && !value.serviceType) {
+      throw new Error("Service type is required");
+    }
+
+    if (requestCategory === "loan" && value.serviceType && !SERVICE_TYPE_OPTIONS.loan.includes(value.serviceType)) {
+      throw new Error("Invalid loan service type");
+    }
+
+    if (requestCategory === "interior" && value.serviceType && !SERVICE_TYPE_OPTIONS.interior.includes(value.serviceType)) {
+      throw new Error("Invalid interior service type");
+    }
+
+    if (requestCategory === "construction" && value.serviceType && !SERVICE_TYPE_OPTIONS.construction.includes(value.serviceType)) {
+      throw new Error("Invalid construction service type");
+    }
+
+    return true;
+  }),
 ];
 
-// 1. Create Request
 exports.createCustomerRequest = async (req, res, next) => {
   try {
-    const { location, budgetMin, budgetMax, propertyType, additionalRequirements } = req.body;
+    const {
+      location,
+      budgetMin,
+      budgetMax,
+      requestCategory,
+      propertyType,
+      serviceType,
+      additionalRequirements,
+    } = req.body;
+
     const request = new CustomerRequest({
       customerId: req.user._id,
       customerName: req.user.name,
       contactDetails: { email: req.user.email, phone: req.user.phone },
       location,
-      budgetMin,
-      budgetMax,
-      propertyType,
+      budgetMin: Number(budgetMin || 0),
+      budgetMax: Number(budgetMax || 0),
+      requestCategory,
+      propertyType: propertyType || undefined,
+      serviceType: serviceType || "",
       additionalRequirements,
     });
+
     await request.save();
 
-    const propertyTypeOptions = getMatchingPropertyTypes(propertyType);
-    const cityRegex = new RegExp(`^${String(location.city).trim()}$`, "i");
-    const matchingProperties = await Property.find({
-      status: "approved",
-      propertyType: { $in: propertyTypeOptions },
-      "location.city": cityRegex,
-      ...(budgetMax ? { price: { ...(budgetMin ? { $gte: budgetMin } : {}), $lte: budgetMax } } : {}),
-    })
-      .select("ownerId title propertyType location price")
-      .lean();
+    let matchedRecipients = 0;
 
-    const recipientIds = [...new Set(matchingProperties.map((item) => String(item.ownerId)).filter(Boolean))];
+    if (isPropertyRequest(requestCategory) && propertyType) {
+      const propertyTypeOptions = getMatchingPropertyTypes(propertyType);
+      const cityRegex = new RegExp(`^${String(location.city).trim()}$`, "i");
+      const priceQuery = {};
 
-    if (recipientIds.length > 0) {
+      if (Number(budgetMin || 0) > 0) priceQuery.$gte = Number(budgetMin);
+      if (Number(budgetMax || 0) > 0) priceQuery.$lte = Number(budgetMax);
+
+      const matchingProperties = await Property.find({
+        status: "approved",
+        propertyType: { $in: propertyTypeOptions },
+        ...(requestCategory === "property_rent" ? { listingType: "rent" } : { listingType: "sale" }),
+        "location.city": cityRegex,
+        ...(Object.keys(priceQuery).length ? { price: priceQuery } : {}),
+      })
+        .select("ownerId")
+        .lean();
+
+      const recipientIds = [...new Set(matchingProperties.map((item) => String(item.ownerId)).filter(Boolean))];
+      matchedRecipients = recipientIds.length;
+
+      if (recipientIds.length) {
+        await Notification.insertMany(
+          recipientIds.map((recipientId) => ({
+            recipientId,
+            senderId: req.user._id,
+            type: "customer_request",
+            title: "New Customer Requirement",
+            message: getPropertyNotificationMessage(req.user, request),
+            payload: {
+              customerRequestId: request._id,
+              requestCategory,
+              propertyType,
+              city: location.city,
+              area: location.area,
+              budgetMin: Number(budgetMin || 0),
+              budgetMax: Number(budgetMax || 0),
+            },
+          }))
+        );
+      }
+    }
+
+    const admins = await User.find({ role: "admin", status: "active" }).select("_id").lean();
+    if (admins.length) {
       await Notification.insertMany(
-        recipientIds.map((recipientId) => ({
-          recipientId,
+        admins.map((admin) => ({
+          recipientId: admin._id,
           senderId: req.user._id,
-          type: "customer_request",
-          title: "New Customer Requirement",
-          message: `${req.user.name} is looking for a ${propertyType} in ${location.area}, ${location.city}.`,
+          type: "admin_service_request",
+          title: getRequestTitle(request),
+          message: getAdminNotificationMessage(req.user, request),
           payload: {
             customerRequestId: request._id,
-            propertyType,
+            requestCategory,
+            propertyType: propertyType || "",
+            serviceType: serviceType || "",
             city: location.city,
             area: location.area,
-            budgetMin,
-            budgetMax,
           },
         }))
       );
     }
 
     res.status(201).json({
-      message: "Requirement posted and shared with matching property owners/agents",
+      message: isPropertyRequest(requestCategory)
+        ? "Requirement submitted and shared with matching owners while also notifying admin."
+        : "Service request submitted successfully. Our admin team will contact you soon.",
       item: request,
-      matchedRecipients: recipientIds.length,
+      matchedRecipients,
     });
   } catch (error) {
     next(error);
   }
 };
 
-// 2. Fetch My Requests (for customers)
 exports.myCustomerRequests = async (req, res, next) => {
   try {
     const requests = await CustomerRequest.find({ customerId: req.user._id })
       .populate("matchedAgents", "name email phone role")
       .sort({ createdAt: -1 });
+
     res.json({ items: requests });
   } catch (error) {
     next(error);
   }
 };
 
-// 3. List for Agents (with masked contact)
 exports.listForAgents = async (req, res, next) => {
   try {
-    // Only Agents/Brokers
     if (!["agent", "broker"].includes(req.user.role)) {
       return res.status(403).json({ message: "Only agents/brokers can view these requests" });
     }
 
-    const city = req.query.city;
-    const filter = {};
-    if (city) filter["location.city"] = new RegExp(city, "i");
+    const user = await User.findById(req.user._id).select("customerLeadCredits");
+    const filter = { requestCategory: { $in: PROPERTY_REQUEST_CATEGORIES } };
+
+    if (req.query.city) {
+      filter["location.city"] = new RegExp(req.query.city, "i");
+    }
 
     const requests = await CustomerRequest.find(filter).sort({ createdAt: -1 }).lean();
+    const unlocks = await LeadUnlock.find({ agentId: req.user._id, status: "paid" }).lean();
+    const unlockedIds = unlocks.map((item) => String(item.customerRequestId));
 
-    // Fetch unlocks to see which ones this agent paid for
-    const unlocks = await LeadUnlock.find({
-      agentId: req.user._id,
-      status: "paid",
-    }).lean();
-
-    const unlockedIds = unlocks.map((u) => String(u.customerRequestId));
-
-    const finalResponse = requests.map((reqInfo) => {
-      const isUnlocked = unlockedIds.includes(String(reqInfo._id));
-
-      return {
-        ...reqInfo,
-        contactDetails: isUnlocked ? reqInfo.contactDetails : { email: "Masked", phone: "Masked" },
-        isContactUnlocked: isUnlocked,
-      };
+    res.json({
+      items: requests.map((item) => maskContactDetails(item, unlockedIds.includes(String(item._id)))),
+      customerLeadCredits: user?.customerLeadCredits || 0,
     });
-
-    let setting = await SystemSetting.findOne({ key: "lead_unlock_price" });
-    const price = setting ? Number(setting.value) : 200;
-
-    res.json({ items: finalResponse, leadUnlockPrice: price });
   } catch (error) {
     next(error);
   }
 };
 
-// 4. Send Match Notification
 exports.sendMatchNotification = async (req, res, next) => {
   try {
     const { id } = req.params;
     const request = await CustomerRequest.findById(id);
     if (!request) return res.status(404).json({ message: "Not found" });
 
+    if (!isPropertyRequest(request.requestCategory)) {
+      return res.status(400).json({ message: "This request is handled directly by admin" });
+    }
+
     const alreadyMatched = request.matchedAgents.some((agentId) => String(agentId) === String(req.user._id));
     if (!alreadyMatched) {
       request.matchedAgents.push(req.user._id);
     }
+
     request.status = "matched";
     await request.save();
 
@@ -161,10 +299,11 @@ exports.sendMatchNotification = async (req, res, next) => {
       recipientId: request.customerId,
       senderId: req.user._id,
       title: "Property Match Received",
-      message: `${req.user.name} has responded to your ${request.propertyType} requirement in ${request.location.area}, ${request.location.city}.`,
+      message: `${req.user.name} has responded to your ${request.propertyType || "property"} request in ${request.location.area}, ${request.location.city}.`,
       type: "match",
       payload: {
         customerRequestId: request._id,
+        requestCategory: request.requestCategory,
         propertyType: request.propertyType,
         city: request.location?.city,
         area: request.location?.area,
@@ -177,7 +316,6 @@ exports.sendMatchNotification = async (req, res, next) => {
   }
 };
 
-// 5. Unlock Lead Intent (Uses credits OR initiates Razorpay for single lead)
 exports.unlockLeadIntent = async (req, res, next) => {
   try {
     if (!["agent", "broker"].includes(req.user.role)) {
@@ -187,8 +325,10 @@ exports.unlockLeadIntent = async (req, res, next) => {
     const { id } = req.params;
     const request = await CustomerRequest.findById(id);
     if (!request) return res.status(404).json({ message: "Not found" });
+    if (!isPropertyRequest(request.requestCategory)) {
+      return res.status(400).json({ message: "Only property requirements can be unlocked" });
+    }
 
-    // Check if already unlocked via LeadUnlock record
     const existing = await LeadUnlock.findOne({ agentId: req.user._id, customerRequestId: id, status: "paid" });
     if (existing) {
       return res.status(400).json({ message: "Lead already unlocked" });
@@ -196,7 +336,6 @@ exports.unlockLeadIntent = async (req, res, next) => {
 
     const user = await User.findById(req.user._id);
 
-    // OPTION A: Use Credit Balance (Instant Unlock)
     if ((user.customerLeadCredits || 0) > 0) {
       const unlock = new LeadUnlock({
         agentId: req.user._id,
@@ -206,21 +345,20 @@ exports.unlockLeadIntent = async (req, res, next) => {
         status: "paid",
         gateway: "credits",
       });
-      await unlock.save();
 
+      await unlock.save();
       user.customerLeadCredits -= 1;
       await user.save();
 
-      return res.json({ 
-        message: "Lead unlocked using credits", 
-        isUnlocked: true, 
+      return res.json({
+        message: "Lead unlocked using credits",
+        isUnlocked: true,
         remainingCredits: user.customerLeadCredits,
-        contactDetails: request.contactDetails
+        contactDetails: request.contactDetails,
       });
     }
 
-    // OPTION B: Single Lead Unlock via Razorpay (Current behavior)
-    let setting = await SystemSetting.findOne({ key: "lead_unlock_price" });
+    const setting = await SystemSetting.findOne({ key: "lead_unlock_price" });
     const priceAmount = setting ? Number(setting.value) : 200;
 
     let transactionRef = `sim_${crypto.randomUUID()}`;
@@ -249,9 +387,10 @@ exports.unlockLeadIntent = async (req, res, next) => {
       customerRequestId: request._id,
       amount: priceAmount,
       status: "created",
-      transactionRef: transactionRef,
-      gateway: gateway,
+      transactionRef,
+      gateway,
     });
+
     await unlock.save();
 
     res.status(201).json({
@@ -264,7 +403,6 @@ exports.unlockLeadIntent = async (req, res, next) => {
   }
 };
 
-// 6. NEW: Create Lead Pack Intent (300rs for 5 credits)
 exports.createLeadPackIntent = async (req, res, next) => {
   try {
     const packPrice = 300;
@@ -272,25 +410,24 @@ exports.createLeadPackIntent = async (req, res, next) => {
       amount: Math.round(packPrice * 100),
       currency: "INR",
       receipt: `pack_${req.user._id}_${Date.now()}`.slice(0, 40),
-      notes: { agentId: String(req.user._id), type: "lead_pack" }
+      notes: { agentId: String(req.user._id), type: "lead_pack" },
     });
 
     res.json({
       orderId: order.id,
       amount: packPrice * 100,
       currency: "INR",
-      keyId: process.env.RAZORPAY_KEY_ID
+      keyId: process.env.RAZORPAY_KEY_ID,
     });
   } catch (error) {
     next(error);
   }
 };
 
-// 7. NEW: Verify Lead Pack Payment
 exports.verifyLeadPackPayment = async (req, res, next) => {
   try {
     const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
-    
+
     const expectedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
       .update(`${razorpayOrderId}|${razorpayPaymentId}`)
@@ -300,7 +437,6 @@ exports.verifyLeadPackPayment = async (req, res, next) => {
       return res.status(400).json({ message: "Signature verification failed" });
     }
 
-    // Add 5 credits to user
     await User.findByIdAndUpdate(req.user._id, { $inc: { customerLeadCredits: 5 } });
 
     res.json({ message: "Lead pack purchased successfully (5 credits added)" });
@@ -309,7 +445,6 @@ exports.verifyLeadPackPayment = async (req, res, next) => {
   }
 };
 
-// 8. Verify Single Lead Unlock Payment
 exports.verifyLeadUnlock = async (req, res, next) => {
   try {
     const { unlockId, success, razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
@@ -340,45 +475,6 @@ exports.verifyLeadUnlock = async (req, res, next) => {
     }
 
     return res.status(400).json({ message: "Payment failed or signature mismatch" });
-  } catch (error) {
-    next(error);
-  }
-};
-
-// Modified listForAgents to show credits
-exports.listForAgents = async (req, res, next) => {
-  try {
-    if (!["agent", "broker"].includes(req.user.role)) {
-      return res.status(403).json({ message: "Only agents/brokers can view these requests" });
-    }
-
-    const user = await User.findById(req.user._id).select("customerLeadCredits");
-    const city = req.query.city;
-    const filter = {};
-    if (city) filter["location.city"] = new RegExp(city, "i");
-
-    const requests = await CustomerRequest.find(filter).sort({ createdAt: -1 }).lean();
-
-    const unlocks = await LeadUnlock.find({
-      agentId: req.user._id,
-      status: "paid",
-    }).lean();
-
-    const unlockedIds = unlocks.map((u) => String(u.customerRequestId));
-
-    const finalResponse = requests.map((reqInfo) => {
-      const isUnlocked = unlockedIds.includes(String(reqInfo._id));
-      return {
-        ...reqInfo,
-        contactDetails: isUnlocked ? reqInfo.contactDetails : { email: "Masked", phone: "Masked" },
-        isContactUnlocked: isUnlocked,
-      };
-    });
-
-    res.json({ 
-      items: finalResponse, 
-      customerLeadCredits: user.customerLeadCredits || 0 
-    });
   } catch (error) {
     next(error);
   }

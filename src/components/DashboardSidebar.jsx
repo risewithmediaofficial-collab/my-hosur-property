@@ -1,24 +1,26 @@
-const DashboardSidebar = ({ title, subtitle, description, navItems = [], children }) => {
+const DashboardSidebar = ({ title, subtitle, description, navItems = [], stats = [], children }) => {
   return (
     <div className="flex min-h-[calc(100vh-4rem)] flex-col bg-transparent md:flex-row">
-      <aside className="sticky top-20 z-10 hidden h-[calc(100vh-5rem)] w-80 shrink-0 overflow-y-auto px-4 pb-6 pt-4 md:flex md:flex-col">
+      <aside className="sticky top-20 z-10 hidden h-[calc(100vh-5rem)] w-[21rem] shrink-0 overflow-y-auto px-4 pb-6 pt-4 md:flex md:flex-col">
         <div className="dashboard-shell flex h-full flex-col gap-6 p-6">
           <div>
-            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">{subtitle}</p>
-            <h1 className="text-2xl font-extrabold leading-tight text-slate-900">{title}</h1>
-            {description ? <p className="mt-2 text-sm leading-6 text-slate-500">{description}</p> : null}
+            <p className="dashboard-kicker">{subtitle}</p>
+            <h1 className="dashboard-display mt-3 text-[2.15rem] font-semibold leading-[1.02] text-slate-900">{title}</h1>
+            {description ? <p className="dashboard-muted mt-3 text-sm leading-6">{description}</p> : null}
           </div>
 
-          <div className="dashboard-subpanel flex-1 p-3">
-            <p className="px-2 pb-2 text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400">Dashboard sections</p>
-            <nav className="space-y-1">
+          <div className="flex-1 border-t border-slate-200 pt-4">
+            <p className="pb-3 text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400">Dashboard sections</p>
+            <nav className="space-y-1.5">
               {navItems.map((item) => (
                 <button
                   key={item.key}
                   type="button"
                   onClick={() => item.onClick?.(item.key)}
-                  className={`flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold transition ${
-                    item.active ? "bg-[#b98a53] text-white shadow-sm" : "text-slate-600 hover:bg-[#fff8ef] hover:text-[#8b6b3f] hover:shadow-sm"
+                  className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left text-sm font-semibold transition ${
+                    item.active
+                      ? "border-slate-900 bg-slate-50 text-slate-950 shadow-[0_12px_22px_rgba(17,17,17,0.05)]"
+                      : "border-transparent bg-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-50 hover:text-slate-900"
                   }`}
                 >
                   <span className="flex min-w-0 flex-1 items-center gap-3">
@@ -26,7 +28,7 @@ const DashboardSidebar = ({ title, subtitle, description, navItems = [], childre
                     <span className="min-w-0 truncate">{item.label}</span>
                   </span>
                   {item.badge ? (
-                    <span className={`ml-2 rounded-full px-2 py-0.5 text-[10px] font-bold ${item.active ? "bg-white/15 text-white" : "bg-[#f5e8d4] text-[#8b6b3f]"}`}>
+                    <span className={`ml-2 rounded-full px-2.5 py-1 text-[10px] font-bold ${item.active ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600"}`}>
                       {item.badge}
                     </span>
                   ) : null}
@@ -36,16 +38,16 @@ const DashboardSidebar = ({ title, subtitle, description, navItems = [], childre
           </div>
 
           <div className="border-t border-slate-100 pt-4">
-            <p className="text-center text-xs text-slate-400">MyHosurProperty 2026</p>
+            <p className="text-center text-xs tracking-[0.16em] text-slate-400">MyHosurProperty 2026</p>
           </div>
         </div>
       </aside>
 
-      <div className="sticky top-[4.5rem] z-20 w-full shrink-0 border-b border-slate-200/80 bg-white/95 px-4 py-3 backdrop-blur md:hidden">
-        <div className="mb-3 rounded-[24px] border border-[#f0e0c9] bg-white px-4 py-4 shadow-sm">
-          <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">{subtitle}</p>
-          <h1 className="mt-1 text-xl font-extrabold text-slate-900">{title}</h1>
-          {description ? <p className="mt-2 text-sm leading-6 text-slate-500">{description}</p> : null}
+      <div className="sticky top-[4.5rem] z-20 w-full shrink-0 border-b border-slate-200 bg-white px-4 py-3 md:hidden">
+        <div className="mb-3 rounded-[24px] border border-slate-200 bg-white px-4 py-4 shadow-sm">
+          <p className="dashboard-kicker">{subtitle}</p>
+          <h1 className="dashboard-display mt-2 text-[1.9rem] font-semibold leading-none text-slate-900">{title}</h1>
+          {description ? <p className="dashboard-muted mt-2 text-sm leading-6">{description}</p> : null}
         </div>
         <div className="hide-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
           {navItems.map((item) => (
@@ -53,14 +55,16 @@ const DashboardSidebar = ({ title, subtitle, description, navItems = [], childre
               key={item.key}
               type="button"
               onClick={() => item.onClick?.(item.key)}
-              className={`flex-shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition ${
-                item.active ? "bg-[#b98a53] text-white shadow-sm" : "bg-slate-100 text-slate-600 hover:bg-[#fff8ef] hover:text-[#8b6b3f]"
+              className={`flex-shrink-0 rounded-full border px-4 py-2 text-xs font-semibold transition ${
+                item.active
+                  ? "border-slate-900 bg-slate-900 text-white shadow-sm"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <span className="flex items-center gap-1.5 whitespace-nowrap">
                 {item.icon ? <span>{item.icon}</span> : null}
                 {item.label}
-                {item.badge ? <span className="rounded-full bg-white/15 px-1.5 py-0.5 text-[9px] font-bold">{item.badge}</span> : null}
+                {item.badge ? <span className="rounded-full bg-black/10 px-1.5 py-0.5 text-[9px] font-bold">{item.badge}</span> : null}
               </span>
             </button>
           ))}

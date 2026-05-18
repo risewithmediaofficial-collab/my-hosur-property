@@ -249,10 +249,10 @@ const ListingPage = () => {
         canonicalPath={buildCanonicalListingQuery(filters)}
         schema={[buildBreadcrumbSchema(breadcrumbs)]}
       />
-      <aside className="sticky top-24 hidden h-[calc(100vh-7rem)] w-80 shrink-0 overflow-y-auto rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(249,245,238,0.84))] p-5 shadow-[0_20px_44px_rgba(15,23,42,0.08)] md:block md:p-6">
+      <aside className="sticky top-24 hidden h-[calc(100vh-7rem)] w-80 shrink-0 overflow-y-auto rounded-[2rem] border border-slate-200 bg-white p-5 shadow-[0_12px_30px_rgba(17,17,17,0.04)] md:block md:p-6">
         <div className="mb-4 flex items-center justify-between gap-3 md:mb-6">
           <div className="min-w-0">
-            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#8b6b3f]">Search studio</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">Search studio</p>
             <h2 className="mt-2 text-lg font-bold text-slate-900">Filter results</h2>
           </div>
           <button type="button" onClick={clearFilters} className="text-xs font-semibold text-slate-500 transition hover:text-slate-900 whitespace-nowrap">
@@ -264,14 +264,14 @@ const ListingPage = () => {
 
       {mobileFilterOpen ? (
         <div className="fixed inset-0 z-50 flex md:hidden">
-          <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm" onClick={() => setMobileFilterOpen(false)} />
-          <aside className="relative ml-auto flex h-full w-full max-w-[86vw] flex-col overflow-hidden rounded-l-[32px] border-l border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(249,245,238,0.94))] shadow-[0_28px_80px_rgba(15,23,42,0.2)]">
+          <div className="absolute inset-0 bg-slate-950/20" onClick={() => setMobileFilterOpen(false)} />
+          <aside className="relative ml-auto flex h-full w-full max-w-[86vw] flex-col overflow-hidden rounded-l-[32px] border-l border-slate-200 bg-white shadow-[0_18px_40px_rgba(17,17,17,0.08)]">
             <div className="mb-5 flex items-center justify-between gap-3 px-5 pt-5">
               <div className="min-w-0">
-                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#8b6b3f]">Filters</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">Filters</p>
                 <h2 className="mt-1 text-lg font-bold text-slate-900">Refine search</h2>
               </div>
-              <button type="button" onClick={() => setMobileFilterOpen(false)} className="rounded-2xl border border-slate-200/80 bg-white/80 p-2 text-slate-600 flex-shrink-0">
+              <button type="button" onClick={() => setMobileFilterOpen(false)} className="rounded-2xl border border-slate-200 bg-white p-2 text-slate-600 flex-shrink-0">
                 <XMarkIcon className="h-5 w-5" />
               </button>
             </div>
@@ -293,22 +293,21 @@ const ListingPage = () => {
         <Breadcrumbs items={breadcrumbs} className="px-1" />
         <section
           ref={heroRef}
-          className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.92),rgba(248,243,236,0.88))] p-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)] md:p-8"
+          className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_12px_30px_rgba(17,17,17,0.04)] md:p-8"
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_20%,rgba(245,200,128,0.18),transparent_22%),radial-gradient(circle_at_86%_18%,rgba(59,130,246,0.12),transparent_18%)]" />
-          <div className="relative flex flex-col gap-6">
+          <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div>
                 <div
                   data-listing-hero
-                  className="inline-flex items-center gap-2 rounded-full border border-[#eadbc4] bg-[#fff8ef] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#8b6b3f]"
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-600"
                 >
                   <SparklesIcon className="h-4 w-4" />
                   Property catalog
                 </div>
                 <h1
                   data-listing-hero
-                  className="mt-4 max-w-3xl font-['Fraunces'] text-4xl leading-[1.05] tracking-[-0.04em] text-slate-900 sm:text-5xl"
+                  className="mt-4 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-[-0.04em] text-slate-900 sm:text-5xl"
                 >
                   Browse verified Hosur listings in a cleaner, more premium flow.
                 </h1>
@@ -318,23 +317,23 @@ const ListingPage = () => {
               </div>
 
               <div data-listing-hero className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[1.4rem] border border-white/70 bg-white/78 px-5 py-4">
+                <div className="rounded-[1.4rem] border border-slate-200 bg-white px-5 py-4">
                   <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Results</p>
                   <p className="mt-2 text-2xl font-semibold text-slate-900">{data.total || data.items.length}</p>
                 </div>
-                <div className="rounded-[1.4rem] border border-white/70 bg-slate-900 px-5 py-4 text-white">
-                  <p className="text-xs uppercase tracking-[0.18em] text-[#f3d8af]">Active filters</p>
-                  <p className="mt-2 text-2xl font-semibold text-white">{activeFilterCount}</p>
+                <div className="rounded-[1.4rem] border border-slate-200 bg-white px-5 py-4">
+                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Active filters</p>
+                  <p className="mt-2 text-2xl font-semibold text-slate-900">{activeFilterCount}</p>
                 </div>
               </div>
             </div>
 
             <div
               data-listing-hero
-              className="flex flex-col gap-3 rounded-[1.6rem] border border-slate-200/70 bg-white/74 p-4 sm:flex-row sm:items-center sm:justify-between"
+              className="flex flex-col gap-3 rounded-[1.6rem] border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="flex min-w-0 items-start gap-3">
-                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-[#fff8ef] text-[#8b6b3f]">
+                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-900">
                   <MagnifyingGlassIcon className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
@@ -356,7 +355,7 @@ const ListingPage = () => {
             {activeFilterChips.length ? (
               <div data-listing-hero className="flex flex-wrap gap-2">
                 {activeFilterChips.map((chip) => (
-                  <span key={chip.key} className="rounded-full border border-slate-200/80 bg-white/80 px-3 py-1.5 text-xs font-semibold text-slate-600">
+                  <span key={chip.key} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600">
                     {chip.label}: {chip.value}
                   </span>
                 ))}
@@ -387,7 +386,7 @@ const ListingPage = () => {
             ))}
           </MotionDiv>
         ) : (
-          <div ref={setRevealRef} className="rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(249,245,238,0.88))] px-6 py-16 text-center shadow-[0_22px_54px_rgba(15,23,42,0.06)]">
+          <div ref={setRevealRef} className="rounded-[2rem] border border-slate-200 bg-white px-6 py-16 text-center shadow-[0_12px_30px_rgba(17,17,17,0.04)]">
             <h3 className="text-3xl font-semibold tracking-tight text-slate-900">No properties found</h3>
             <p className="mt-4 mx-auto max-w-xl text-sm leading-8 text-slate-600">
               Try widening your city, budget, or property-type filters to bring more inventory into view.

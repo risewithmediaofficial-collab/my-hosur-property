@@ -23,15 +23,28 @@ import useBodyScrollLock from "../hooks/useBodyScrollLock";
 import { deleteProperty, fetchProperties } from "../services/api/propertyApi";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
 import { getPropertyImageAlt, getPropertyPath } from "../utils/seo";
-import { 
+import {
+  AdjustmentsHorizontalIcon,
+  ArrowDownTrayIcon,
   UsersIcon,
   ChartBarIcon,
   HomeModernIcon,
   BanknotesIcon,
   ChatBubbleLeftRightIcon,
   Cog6ToothIcon,
-  FunnelIcon
+  EnvelopeIcon,
+  TicketIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
+
+const formatCustomerRequestLabel = (item) => {
+  if (item.requestCategory === "loan") return "Loan";
+  if (item.requestCategory === "interior") return `${item.serviceType || "Interior"} Interior`;
+  if (item.requestCategory === "construction") return `${item.serviceType || "Construction"} Construction`;
+  if (item.requestCategory === "property_rent") return `${item.propertyType || "Property"} Rent`;
+  if (item.requestCategory === "property_sell") return `${item.propertyType || "Property"} Sell`;
+  return item.propertyType || "Property";
+};
 
 const AdminDashboardPage = () => {
   const { token } = useAuth();
@@ -71,6 +84,12 @@ const AdminDashboardPage = () => {
     { id: "leads", label: "Requests & Leads", icon: ChatBubbleLeftRightIcon },
     { id: "payments", label: "Payments", icon: BanknotesIcon },
     { id: "settings", label: "Settings", icon: Cog6ToothIcon },
+  ];
+  const overviewStats = [
+    { key: "users", label: "Users", value: metrics.users || users.length || 0, icon: <UsersIcon className="h-5 w-5" /> },
+    { key: "properties", label: "Properties", value: metrics.properties || propertyListings.length || 0, icon: <HomeModernIcon className="h-5 w-5" /> },
+    { key: "payments", label: "Payments", value: metrics.payments || payments.length || 0, icon: <BanknotesIcon className="h-5 w-5" /> },
+    { key: "leads", label: "Lead Requests", value: metrics.leads || leads.length || 0, icon: <TicketIcon className="h-5 w-5" /> },
   ];
 
   const exportToExcel = () => {
@@ -257,10 +276,10 @@ const AdminDashboardPage = () => {
       subtitle="Platform Control"
       description="Manage users, listings, leads, payments, and settings from one clean control center."
       stats={[
-        { label: "Users", value: metrics.users || users.length || 0 },
-        { label: "Posted Properties", value: propertyListings.length || metrics.properties || 0 },
-        { label: "Payments", value: payments.length },
-        { label: "Lead Requests", value: leads.length },
+        { label: "Users", value: metrics.users || users.length || 0, icon: <UsersIcon className="h-4 w-4" /> },
+        { label: "Posted Properties", value: propertyListings.length || metrics.properties || 0, icon: <HomeModernIcon className="h-4 w-4" /> },
+        { label: "Payments", value: payments.length, icon: <BanknotesIcon className="h-4 w-4" /> },
+        { label: "Lead Requests", value: leads.length, icon: <TicketIcon className="h-4 w-4" /> },
       ]}
       navItems={tabs.map((tab) => ({
         key: tab.id,
@@ -272,10 +291,15 @@ const AdminDashboardPage = () => {
     >
         {activeTab === "overview" && (
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {Object.entries(metrics).map(([k, v]) => (
-              <article key={k} className="dashboard-stat p-4 text-center">
-                <p className="text-sm capitalize text-slate-500">{k.replace(/([A-Z])/g, ' $1').trim()}</p>
-                <p className="mt-1 text-3xl font-extrabold text-slate-900">{v}</p>
+            {overviewStats.map(({ key, label, value, icon }) => (
+              <article key={key} className="dashboard-stat p-5 text-left">
+                <div className="flex items-center gap-3 text-slate-700">
+                  <div className="rounded-full bg-slate-100 p-2.5">
+                    {icon}
+                  </div>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">{label}</p>
+                </div>
+                <p className="mt-5 text-4xl font-extrabold text-slate-900">{value}</p>
               </article>
             ))}
           </section>
@@ -307,13 +331,15 @@ const AdminDashboardPage = () => {
           <article className="dashboard-shell relative p-6">
             <div className="mb-4 space-y-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <h2 className="inline-flex items-center gap-2 text-lg font-bold"><UsersIcon className="h-5 w-5 text-sage" />Registered Users ({metrics.users || users.length})</h2>
+                <h2 className="inline-flex items-center gap-2 text-lg font-bold text-slate-900"><UsersIcon className="h-5 w-5 text-slate-700" />Registered Users ({metrics.users || users.length})</h2>
                 <div className="flex gap-2">
-                  <button onClick={() => openEmailModal("all")} className="rounded-lg bg-ink px-3 py-1.5 text-xs text-white shadow-soft hover:bg-[#8b6b3f]">
-                    📧 Broadcast Email
+                  <button onClick={() => openEmailModal("all")} className="dashboard-primary px-3 py-2 text-xs">
+                    <EnvelopeIcon className="h-4 w-4" />
+                    Broadcast Email
                   </button>
-                  <button onClick={exportToExcel} className="rounded-lg bg-green-600 px-3 py-1.5 text-xs text-white hover:bg-green-700 shadow-soft">
-                    📥 Export CSV
+                  <button onClick={exportToExcel} className="dashboard-secondary px-3 py-2 text-xs">
+                    <ArrowDownTrayIcon className="h-4 w-4" />
+                    Export CSV
                   </button>
                 </div>
               </div>
@@ -321,25 +347,25 @@ const AdminDashboardPage = () => {
                 <input 
                   type="text" 
                   placeholder="Filter users by name, email or phone..." 
-                  className="soft-input flex-1 rounded-xl px-4 py-2 text-xs md:text-sm border-2 border-clay/40 focus:border-sage transition-all"
+                  className="dashboard-control flex-1 text-sm"
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
                 />
                 <button 
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`rounded-xl border-2 px-3 py-2 transition-all flex items-center gap-1.5 text-xs font-bold ${showFilters ? "bg-sage border-sage text-white" : "border-clay/40 text-ink/70 bg-white hover:bg-stone"}`}
+                  className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all ${showFilters ? "dashboard-primary" : "dashboard-secondary"}`}
                 >
-                  <FunnelIcon className="h-4 w-4" />
+                  <AdjustmentsHorizontalIcon className="h-4 w-4" />
                   Filter
                 </button>
               </div>
 
               {showFilters && (
-                <div className="flex flex-wrap gap-2 animate-fade-in p-3 bg-stone/50 rounded-xl border border-clay/30">
-                  <div className="flex-1 min-w-[120px]">
-                    <label className="block text-[10px] font-bold text-ink/60 uppercase mb-1">Filter by Role</label>
+                <div className="dashboard-subpanel flex flex-wrap gap-3 p-4">
+                  <div className="min-w-[120px] flex-1">
+                    <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Filter by Role</label>
                     <select 
-                      className="w-full rounded-lg border border-clay/60 px-2 py-1.5 text-xs bg-white"
+                      className="dashboard-control text-sm"
                       value={filterRole}
                       onChange={(e) => setFilterRole(e.target.value)}
                     >
@@ -352,10 +378,10 @@ const AdminDashboardPage = () => {
                       <option value="admin">Admin</option>
                     </select>
                   </div>
-                  <div className="flex-1 min-w-[120px]">
-                    <label className="block text-[10px] font-bold text-ink/60 uppercase mb-1">Filter by Status</label>
+                  <div className="min-w-[120px] flex-1">
+                    <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Filter by Status</label>
                     <select 
-                      className="w-full rounded-lg border border-clay/60 px-2 py-1.5 text-xs bg-white"
+                      className="dashboard-control text-sm"
                       value={filterStatus}
                       onChange={(e) => setFilterStatus(e.target.value)}
                     >
@@ -366,7 +392,7 @@ const AdminDashboardPage = () => {
                   </div>
                   <button 
                     onClick={() => { setFilterRole("all"); setFilterStatus("all"); setUserSearch(""); }}
-                    className="self-end text-[10px] font-bold text-red-500 hover:underline px-2 py-1"
+                    className="self-end px-2 py-1 text-[10px] font-bold text-slate-500 hover:text-slate-900"
                   >
                     Clear All
                   </button>
@@ -472,7 +498,7 @@ const AdminDashboardPage = () => {
                         </button>
                       </td>
                       <td className="py-2">
-                        <button type="button" onClick={() => openProperty(p)} className="text-left transition hover:text-sage">
+                        <button type="button" onClick={() => openProperty(p)} className="text-left transition hover:text-ink">
                           <p className="font-medium">{p.title}</p>
                           <p className="text-xs text-ink/65">
                             Rs. {Number(p.price || 0).toLocaleString("en-IN")} · {p.propertyType || "Property"} · {p.listingType || "sale"}
@@ -587,10 +613,14 @@ const AdminDashboardPage = () => {
                             <p className="text-xs text-ink/65">{item.contactDetails?.phone || "-"}</p>
                           </td>
                           <td className="py-2">
-                            <p className="font-semibold">{item.propertyType}</p>
+                            <p className="font-semibold">{formatCustomerRequestLabel(item)}</p>
+                            <p className="text-xs uppercase text-ink/50">{(item.requestCategory || "property_buy").replaceAll("_", " ")}</p>
                             <p className="text-xs text-ink/65">{item.additionalRequirements || "-"}</p>
                           </td>
-                          <td className="py-2">Rs. {item.budgetMin || 0} - Rs. {item.budgetMax || 0}<br />{item.location?.city}, {item.location?.area}</td>
+                          <td className="py-2">
+                            {(item.budgetMin || item.budgetMax) ? <>Rs. {item.budgetMin || 0} - Rs. {item.budgetMax || 0}<br /></> : null}
+                            {item.location?.city}, {item.location?.area}
+                          </td>
                           <td className="py-2">{item.status}</td>
                         </tr>
                       ))}
@@ -633,11 +663,13 @@ const AdminDashboardPage = () => {
 
       {/* View User Modal Overlay */}
       {selectedUser && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-3 backdrop-blur-sm transition-opacity sm:items-center sm:p-4">
-          <div className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-2xl flex-col overflow-hidden rounded-[28px] border border-clay/60 bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-clay bg-stone p-5">
-              <h3 className="font-bold text-lg">User Details</h3>
-              <button onClick={() => setSelectedUser(null)} className="text-ink/50 hover:text-ink text-2xl leading-none">&times;</button>
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/20 p-3 transition-opacity sm:items-center sm:p-4">
+          <div className="dashboard-modal flex max-h-[calc(100dvh-1.5rem)] w-full max-w-2xl flex-col overflow-hidden">
+            <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-5">
+              <h3 className="dashboard-display text-2xl font-semibold">User Details</h3>
+              <button onClick={() => setSelectedUser(null)} className="text-slate-400 transition hover:text-slate-900">
+                <XMarkIcon className="h-6 w-6" />
+              </button>
             </div>
             <div className="space-y-5 overflow-y-auto p-5 sm:p-6">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -646,55 +678,55 @@ const AdminDashboardPage = () => {
                   <p className="text-sm text-ink/70">{selectedUser.email}</p>
                   <p className="text-sm text-ink/70">{selectedUser.phone || "No phone provided"}</p>
                   <p className="text-sm text-ink/70">{selectedUser.address || "No address provided"}</p>
-                  <p className="mt-1 text-xs font-bold uppercase tracking-wide text-sage">{selectedUser.role}</p>
+                  <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-slate-600">{selectedUser.role}</p>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${selectedUser.status === "deactivated" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
+                <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${selectedUser.status === "deactivated" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
                   {selectedUser.status || "active"}
                 </span>
               </div>
-              
-              <div className="grid grid-cols-1 gap-3 border-t border-clay pt-4 text-sm sm:grid-cols-2">
-                <div className="bg-stone p-3 rounded-xl border border-clay/50">
-                  <p className="text-xs text-ink/60 mb-1">Active Plan</p>
+
+              <div className="grid grid-cols-1 gap-3 border-t border-slate-200 pt-4 text-sm sm:grid-cols-2">
+                <div className="dashboard-subpanel p-3">
+                  <p className="mb-1 text-xs text-ink/60">Active Plan</p>
                   <p className="font-semibold">{selectedUser.activePlanName || "Free Plan"}</p>
-                  <p className="text-[10px] text-ink/60 mt-0.5">{selectedUser.activePlan?.expiresAt ? `Valid till ${new Date(selectedUser.activePlan.expiresAt).toLocaleDateString("en-IN")}` : "No expiry"}</p>
+                  <p className="mt-0.5 text-[10px] text-ink/60">{selectedUser.activePlan?.expiresAt ? `Valid till ${new Date(selectedUser.activePlan.expiresAt).toLocaleDateString("en-IN")}` : "No expiry"}</p>
                 </div>
-                <div className="bg-stone p-3 rounded-xl border border-clay/50">
-                  <p className="text-xs text-ink/60 mb-1">Properties (Total: {selectedUser.propertyStats?.total || 0})</p>
-                  <p className="text-xs font-semibold text-sage">Live: {selectedUser.propertyStats?.approved || 0}</p>
-                  <p className="text-xs font-semibold text-amber-600 mt-0.5">Pending/Other: {selectedUser.propertyStats?.pending || 0}</p>
+                <div className="dashboard-subpanel p-3">
+                  <p className="mb-1 text-xs text-ink/60">Properties (Total: {selectedUser.propertyStats?.total || 0})</p>
+                  <p className="text-xs font-semibold text-slate-900">Live: {selectedUser.propertyStats?.approved || 0}</p>
+                  <p className="mt-0.5 text-xs font-semibold text-amber-600">Pending/Other: {selectedUser.propertyStats?.pending || 0}</p>
                 </div>
               </div>
 
               {["agent", "broker"].includes(selectedUser.role) && (
-                <div className="bg-stone p-3 rounded-xl border border-clay/50 text-sm">
-                  <p className="text-xs text-ink/60 mb-1">Agent Lead Pipeline</p>
+                <div className="dashboard-subpanel p-3 text-sm">
+                  <p className="mb-1 text-xs text-ink/60">Agent Lead Pipeline</p>
                   <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
                     <p>Total Matches Sent: <span className="font-bold">{selectedUser.customerLeadStats?.got || 0}</span></p>
-                    <p>Total Leads Unlocked: <span className="font-bold text-sage">{selectedUser.customerLeadStats?.bought || 0}</span></p>
+                    <p>Total Leads Unlocked: <span className="font-bold text-slate-900">{selectedUser.customerLeadStats?.bought || 0}</span></p>
                   </div>
                 </div>
               )}
 
-              <div className="bg-stone p-3 rounded-xl border border-clay/50 text-sm">
-                <div className="flex justify-between items-center mb-2">
+              <div className="dashboard-subpanel p-3 text-sm">
+                <div className="mb-2 flex items-center justify-between">
                   <p className="text-xs text-ink/60">Admin Notes (Private)</p>
                   {!editingNotes ? (
-                    <button onClick={() => setEditingNotes(true)} className="text-[10px] font-bold text-sage hover:underline">Edit</button>
+                    <button onClick={() => setEditingNotes(true)} className="text-[10px] font-bold text-slate-700 hover:underline">Edit</button>
                   ) : (
                     <div className="flex gap-2">
                       <button onClick={() => { setEditingNotes(false); setTempNotes(selectedUser.adminNotes || ""); }} className="text-[10px] font-bold text-ink/60 hover:underline">Cancel</button>
-                      <button onClick={onSaveNotes} className="text-[10px] font-bold text-sage hover:underline">Save</button>
+                      <button onClick={onSaveNotes} className="text-[10px] font-bold text-slate-700 hover:underline">Save</button>
                     </div>
                   )}
                 </div>
                 {!editingNotes ? (
-                  <p className="text-sm text-ink whitespace-pre-wrap">{selectedUser.adminNotes || <span className="text-ink/40 italic">No notes added.</span>}</p>
+                  <p className="whitespace-pre-wrap text-sm text-ink">{selectedUser.adminNotes || <span className="italic text-ink/40">No notes added.</span>}</p>
                 ) : (
-                  <textarea 
-                    className="w-full rounded-lg border border-clay/60 p-2 text-sm bg-white" 
-                    rows={3} 
-                    value={tempNotes} 
+                  <textarea
+                    className="dashboard-control min-h-[110px]"
+                    rows={3}
+                    value={tempNotes}
                     onChange={(e) => setTempNotes(e.target.value)}
                     placeholder="Add details about this member here..."
                   />
@@ -702,18 +734,18 @@ const AdminDashboardPage = () => {
               </div>
 
               <div className="mt-4">
-                <p className="text-xs font-bold text-ink/60 uppercase tracking-tight mb-2">Properties Posted by {selectedUser.name}</p>
+                <p className="mb-2 text-xs font-bold uppercase tracking-tight text-ink/60">Properties Posted by {selectedUser.name}</p>
                 {userProperties.length > 0 ? (
-                  <div className="space-y-2 max-h-48 overflow-y-auto pr-1 thin-scrollbar">
-                    {userProperties.map(p => (
-                      <div key={p._id} className="flex flex-col gap-2 rounded-xl border border-clay/40 bg-stone p-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="thin-scrollbar max-h-48 space-y-2 overflow-y-auto pr-1">
+                    {userProperties.map((p) => (
+                      <div key={p._id} className="dashboard-subpanel flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                          <p className="text-xs font-bold truncate max-w-[180px]">{p.title}</p>
+                          <p className="max-w-[180px] truncate text-xs font-bold">{p.title}</p>
                           <p className="text-[10px] text-ink/50">Rs. {Number(p.price || 0).toLocaleString("en-IN")}</p>
-                          <p className="text-[10px] text-ink/60">{p.location?.city} — {p.status}</p>
+                          <p className="text-[10px] text-ink/60">{p.location?.city} - {p.status}</p>
                         </div>
                         <div className="flex gap-2">
-                          <button onClick={() => { setSelectedUser(null); openProperty(p); }} className="text-[10px] font-bold text-ink/80 border border-clay px-2 py-1 rounded-md hover:bg-clay/20">
+                          <button onClick={() => { setSelectedUser(null); openProperty(p); }} className="dashboard-secondary px-2 py-1 text-[10px]">
                             View Property
                           </button>
                           <button onClick={() => onDeleteProperty(p._id, p.title)} className="rounded-md bg-red-600 px-2 py-1 text-[10px] font-bold text-white hover:bg-red-700">
@@ -724,27 +756,24 @@ const AdminDashboardPage = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-ink/50 italic py-2">This user hasn't posted any properties yet.</p>
+                  <p className="py-2 text-xs italic text-ink/50">This user hasn&apos;t posted any properties yet.</p>
                 )}
               </div>
             </div>
-            
-            <div className="flex flex-col gap-4 border-t border-clay bg-stone p-5 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-xs text-ink/60 flex-1">
-                {selectedUser.status === "deactivated" 
+
+            <div className="flex flex-col gap-4 border-t border-slate-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="flex-1 text-xs text-ink/60">
+                {selectedUser.status === "deactivated"
                   ? "User is currently restricted from logging in and accessing the platform."
                   : "If this user is cheating or misbehaving, you can deactivate their account."}
               </p>
               <div className="flex gap-2">
-                <button 
-                  onClick={() => { setSelectedUser(null); openEmailModal(selectedUser._id); }}
-                  className="px-4 py-2 rounded-lg text-sm font-bold shadow transition bg-ink text-white hover:opacity-90"
-                >
+                <button onClick={() => { setSelectedUser(null); openEmailModal(selectedUser._id); }} className="dashboard-secondary px-4 py-2 text-sm">
                   Send Email
                 </button>
-                <button 
+                <button
                   onClick={() => onToggleUserStatus(selectedUser)}
-                  className={`px-4 py-2 rounded-lg text-sm font-bold shadow transition ${selectedUser.status === "deactivated" ? "bg-sage text-white hover:opacity-90" : "bg-red-600 text-white hover:bg-red-700"}`}
+                  className={`rounded-lg px-4 py-2 text-sm font-bold shadow transition ${selectedUser.status === "deactivated" ? "bg-slate-900 text-white hover:opacity-90" : "bg-red-600 text-white hover:bg-red-700"}`}
                 >
                   {selectedUser.status === "deactivated" ? "Reactivate User" : "Deactivate User"}
                 </button>
@@ -756,12 +785,12 @@ const AdminDashboardPage = () => {
 
       {/* Email Modal */}
       {emailModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/40 p-3 backdrop-blur-sm sm:items-center sm:p-4">
-          <div className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-lg flex-col overflow-hidden rounded-[28px] bg-white shadow-xl">
-            <div className="flex items-center justify-between border-b border-clay/50 px-6 pb-4 pt-6">
-              <h2 className="text-xl font-bold">{emailTarget === "all" ? "Broadcast Email to All" : "Send Email to User"}</h2>
-              <button onClick={() => setEmailModalOpen(false)} className="text-ink/60 hover:text-ink">
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/20 p-3 sm:items-center sm:p-4">
+          <div className="dashboard-modal flex max-h-[calc(100dvh-1.5rem)] w-full max-w-lg flex-col overflow-hidden">
+            <div className="flex items-center justify-between border-b border-slate-200/80 px-6 pb-4 pt-6">
+              <h2 className="dashboard-display text-2xl font-semibold">{emailTarget === "all" ? "Broadcast Email to All" : "Send Email to User"}</h2>
+              <button onClick={() => setEmailModalOpen(false)} className="text-slate-400 transition hover:text-slate-900">
+                <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
             <form onSubmit={onSendEmail} className="mt-6 flex flex-col gap-4 overflow-y-auto p-6">
@@ -772,7 +801,7 @@ const AdminDashboardPage = () => {
                   required
                   value={emailSubject}
                   onChange={(e) => setEmailSubject(e.target.value)}
-                  className="w-full rounded-xl border border-clay p-3 text-sm focus:border-sage focus:outline-none focus:ring-1 focus:ring-sage"
+                  className="dashboard-control"
                   placeholder="Enter email subject"
                 />
               </div>
@@ -783,15 +812,15 @@ const AdminDashboardPage = () => {
                   rows={6}
                   value={emailMessage}
                   onChange={(e) => setEmailMessage(e.target.value)}
-                  className="w-full rounded-xl border border-clay p-3 text-sm focus:border-sage focus:outline-none focus:ring-1 focus:ring-sage"
+                  className="dashboard-control min-h-[170px]"
                   placeholder="Type your message here... (HTML tags like <br/> or <b> are supported internally)"
                 />
               </div>
               <div className="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                <button type="button" onClick={() => setEmailModalOpen(false)} className="rounded-xl px-4 py-2 text-sm font-bold text-ink/70 hover:bg-stone">
+                <button type="button" onClick={() => setEmailModalOpen(false)} className="dashboard-secondary px-4 py-2 text-sm">
                   Cancel
                 </button>
-                <button type="submit" disabled={sendingEmail} className="uiverse-btn rounded-xl bg-ink px-6 py-2 text-sm font-bold text-white disabled:opacity-70">
+                <button type="submit" disabled={sendingEmail} className="dashboard-primary px-6 py-2 text-sm disabled:opacity-70">
                   {sendingEmail ? "Sending..." : "Send Email"}
                 </button>
               </div>

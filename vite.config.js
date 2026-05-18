@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const proxyTarget = env.VITE_API_PROXY_TARGET || env.VITE_API_URL || "https://my-hosur-propertyy.onrender.com";
+  const proxyTarget = env.VITE_API_PROXY_TARGET || "http://127.0.0.1:5001";
 
   return {
     plugins: [react()],
