@@ -550,108 +550,114 @@ const AdminDashboardPage = () => {
 
         {activeTab === "leads" && (
           <div className="space-y-6">
-            <section className="dashboard-shell p-6">
+            <section className="dashboard-shell p-4 sm:p-6">
               <h2 className="text-lg font-bold text-slate-900">Customer Call / Inquiry Requests</h2>
               <p className="mt-1 text-sm text-slate-600">All customer requests are stored here for admin tracking and audit.</p>
               <div className="mt-3 overflow-x-auto">
-                <table className="dashboard-table min-w-full text-left text-sm">
+                <table className="dashboard-table min-w-full text-left text-xs sm:text-sm">
                   <thead className="whitespace-nowrap">
                     <tr className="border-b border-clay">
-                      <th className="py-2">Date</th>
-                      <th className="py-2">Property</th>
-                      <th className="py-2">Customer</th>
-                      <th className="py-2">Posted By</th>
-                      <th className="py-2">Intent</th>
-                      <th className="py-2">Message</th>
+                      <th className="py-2 px-1 sm:py-3 sm:px-2">Date</th>
+                      <th className="py-2 px-1 sm:py-3 sm:px-2">Property</th>
+                      <th className="py-2 px-1 sm:py-3 sm:px-2">Customer</th>
+                      <th className="hidden py-2 px-1 sm:py-3 sm:px-2 lg:table-cell">Posted By</th>
+                      <th className="py-2 px-1 sm:py-3 sm:px-2">Intent</th>
+                      <th className="hidden py-2 px-1 sm:py-3 sm:px-2 md:table-cell">Message</th>
                     </tr>
                   </thead>
                   <tbody>
                     {leads.map((l) => (
                       <tr key={l._id} className="border-b border-clay/60 align-top">
-                        <td className="py-2">{new Date(l.createdAt).toLocaleString("en-IN")}</td>
-                        <td className="py-2">
-                          <p className="font-semibold">{l.propertyId?.title || "N/A"}</p>
-                          <p className="text-xs text-ink/65">{l.propertyId?.location?.city || ""}</p>
+                        <td className="py-2 px-1 sm:py-3 sm:px-2 whitespace-nowrap text-[10px] sm:text-sm">{new Date(l.createdAt).toLocaleString("en-IN").split(",")[0]}</td>
+                        <td className="py-2 px-1 sm:py-3 sm:px-2">
+                          <p className="font-semibold text-[10px] sm:text-sm truncate">{l.propertyId?.title || "N/A"}</p>
+                          <p className="text-[8px] sm:text-xs text-ink/65 truncate">{l.propertyId?.location?.city || ""}</p>
                         </td>
-                        <td className="py-2">
-                          <p>{l.userId?.name || l.contactInfo?.name || "N/A"}</p>
-                          <p className="text-xs text-ink/65">{l.userId?.email || l.contactInfo?.email || "N/A"}</p>
-                          <p className="text-xs text-ink/65">{l.userId?.phone || l.contactInfo?.phone || "N/A"}</p>
+                        <td className="py-2 px-1 sm:py-3 sm:px-2">
+                          <p className="text-[10px] sm:text-sm truncate">{l.userId?.name || l.contactInfo?.name || "N/A"}</p>
+                          <p className="text-[8px] sm:text-xs text-ink/65 truncate">{l.userId?.email || l.contactInfo?.email || "N/A"}</p>
                         </td>
-                        <td className="py-2">
-                          <p>{l.ownerId?.name || "N/A"}</p>
-                          <p className="text-xs text-ink/65">{l.ownerId?.email || "N/A"}</p>
+                        <td className="hidden py-2 px-1 sm:py-3 sm:px-2 lg:table-cell">
+                          <p className="text-[10px] sm:text-sm truncate">{l.ownerId?.name || "N/A"}</p>
+                          <p className="text-[8px] sm:text-xs text-ink/65 truncate">{l.ownerId?.email || "N/A"}</p>
                         </td>
-                        <td className="py-2">{l.intentType}</td>
-                        <td className="py-2 max-w-xs">{l.contactInfo?.message || "-"}</td>
+                        <td className="py-2 px-1 sm:py-3 sm:px-2 text-[10px] sm:text-sm whitespace-nowrap">{l.intentType}</td>
+                        <td className="hidden py-2 px-1 sm:py-3 sm:px-2 md:table-cell max-w-xs text-[10px] sm:text-sm truncate">{l.contactInfo?.message || "-"}</td>
                       </tr>
                     ))}
+                    {leads.length === 0 && <tr><td colSpan={6} className="py-8 text-center text-ink/50">No leads found.</td></tr>}
                   </tbody>
                 </table>
               </div>
             </section>
 
             <section className="grid gap-6 lg:grid-cols-2">
-              <article className="dashboard-shell p-6">
+              <article className="dashboard-shell p-4 sm:p-6">
                 <h2 className="text-lg font-bold text-slate-900">Customer Property Requests</h2>
                 <div className="mt-3 overflow-x-auto">
-                  <table className="dashboard-table min-w-full text-left text-sm">
+                  <table className="dashboard-table min-w-full text-left text-xs sm:text-sm">
                     <thead className="whitespace-nowrap">
                       <tr className="border-b border-clay">
-                        <th className="py-2">Customer</th>
-                        <th className="py-2">Requirement</th>
-                        <th className="py-2">Budget/Location</th>
-                        <th className="py-2">Status</th>
+                        <th className="py-2 px-1 sm:py-3 sm:px-2">Customer</th>
+                        <th className="py-2 px-1 sm:py-3 sm:px-2">Requirement</th>
+                        <th className="hidden py-2 px-1 sm:py-3 sm:px-2 md:table-cell">Budget/Location</th>
+                        <th className="py-2 px-1 sm:py-3 sm:px-2">Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       {customerRequests.map((item) => (
                         <tr key={item._id} className="border-b border-clay/60 align-top">
-                          <td className="py-2">
-                            <p className="font-semibold">{item.customerName}</p>
-                            <p className="text-xs text-ink/65">{item.contactDetails?.email || "-"}</p>
-                            <p className="text-xs text-ink/65">{item.contactDetails?.phone || "-"}</p>
+                          <td className="py-2 px-1 sm:py-3 sm:px-2">
+                            <p className="font-semibold text-[10px] sm:text-sm truncate">{item.customerName}</p>
+                            <p className="text-[8px] sm:text-xs text-ink/65 truncate">{item.contactDetails?.email || "-"}</p>
                           </td>
-                          <td className="py-2">
-                            <p className="font-semibold">{formatCustomerRequestLabel(item)}</p>
-                            <p className="text-xs uppercase text-ink/50">{(item.requestCategory || "property_buy").replaceAll("_", " ")}</p>
-                            <p className="text-xs text-ink/65">{item.additionalRequirements || "-"}</p>
+                          <td className="py-2 px-1 sm:py-3 sm:px-2">
+                            <p className="font-semibold text-[10px] sm:text-sm">{formatCustomerRequestLabel(item)}</p>
+                            <p className="text-[8px] uppercase text-ink/50">{(item.requestCategory || "property_buy").replaceAll("_", " ")}</p>
                           </td>
-                          <td className="py-2">
+                          <td className="hidden py-2 px-1 sm:py-3 sm:px-2 md:table-cell text-[10px] sm:text-sm">
                             {(item.budgetMin || item.budgetMax) ? <>Rs. {item.budgetMin || 0} - Rs. {item.budgetMax || 0}<br /></> : null}
                             {item.location?.city}, {item.location?.area}
                           </td>
-                          <td className="py-2">{item.status}</td>
+                          <td className="py-2 px-1 sm:py-3 sm:px-2">
+                            <span className={`inline-flex rounded px-1.5 py-0.5 text-[9px] font-bold uppercase whitespace-nowrap ${
+                              item.status === "completed" ? "bg-green-100 text-green-700" : item.status === "pending" ? "bg-yellow-100 text-yellow-700" : "bg-gray-100 text-gray-700"
+                            }`}>
+                              {item.status}
+                            </span>
+                          </td>
                         </tr>
                       ))}
+                      {customerRequests.length === 0 && <tr><td colSpan={4} className="py-8 text-center text-ink/50">No requests found.</td></tr>}
                     </tbody>
                   </table>
                 </div>
               </article>
 
-              <article className="dashboard-shell p-6">
+              <article className="dashboard-shell p-4 sm:p-6">
                 <h2 className="text-lg font-bold text-slate-900">Lead Unlock Purchase Records</h2>
                 <div className="mt-3 overflow-x-auto">
-                  <table className="dashboard-table min-w-full text-left text-sm">
+                  <table className="dashboard-table min-w-full text-left text-xs sm:text-sm">
                     <thead className="whitespace-nowrap">
                       <tr className="border-b border-clay">
-                        <th className="py-2">Agent</th>
-                        <th className="py-2">Customer</th>
-                        <th className="py-2">Amount</th>
-                        <th className="py-2">Status</th>
-                        <th className="py-2">Time</th>
+                        <th className="py-2 px-1 sm:py-3 sm:px-2">Agent</th>
+                        <th className="py-2 px-1 sm:py-3 sm:px-2">Customer</th>
+                        <th className="py-2 px-1 sm:py-3 sm:px-2">Amount</th>
+                        <th className="hidden py-2 px-1 sm:py-3 sm:px-2 sm:table-cell">Status</th>
+                        <th className="hidden py-2 px-1 sm:py-3 sm:px-2 lg:table-cell">Time</th>
                       </tr>
                     </thead>
                     <tbody>
                       {leadUnlocks.map((item) => (
                         <tr key={item._id} className="border-b border-clay/60">
-                          <td className="py-2">{item.agentId?.name || "N/A"}</td>
-                          <td className="py-2">{item.customerId?.name || "N/A"}</td>
-                          <td className="py-2">Rs. {item.amount}</td>
-                          <td className="py-2">{item.status}</td>
-                          <td className="py-2">{new Date(item.createdAt).toLocaleString("en-IN")}</td>
+                          <td className="py-2 px-1 sm:py-3 sm:px-2 text-[10px] sm:text-sm truncate">{item.agentId?.name || "N/A"}</td>
+                          <td className="py-2 px-1 sm:py-3 sm:px-2 text-[10px] sm:text-sm truncate">{item.customerId?.name || "N/A"}</td>
+                          <td className="py-2 px-1 sm:py-3 sm:px-2 text-[10px] sm:text-sm font-semibold whitespace-nowrap">Rs. {item.amount}</td>
+                          <td className="hidden py-2 px-1 sm:py-3 sm:px-2 sm:table-cell text-[10px] sm:text-sm capitalize">{item.status}</td>
+                          <td className="hidden py-2 px-1 sm:py-3 sm:px-2 lg:table-cell text-[10px] sm:text-sm">{new Date(item.createdAt).toLocaleString("en-IN").split(",")[0]}</td>
                         </tr>
                       ))}
+                      {leadUnlocks.length === 0 && <tr><td colSpan={5} className="py-8 text-center text-ink/50">No records found.</td></tr>}
                     </tbody>
                   </table>
                 </div>

@@ -12,6 +12,8 @@ const serviceLinks = [
   { label: "About MyHosurProperty", to: "/about" },
 ];
 
+const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
 const Footer = () => (
   <footer className="mt-12 bg-white text-slate-600">
     <div className="px-4 pb-10 pt-4 sm:px-5 lg:px-6 lg:pb-12">
@@ -37,7 +39,7 @@ const Footer = () => (
             <h4 className="text-xs font-bold uppercase tracking-[0.24em] text-slate-400">Navigation</h4>
             <nav className="flex flex-col gap-3">
               {primaryNavLinks.map((link) => (
-                <NavLink key={link.to} to={link.to} className="text-sm text-slate-500 transition hover:text-slate-900">
+                <NavLink key={link.to} to={link.to} onClick={scrollToTop} className="text-sm text-slate-500 transition hover:text-slate-900">
                   {link.label}
                 </NavLink>
               ))}
@@ -48,7 +50,7 @@ const Footer = () => (
             <h4 className="text-xs font-bold uppercase tracking-[0.24em] text-slate-400">Services</h4>
             <nav className="flex flex-col gap-3" aria-label="Footer services">
               {serviceLinks.map((service) => (
-                <NavLink key={service.to} to={service.to} className="text-sm text-slate-500 transition hover:text-slate-900">
+                <NavLink key={service.to} to={service.to} onClick={scrollToTop} className="text-sm text-slate-500 transition hover:text-slate-900">
                   {service.label}
                 </NavLink>
               ))}
@@ -77,10 +79,10 @@ const Footer = () => (
         <div className="mt-10 flex flex-col gap-3 border-t border-slate-200 pt-6 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
           <p>Copyright 2026 MyHosurProperty. All rights reserved.</p>
           <div className="flex flex-wrap gap-4">
-            <NavLink to="/about" className="transition hover:text-slate-900">About Us</NavLink>
-            <NavLink to="/contact" className="transition hover:text-slate-900">Contact</NavLink>
-            <NavLink to="/listings" className="transition hover:text-slate-900">Browse Listings</NavLink>
-            <NavLink to="/auth" className="transition hover:text-slate-900">Sign In</NavLink>
+            <NavLink to="/about" onClick={scrollToTop} className="transition hover:text-slate-900">About Us</NavLink>
+            <NavLink to="/contact" onClick={scrollToTop} className="transition hover:text-slate-900">Contact</NavLink>
+            <NavLink to="/listings" onClick={scrollToTop} className="transition hover:text-slate-900">Browse Listings</NavLink>
+            <NavLink to="/auth" onClick={scrollToTop} className="transition hover:text-slate-900">Sign In</NavLink>
           </div>
         </div>
       </div>
