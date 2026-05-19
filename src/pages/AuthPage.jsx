@@ -1,12 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShieldCheckIcon, EnvelopeIcon, LockClosedIcon, PhoneIcon, MapPinIcon, UserIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import { loginUser, requestOtp, signupUser, socialLogin, verifyOtp } from "../services/api/authApi";
+import { loginUser, signupUser } from "../services/api/authApi";
 import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
-import { loadExternalScript } from "../utils/loadExternalScript";
 
 const MotionDiv = motion.div;
 
@@ -55,7 +54,6 @@ const AuthPage = () => {
   const redirectTo = location.state?.from?.pathname || "/dashboard";
 
   const [mode, setMode] = useState("login");
-  const [useOtp, setUseOtp] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -63,78 +61,16 @@ const AuthPage = () => {
     address: "",
     password: "",
     role: "buyer",
-    otp: "",
   });
   const [loading, setLoading] = useState(false);
 
-  const googleBtnRef = useRef(null);
-  const googleInitRef = useRef(false);
-
   const onChange = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
-
-  useEffect(() => {
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    if (!clientId || googleInitRef.current) return;
-
-    loadExternalScript("https://accounts.google.com/gsi/client").then((ok) => {
-      if (!ok || !window.google?.accounts?.id || googleInitRef.current) return;
-
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: async ({ credential }) => {
-          if (!credential) {
-            toast.error("Google sign-in failed");
-            return;
-          }
-
-          try {
-            const data = await socialLogin({ provider: "google", token: credential });
-            login(data);
-            toast.success("Signed in with Google");
-            scrollToTop();
-            navigate(redirectTo);
-          } catch (error) {
-            toast.error(error.response?.data?.message || "Google sign-in failed");
-          }
-        },
-      });
-
-      if (googleBtnRef.current) {
-        googleBtnRef.current.innerHTML = "";
-        window.google.accounts.id.renderButton(googleBtnRef.current, {
-          type: "standard",
-          theme: "outline",
-          size: "large",
-          text: "signin_with",
-          shape: "pill",
-          width: Math.min(420, googleBtnRef.current.offsetWidth || 320),
-        });
-      }
-
-      googleInitRef.current = true;
-    });
-  }, [login, navigate, redirectTo]);
 
   const submit = async (event) => {
     event.preventDefault();
     setLoading(true);
 
     try {
-      if (useOtp) {
-        if (!form.otp) {
-          await requestOtp({ email: form.email });
-          toast.success("OTP sent. Demo code: 123456");
-          setLoading(false);
-          return;
-        }
-
-        const data = await verifyOtp({ email: form.email, otp: form.otp });
-        login(data);
-        scrollToTop();
-        navigate(redirectTo);
-        return;
-      }
-
       const data = mode === "signup" ? await signupUser(form) : await loginUser(form);
       login(data);
       toast.success(mode === "signup" ? "Account created successfully" : "Welcome back");
@@ -152,7 +88,7 @@ const AuthPage = () => {
   const subText = isSignup
     ? "Create a simple profile to browse listings, connect with sellers, and manage your property activity."
     : "Sign in to access saved listings, leads, and account activity in one place.";
-  const statusText = useOtp ? "OTP sign in" : isSignup ? "New account" : "Secure access";
+  const statusText = isSignup ? "New account" : "Secure access";
 
   return (
     <>
@@ -412,31 +348,6 @@ const AuthPage = () => {
           max-width: 420px;
         }
 
-        .auth-google-wrap {
-          margin-bottom: 8px;
-        }
-        .auth-google-wrap > div {
-          width: 100%;
-          overflow: hidden;
-          border-radius: 999px;
-        }
-        .auth-divider {
-          display: flex;
-          align-items: center;
-          gap: 14px;
-          margin: 20px 0 22px;
-        }
-        .auth-divider-line {
-          flex: 1;
-          height: 1px;
-          background: #e2e8f0;
-        }
-        .auth-divider-text {
-          font-size: 12px;
-          font-weight: 600;
-          color: #94a3b8;
-        }
-
         .auth-fields {
           display: flex;
           flex-direction: column;
@@ -688,7 +599,6 @@ const AuthPage = () => {
                   className={`auth-mode-btn ${!isSignup ? "is-active" : ""}`}
                   onClick={() => {
                     setMode("login");
-                    setUseOtp(false);
                   }}
                 >
                   Sign In
@@ -698,7 +608,6 @@ const AuthPage = () => {
                   className={`auth-mode-btn ${isSignup ? "is-active" : ""}`}
                   onClick={() => {
                     setMode("signup");
-                    setUseOtp(false);
                   }}
                 >
                   Create Account
@@ -706,20 +615,10 @@ const AuthPage = () => {
               </div>
 
               <AnimatePresence mode="wait">
-                <motion.div key={`${mode}-${useOtp}`} variants={fade} initial="hidden" animate="show" exit="exit">
+                <motion.div key={mode} variants={fade} initial="hidden" animate="show" exit="exit">
                   <div className="auth-heading-wrap">
                     <h1 className="auth-title">{headingText}</h1>
                     <p className="auth-subtitle">{subText}</p>
-                  </div>
-
-                  <div className="auth-google-wrap">
-                    <div ref={googleBtnRef} />
-                  </div>
-
-                  <div className="auth-divider">
-                    <div className="auth-divider-line" />
-                    <span className="auth-divider-text">or continue with email</span>
-                    <div className="auth-divider-line" />
                   </div>
 
                   <form onSubmit={submit}>
@@ -766,17 +665,15 @@ const AuthPage = () => {
                         />
                       ) : null}
 
-                      {!useOtp ? (
-                        <Field
-                          label="Password"
-                          icon={LockClosedIcon}
-                          type="password"
-                          placeholder="Enter your password"
-                          value={form.password}
-                          onChange={(event) => onChange("password", event.target.value)}
-                          required
-                        />
-                      ) : null}
+                      <Field
+                        label="Password"
+                        icon={LockClosedIcon}
+                        type="password"
+                        placeholder="Enter your password"
+                        value={form.password}
+                        onChange={(event) => onChange("password", event.target.value)}
+                        required
+                      />
 
                       {isSignup ? (
                         <SelectField
@@ -794,16 +691,6 @@ const AuthPage = () => {
                         </SelectField>
                       ) : null}
 
-                      {useOtp ? (
-                        <Field
-                          label="OTP Code"
-                          icon={ShieldCheckIcon}
-                          placeholder="Enter the 6-digit OTP"
-                          value={form.otp}
-                          onChange={(event) => onChange("otp", event.target.value)}
-                        />
-                      ) : null}
-
                       {isSignup ? (
                         <motion.div variants={item} className="auth-free-badge">
                           <ShieldCheckIcon className="auth-free-badge-icon" />
@@ -816,7 +703,7 @@ const AuthPage = () => {
                       <motion.div variants={item}>
                         <button type="submit" className="auth-submit" disabled={loading}>
                           {loading ? <span className="auth-spinner" /> : null}
-                          {loading ? "Please wait..." : useOtp ? (form.otp ? "Verify OTP" : "Send OTP") : isSignup ? "Create Account" : "Sign In"}
+                          {loading ? "Please wait..." : isSignup ? "Create Account" : "Sign In"}
                         </button>
                       </motion.div>
                     </motion.div>
@@ -840,13 +727,9 @@ const AuthPage = () => {
                           className="auth-toggle-btn"
                           onClick={() => {
                             setMode((currentMode) => (currentMode === "login" ? "signup" : "login"));
-                            setUseOtp(false);
                           }}
                         >
                           {isSignup ? "Back to Sign In" : "Create Account"}
-                        </button>
-                        <button type="button" className="auth-toggle-btn" onClick={() => setUseOtp((currentValue) => !currentValue)}>
-                          {useOtp ? "Use Password Instead" : "Sign In with OTP"}
                         </button>
                       </div>
                     </div>
