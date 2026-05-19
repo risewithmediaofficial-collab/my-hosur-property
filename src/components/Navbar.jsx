@@ -114,7 +114,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[linear-gradient(180deg,rgba(243,251,250,0.96),rgba(243,251,250,0.68))] backdrop-blur-xl">
+    <header className="sticky top-0 z-50 bg-transparent">
       <div className="px-4 py-3 sm:px-5 lg:px-6">
         <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3 rounded-[24px] border border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(234,247,245,0.88))] px-4 py-3 shadow-[0_18px_38px_rgba(16,95,104,0.1)] backdrop-blur-xl sm:px-5">
           <NavLink
