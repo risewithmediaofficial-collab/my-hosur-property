@@ -63,6 +63,8 @@ const AdminDashboardPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [filterRole, setFilterRole] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [paymentPlanFilter, setPaymentPlanFilter] = useState("all");
+  const [paymentPlanOptions, setPaymentPlanOptions] = useState([]);
   const [activeTab, setActiveTab] = useState("overview");
   const [editingNotes, setEditingNotes] = useState(false);
   const [tempNotes, setTempNotes] = useState("");
@@ -125,7 +127,10 @@ const AdminDashboardPage = () => {
       const [metricsRes, usersRes, paymentsRes, propertyRes, leadsRes, customerRequestsRes, leadUnlocksRes, leadPriceRes] = await Promise.allSettled([
         fetchAdminMetrics(token),
         fetchAdminUsers(token),
-        fetchAdminPayments(token),
+        fetchAdminPayments(token, {
+          limit: 50,
+          ...(paymentPlanFilter !== "all" ? { planId: paymentPlanFilter } : {}),
+        }),
         fetchAdminPropertyApplications(token, { status: "all", limit: 100 }),
         fetchAdminLeads(token, { limit: 50 }),
         fetchAdminCustomerRequests(token, { limit: 50 }),
@@ -135,7 +140,10 @@ const AdminDashboardPage = () => {
 
       if (metricsRes.status === "fulfilled") setMetrics(metricsRes.value);
       if (usersRes.status === "fulfilled") setUsers(usersRes.value.items || []);
-      if (paymentsRes.status === "fulfilled") setPayments(paymentsRes.value.items || []);
+      if (paymentsRes.status === "fulfilled") {
+        setPayments(paymentsRes.value.items || []);
+        setPaymentPlanOptions(paymentsRes.value.planOptions || []);
+      }
       if (propertyRes.status === "fulfilled") setPropertyListings(propertyRes.value.items || []);
       if (leadsRes.status === "fulfilled") setLeads(leadsRes.value.items || []);
       if (customerRequestsRes.status === "fulfilled") setCustomerRequests(customerRequestsRes.value.items || []);
@@ -144,7 +152,7 @@ const AdminDashboardPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [paymentPlanFilter, token]);
 
   useEffect(() => {
     load();
@@ -437,7 +445,29 @@ const AdminDashboardPage = () => {
 
         {activeTab === "payments" && (
           <article className="dashboard-shell p-6">
-            <h2 className="text-lg font-bold text-slate-900">Platform Payments</h2>
+            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">Platform Payments</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  Filter payments by purchased plan to review who bought each package faster.
+                </p>
+              </div>
+              <label className="block text-sm text-slate-700">
+                <span className="mb-1 block font-medium">Filter by plan</span>
+                <select
+                  value={paymentPlanFilter}
+                  onChange={(event) => setPaymentPlanFilter(event.target.value)}
+                  className="min-w-[220px] rounded-xl border border-clay bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-400"
+                >
+                  <option value="all">All plans</option>
+                  {paymentPlanOptions.map((plan) => (
+                    <option key={plan._id} value={plan._id}>
+                      {plan.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
             <div className="mt-3 overflow-x-auto text-sm">
               <table className="dashboard-table min-w-full text-left">
                 <thead className="whitespace-nowrap">
@@ -459,6 +489,13 @@ const AdminDashboardPage = () => {
                       <td className="py-2">{new Date(p.createdAt).toLocaleDateString("en-IN")}</td>
                     </tr>
                   ))}
+                  {payments.length === 0 && (
+                    <tr>
+                      <td colSpan="5" className="py-6 text-center text-sm text-slate-500">
+                        No payments found for the selected plan.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

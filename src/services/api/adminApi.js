@@ -22,7 +22,8 @@ export const assignLeadToBroker = async (token, leadId, brokerId) =>
   (await apiClient.patch(`/api/admin/leads/${leadId}/assign`, { brokerId }, withAuth(token))).data;
 export const updateAdminLeadBrokerStatus = async (token, leadId, brokerId, status) =>
   (await apiClient.patch(`/api/admin/leads/${leadId}/brokers/${brokerId}/status`, { status }, withAuth(token))).data;
-export const fetchAdminPayments = async (token) => (await apiClient.get("/api/admin/payments", withAuth(token))).data;
+export const fetchAdminPayments = async (token, params) =>
+  (await apiClient.get("/api/admin/payments", { ...withAuth(token), params })).data;
 export const updatePropertyStatus = async (token, propertyId, status) =>
   (await apiClient.patch(`/api/admin/properties/${propertyId}/status`, { status }, withAuth(token))).data;
 export const fetchAdminCustomerRequests = async (token, params) =>

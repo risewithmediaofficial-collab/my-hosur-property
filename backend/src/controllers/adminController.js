@@ -1,7 +1,9 @@
+const mongoose = require("mongoose");
 const User = require("../models/User");
 const Property = require("../models/Property");
 const Lead = require("../models/Lead");
 const Payment = require("../models/Payment");
+const Plan = require("../models/Plan");
 const CustomerRequest = require("../models/CustomerRequest");
 const LeadUnlock = require("../models/LeadUnlock");
 const Notification = require("../models/Notification");
@@ -409,17 +411,30 @@ const listAllPayments = async (req, res) => {
 
   if (req.query.status) query.status = req.query.status;
   if (req.query.userId) query.userId = req.query.userId;
+  if (req.query.planId && mongoose.Types.ObjectId.isValid(req.query.planId)) {
+    query.planId = req.query.planId;
+  }
   if (req.query.dateFrom || req.query.dateTo) {
     query.createdAt = {};
     if (req.query.dateFrom) query.createdAt.$gte = new Date(req.query.dateFrom);
     if (req.query.dateTo) query.createdAt.$lte = new Date(req.query.dateTo);
   }
 
-  const [total, items, summary] = await Promise.all([
+  const planOptionQuery = { ...query };
+  delete planOptionQuery.planId;
+
+  const [total, items, summary, usedPlanIds] = await Promise.all([
     Payment.countDocuments(query),
     Payment.find(query).populate("userId", "name email role").populate("planId", "name category").sort("-createdAt").skip(skip).limit(limit),
     Payment.find({ ...query, status: "paid" }).select("amount"),
+    Payment.distinct("planId", planOptionQuery),
   ]);
+
+  const planOptions = usedPlanIds.length
+    ? await Plan.find({ _id: { $in: usedPlanIds.filter(Boolean) } })
+      .select("name category")
+      .sort({ name: 1 })
+    : [];
 
   res.json({
     items,
@@ -428,6 +443,7 @@ const listAllPayments = async (req, res) => {
     total,
     totalPages: Math.ceil(total / limit),
     paidRevenue: sumAmount(summary),
+    planOptions,
   });
 };
 
