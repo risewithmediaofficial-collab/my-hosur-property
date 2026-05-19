@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import useLowMotionDevice from "../hooks/useLowMotionDevice";
 
 const charVariant = {
   hidden: { opacity: 0, y: 20 },
@@ -29,7 +30,16 @@ export default function AnimatedHeading({
   as: Tag = "h1",
   delay = 0,
 }) {
+  const lowMotionDevice = useLowMotionDevice();
   const words = text.split(" ");
+
+  if (lowMotionDevice) {
+    return (
+      <Tag className={`site-premium-heading ${className}`}>
+        <span className="heading-static">{text}</span>
+      </Tag>
+    );
+  }
 
   return (
     <Tag className={`site-premium-heading ${className}`}>

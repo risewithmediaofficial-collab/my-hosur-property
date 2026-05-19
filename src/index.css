@@ -64,6 +64,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html.low-motion-ui {
+  scroll-behavior: auto;
+}
+
+.low-motion-ui body {
+  background-attachment: scroll;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -421,6 +429,15 @@ h4,
   overflow: visible;
 }
 
+.site-premium-heading .heading-static {
+  display: block;
+  background: linear-gradient(135deg, var(--site-heading-ink) 0%, var(--site-primary) 92%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.08;
+}
+
 .text-primary {
   color: var(--site-heading-ink);
 }
@@ -535,6 +552,77 @@ textarea:disabled {
 a[href]:not(.no-underline):focus-visible {
   text-decoration: underline;
   text-underline-offset: 4px;
+}
+
+.low-motion-ui .glass-panel,
+.low-motion-ui .neo-panel,
+.low-motion-ui .content-card,
+.low-motion-ui .site-section,
+.low-motion-ui .site-panel,
+.low-motion-ui .dashboard-shell,
+.low-motion-ui .dashboard-panel,
+.low-motion-ui .dashboard-modal,
+.low-motion-ui .backdrop-blur-sm,
+.low-motion-ui .backdrop-blur-md,
+.low-motion-ui .backdrop-blur-xl {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.low-motion-ui .animate-fade-up,
+.low-motion-ui .animate-float-slow {
+  animation: none !important;
+}
+
+.low-motion-ui .glass-panel,
+.low-motion-ui .neo-panel,
+.low-motion-ui .content-card,
+.low-motion-ui .site-section,
+.low-motion-ui .site-panel,
+.low-motion-ui .dashboard-shell,
+.low-motion-ui .dashboard-panel,
+.low-motion-ui .dashboard-modal,
+.low-motion-ui .site-button-primary,
+.low-motion-ui .site-button-secondary,
+.low-motion-ui .dashboard-primary,
+.low-motion-ui .dashboard-secondary,
+.low-motion-ui .neo-btn,
+.low-motion-ui .uiverse-btn {
+  box-shadow: 0 10px 24px rgba(16, 95, 104, 0.08) !important;
+}
+
+.low-motion-ui a,
+.low-motion-ui button,
+.low-motion-ui input,
+.low-motion-ui select,
+.low-motion-ui textarea,
+.low-motion-ui article,
+.low-motion-ui img {
+  transition-duration: 0.16s !important;
+}
+
+.low-motion-ui .neo-btn:hover,
+.low-motion-ui .uiverse-btn:hover,
+.low-motion-ui .dashboard-stat:hover,
+.low-motion-ui .site-button-primary:hover,
+.low-motion-ui .site-button-secondary:hover,
+.low-motion-ui .dashboard-primary:hover,
+.low-motion-ui .dashboard-secondary:hover,
+.low-motion-ui article:hover,
+.low-motion-ui a:hover,
+.low-motion-ui button:hover,
+.low-motion-ui .group:hover img {
+  transform: none !important;
+}
+
+.low-motion-ui .site-button-primary:hover,
+.low-motion-ui .site-button-secondary:hover,
+.low-motion-ui .dashboard-primary:hover,
+.low-motion-ui .dashboard-secondary:hover,
+.low-motion-ui .neo-btn:hover,
+.low-motion-ui .uiverse-btn:hover,
+.low-motion-ui article:hover {
+  box-shadow: 0 12px 26px rgba(16, 95, 104, 0.1) !important;
 }
 
 .bg-slate-50 .text-secondary,

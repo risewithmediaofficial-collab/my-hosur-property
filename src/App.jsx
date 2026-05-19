@@ -1,13 +1,14 @@
 import { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter, Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { initEmailJs } from "./services/emailService";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Loader from "./components/Loader";
 import { PrivateRouteSeo } from "./components/SeoHead";
 import ProtectedRoute from "./components/ProtectedRoute";
+import useLowMotionDevice from "./hooks/useLowMotionDevice";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
@@ -39,12 +40,18 @@ const pageTransition = {
 
 const AppShell = () => {
   const location = useLocation();
+  const lowMotionDevice = useLowMotionDevice();
   const isFullHeight = FULL_HEIGHT_PATHS.some((p) => location.pathname.startsWith(p));
   const isPrivatePath = PRIVATE_PATHS.some((p) => location.pathname.startsWith(p));
 
   useEffect(() => {
     initEmailJs();
   }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("low-motion-ui", lowMotionDevice);
+    return () => document.documentElement.classList.remove("low-motion-ui");
+  }, [lowMotionDevice]);
 
   // Scroll to top when route changes
   useEffect(() => {
@@ -66,81 +73,89 @@ const AppShell = () => {
   const hideFooter = ["/auth", "/admin/login"].some((p) => location.pathname.startsWith(p));
 
   return (
-    <div className="flex min-h-screen flex-col bg-transparent">
-      <Toaster position="top-right" toastOptions={{ duration: 2500 }} />
-      {isPrivatePath ? <PrivateRouteSeo title="Account" /> : null}
-      {!hideNavbar && <Navbar />}
-      <main className={`flex-1 ${isFullHeight || hideNavbar ? "" : "pt-4 pb-12 md:pt-6"}`}>
-        <Suspense fallback={<RouteFallback />}>
-          <AnimatePresence mode="wait">
-            <motion.div key={location.pathname} variants={pageTransition} initial="initial" animate="animate" exit="exit">
-              <Routes location={location}>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path="/services" element={<ServicesPage />} />
-                <Route path="/listings" element={<ListingPage />} />
-                <Route path="/property/:id/:slug?" element={<PropertyDetailPage />} />
-                <Route path="/auth" element={<AuthPage />} />
-                <Route path="/admin/login" element={<AdminLoginPage />} />
-                <Route path="/adminlogin" element={<Navigate to="/admin/login" replace />} />
-                <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <DashboardRouterPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/dashboard"
-                  element={
-                    <ProtectedRoute roles={["admin"]}>
-                      <AdminDashboardPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/plans"
-                  element={
-                    <ProtectedRoute>
-                      <PlansPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/request-service"
-                  element={
-                    <ProtectedRoute>
-                      <ServiceRequestPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/post-property"
-                  element={
-                    <ProtectedRoute>
-                      <PostPropertyPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/edit-property/:id"
-                  element={
-                    <ProtectedRoute>
-                      <EditPropertyPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </motion.div>
-          </AnimatePresence>
-        </Suspense>
-      </main>
-      {!hideFooter && <Footer />}
-    </div>
+    <MotionConfig reducedMotion={lowMotionDevice ? "always" : "never"}>
+      <div className="flex min-h-screen flex-col bg-transparent">
+        <Toaster position="top-right" toastOptions={{ duration: 2500 }} />
+        {isPrivatePath ? <PrivateRouteSeo title="Account" /> : null}
+        {!hideNavbar && <Navbar />}
+        <main className={`flex-1 ${isFullHeight || hideNavbar ? "" : "pt-4 pb-12 md:pt-6"}`}>
+          <Suspense fallback={<RouteFallback />}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={location.pathname}
+                variants={lowMotionDevice ? undefined : pageTransition}
+                initial={lowMotionDevice ? false : "initial"}
+                animate={lowMotionDevice ? false : "animate"}
+                exit={lowMotionDevice ? undefined : "exit"}
+              >
+                <Routes location={location}>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/services" element={<ServicesPage />} />
+                  <Route path="/listings" element={<ListingPage />} />
+                  <Route path="/property/:id/:slug?" element={<PropertyDetailPage />} />
+                  <Route path="/auth" element={<AuthPage />} />
+                  <Route path="/admin/login" element={<AdminLoginPage />} />
+                  <Route path="/adminlogin" element={<Navigate to="/admin/login" replace />} />
+                  <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardRouterPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/dashboard"
+                    element={
+                      <ProtectedRoute roles={["admin"]}>
+                        <AdminDashboardPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/plans"
+                    element={
+                      <ProtectedRoute>
+                        <PlansPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/request-service"
+                    element={
+                      <ProtectedRoute>
+                        <ServiceRequestPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/post-property"
+                    element={
+                      <ProtectedRoute>
+                        <PostPropertyPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/edit-property/:id"
+                    element={
+                      <ProtectedRoute>
+                        <EditPropertyPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </motion.div>
+            </AnimatePresence>
+          </Suspense>
+        </main>
+        {!hideFooter && <Footer />}
+      </div>
+    </MotionConfig>
   );
 };
 

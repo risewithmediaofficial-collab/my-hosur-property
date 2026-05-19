@@ -1,8 +1,6 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ArrowRightIcon,
   BuildingOffice2Icon,
@@ -12,7 +10,6 @@ import {
   MagnifyingGlassIcon,
   ScaleIcon,
   WrenchScrewdriverIcon,
-  SparklesIcon,
 } from "@heroicons/react/24/outline";
 import CountUpNumber from "../components/CountUpNumber";
 import PropertyCard from "../components/PropertyCard";
@@ -24,10 +21,7 @@ import realEstateBackground from "../assets/real-estate-background-hero.jpg";
 import { fetchHomeProperties } from "../services/api/propertyApi";
 import { buildRealEstateAgentSchema, buildWebsiteSchema } from "../utils/seo";
 
-gsap.registerPlugin(ScrollTrigger);
-
 const MotionSection = motion.section;
-const MotionDiv = motion.div;
 
 const reveal = {
   hidden: { opacity: 0, y: 28 },
@@ -36,96 +30,6 @@ const reveal = {
     y: 0,
     transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay },
   }),
-};
-
-// Premium 3D animations
-const heroHeroVariants = {
-  hidden: { opacity: 0, y: 60, scale: 0.9 },
-  show: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-  },
-};
-
-const floatingVariants = {
-  hidden: { opacity: 0, y: 100 },
-  show: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.7,
-      ease: [0.22, 1, 0.36, 1],
-      delay,
-    },
-  }),
-  float: {
-    y: [0, -12, 0],
-    transition: {
-      duration: 3,
-      repeat: Infinity,
-      ease: "easeInOut",
-    },
-  },
-};
-
-const cardHoverVariants = {
-  initial: { scale: 1, rotateX: 0, rotateY: 0 },
-  hover: {
-    scale: 1.02,
-    rotateX: 2,
-    rotateY: 2,
-    boxShadow: "0 20px 60px rgba(17, 17, 17, 0.15)",
-  },
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    },
-  },
-};
-
-const gradientText = {
-  hidden: { opacity: 0, y: 20 },
-  show: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, delay },
-    background: "linear-gradient(135deg, #111111 0%, #555555 100%)",
-    backgroundClip: "text",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-  }),
-};
-
-// Character-level animation for headings (Refit style)
-const charContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.02,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-const charVariant = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: [0.22, 1, 0.36, 1],
-    },
-  },
 };
 
 const quickActions = [
@@ -227,13 +131,9 @@ const HomePage = () => {
   const [featuredLoading, setFeaturedLoading] = useState(true);
   const [openShortcutMenu, setOpenShortcutMenu] = useState("");
   const [propertyTypeMenuOpen, setPropertyTypeMenuOpen] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const heroRef = useRef(null);
-  const statsRef = useRef(null);
-  const servicesRef = useRef(null);
   const shortcutBarRef = useRef(null);
   const propertyTypeMenuRef = useRef(null);
-  
+
   const [search, setSearch] = useState({
     intent: "buy",
     search: "",
@@ -242,51 +142,6 @@ const HomePage = () => {
   });
 
   const debouncedSearch = useDebounce(search.search, 300);
-
-  // Track mouse for 3D effects
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
-  // GSAP animations on scroll
-  useEffect(() => {
-    if (!statsRef.current) return;
-
-    gsap.to(statsRef.current, {
-      scrollTrigger: {
-        trigger: statsRef.current,
-        start: "top center",
-        end: "bottom center",
-        markers: false,
-      },
-      y: -20,
-      opacity: 1,
-      duration: 0.8,
-    });
-  }, []);
-
-  // Services parallax
-  useEffect(() => {
-    if (!servicesRef.current) return;
-
-    const cards = servicesRef.current.querySelectorAll(".service-card");
-    cards.forEach((card, index) => {
-      gsap.to(card, {
-        scrollTrigger: {
-          trigger: card,
-          start: "top center+=100",
-          end: "center center",
-          scrub: 1,
-        },
-        y: -30 * (index + 1),
-        opacity: 1,
-      });
-    });
-  }, []);
 
   useEffect(() => {
     fetchHomeProperties()

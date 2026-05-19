@@ -17,6 +17,7 @@ import SeoHead from "../components/SeoHead";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
 import useDebounce from "../hooks/useDebounce";
 import useAuth from "../hooks/useAuth";
+import useLowMotionDevice from "../hooks/useLowMotionDevice";
 import { fetchProperties } from "../services/api/propertyApi";
 import { toggleSavedProperty } from "../services/api/userApi";
 import { buildBreadcrumbSchema, buildCanonicalListingQuery } from "../utils/seo";
@@ -81,6 +82,7 @@ const ListingPage = () => {
   const sentinelRef = useRef(null);
   const heroRef = useRef(null);
   const revealRefs = useRef([]);
+  const lowMotionDevice = useLowMotionDevice();
 
   useBodyScrollLock(mobileFilterOpen);
 
@@ -154,6 +156,8 @@ const ListingPage = () => {
   }, [data.page, data.totalPages]);
 
   useEffect(() => {
+    if (lowMotionDevice) return undefined;
+
     const ctx = gsap.context(() => {
       if (heroRef.current) {
         gsap.fromTo(
@@ -189,7 +193,7 @@ const ListingPage = () => {
     });
 
     return () => ctx.revert();
-  }, []);
+  }, [lowMotionDevice]);
 
   const clearFilters = () =>
     setFilters({
@@ -367,8 +371,8 @@ const ListingPage = () => {
         {data.items.length ? (
           <MotionDiv
             ref={setRevealRef}
-            initial="hidden"
-            whileInView="show"
+            initial={lowMotionDevice ? false : "hidden"}
+            whileInView={lowMotionDevice ? undefined : "show"}
             viewport={{ once: true, amount: 0.08 }}
             variants={fadeUp}
             className="grid gap-6 sm:grid-cols-2 2xl:grid-cols-3"
@@ -376,10 +380,10 @@ const ListingPage = () => {
             {data.items.map((item, index) => (
               <MotionDiv
                 key={item._id}
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: Math.min(index * 0.03, 0.18) }}
-                whileHover={{ y: -6 }}
+                initial={lowMotionDevice ? false : { opacity: 0, y: 24 }}
+                animate={lowMotionDevice ? undefined : { opacity: 1, y: 0 }}
+                transition={lowMotionDevice ? undefined : { duration: 0.5, delay: Math.min(index * 0.03, 0.18) }}
+                whileHover={lowMotionDevice ? undefined : { y: -6 }}
               >
                 <PropertyCard item={item} onSave={onSave} isSaved={savedIds.includes(item._id)} />
               </MotionDiv>
