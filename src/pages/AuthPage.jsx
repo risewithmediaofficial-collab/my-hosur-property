@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShieldCheckIcon, EnvelopeIcon, LockClosedIcon, PhoneIcon, MapPinIcon, UserIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { loginUser, requestOtp, signupUser, socialLogin, verifyOtp } from "../services/api/authApi";
 import useAuth from "../hooks/useAuth";
+import useScrollToTop from "../hooks/useScrollToTop";
 import { loadExternalScript } from "../utils/loadExternalScript";
 
 const MotionDiv = motion.div;
@@ -48,6 +49,7 @@ const SelectField = ({ label, icon: Icon, children, ...props }) => (
 
 const AuthPage = () => {
   const navigate = useNavigate();
+  const scrollToTop = useScrollToTop();
   const location = useLocation();
   const { login } = useAuth();
   const redirectTo = location.state?.from?.pathname || "/dashboard";
@@ -89,6 +91,7 @@ const AuthPage = () => {
             const data = await socialLogin({ provider: "google", token: credential });
             login(data);
             toast.success("Signed in with Google");
+            scrollToTop();
             navigate(redirectTo);
           } catch (error) {
             toast.error(error.response?.data?.message || "Google sign-in failed");
@@ -127,6 +130,7 @@ const AuthPage = () => {
 
         const data = await verifyOtp({ email: form.email, otp: form.otp });
         login(data);
+        scrollToTop();
         navigate(redirectTo);
         return;
       }
@@ -134,6 +138,7 @@ const AuthPage = () => {
       const data = mode === "signup" ? await signupUser(form) : await loginUser(form);
       login(data);
       toast.success(mode === "signup" ? "Account created successfully" : "Welcome back");
+      scrollToTop();
       navigate(redirectTo);
     } catch (error) {
       toast.error(error.response?.data?.message || "Authentication failed");

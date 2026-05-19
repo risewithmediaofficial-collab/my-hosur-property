@@ -46,6 +46,22 @@ const AppShell = () => {
     initEmailJs();
   }, []);
 
+  // Scroll to top when route changes
+  useEffect(() => {
+    // Temporarily disable smooth scroll for immediate scroll to top
+    const htmlElement = document.documentElement;
+    const originalScroll = htmlElement.style.scrollBehavior;
+    htmlElement.style.scrollBehavior = 'auto';
+    
+    window.scrollTo(0, 0);
+    document.body.scrollTop = 0;
+    
+    // Restore smooth scroll after a brief delay
+    setTimeout(() => {
+      htmlElement.style.scrollBehavior = originalScroll;
+    }, 50);
+  }, [location.pathname]);
+
   const hideNavbar = ["/admin/login"].some((p) => location.pathname.startsWith(p));
   const hideFooter = ["/auth", "/admin/login"].some((p) => location.pathname.startsWith(p));
 

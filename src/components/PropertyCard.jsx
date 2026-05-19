@@ -3,9 +3,11 @@ import { currency, formatArea } from "../utils/format";
 import { ArrowRightIcon, CheckBadgeIcon, MapPinIcon, RectangleStackIcon, UserIcon } from "@heroicons/react/24/outline";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
 import { getPropertyImageAlt, getPropertyPath } from "../utils/seo";
+import useScrollToTop from "../hooks/useScrollToTop";
 
 const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
   const href = getPropertyPath(item);
+  const scrollToTop = useScrollToTop();
   const badges = [
     item.verification?.isVerified ? "Verified" : "",
     item.verification?.reraId ? "RERA" : "",
@@ -105,6 +107,7 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
             </button>
             <Link
               to={href}
+              onClick={scrollToTop}
               aria-label={`View ${item.title} property details`}
               className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-3.5 py-2 text-center text-xs font-semibold text-white transition hover:-translate-y-0.5 hover:bg-black sm:flex-none sm:px-4"
             >

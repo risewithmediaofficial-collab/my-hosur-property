@@ -12,7 +12,20 @@ const serviceLinks = [
   { label: "About MyHosurProperty", to: "/about" },
 ];
 
-const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+const scrollToTop = () => {
+  // Temporarily disable smooth scroll for immediate scroll to top
+  const htmlElement = document.documentElement;
+  const originalScroll = htmlElement.style.scrollBehavior;
+  htmlElement.style.scrollBehavior = 'auto';
+  
+  window.scrollTo(0, 0);
+  document.body.scrollTop = 0;
+  
+  // Restore smooth scroll after a brief delay
+  setTimeout(() => {
+    htmlElement.style.scrollBehavior = originalScroll;
+  }, 50);
+};
 
 const Footer = () => (
   <footer className="mt-12 bg-white text-slate-600">

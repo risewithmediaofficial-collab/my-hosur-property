@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import useAuth from "../hooks/useAuth";
+import useScrollToTop from "../hooks/useScrollToTop";
 import { adminLoginUser } from "../services/api/adminAuthApi";
 import { ShieldCheckIcon } from "@heroicons/react/24/outline";
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();
+  const scrollToTop = useScrollToTop();
   const { login } = useAuth();
   const [form, setForm] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -20,6 +22,7 @@ const AdminLoginPage = () => {
       const data = await adminLoginUser(form);
       login(data);
       toast.success("Admin login successful");
+      scrollToTop();
       navigate("/admin/dashboard");
     } catch (error) {
       toast.error(
