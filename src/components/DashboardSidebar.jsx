@@ -13,16 +13,16 @@ const DashboardSidebar = ({
   return (
     <div className={`flex min-h-[calc(100vh-4rem)] flex-col bg-transparent md:flex-row ${rootClassName}`}>
       <aside className={`sticky top-20 z-10 hidden h-[calc(100vh-5rem)] w-[21rem] shrink-0 overflow-y-auto px-4 pb-6 pt-4 md:flex md:flex-col ${asideClassName}`}>
-        <div className="dashboard-shell flex h-full flex-col gap-6 p-6">
+        <div className="dashboard-shell flex h-full min-h-0 flex-col gap-6 p-6">
           <div>
             <p className="dashboard-kicker">{subtitle}</p>
             <h1 className="dashboard-display mt-3 text-[2.15rem] font-semibold leading-[1.02] text-slate-900">{title}</h1>
             {description ? <p className="dashboard-muted mt-3 text-sm leading-6">{description}</p> : null}
           </div>
 
-          <div className="flex-1 border-t border-slate-200 pt-4">
+          <div className="flex min-h-0 flex-1 flex-col border-t border-slate-200 pt-4">
             <p className="pb-3 text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400">Dashboard sections</p>
-            <nav className="space-y-1.5">
+            <nav className="min-h-0 flex-1 space-y-1.5 overflow-y-auto pr-1 pb-2">
               {navItems.map((item) => (
                 <button
                   key={item.key}
