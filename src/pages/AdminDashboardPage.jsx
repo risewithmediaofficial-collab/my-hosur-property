@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 import useAuth from "../hooks/useAuth";
@@ -46,6 +46,8 @@ const formatCustomerRequestLabel = (item) => {
   return item.propertyType || "Property";
 };
 
+const formatAdminDate = (value) => new Date(value).toLocaleDateString("en-IN");
+
 const AdminDashboardPage = () => {
   const { token } = useAuth();
   const [metrics, setMetrics] = useState({});
@@ -66,6 +68,8 @@ const AdminDashboardPage = () => {
   const [paymentPlanFilter, setPaymentPlanFilter] = useState("all");
   const [paymentPlanOptions, setPaymentPlanOptions] = useState([]);
   const [activeTab, setActiveTab] = useState("overview");
+  const [leadView, setLeadView] = useState("inquiries");
+  const [selectedLeadItem, setSelectedLeadItem] = useState(null);
   const [editingNotes, setEditingNotes] = useState(false);
   const [tempNotes, setTempNotes] = useState("");
   
@@ -77,16 +81,8 @@ const AdminDashboardPage = () => {
   const [sendingEmail, setSendingEmail] = useState(false);
 
   const navigate = useNavigate();
-  useBodyScrollLock(Boolean(selectedUser) || emailModalOpen);
+  useBodyScrollLock(Boolean(selectedUser) || emailModalOpen || Boolean(selectedLeadItem));
 
-  const tabs = [
-    { id: "overview", label: "Overview", icon: ChartBarIcon },
-    { id: "users", label: "Users", icon: UsersIcon },
-    { id: "properties", label: "Properties", icon: HomeModernIcon },
-    { id: "leads", label: "Requests & Leads", icon: ChatBubbleLeftRightIcon },
-    { id: "payments", label: "Payments", icon: BanknotesIcon },
-    { id: "settings", label: "Settings", icon: Cog6ToothIcon },
-  ];
   const overviewStats = [
     { key: "users", label: "Users", value: metrics.users || users.length || 0, icon: <UsersIcon className="h-5 w-5" /> },
     { key: "properties", label: "Properties", value: metrics.properties || propertyListings.length || 0, icon: <HomeModernIcon className="h-5 w-5" /> },
@@ -179,6 +175,47 @@ const AdminDashboardPage = () => {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
+  const inquiryNewCount = leads.filter((item) => item.status === "pending").length;
+  const customerRequestNewCount = customerRequests.filter((item) => item.status === "open").length;
+  const leadUnlockNewCount = leadUnlocks.filter((item) => item.status === "created").length;
+  const leadQueueCount = inquiryNewCount + customerRequestNewCount + leadUnlockNewCount;
+
+  const tabs = useMemo(
+    () => [
+      { id: "overview", label: "Overview", icon: ChartBarIcon },
+      { id: "users", label: "Users", icon: UsersIcon, badge: metrics.users || users.length || 0 },
+      { id: "properties", label: "Properties", icon: HomeModernIcon, badge: propertyListings.length || metrics.properties || 0 },
+      { id: "leads", label: "Requests & Leads", icon: ChatBubbleLeftRightIcon, badge: leadQueueCount || leads.length + customerRequests.length + leadUnlocks.length },
+      { id: "payments", label: "Payments", icon: BanknotesIcon, badge: payments.length },
+      { id: "settings", label: "Settings", icon: Cog6ToothIcon },
+    ],
+    [customerRequests.length, leadQueueCount, leadUnlocks.length, leads.length, metrics.properties, metrics.users, payments.length, propertyListings.length, users.length]
+  );
+
+  const leadViews = useMemo(
+    () => [
+      {
+        id: "inquiries",
+        label: "Inquiry Leads",
+        total: leads.length,
+        newCount: inquiryNewCount,
+      },
+      {
+        id: "requirements",
+        label: "Property Requests",
+        total: customerRequests.length,
+        newCount: customerRequestNewCount,
+      },
+      {
+        id: "unlocks",
+        label: "Lead Unlocks",
+        total: leadUnlocks.length,
+        newCount: leadUnlockNewCount,
+      },
+    ],
+    [customerRequestNewCount, customerRequests.length, inquiryNewCount, leadUnlockNewCount, leadUnlocks.length, leads.length]
+  );
+
   const openProperty = (property) => {
     navigate(getPropertyPath(property));
   };
@@ -238,6 +275,10 @@ const AdminDashboardPage = () => {
     setEditingNotes(false);
   };
 
+  const openLeadModal = (type, item) => {
+    setSelectedLeadItem({ type, item });
+  };
+
   const openEmailModal = (target) => {
     setEmailTarget(target);
     setEmailSubject("");
@@ -267,6 +308,8 @@ const AdminDashboardPage = () => {
     }
   };
 
+  const activeLeadView = leadViews.find((item) => item.id === leadView) || leadViews[0];
+
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-50 pt-6">
@@ -283,16 +326,21 @@ const AdminDashboardPage = () => {
       title="Admin Panel"
       subtitle="Platform Control"
       description="Manage users, listings, leads, payments, and settings from one clean control center."
+      rootClassName="md:h-full md:min-h-0 md:overflow-hidden"
+      asideClassName="md:top-0 md:h-full md:overflow-hidden"
+      mainClassName="md:h-full md:overflow-y-auto"
+      contentClassName="md:space-y-0 md:flex md:h-full md:min-h-0 md:flex-col md:gap-6 md:overflow-hidden"
       stats={[
         { label: "Users", value: metrics.users || users.length || 0, icon: <UsersIcon className="h-4 w-4" /> },
         { label: "Posted Properties", value: propertyListings.length || metrics.properties || 0, icon: <HomeModernIcon className="h-4 w-4" /> },
         { label: "Payments", value: payments.length, icon: <BanknotesIcon className="h-4 w-4" /> },
-        { label: "Lead Requests", value: leads.length, icon: <TicketIcon className="h-4 w-4" /> },
+        { label: "New Queue", value: leadQueueCount, icon: <TicketIcon className="h-4 w-4" /> },
       ]}
       navItems={tabs.map((tab) => ({
         key: tab.id,
         label: tab.label,
         icon: <tab.icon className="h-4 w-4" />,
+        badge: tab.badge,
         active: activeTab === tab.id,
         onClick: setActiveTab,
       }))}
@@ -314,7 +362,7 @@ const AdminDashboardPage = () => {
         )}
 
         {activeTab === "settings" && (
-          <div className="space-y-6">
+          <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pr-1">
             <section className="dashboard-shell p-5">
               <h2 className="text-lg font-bold text-slate-900">Lead Unlock Pricing Control</h2>
               <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -336,7 +384,7 @@ const AdminDashboardPage = () => {
         )}
 
         {activeTab === "users" && (
-          <article className="dashboard-shell relative p-6">
+          <article className="dashboard-shell relative flex min-h-0 flex-1 flex-col p-6">
             <div className="mb-4 space-y-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="inline-flex items-center gap-2 text-lg font-bold text-slate-900"><UsersIcon className="h-5 w-5 text-slate-700" />Registered Users ({metrics.users || users.length})</h2>
@@ -407,7 +455,7 @@ const AdminDashboardPage = () => {
                 </div>
               )}
             </div>
-            <div className="overflow-x-auto">
+            <div className="min-h-0 overflow-y-auto rounded-[1.5rem] border border-slate-200/70">
               <table className="dashboard-table min-w-full text-left text-sm">
                 <thead className="whitespace-nowrap">
                   <tr>
@@ -444,7 +492,7 @@ const AdminDashboardPage = () => {
         )}
 
         {activeTab === "payments" && (
-          <article className="dashboard-shell p-6">
+          <article className="dashboard-shell flex min-h-0 flex-1 flex-col p-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
                 <h2 className="text-lg font-bold text-slate-900">Platform Payments</h2>
@@ -468,7 +516,7 @@ const AdminDashboardPage = () => {
                 </select>
               </label>
             </div>
-            <div className="mt-3 overflow-x-auto text-sm">
+            <div className="mt-3 min-h-0 overflow-y-auto rounded-[1.5rem] border border-slate-200/70 text-sm">
               <table className="dashboard-table min-w-full text-left">
                 <thead className="whitespace-nowrap">
                   <tr className="border-b border-clay">
@@ -503,12 +551,12 @@ const AdminDashboardPage = () => {
         )}
 
         {activeTab === "properties" && (
-          <section className="dashboard-shell p-6">
+          <section className="dashboard-shell flex min-h-0 flex-1 flex-col p-6">
             <h2 className="text-lg font-bold text-slate-900">Posted Properties</h2>
             <p className="mt-1 text-sm text-slate-600">
               Properties go live as soon as users publish them. Open any listing to review it, see who posted it, or delete it from the platform.
             </p>
-            <div className="mt-3 overflow-x-auto">
+            <div className="mt-3 min-h-0 overflow-y-auto rounded-[1.5rem] border border-slate-200/70">
               <table className="dashboard-table min-w-full text-left text-sm">
                 <thead className="whitespace-nowrap">
                   <tr className="border-b border-clay">
@@ -586,121 +634,201 @@ const AdminDashboardPage = () => {
         )}
 
         {activeTab === "leads" && (
-          <div className="space-y-6">
-            <section className="dashboard-shell p-4 sm:p-6">
-              <h2 className="text-lg font-bold text-slate-900">Customer Call / Inquiry Requests</h2>
-              <p className="mt-1 text-sm text-slate-600">All customer requests are stored here for admin tracking and audit.</p>
-              <div className="mt-3 overflow-x-auto">
-                <table className="dashboard-table min-w-full text-left text-xs sm:text-sm">
-                  <thead className="whitespace-nowrap">
-                    <tr className="border-b border-clay">
-                      <th className="py-2 px-1 sm:py-3 sm:px-2">Date</th>
-                      <th className="py-2 px-1 sm:py-3 sm:px-2">Property</th>
-                      <th className="py-2 px-1 sm:py-3 sm:px-2">Customer</th>
-                      <th className="hidden py-2 px-1 sm:py-3 sm:px-2 lg:table-cell">Posted By</th>
-                      <th className="py-2 px-1 sm:py-3 sm:px-2">Intent</th>
-                      <th className="hidden py-2 px-1 sm:py-3 sm:px-2 md:table-cell">Message</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {leads.map((l) => (
-                      <tr key={l._id} className="border-b border-clay/60 align-top">
-                        <td className="py-2 px-1 sm:py-3 sm:px-2 whitespace-nowrap text-[10px] sm:text-sm">{new Date(l.createdAt).toLocaleString("en-IN").split(",")[0]}</td>
-                        <td className="py-2 px-1 sm:py-3 sm:px-2">
-                          <p className="font-semibold text-[10px] sm:text-sm truncate">{l.propertyId?.title || "N/A"}</p>
-                          <p className="text-[8px] sm:text-xs text-ink/65 truncate">{l.propertyId?.location?.city || ""}</p>
-                        </td>
-                        <td className="py-2 px-1 sm:py-3 sm:px-2">
-                          <p className="text-[10px] sm:text-sm truncate">{l.userId?.name || l.contactInfo?.name || "N/A"}</p>
-                          <p className="text-[8px] sm:text-xs text-ink/65 truncate">{l.userId?.email || l.contactInfo?.email || "N/A"}</p>
-                        </td>
-                        <td className="hidden py-2 px-1 sm:py-3 sm:px-2 lg:table-cell">
-                          <p className="text-[10px] sm:text-sm truncate">{l.ownerId?.name || "N/A"}</p>
-                          <p className="text-[8px] sm:text-xs text-ink/65 truncate">{l.ownerId?.email || "N/A"}</p>
-                        </td>
-                        <td className="py-2 px-1 sm:py-3 sm:px-2 text-[10px] sm:text-sm whitespace-nowrap">{l.intentType}</td>
-                        <td className="hidden py-2 px-1 sm:py-3 sm:px-2 md:table-cell max-w-xs text-[10px] sm:text-sm truncate">{l.contactInfo?.message || "-"}</td>
-                      </tr>
-                    ))}
-                    {leads.length === 0 && <tr><td colSpan={6} className="py-8 text-center text-ink/50">No leads found.</td></tr>}
-                  </tbody>
-                </table>
+          <section className="dashboard-shell flex min-h-0 flex-1 flex-col p-6">
+            <div className="border-b border-slate-200 pb-5">
+              <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900">Requests & Leads Queue</h2>
+                  <p className="mt-1 text-sm text-slate-600">
+                    Review inquiry leads, property requests, and unlock activity from one fixed admin queue.
+                  </p>
+                </div>
+                <div className="dashboard-chip">
+                  {leadQueueCount} new / active items
+                </div>
               </div>
-            </section>
 
-            <section className="grid gap-6 lg:grid-cols-2">
-              <article className="dashboard-shell p-4 sm:p-6">
-                <h2 className="text-lg font-bold text-slate-900">Customer Property Requests</h2>
-                <div className="mt-3 overflow-x-auto">
-                  <table className="dashboard-table min-w-full text-left text-xs sm:text-sm">
-                    <thead className="whitespace-nowrap">
-                      <tr className="border-b border-clay">
-                        <th className="py-2 px-1 sm:py-3 sm:px-2">Customer</th>
-                        <th className="py-2 px-1 sm:py-3 sm:px-2">Requirement</th>
-                        <th className="hidden py-2 px-1 sm:py-3 sm:px-2 md:table-cell">Budget/Location</th>
-                        <th className="py-2 px-1 sm:py-3 sm:px-2">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {customerRequests.map((item) => (
-                        <tr key={item._id} className="border-b border-clay/60 align-top">
-                          <td className="py-2 px-1 sm:py-3 sm:px-2">
-                            <p className="font-semibold text-[10px] sm:text-sm truncate">{item.customerName}</p>
-                            <p className="text-[8px] sm:text-xs text-ink/65 truncate">{item.contactDetails?.email || "-"}</p>
-                          </td>
-                          <td className="py-2 px-1 sm:py-3 sm:px-2">
-                            <p className="font-semibold text-[10px] sm:text-sm">{formatCustomerRequestLabel(item)}</p>
-                            <p className="text-[8px] uppercase text-ink/50">{(item.requestCategory || "property_buy").replaceAll("_", " ")}</p>
-                          </td>
-                          <td className="hidden py-2 px-1 sm:py-3 sm:px-2 md:table-cell text-[10px] sm:text-sm">
-                            {(item.budgetMin || item.budgetMax) ? <>Rs. {item.budgetMin || 0} - Rs. {item.budgetMax || 0}<br /></> : null}
-                            {item.location?.city}, {item.location?.area}
-                          </td>
-                          <td className="py-2 px-1 sm:py-3 sm:px-2">
-                            <span className={`inline-flex rounded px-1.5 py-0.5 text-[9px] font-bold uppercase whitespace-nowrap ${
-                              item.status === "completed" ? "bg-green-100 text-green-700" : item.status === "pending" ? "bg-yellow-100 text-yellow-700" : "bg-gray-100 text-gray-700"
+              <div className="mt-4 grid gap-3 lg:grid-cols-3">
+                {leadViews.map((view) => (
+                  <button
+                    key={view.id}
+                    type="button"
+                    onClick={() => setLeadView(view.id)}
+                    className={`rounded-[1.35rem] border px-4 py-4 text-left transition ${
+                      leadView === view.id
+                        ? "border-slate-900 bg-[rgba(222,241,239,0.82)] shadow-[0_14px_28px_rgba(16,95,104,0.08)]"
+                        : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-bold text-slate-900">{view.label}</p>
+                        <p className="mt-1 text-xs text-slate-500">
+                          {view.newCount > 0 ? `${view.newCount} new in queue` : "No new items right now"}
+                        </p>
+                      </div>
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${
+                        leadView === view.id ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700"
+                      }`}>
+                        {view.total}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-5 flex min-h-0 flex-1 flex-col overflow-hidden">
+              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">{activeLeadView.label}</h3>
+                  <p className="text-sm text-slate-500">
+                    Showing {activeLeadView.total} item{activeLeadView.total === 1 ? "" : "s"} with {activeLeadView.newCount} new / open.
+                  </p>
+                </div>
+              </div>
+
+              <div className="min-h-0 space-y-3 overflow-y-auto pr-1">
+                {leadView === "inquiries" &&
+                  (leads.length ? (
+                    leads.map((item) => (
+                      <article key={item._id} className="dashboard-subpanel rounded-[1.25rem] px-4 py-3">
+                        <div className="grid gap-3 lg:grid-cols-[1.2fr_0.95fr_0.95fr_0.7fr_auto] lg:items-center">
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-bold text-slate-900">{item.propertyId?.title || "Property not available"}</p>
+                            <p className="mt-1 truncate text-xs text-slate-500">
+                              {item.propertyId?.location?.city || "-"}{item.propertyId?.location?.area ? `, ${item.propertyId.location.area}` : ""}
+                            </p>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Customer</p>
+                            <p className="truncate text-sm font-semibold text-slate-900">{item.userId?.name || item.contactInfo?.name || "N/A"}</p>
+                            <p className="truncate text-xs text-slate-500">{item.userId?.email || item.contactInfo?.email || "No email"}</p>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Posted By</p>
+                            <p className="truncate text-sm font-semibold text-slate-900">{item.ownerId?.name || "N/A"}</p>
+                            <p className="truncate text-xs text-slate-500">{item.ownerId?.email || "No email"}</p>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
+                              item.status === "approved"
+                                ? "bg-green-100 text-green-700"
+                                : item.status === "rejected"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-amber-100 text-amber-700"
                             }`}>
                               {item.status}
                             </span>
-                          </td>
-                        </tr>
-                      ))}
-                      {customerRequests.length === 0 && <tr><td colSpan={4} className="py-8 text-center text-ink/50">No requests found.</td></tr>}
-                    </tbody>
-                  </table>
-                </div>
-              </article>
+                            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{item.intentType}</span>
+                          </div>
+                          <div className="flex items-center justify-start gap-2 lg:justify-end">
+                            <button onClick={() => openLeadModal("inquiries", item)} className="dashboard-secondary px-4 py-2 text-xs">
+                              View
+                            </button>
+                          </div>
+                        </div>
+                      </article>
+                    ))
+                  ) : (
+                    <div className="dashboard-empty px-6 py-10 text-center text-sm">No inquiry leads found.</div>
+                  ))}
 
-              <article className="dashboard-shell p-4 sm:p-6">
-                <h2 className="text-lg font-bold text-slate-900">Lead Unlock Purchase Records</h2>
-                <div className="mt-3 overflow-x-auto">
-                  <table className="dashboard-table min-w-full text-left text-xs sm:text-sm">
-                    <thead className="whitespace-nowrap">
-                      <tr className="border-b border-clay">
-                        <th className="py-2 px-1 sm:py-3 sm:px-2">Agent</th>
-                        <th className="py-2 px-1 sm:py-3 sm:px-2">Customer</th>
-                        <th className="py-2 px-1 sm:py-3 sm:px-2">Amount</th>
-                        <th className="hidden py-2 px-1 sm:py-3 sm:px-2 sm:table-cell">Status</th>
-                        <th className="hidden py-2 px-1 sm:py-3 sm:px-2 lg:table-cell">Time</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {leadUnlocks.map((item) => (
-                        <tr key={item._id} className="border-b border-clay/60">
-                          <td className="py-2 px-1 sm:py-3 sm:px-2 text-[10px] sm:text-sm truncate">{item.agentId?.name || "N/A"}</td>
-                          <td className="py-2 px-1 sm:py-3 sm:px-2 text-[10px] sm:text-sm truncate">{item.customerId?.name || "N/A"}</td>
-                          <td className="py-2 px-1 sm:py-3 sm:px-2 text-[10px] sm:text-sm font-semibold whitespace-nowrap">Rs. {item.amount}</td>
-                          <td className="hidden py-2 px-1 sm:py-3 sm:px-2 sm:table-cell text-[10px] sm:text-sm capitalize">{item.status}</td>
-                          <td className="hidden py-2 px-1 sm:py-3 sm:px-2 lg:table-cell text-[10px] sm:text-sm">{new Date(item.createdAt).toLocaleString("en-IN").split(",")[0]}</td>
-                        </tr>
-                      ))}
-                      {leadUnlocks.length === 0 && <tr><td colSpan={5} className="py-8 text-center text-ink/50">No records found.</td></tr>}
-                    </tbody>
-                  </table>
-                </div>
-              </article>
-            </section>
-          </div>
+                {leadView === "requirements" &&
+                  (customerRequests.length ? (
+                    customerRequests.map((item) => (
+                      <article key={item._id} className="dashboard-subpanel rounded-[1.25rem] px-4 py-3">
+                        <div className="grid gap-3 lg:grid-cols-[1fr_1fr_1.15fr_0.7fr_auto] lg:items-center">
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-bold text-slate-900">{formatCustomerRequestLabel(item)}</p>
+                            <p className="mt-1 truncate text-xs uppercase tracking-[0.12em] text-slate-400">
+                              {(item.requestCategory || "property_buy").replaceAll("_", " ")}
+                            </p>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Customer</p>
+                            <p className="truncate text-sm font-semibold text-slate-900">{item.customerName}</p>
+                            <p className="truncate text-xs text-slate-500">{item.contactDetails?.email || "No email"}</p>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Budget / Location</p>
+                            <p className="truncate text-sm font-semibold text-slate-900">
+                              {item.budgetMin || item.budgetMax ? `Rs. ${item.budgetMin || 0} - Rs. ${item.budgetMax || 0}` : "Budget not shared"}
+                            </p>
+                            <p className="truncate text-xs text-slate-500">{item.location?.city || "-"}{item.location?.area ? `, ${item.location.area}` : ""}</p>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
+                              item.status === "closed"
+                                ? "bg-green-100 text-green-700"
+                                : item.status === "matched"
+                                  ? "bg-sky-100 text-sky-700"
+                                  : "bg-amber-100 text-amber-700"
+                            }`}>
+                              {item.status}
+                            </span>
+                            <span className="text-xs text-slate-500">{item.matchedAgents?.length || 0} matched</span>
+                          </div>
+                          <div className="flex items-center justify-start gap-2 lg:justify-end">
+                            <button onClick={() => openLeadModal("requirements", item)} className="dashboard-secondary px-4 py-2 text-xs">
+                              View
+                            </button>
+                          </div>
+                        </div>
+                      </article>
+                    ))
+                  ) : (
+                    <div className="dashboard-empty px-6 py-10 text-center text-sm">No customer property requests found.</div>
+                  ))}
+
+                {leadView === "unlocks" &&
+                  (leadUnlocks.length ? (
+                    leadUnlocks.map((item) => (
+                      <article key={item._id} className="dashboard-subpanel rounded-[1.25rem] px-4 py-3">
+                        <div className="grid gap-3 lg:grid-cols-[0.95fr_0.95fr_0.9fr_1.1fr_auto] lg:items-center">
+                          <div className="min-w-0">
+                            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Agent</p>
+                            <p className="truncate text-sm font-semibold text-slate-900">{item.agentId?.name || "N/A"}</p>
+                            <p className="truncate text-xs text-slate-500">{item.agentId?.email || "No email"}</p>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Customer</p>
+                            <p className="truncate text-sm font-semibold text-slate-900">{item.customerId?.name || "N/A"}</p>
+                            <p className="truncate text-xs text-slate-500">{item.customerId?.email || "No email"}</p>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Amount</p>
+                            <p className="text-sm font-semibold text-slate-900">Rs. {item.amount}</p>
+                            <p className="truncate text-xs text-slate-500">{item.gateway || "gateway"}</p>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
+                              item.status === "paid"
+                                ? "bg-green-100 text-green-700"
+                                : item.status === "failed"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-amber-100 text-amber-700"
+                            }`}>
+                              {item.status}
+                            </span>
+                            <span className="truncate text-xs text-slate-500">
+                              {item.customerRequestId?.propertyType || "Property"} - {item.customerRequestId?.location?.city || "-"}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-start gap-2 lg:justify-end">
+                            <button onClick={() => openLeadModal("unlocks", item)} className="dashboard-secondary px-4 py-2 text-xs">
+                              View
+                            </button>
+                          </div>
+                        </div>
+                      </article>
+                    ))
+                  ) : (
+                    <div className="dashboard-empty px-6 py-10 text-center text-sm">No lead unlock records found.</div>
+                  ))}
+              </div>
+            </div>
+          </section>
         )}
     </DashboardSidebar>
 
@@ -819,6 +947,203 @@ const AdminDashboardPage = () => {
                   className={`rounded-lg px-4 py-2 text-sm font-bold shadow transition ${selectedUser.status === "deactivated" ? "bg-slate-900 text-white hover:opacity-90" : "bg-red-600 text-white hover:bg-red-700"}`}
                 >
                   {selectedUser.status === "deactivated" ? "Reactivate User" : "Deactivate User"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedLeadItem && (
+        <div className="fixed inset-0 z-[55] flex items-end justify-center bg-ink/20 p-3 transition-opacity sm:items-center sm:p-4">
+          <div className="dashboard-modal flex max-h-[calc(100dvh-1.5rem)] w-full max-w-3xl flex-col overflow-hidden">
+            <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-5">
+              <div>
+                <h3 className="dashboard-display text-2xl font-semibold">
+                  {selectedLeadItem.type === "inquiries"
+                    ? "Inquiry Lead Details"
+                    : selectedLeadItem.type === "requirements"
+                      ? "Property Request Details"
+                      : "Lead Unlock Details"}
+                </h3>
+                <p className="mt-1 text-sm text-slate-500">Full record view for admin review.</p>
+              </div>
+              <button onClick={() => setSelectedLeadItem(null)} className="text-slate-400 transition hover:text-slate-900">
+                <XMarkIcon className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="space-y-5 overflow-y-auto p-5 sm:p-6">
+              {selectedLeadItem.type === "inquiries" && (
+                <>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
+                      selectedLeadItem.item.status === "approved"
+                        ? "bg-green-100 text-green-700"
+                        : selectedLeadItem.item.status === "rejected"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-amber-100 text-amber-700"
+                    }`}>
+                      {selectedLeadItem.item.status}
+                    </span>
+                    <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                      {selectedLeadItem.item.intentType}
+                    </span>
+                    <span className="text-xs text-slate-500">{formatAdminDate(selectedLeadItem.item.createdAt)}</span>
+                  </div>
+
+                  <div className="dashboard-subpanel p-4">
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Property</p>
+                    <p className="mt-2 text-lg font-bold text-slate-900">{selectedLeadItem.item.propertyId?.title || "Property not available"}</p>
+                    <p className="mt-1 text-sm text-slate-500">
+                      {selectedLeadItem.item.propertyId?.location?.city || "-"}
+                      {selectedLeadItem.item.propertyId?.location?.area ? `, ${selectedLeadItem.item.propertyId.location.area}` : ""}
+                    </p>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="dashboard-subpanel p-4">
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Customer</p>
+                      <p className="mt-2 font-semibold text-slate-900">{selectedLeadItem.item.userId?.name || selectedLeadItem.item.contactInfo?.name || "N/A"}</p>
+                      <p className="text-sm text-slate-600">{selectedLeadItem.item.userId?.email || selectedLeadItem.item.contactInfo?.email || "No email"}</p>
+                      <p className="text-sm text-slate-600">{selectedLeadItem.item.userId?.phone || selectedLeadItem.item.contactInfo?.phone || "No phone"}</p>
+                    </div>
+                    <div className="dashboard-subpanel p-4">
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Posted By</p>
+                      <p className="mt-2 font-semibold text-slate-900">{selectedLeadItem.item.ownerId?.name || "N/A"}</p>
+                      <p className="text-sm text-slate-600">{selectedLeadItem.item.ownerId?.email || "No email"}</p>
+                      <p className="text-sm text-slate-600">{selectedLeadItem.item.ownerId?.phone || "No phone"}</p>
+                    </div>
+                  </div>
+
+                  <div className="dashboard-subpanel p-4">
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Message</p>
+                    <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-600">
+                      {selectedLeadItem.item.contactInfo?.message || "No message shared."}
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {selectedLeadItem.type === "requirements" && (
+                <>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
+                      selectedLeadItem.item.status === "closed"
+                        ? "bg-green-100 text-green-700"
+                        : selectedLeadItem.item.status === "matched"
+                          ? "bg-sky-100 text-sky-700"
+                          : "bg-amber-100 text-amber-700"
+                    }`}>
+                      {selectedLeadItem.item.status}
+                    </span>
+                    <span className="text-xs text-slate-500">{formatAdminDate(selectedLeadItem.item.createdAt)}</span>
+                  </div>
+
+                  <div className="dashboard-subpanel p-4">
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Requirement</p>
+                    <p className="mt-2 text-lg font-bold text-slate-900">{formatCustomerRequestLabel(selectedLeadItem.item)}</p>
+                    <p className="mt-1 text-sm uppercase tracking-[0.12em] text-slate-400">
+                      {(selectedLeadItem.item.requestCategory || "property_buy").replaceAll("_", " ")}
+                    </p>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="dashboard-subpanel p-4">
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Customer</p>
+                      <p className="mt-2 font-semibold text-slate-900">{selectedLeadItem.item.customerName}</p>
+                      <p className="text-sm text-slate-600">{selectedLeadItem.item.contactDetails?.email || "No email"}</p>
+                      <p className="text-sm text-slate-600">{selectedLeadItem.item.contactDetails?.phone || "No phone"}</p>
+                    </div>
+                    <div className="dashboard-subpanel p-4">
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Budget / Location</p>
+                      <p className="mt-2 font-semibold text-slate-900">
+                        {selectedLeadItem.item.budgetMin || selectedLeadItem.item.budgetMax
+                          ? `Rs. ${selectedLeadItem.item.budgetMin || 0} - Rs. ${selectedLeadItem.item.budgetMax || 0}`
+                          : "Budget not shared"}
+                      </p>
+                      <p className="text-sm text-slate-600">
+                        {selectedLeadItem.item.location?.city || "-"}
+                        {selectedLeadItem.item.location?.area ? `, ${selectedLeadItem.item.location.area}` : ""}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="dashboard-subpanel p-4">
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Additional Requirements</p>
+                    <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-600">
+                      {selectedLeadItem.item.additionalRequirements || "No additional notes provided."}
+                    </p>
+                    <p className="mt-3 text-xs text-slate-500">{selectedLeadItem.item.matchedAgents?.length || 0} matched agents</p>
+                  </div>
+                </>
+              )}
+
+              {selectedLeadItem.type === "unlocks" && (
+                <>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
+                      selectedLeadItem.item.status === "paid"
+                        ? "bg-green-100 text-green-700"
+                        : selectedLeadItem.item.status === "failed"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-amber-100 text-amber-700"
+                    }`}>
+                      {selectedLeadItem.item.status}
+                    </span>
+                    <span className="text-xs text-slate-500">{formatAdminDate(selectedLeadItem.item.createdAt)}</span>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="dashboard-subpanel p-4">
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Agent</p>
+                      <p className="mt-2 font-semibold text-slate-900">{selectedLeadItem.item.agentId?.name || "N/A"}</p>
+                      <p className="text-sm text-slate-600">{selectedLeadItem.item.agentId?.email || "No email"}</p>
+                    </div>
+                    <div className="dashboard-subpanel p-4">
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Customer</p>
+                      <p className="mt-2 font-semibold text-slate-900">{selectedLeadItem.item.customerId?.name || "N/A"}</p>
+                      <p className="text-sm text-slate-600">{selectedLeadItem.item.customerId?.email || "No email"}</p>
+                    </div>
+                    <div className="dashboard-subpanel p-4">
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Payment</p>
+                      <p className="mt-2 font-semibold text-slate-900">Rs. {selectedLeadItem.item.amount}</p>
+                      <p className="text-sm text-slate-600">{selectedLeadItem.item.gateway || "gateway"}</p>
+                    </div>
+                  </div>
+
+                  <div className="dashboard-subpanel p-4">
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Linked Request</p>
+                    <p className="mt-2 text-sm text-slate-600">
+                      {selectedLeadItem.item.customerRequestId?.propertyType || "Property"} in {selectedLeadItem.item.customerRequestId?.location?.city || "-"}
+                      {selectedLeadItem.item.customerRequestId?.location?.area ? `, ${selectedLeadItem.item.customerRequestId.location.area}` : ""}
+                    </p>
+                    <p className="mt-2 text-sm text-slate-600">
+                      {selectedLeadItem.item.customerRequestId?.budgetMin || selectedLeadItem.item.customerRequestId?.budgetMax
+                        ? `Rs. ${selectedLeadItem.item.customerRequestId?.budgetMin || 0} - Rs. ${selectedLeadItem.item.customerRequestId?.budgetMax || 0}`
+                        : "Budget not shared"}
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-3 border-t border-slate-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs text-slate-500">Use this popup to review full details without leaving the admin queue.</p>
+              <div className="flex gap-2">
+                {selectedLeadItem.type === "inquiries" && selectedLeadItem.item.propertyId ? (
+                  <button
+                    onClick={() => {
+                      setSelectedLeadItem(null);
+                      openProperty(selectedLeadItem.item.propertyId);
+                    }}
+                    className="dashboard-secondary px-4 py-2 text-sm"
+                  >
+                    Open Property
+                  </button>
+                ) : null}
+                <button onClick={() => setSelectedLeadItem(null)} className="dashboard-primary px-4 py-2 text-sm">
+                  Close
                 </button>
               </div>
             </div>

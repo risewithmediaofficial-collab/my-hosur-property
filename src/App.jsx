@@ -43,6 +43,7 @@ const AppShell = () => {
   const lowMotionDevice = useLowMotionDevice();
   const isFullHeight = FULL_HEIGHT_PATHS.some((p) => location.pathname.startsWith(p));
   const isPrivatePath = PRIVATE_PATHS.some((p) => location.pathname.startsWith(p));
+  const isAdminDashboard = location.pathname.startsWith("/admin/dashboard");
 
   useEffect(() => {
     initEmailJs();
@@ -70,15 +71,15 @@ const AppShell = () => {
   }, [location.pathname]);
 
   const hideNavbar = ["/admin/login"].some((p) => location.pathname.startsWith(p));
-  const hideFooter = ["/auth", "/admin/login"].some((p) => location.pathname.startsWith(p));
+  const hideFooter = ["/auth", "/admin/login", "/admin/dashboard"].some((p) => location.pathname.startsWith(p));
 
   return (
     <MotionConfig reducedMotion={lowMotionDevice ? "always" : "never"}>
-      <div className="flex min-h-screen flex-col bg-transparent">
+      <div className={`flex min-h-screen flex-col bg-transparent ${isAdminDashboard ? "md:h-screen md:overflow-hidden" : ""}`}>
         <Toaster position="top-right" toastOptions={{ duration: 2500 }} />
         {isPrivatePath ? <PrivateRouteSeo title="Account" /> : null}
         {!hideNavbar && <Navbar />}
-        <main className={`flex-1 ${isFullHeight || hideNavbar ? "" : "pt-4 pb-12 md:pt-6"}`}>
+        <main className={`flex-1 ${isFullHeight || hideNavbar ? "" : "pt-4 pb-12 md:pt-6"} ${isAdminDashboard ? "md:min-h-0 md:overflow-hidden" : ""}`}>
           <Suspense fallback={<RouteFallback />}>
             <AnimatePresence mode="wait">
               <motion.div
@@ -87,6 +88,7 @@ const AppShell = () => {
                 initial={lowMotionDevice ? false : "initial"}
                 animate={lowMotionDevice ? false : "animate"}
                 exit={lowMotionDevice ? undefined : "exit"}
+                className={isAdminDashboard ? "h-full" : ""}
               >
                 <Routes location={location}>
                   <Route path="/" element={<HomePage />} />

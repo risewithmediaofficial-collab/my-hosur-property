@@ -1,7 +1,18 @@
-const DashboardSidebar = ({ title, subtitle, description, navItems = [], stats = [], children }) => {
+const DashboardSidebar = ({
+  title,
+  subtitle,
+  description,
+  navItems = [],
+  stats = [],
+  children,
+  rootClassName = "",
+  asideClassName = "",
+  mainClassName = "",
+  contentClassName = "",
+}) => {
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] flex-col bg-transparent md:flex-row">
-      <aside className="sticky top-20 z-10 hidden h-[calc(100vh-5rem)] w-[21rem] shrink-0 overflow-y-auto px-4 pb-6 pt-4 md:flex md:flex-col">
+    <div className={`flex min-h-[calc(100vh-4rem)] flex-col bg-transparent md:flex-row ${rootClassName}`}>
+      <aside className={`sticky top-20 z-10 hidden h-[calc(100vh-5rem)] w-[21rem] shrink-0 overflow-y-auto px-4 pb-6 pt-4 md:flex md:flex-col ${asideClassName}`}>
         <div className="dashboard-shell flex h-full flex-col gap-6 p-6">
           <div>
             <p className="dashboard-kicker">{subtitle}</p>
@@ -71,9 +82,9 @@ const DashboardSidebar = ({ title, subtitle, description, navItems = [], stats =
         </div>
       </div>
 
-      <main className="min-w-0 flex-1 overflow-visible md:min-h-0 md:overflow-auto">
-        <div className="mx-auto max-w-6xl px-4 py-6 md:px-6 md:py-8 xl:px-8">
-          <section className="space-y-6">{children}</section>
+      <main className={`min-w-0 flex-1 overflow-visible md:min-h-0 md:overflow-auto ${mainClassName}`}>
+        <div className="mx-auto h-full max-w-6xl px-4 py-6 md:px-6 md:py-8 xl:px-8">
+          <section className={`space-y-6 ${contentClassName}`}>{children}</section>
         </div>
       </main>
     </div>

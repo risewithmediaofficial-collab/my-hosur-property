@@ -111,6 +111,7 @@ h4,
   border: 1px solid var(--site-border);
   box-shadow: var(--site-shadow);
   backdrop-filter: blur(16px);
+  border-radius: 2rem;
 }
 
 .neo-inset,
@@ -120,6 +121,7 @@ h4,
 .site-button-secondary {
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid var(--site-border);
+  border-radius: 1.5rem;
 }
 
 .neo-btn {
