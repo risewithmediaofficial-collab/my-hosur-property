@@ -20,7 +20,7 @@ import SeoHead from "../components/SeoHead";
 import AnimatedHeading from "../components/AnimatedHeading";
 import useDebounce from "../hooks/useDebounce";
 import useScrollToTop from "../hooks/useScrollToTop";
-import realEstateBackground from "../assets/real estate background.png";
+import realEstateBackground from "../assets/real-estate-background-hero.jpg";
 import { fetchHomeProperties } from "../services/api/propertyApi";
 import { buildRealEstateAgentSchema, buildWebsiteSchema } from "../utils/seo";
 
