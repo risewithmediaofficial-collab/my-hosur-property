@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ArrowRightIcon,
   BuildingOffice2Icon,
+  CheckIcon,
   CheckBadgeIcon,
   ChevronDownIcon,
   MagnifyingGlassIcon,
@@ -16,8 +17,10 @@ import {
 import CountUpNumber from "../components/CountUpNumber";
 import PropertyCard from "../components/PropertyCard";
 import SeoHead from "../components/SeoHead";
+import AnimatedHeading from "../components/AnimatedHeading";
 import useDebounce from "../hooks/useDebounce";
 import useScrollToTop from "../hooks/useScrollToTop";
+import realEstateBackground from "../assets/real estate background.png";
 import { fetchHomeProperties } from "../services/api/propertyApi";
 import { buildRealEstateAgentSchema, buildWebsiteSchema } from "../utils/seo";
 
@@ -101,11 +104,44 @@ const gradientText = {
   }),
 };
 
+// Character-level animation for headings (Refit style)
+const charContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.02,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const charVariant = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
 const quickActions = [
   { label: "Buy Property", to: "/listings?intent=buy" },
   { label: "Rent Property", to: "/listings?intent=rent" },
   { label: "Commercial", to: "/listings?intent=buy&propertyType=Commercial" },
   { label: "Plots & Land", to: "/listings?intent=buy&propertyType=Plot" },
+];
+
+const propertyTypeOptions = [
+  { label: "All types", value: "" },
+  { label: "Apartment", value: "Apartment" },
+  { label: "Villa", value: "Villa" },
+  { label: "Independent House", value: "Independent House" },
+  { label: "Plot", value: "Plot" },
+  { label: "Commercial", value: "Commercial" },
 ];
 
 const shortcutGroups = [
@@ -190,10 +226,13 @@ const HomePage = () => {
   const [featured, setFeatured] = useState([]);
   const [featuredLoading, setFeaturedLoading] = useState(true);
   const [openShortcutMenu, setOpenShortcutMenu] = useState("");
+  const [propertyTypeMenuOpen, setPropertyTypeMenuOpen] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const heroRef = useRef(null);
   const statsRef = useRef(null);
   const servicesRef = useRef(null);
+  const shortcutBarRef = useRef(null);
+  const propertyTypeMenuRef = useRef(null);
   
   const [search, setSearch] = useState({
     intent: "buy",
@@ -256,6 +295,33 @@ const HomePage = () => {
       .finally(() => setFeaturedLoading(false));
   }, []);
 
+  useEffect(() => {
+    const handlePointerDown = (event) => {
+      if (shortcutBarRef.current && !shortcutBarRef.current.contains(event.target)) {
+        setOpenShortcutMenu("");
+      }
+
+      if (propertyTypeMenuRef.current && !propertyTypeMenuRef.current.contains(event.target)) {
+        setPropertyTypeMenuOpen(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setOpenShortcutMenu("");
+        setPropertyTypeMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
     if (search.intent) params.set("intent", search.intent);
@@ -266,9 +332,11 @@ const HomePage = () => {
   }, [debouncedSearch, search.city, search.intent, search.propertyType]);
 
   const featuredListings = featured.slice(0, 4);
+  const selectedPropertyTypeLabel =
+    propertyTypeOptions.find((option) => option.value === search.propertyType)?.label || "All types";
 
   return (
-    <main className="w-full space-y-6 bg-white px-4 py-6 sm:px-5 md:space-y-8 md:py-8 lg:px-6">
+    <main className="w-full space-y-6 bg-transparent px-4 py-6 sm:px-5 md:space-y-8 md:py-8 lg:px-6">
       <SeoHead
         title="Verified Property Listings in Hosur"
         description="Explore verified property listings, real-estate services, and professional local property support through My Hosur Property."
@@ -281,38 +349,39 @@ const HomePage = () => {
         initial="hidden"
         animate="show"
         variants={reveal}
-        className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-[0_10px_24px_rgba(17,17,17,0.04)] sm:p-5"
+        className="relative z-30 rounded-[2rem] border border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.86),rgba(234,247,245,0.94))] p-4 shadow-[0_16px_34px_rgba(16,95,104,0.08)] backdrop-blur-xl sm:p-5"
       >
         <div className="flex flex-col gap-4">
-          <div className="flex flex-wrap gap-2">
+          <div ref={shortcutBarRef} className="relative z-40 flex flex-wrap gap-2">
             {shortcutGroups.map((group) => (
               <div
                 key={group.label}
-                className="relative"
+                className={`relative ${openShortcutMenu === group.label ? "z-50" : "z-10"}`}
                 onMouseEnter={() => setOpenShortcutMenu(group.label)}
                 onMouseLeave={() => setOpenShortcutMenu("")}
               >
                 <button
                   type="button"
                   onClick={() => setOpenShortcutMenu((current) => (current === group.label ? "" : group.label))}
-                  className={`inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition ${
+                  className={`inline-flex min-h-[48px] items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold shadow-[0_10px_24px_rgba(16,95,104,0.08)] backdrop-blur-sm transition ${
                     openShortcutMenu === group.label
-                      ? "border-slate-300 bg-white text-slate-900"
-                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+                      ? "border-slate-900 bg-[rgba(255,255,255,0.97)] text-slate-900"
+                      : "border-slate-200 bg-[rgba(255,255,255,0.93)] text-slate-700 hover:border-slate-300 hover:bg-[rgba(255,255,255,0.98)] hover:text-slate-900"
                   }`}
                 >
                   <span>{group.label}</span>
-                  <ChevronDownIcon className={`h-4 w-4 text-slate-400 transition ${openShortcutMenu === group.label ? "rotate-180" : ""}`} />
+                  <ChevronDownIcon className={`h-4 w-4 text-slate-400 transition ${openShortcutMenu === group.label ? "rotate-180 text-slate-700" : ""}`} />
                 </button>
 
                 {openShortcutMenu === group.label ? (
-                  <div className="absolute left-0 top-full z-30 min-w-[220px] pt-3">
-                    <div className="rounded-[1.4rem] border border-slate-200 bg-white p-2 shadow-[0_18px_40px_rgba(17,17,17,0.08)]">
+                  <div className="absolute left-0 top-full z-50 min-w-[240px] pt-3">
+                    <div className="rounded-[1.4rem] border border-white/85 bg-[rgba(255,255,255,0.99)] p-2 shadow-[0_24px_50px_rgba(16,95,104,0.2)] backdrop-blur-xl">
                       {group.items.map((item) => (
                         <Link
                           key={`${group.label}-${item.label}`}
                           to={item.to}
-                          className="block rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+                          className="block rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-[rgba(222,241,239,0.8)] hover:text-slate-900"
+                          onClick={() => setOpenShortcutMenu("")}
                         >
                           {item.label}
                         </Link>
@@ -360,24 +429,41 @@ const HomePage = () => {
         initial="hidden"
         animate="show"
         variants={reveal}
-        className="rounded-[2rem] border border-slate-200 bg-white px-6 py-8 shadow-[0_12px_30px_rgba(17,17,17,0.04)] sm:px-8 lg:px-10 lg:py-12"
+        className="relative isolate overflow-hidden rounded-[2rem] border border-slate-200 px-6 py-8 shadow-[0_22px_46px_rgba(16,95,104,0.16)] sm:px-8 lg:px-10 lg:py-12"
+        style={{
+          backgroundImage: `url(${realEstateBackground})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center center",
+        }}
       >
-        <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
-          <div className="max-w-3xl">
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(248,252,252,0.9)_0%,rgba(248,252,252,0.76)_36%,rgba(248,252,252,0.3)_62%,rgba(15,69,77,0.14)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(15,69,77,0.06)_100%)]" />
+
+        <div className="relative z-10 flex min-h-[540px] flex-col justify-between gap-10 lg:min-h-[620px]">
+          <div className="max-w-3xl pt-2 lg:max-w-[52rem] lg:pt-6">
             <motion.div variants={reveal} custom={0.05} className="site-kicker">
               <CheckBadgeIcon className="h-4 w-4" />
               Trusted property platform
             </motion.div>
-            <motion.h1 variants={reveal} custom={0.1} className="mt-5 max-w-4xl text-4xl font-semibold leading-[1.03] tracking-[-0.04em] text-slate-900 sm:text-5xl lg:text-6xl">
-              Buy, sell, rent, and manage property with a cleaner real-estate experience.
-            </motion.h1>
+            <motion.div variants={reveal} custom={0.1}>
+              <AnimatedHeading
+                as="h1"
+                text="Buy, sell, rent, and manage property with a cleaner real-estate experience."
+                className="mt-5 max-w-4xl text-4xl font-semibold leading-[1.03] sm:text-5xl lg:text-6xl"
+              />
+            </motion.div>
             <motion.p variants={reveal} custom={0.15} className="mt-5 max-w-2xl text-base leading-8 text-slate-600">
               My Hosur Property brings verified listings, local guidance, and complete property support into one professional platform built for Hosur.
             </motion.p>
 
-            <motion.div variants={reveal} custom={0.2} className="mt-7 rounded-[1.75rem] border border-slate-200 bg-slate-50 p-3">
+            <motion.div
+              ref={propertyTypeMenuRef}
+              variants={reveal}
+              custom={0.2}
+              className="relative z-40 mt-7 rounded-[1.75rem] border border-white/55 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(234,247,245,0.74))] p-3 shadow-[0_18px_36px_rgba(16,95,104,0.14)] backdrop-blur-md"
+            >
               <div className="grid gap-3 lg:grid-cols-[1.1fr_0.7fr_0.6fr_auto]">
-                <div className="flex items-center gap-3 rounded-[1.1rem] border border-slate-200 bg-white px-4 py-3">
+                <div className="flex items-center gap-3 rounded-[1.1rem] border border-white/70 bg-white/90 px-4 py-3 backdrop-blur-sm">
                   <MagnifyingGlassIcon className="h-5 w-5 text-slate-400" />
                   <input
                     value={search.search}
@@ -394,18 +480,46 @@ const HomePage = () => {
                   className="site-input rounded-[1.1rem] bg-white text-sm"
                 />
 
-                <select
-                  value={search.propertyType}
-                  onChange={(event) => setSearch((prev) => ({ ...prev, propertyType: event.target.value }))}
-                  className="site-input rounded-[1.1rem] bg-white text-sm"
-                >
-                  <option value="">All types</option>
-                  <option value="Apartment">Apartment</option>
-                  <option value="Villa">Villa</option>
-                  <option value="Independent House">Independent House</option>
-                  <option value="Plot">Plot</option>
-                  <option value="Commercial">Commercial</option>
-                </select>
+                <div className="relative z-40">
+                  <button
+                    type="button"
+                    onClick={() => setPropertyTypeMenuOpen((current) => !current)}
+                    className={`flex min-h-[56px] w-full items-center justify-between rounded-[1.1rem] border px-4 py-3 text-left text-sm font-semibold shadow-[0_10px_24px_rgba(16,95,104,0.08)] transition ${
+                      propertyTypeMenuOpen
+                        ? "border-slate-900 bg-[rgba(255,255,255,0.98)] text-slate-900"
+                        : "border-white/70 bg-white/92 text-slate-700 hover:border-slate-300 hover:bg-white"
+                    }`}
+                  >
+                    <span>{selectedPropertyTypeLabel}</span>
+                    <ChevronDownIcon className={`h-4 w-4 text-slate-500 transition ${propertyTypeMenuOpen ? "rotate-180 text-slate-700" : ""}`} />
+                  </button>
+
+                  {propertyTypeMenuOpen ? (
+                    <div className="absolute left-0 right-0 top-full z-50 mt-3 max-h-[260px] overflow-y-auto rounded-[1.3rem] border border-white/85 bg-[rgba(255,255,255,0.99)] p-2 shadow-[0_24px_50px_rgba(16,95,104,0.2)] backdrop-blur-xl">
+                      {propertyTypeOptions.map((option) => {
+                        const isSelected = option.value === search.propertyType;
+                        return (
+                          <button
+                            key={option.label}
+                            type="button"
+                            onClick={() => {
+                              setSearch((prev) => ({ ...prev, propertyType: option.value }));
+                              setPropertyTypeMenuOpen(false);
+                            }}
+                            className={`flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${
+                              isSelected
+                                ? "bg-[rgba(222,241,239,0.82)] text-slate-900"
+                                : "text-slate-600 hover:bg-[rgba(222,241,239,0.72)] hover:text-slate-900"
+                            }`}
+                          >
+                            <span>{option.label}</span>
+                            {isSelected ? <CheckIcon className="h-4 w-4 text-slate-700" /> : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </div>
 
                 <button
                   type="button"
@@ -425,7 +539,7 @@ const HomePage = () => {
                 <Link
                   key={item.label}
                   to={item.to}
-                  className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:-translate-y-[6px] hover:border-slate-900 hover:bg-slate-50 hover:text-slate-900"
+                  className="rounded-full border border-white/65 bg-white/82 px-4 py-2 text-sm font-semibold text-slate-700 shadow-[0_10px_24px_rgba(16,95,104,0.1)] backdrop-blur-sm transition hover:-translate-y-[6px] hover:border-slate-900 hover:bg-slate-50 hover:text-slate-900"
                 >
                   {item.label}
                 </Link>
@@ -433,27 +547,18 @@ const HomePage = () => {
             </motion.div>
           </div>
 
-          <motion.div variants={reveal} custom={0.2} className="grid gap-4">
-            <div className="overflow-hidden rounded-[1.8rem] border border-slate-200 bg-white">
-              <img
-                src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=80"
-                alt="Modern residential property in Hosur"
-                className="h-[320px] w-full object-cover"
-                loading="eager"
-                fetchPriority="high"
-                decoding="async"
-              />
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {homeStats.map((item) => (
-                <div key={item.label} className="rounded-[1.4rem] border border-slate-200 bg-white p-4">
-                  <p className="text-3xl font-semibold text-slate-900">
-                    <CountUpNumber value={item.value} suffix={item.suffix} />
-                  </p>
-                  <p className="mt-2 text-sm text-slate-500">{item.label}</p>
-                </div>
-              ))}
-            </div>
+          <motion.div variants={reveal} custom={0.3} className="relative z-10 grid gap-3 sm:grid-cols-3 lg:max-w-[52rem]">
+            {homeStats.map((item) => (
+              <div
+                key={item.label}
+                className="rounded-[1.45rem] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(234,247,245,0.68))] p-4 shadow-[0_18px_30px_rgba(16,95,104,0.1)] backdrop-blur-md"
+              >
+                <p className="text-3xl font-semibold text-slate-900">
+                  <CountUpNumber value={item.value} suffix={item.suffix} />
+                </p>
+                <p className="mt-2 text-sm text-slate-500">{item.label}</p>
+              </div>
+            ))}
           </motion.div>
         </div>
       </MotionSection>
@@ -472,9 +577,9 @@ const HomePage = () => {
               key={item.title}
               variants={reveal}
               custom={index * 0.05}
-              className="rounded-[1.7rem] border border-slate-200 bg-white p-6 transition duration-300 hover:-translate-y-[6px] hover:border-slate-900 hover:shadow-[0_16px_30px_rgba(17,17,17,0.06)]"
+              className="rounded-[1.7rem] border border-slate-200 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(234,247,245,0.82))] p-6 transition duration-300 hover:-translate-y-[6px] hover:border-slate-900 hover:shadow-[0_18px_34px_rgba(16,95,104,0.12)]"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-900">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-[linear-gradient(145deg,rgba(200,230,226,0.92),rgba(99,193,187,0.22))] text-slate-900">
                 <Icon className="h-5 w-5" />
               </div>
               <h2 className="mt-5 text-2xl font-semibold tracking-tight text-slate-900">{item.title}</h2>
@@ -493,7 +598,7 @@ const HomePage = () => {
         whileInView="show"
         viewport={{ once: true, amount: 0.18 }}
         variants={reveal}
-        className="rounded-[2rem] border border-slate-200 bg-slate-50 px-5 py-6 sm:px-6 lg:px-8"
+        className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(135deg,rgba(234,247,245,0.9),rgba(255,255,255,0.85))] px-5 py-6 sm:px-6 lg:px-8"
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -531,7 +636,7 @@ const HomePage = () => {
         whileInView="show"
         viewport={{ once: true, amount: 0.2 }}
         variants={reveal}
-        className="rounded-[2rem] border border-slate-200 bg-white px-6 py-8 shadow-[0_12px_30px_rgba(17,17,17,0.04)] sm:px-8"
+        className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(234,247,245,0.86))] px-6 py-8 shadow-[0_18px_38px_rgba(16,95,104,0.1)] sm:px-8"
       >
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>

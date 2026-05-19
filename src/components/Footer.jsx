@@ -28,13 +28,13 @@ const scrollToTop = () => {
 };
 
 const Footer = () => (
-  <footer className="mt-12 bg-white text-slate-600">
+  <footer className="mt-12 bg-transparent text-slate-600">
     <div className="px-4 pb-10 pt-4 sm:px-5 lg:px-6 lg:pb-12">
-      <div className="mx-auto w-full max-w-[1440px] rounded-[28px] border border-slate-200 bg-white px-6 py-10 shadow-[0_12px_28px_rgba(17,17,17,0.04)] sm:px-8">
+      <div className="mx-auto w-full max-w-[1440px] rounded-[28px] border border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(234,247,245,0.9))] px-6 py-10 shadow-[0_18px_40px_rgba(16,95,104,0.1)] backdrop-blur-xl sm:px-8">
         <div className="grid gap-8 md:grid-cols-[1.15fr_0.8fr_0.9fr_1fr]">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-900">
+              <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-[linear-gradient(145deg,rgba(200,230,226,0.95),rgba(99,193,187,0.24))] text-slate-900 shadow-[0_10px_20px_rgba(16,95,104,0.1)]">
                 <BuildingOffice2Icon className="h-5 w-5" />
               </div>
               <div>

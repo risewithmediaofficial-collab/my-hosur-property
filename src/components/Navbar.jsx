@@ -114,9 +114,9 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white">
+    <header className="sticky top-0 z-50 bg-[linear-gradient(180deg,rgba(243,251,250,0.96),rgba(243,251,250,0.68))] backdrop-blur-xl">
       <div className="px-4 py-3 sm:px-5 lg:px-6">
-        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3 rounded-[24px] border border-slate-200 bg-white px-4 py-3 shadow-[0_8px_22px_rgba(17,17,17,0.04)] sm:px-5">
+        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3 rounded-[24px] border border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(234,247,245,0.88))] px-4 py-3 shadow-[0_18px_38px_rgba(16,95,104,0.1)] backdrop-blur-xl sm:px-5">
           <NavLink
             to="/"
             onClick={() => {
@@ -125,7 +125,7 @@ const Navbar = () => {
             }}
             className="inline-flex min-w-0 items-center gap-3 text-slate-900"
           >
-            <div className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-900">
+            <div className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-[linear-gradient(145deg,rgba(200,230,226,0.95),rgba(99,193,187,0.24))] text-slate-900 shadow-[0_10px_20px_rgba(16,95,104,0.1)]">
               <BuildingOffice2Icon className="h-5 w-5" />
             </div>
             <div className="min-w-0">
@@ -183,7 +183,7 @@ const Navbar = () => {
 
           <button
             type="button"
-            className="inline-flex rounded-2xl border border-slate-200 bg-white p-2.5 text-slate-700 transition hover:bg-slate-50 lg:hidden"
+            className="inline-flex rounded-2xl border border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(234,247,245,0.78))] p-2.5 text-slate-700 transition hover:bg-slate-50 lg:hidden"
             onClick={() => setMobileMenuOpen((value) => !value)}
           >
             {mobileMenuOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
@@ -193,7 +193,7 @@ const Navbar = () => {
 
       {mobileMenuOpen ? (
         <div className="px-4 pb-3 sm:px-5 lg:hidden">
-          <div className="mx-auto max-h-[calc(100dvh-4.75rem)] max-w-[1440px] overflow-y-auto rounded-[24px] border border-slate-200 bg-white px-4 py-4 shadow-[0_14px_30px_rgba(17,17,17,0.05)] sm:px-5">
+          <div className="mx-auto max-h-[calc(100dvh-4.75rem)] max-w-[1440px] overflow-y-auto rounded-[24px] border border-slate-200 bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(234,247,245,0.9))] px-4 py-4 shadow-[0_20px_42px_rgba(16,95,104,0.12)] backdrop-blur-xl sm:px-5">
             <div className="flex flex-col gap-3">
               <nav className="flex flex-col gap-2">
                 {navLinks.map(renderMobileLink)}
