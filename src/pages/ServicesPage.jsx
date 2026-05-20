@@ -23,6 +23,14 @@ import CountUpNumber from "../components/CountUpNumber";
 import SeoHead from "../components/SeoHead";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
 
+// Import service images
+import buySellImg from "../assets/property buy guideance.jpg";
+import loanImg from "../assets/Home loan.jpg";
+import registrationImg from "../assets/Sale deed registration.jpg";
+import searchImg from "../assets/plot search.jpg";
+import interiorImg from "../assets/interiros.jpg";
+import contractorImg from "../assets/contarcts works.jpg";
+
 const MotionSection = motion.section;
 
 const reveal = {
@@ -33,6 +41,105 @@ const reveal = {
     transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay },
   }),
 };
+
+const fadeInFromLeft = {
+  hidden: { opacity: 0, x: -40 },
+  show: (delay = 0) => ({
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay },
+  }),
+};
+
+const fadeInFromRight = {
+  hidden: { opacity: 0, x: 40 },
+  show: (delay = 0) => ({
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay },
+  }),
+};
+
+const serviceHighlights = [
+  {
+    id: 1,
+    title: "Buy, Sell & Rent Properties",
+    description: "Whether you're looking to buy your dream property, sell an existing one, or rent space for your needs, we provide complete guidance through every step of the process. Our experienced team handles all legal documentation and ensures smooth transactions.",
+    image: buySellImg,
+    highlights: [
+      "Expert legal support",
+      "Safe & transparent deals",
+      "Complete guidance",
+      "Fast processing"
+    ],
+    imagePosition: "right"
+  },
+  {
+    id: 2,
+    title: "Loan & Finance Solutions",
+    description: "Access competitive home loans, plot loans, commercial loans, and balance transfers with our trusted finance partners. We simplify the application process and help you secure the best rates and terms for your property investment.",
+    image: loanImg,
+    highlights: [
+      "Competitive rates",
+      "Easy documentation",
+      "Fast approval",
+      "Multiple loan options"
+    ],
+    imagePosition: "left"
+  },
+  {
+    id: 3,
+    title: "Registration & Legal Services",
+    description: "Complete documentation, sale deed registration, patta transfers, and land surveys—all handled by our expert team. We ensure all your property transactions are legally compliant and registered correctly.",
+    image: registrationImg,
+    highlights: [
+      "Legal compliance",
+      "Error-free registration",
+      "Fast processing",
+      "Complete documentation"
+    ],
+    imagePosition: "right"
+  },
+  {
+    id: 4,
+    title: "Find Your Perfect Property",
+    description: "Looking for a specific property? Our advanced search tools and local expertise help you find plots, commercial properties, and agricultural land that match your requirements and budget perfectly.",
+    image: searchImg,
+    highlights: [
+      "Verified properties",
+      "Best deals",
+      "Local expertise",
+      "Personalized search"
+    ],
+    imagePosition: "left"
+  },
+  {
+    id: 5,
+    title: "Interior & Construction Services",
+    description: "Transform your vision into reality with our professional interior design and construction services. From residential homes to commercial offices, we deliver quality results on time and within budget.",
+    image: interiorImg,
+    highlights: [
+      "Professional team",
+      "Quality materials",
+      "On-time delivery",
+      "Budget-friendly"
+    ],
+    imagePosition: "right"
+  },
+  {
+    id: 6,
+    title: "Skilled Contractor Services",
+    description: "Access our network of skilled contractors for electrical work, plumbing, masonry, and general maintenance. Quality workmanship, reliable service, and fair pricing for all your maintenance needs.",
+    image: contractorImg,
+    highlights: [
+      "Certified workers",
+      "Quality assured",
+      "Fair pricing",
+      "Quick response"
+    ],
+    imagePosition: "left"
+  }
+];
 
 const serviceCategories = [
   {
@@ -246,6 +353,111 @@ const ServicesPage = () => {
           })}
         </div>
       </MotionSection>
+
+      {/* Zigzag Service Highlights with Images */}
+      <div className="space-y-8 md:space-y-12">
+        <div className="text-center">
+          <motion.p
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={reveal}
+            custom={0.05}
+            className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500"
+          >
+            Our Core Expertise
+          </motion.p>
+          <motion.h2
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={reveal}
+            custom={0.1}
+            className="mt-3 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl"
+          >
+            Comprehensive Services with Professional Excellence
+          </motion.h2>
+        </div>
+
+        {serviceHighlights.map((service) => {
+          const isImageRight = service.imagePosition === "right";
+          return (
+            <motion.div
+              key={service.id}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.3 }}
+              variants={reveal}
+              className="rounded-[2rem] border border-slate-200 bg-white shadow-[0_12px_30px_rgba(17,17,17,0.04)] overflow-hidden"
+            >
+              <div className="grid gap-0 lg:grid-cols-2 lg:items-center">
+                {/* Content Section */}
+                <motion.div
+                  variants={isImageRight ? fadeInFromLeft : fadeInFromRight}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true, amount: 0.3 }}
+                  custom={0.1}
+                  className={`p-6 sm:p-8 lg:p-10 ${!isImageRight ? "lg:order-2" : ""}`}
+                >
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
+                      Service #{service.id}
+                    </p>
+                    <h3 className="mt-3 text-2xl font-semibold leading-tight tracking-tight text-slate-900 sm:text-3xl">
+                      {service.title}
+                    </h3>
+                    <p className="mt-4 max-w-xl text-base leading-8 text-slate-600">
+                      {service.description}
+                    </p>
+                  </div>
+
+                  {/* Highlights with checkmarks */}
+                  <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                    {service.highlights.map((highlight, idx) => (
+                      <div key={idx} className="flex items-start gap-3">
+                        <div className="mt-1 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-slate-900 text-white">
+                          <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <span className="text-sm font-medium text-slate-700">{highlight}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* CTA Button */}
+                  <div className="mt-8">
+                    <Link
+                      to="/contact"
+                      className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-black"
+                    >
+                      Learn More
+                      <SparklesIcon className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </motion.div>
+
+                {/* Image Section */}
+                <motion.div
+                  variants={isImageRight ? fadeInFromRight : fadeInFromLeft}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true, amount: 0.3 }}
+                  custom={0.1}
+                  className={`relative h-72 overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 sm:h-96 lg:h-full ${!isImageRight ? "lg:order-1" : ""}`}
+                >
+                  <img
+                    src={service.image}
+                    alt={service.title}
+                    className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+                  />
+                </motion.div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
 
       <MotionSection
         initial="hidden"
