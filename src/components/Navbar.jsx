@@ -18,10 +18,16 @@ import {
 import { Squares2X2Icon as Squares2X2SolidIcon } from "@heroicons/react/24/solid";
 
 const navIconMap = {
-  "Our Services": BriefcaseIcon,
-  "About Us": InformationCircleIcon,
+  Buy: HomeIcon,
+  Rent: HomeIcon,
+  Plots: BriefcaseIcon,
+  Villas: BriefcaseIcon,
+  Apartments: BuildingOffice2Icon,
+  Commercial: BriefcaseIcon,
+  Agents: Squares2X2Icon,
+  About: InformationCircleIcon,
   Contact: PhoneIcon,
-  "List My Property": PlusCircleIcon,
+  "Post Property": PlusCircleIcon,
 };
 
 const Navbar = () => {
@@ -129,7 +135,7 @@ const Navbar = () => {
               <BuildingOffice2Icon className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <p className="truncate text-lg font-extrabold tracking-tight text-slate-900">MyHosurProperty</p>
+              <p className="truncate text-lg font-extrabold tracking-tight text-slate-900">My Hosur Property</p>
               <p className="truncate text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-500">Real Estate</p>
             </div>
           </NavLink>
@@ -171,7 +177,7 @@ const Navbar = () => {
               </button>
             ) : (
               <NavLink
-                to="/auth"
+                to="/login"
                 onClick={scrollToTop}
                 className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-1.5 hover:bg-black"
               >
@@ -233,7 +239,7 @@ const Navbar = () => {
                   </button>
                 ) : (
                   <NavLink
-                    to="/auth"
+                    to="/login"
                     onClick={() => {
                       scrollToTop();
                       closeMenu();

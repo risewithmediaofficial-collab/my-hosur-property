@@ -8,7 +8,7 @@ import CustomerDashboardPage from "./CustomerDashboardPage";
 const DashboardRouterPage = () => {
   const { user } = useAuth();
 
-  if (!user) return <Navigate to="/auth" replace />;
+  if (!user) return <Navigate to="/login" replace />;
   if (["agent", "broker", "seller", "builder"].includes(user.role)) return <AgentDashboardPage />;
   if (user.role === "admin") return <AdminDashboardPage />;
   if (user.role === "customer") return <CustomerDashboardPage />;

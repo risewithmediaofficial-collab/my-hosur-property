@@ -79,7 +79,7 @@ const AboutPage = () => {
               MyHosurProperty connects buyers, sellers, agents, builders, and service teams through a cleaner real-estate experience focused on verified listings, guided transactions, and trustworthy local support.
             </motion.p>
             <motion.div variants={reveal} custom={0.2} className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link to="/listings" className="site-button-primary rounded-2xl px-6 py-3.5 text-sm">
+              <Link to="/buy" className="site-button-primary rounded-2xl px-6 py-3.5 text-sm">
                 Browse Listings
               </Link>
               <Link to="/contact" className="site-button-secondary rounded-2xl px-6 py-3.5 text-sm">

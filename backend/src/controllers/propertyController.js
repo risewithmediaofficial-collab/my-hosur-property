@@ -9,6 +9,7 @@ const {
   adminPropertyNotificationEmail,
 } = require("../utils/emailTemplates");
 const { normalizeUploadList } = require("../utils/uploadPaths");
+const { buildPropertySlug } = require("../utils/seo");
 
 const PROPERTY_TYPES = [
   "Apartment",
@@ -85,6 +86,36 @@ const buildQuery = (q) => {
   }
 
   return query;
+};
+
+const buildPropertyDetailPayload = async (property) => {
+  const similar = await Property.find({
+    _id: { $ne: property._id },
+    status: "approved",
+    propertyType: property.propertyType,
+    "location.city": property.location.city,
+  })
+    .populate("ownerId", "name email phone role")
+    .sort("-createdAt")
+    .limit(4);
+
+  const localityInsights = property.localityInsights || {
+    rating: 4.1,
+    connectivity: 4.0,
+    safety: 3.9,
+    livability: 4.2,
+    notes: "Balanced locality with schools, transit, and daily services.",
+  };
+
+  return { property, similar, localityInsights, accessRestricted: false };
+};
+
+const findPropertyBySlug = async (slug) => {
+  const properties = await Property.find({ status: "approved" })
+    .populate("ownerId", "name email phone role")
+    .sort({ updatedAt: -1 });
+
+  return properties.find((property) => buildPropertySlug(property) === slug) || null;
 };
 
 const calculateRankScore = (item, user, query) => {
@@ -191,28 +222,28 @@ const getPropertyById = async (req, res) => {
     
     await Property.findByIdAndUpdate(req.params.id, { $inc: { viewCount: 1 } });
 
-    const similar = await Property.find({
-      _id: { $ne: property._id },
-      status: "approved",
-      propertyType: property.propertyType,
-      "location.city": property.location.city,
-    })
-      .sort("-createdAt")
-      .limit(4);
-
-    const localityInsights = property.localityInsights || {
-      rating: 4.1,
-      connectivity: 4.0,
-      safety: 3.9,
-      livability: 4.2,
-      notes: "Balanced locality with schools, transit, and daily services.",
-    };
-
-    const responseData = { property, similar, localityInsights, accessRestricted: false };
+    const responseData = await buildPropertyDetailPayload(property);
     console.log("Sending response:", responseData);
     return res.json(responseData);
   } catch (error) {
     console.error("Error in getPropertyById:", error);
+    return res.status(500).json({ message: "Error fetching property", error: error.message });
+  }
+};
+
+const getPropertyBySlug = async (req, res) => {
+  try {
+    const property = await findPropertyBySlug(req.params.slug);
+
+    if (!property) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+
+    await Property.findByIdAndUpdate(property._id, { $inc: { viewCount: 1 } });
+    const responseData = await buildPropertyDetailPayload(property);
+    return res.json(responseData);
+  } catch (error) {
+    console.error("Error in getPropertyBySlug:", error);
     return res.status(500).json({ message: "Error fetching property", error: error.message });
   }
 };
@@ -471,7 +502,8 @@ const uploadAssets = async (req, res) => {
 
 const seoListings = async (_req, res) => {
   const items = await Property.find({ status: "approved" })
-    .select("title propertyType bhk listingType location featuredUntil createdAt updatedAt")
+    .select("title propertyType bhk listingType location featuredUntil createdAt updatedAt ownerId")
+    .populate("ownerId", "name email phone role")
     .sort({ updatedAt: -1 })
     .lean();
 
@@ -482,6 +514,7 @@ module.exports = {
   propertyValidators,
   listProperties,
   getPropertyById,
+  getPropertyBySlug,
   createProperty,
   updateProperty,
   deleteProperty,

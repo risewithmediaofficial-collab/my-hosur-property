@@ -1,6 +1,8 @@
+const seoRoutes = require("../../../shared/seoRoutes.json");
+
 const trimTrailingSlash = (value = "") => String(value).replace(/\/+$/, "");
 
-const getPublicSiteUrl = () => trimTrailingSlash(process.env.CLIENT_URL || "http://localhost:5173");
+const getPublicSiteUrl = () => trimTrailingSlash(process.env.CLIENT_URL || "https://myhosurproperty.com");
 
 const slugify = (text = "") =>
   String(text)
@@ -11,18 +13,23 @@ const slugify = (text = "") =>
 
 const buildPropertySlug = (property = {}) => {
   const parts = [
+    property.title || "",
     property.bhk ? `${property.bhk} bhk` : "",
     property.propertyType || "",
-    property.listingType === "rent" ? "for rent" : property.listingType === "new-project" ? "new project" : "for sale",
     property.location?.area || "",
-    property.location?.city || "",
-    property.title || "",
+    property.location?.city || "Hosur",
   ].filter(Boolean);
 
   return slugify(parts.join(" "));
 };
 
-const getPropertyPath = (property = {}) => `/property/${property._id}/${buildPropertySlug(property)}`;
+const buildAgentSlug = (agent = {}) => slugify(agent.slug || agent.name || agent.email?.split("@")[0] || "agent");
+
+const getPropertyPath = (property = {}) => `/property/${buildPropertySlug(property)}`;
+
+const getAgentPath = (agent = {}) => `/agent/${buildAgentSlug(agent)}`;
+
+const getStaticSeoRoutes = () => seoRoutes.filter((route) => route.sitemap);
 
 const xmlEscape = (value = "") =>
   String(value)
@@ -35,6 +42,9 @@ const xmlEscape = (value = "") =>
 module.exports = {
   getPublicSiteUrl,
   buildPropertySlug,
+  buildAgentSlug,
   getPropertyPath,
+  getAgentPath,
+  getStaticSeoRoutes,
   xmlEscape,
 };

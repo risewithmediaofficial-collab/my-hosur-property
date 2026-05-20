@@ -6,6 +6,8 @@ const ctrl = require("../controllers/userController");
 
 const router = express.Router();
 
+router.get("/agents", ctrl.listPublicAgents);
+router.get("/agents/:slug", ctrl.getAgentBySlug);
 router.get("/saved", auth, ctrl.getSavedProperties);
 router.post("/saved/toggle", auth, [body("propertyId").isMongoId()], validate, ctrl.toggleSavedProperty);
 

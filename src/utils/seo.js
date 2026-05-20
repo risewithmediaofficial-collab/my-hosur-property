@@ -1,9 +1,10 @@
 import { slugify } from "./format";
+import { getCategoryPathForProperty } from "./seoRoutes";
 
-export const SITE_NAME = "MyHosurProperty";
-export const SITE_TITLE_SUFFIX = "MyHosurProperty";
+export const SITE_NAME = "My Hosur Property";
+export const SITE_TITLE_SUFFIX = "My Hosur Property";
 export const SITE_DESCRIPTION =
-  "MyHosurProperty helps buyers, sellers, owners, brokers, and builders discover verified property listings in Hosur with cleaner search, stronger lead flow, and a more trustworthy real estate experience.";
+  "My Hosur Property helps buyers, sellers, owners, brokers, and builders discover verified property listings in Hosur with cleaner search, stronger lead flow, and a more trustworthy real estate experience.";
 export const SITE_KEYWORDS = [
   "Hosur property",
   "property in Hosur",
@@ -11,12 +12,12 @@ export const SITE_KEYWORDS = [
   "apartments in Hosur",
   "villas in Hosur",
   "plots in Hosur",
-  "houses for sale in Hosur",
-  "property listings Hosur",
-  "rent house Hosur",
-  "MyHosurProperty",
+  "commercial property Hosur",
+  "property agents Hosur",
+  "houses for sale Hosur",
+  "My Hosur Property",
 ].join(", ");
-export const DEFAULT_SITE_URL = "https://my-hosur-property.onrender.com";
+export const DEFAULT_SITE_URL = "https://myhosurproperty.com";
 export const DEFAULT_OG_IMAGE = "/favicon.svg";
 
 const trimTrailingSlash = (value = "") => value.replace(/\/+$/, "");
@@ -41,23 +42,27 @@ export const buildPageTitle = (title) => (title ? `${title} | ${SITE_TITLE_SUFFI
 export const truncateText = (text = "", limit = 160) => {
   const normalized = String(text).replace(/\s+/g, " ").trim();
   if (normalized.length <= limit) return normalized;
-  return `${normalized.slice(0, Math.max(limit - 1, 0)).trim()}…`;
+  return `${normalized.slice(0, Math.max(limit - 1, 0)).trim()}...`;
 };
 
 export const buildPropertySlug = (property = {}) => {
   const parts = [
+    property.title || "",
     property.bhk ? `${property.bhk} bhk` : "",
     property.propertyType || "",
-    property.listingType === "rent" ? "for rent" : property.listingType === "new-project" ? "new project" : "for sale",
     property.location?.area || "",
-    property.location?.city || "",
-    property.title || "",
+    property.location?.city || "Hosur",
   ].filter(Boolean);
 
   return slugify(parts.join(" "));
 };
 
-export const getPropertyPath = (property = {}) => `/property/${property._id}/${buildPropertySlug(property)}`;
+export const getPropertyPath = (property = {}) => `/property/${buildPropertySlug(property)}`;
+
+export const buildAgentSlug = (agent = {}) =>
+  slugify(agent.slug || agent.name || agent.email?.split("@")[0] || "agent");
+
+export const getAgentPath = (agent = {}) => `/agent/${buildAgentSlug(agent)}`;
 
 export const getPropertyImageAlt = (property = {}, index = 0) => {
   const propertyType = property.propertyType || "Property";
@@ -69,33 +74,6 @@ export const getPropertyImageAlt = (property = {}, index = 0) => {
   const imageLabel = index > 0 ? `photo ${index + 1}` : "main photo";
 
   return `${bhkLabel}${propertyType} ${listingLabel} in ${area}${city} - ${imageLabel}`;
-};
-
-export const buildCanonicalListingQuery = (filters = {}) => {
-  const query = new URLSearchParams();
-  [
-    "intent",
-    "search",
-    "city",
-    "area",
-    "propertyType",
-    "furnishingStatus",
-    "minBhk",
-    "maxBhk",
-    "possessionStatus",
-    "verified",
-    "listingSource",
-    "amenities",
-    "minPrice",
-    "maxPrice",
-  ].forEach((key) => {
-    if (filters[key]) {
-      query.set(key, String(filters[key]));
-    }
-  });
-
-  const qs = query.toString();
-  return qs ? `/listings?${qs}` : "/listings";
 };
 
 export const buildBreadcrumbSchema = (items = []) => ({
@@ -117,7 +95,7 @@ export const buildWebsiteSchema = () => ({
   description: SITE_DESCRIPTION,
   potentialAction: {
     "@type": "SearchAction",
-    target: `${getSiteUrl()}/listings?search={search_term_string}`,
+    target: `${getSiteUrl()}/buy?search={search_term_string}`,
     "query-input": "required name=search_term_string",
   },
 });
@@ -128,8 +106,8 @@ export const buildRealEstateAgentSchema = () => ({
   name: SITE_NAME,
   url: getSiteUrl(),
   description: SITE_DESCRIPTION,
-  areaServed: "Hosur, Tamil Nadu, India",
-  priceRange: "₹₹",
+  areaServed: "Hosur",
+  priceRange: "INR",
   telephone: "+91 98765 43210",
   email: "support@myhosurproperty.com",
   address: {
@@ -140,6 +118,50 @@ export const buildRealEstateAgentSchema = () => ({
     addressCountry: "IN",
   },
   sameAs: [getSiteUrl()],
+});
+
+export const buildPropertySchema = (property = {}) => ({
+  "@context": "https://schema.org",
+  "@type": "Residence",
+  name: property.title,
+  description: truncateText(property.description || SITE_DESCRIPTION, 200),
+  url: absoluteUrl(getPropertyPath(property)),
+  image: (property.images || []).map((image) => absoluteUrl(image)),
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: property.location?.area || "",
+    addressRegion: property.location?.city || "Hosur",
+    addressCountry: "IN",
+  },
+  offers: {
+    "@type": "Offer",
+    price: property.price,
+    priceCurrency: "INR",
+    availability: "https://schema.org/InStock",
+    url: absoluteUrl(getPropertyPath(property)),
+  },
+  floorSize: property.carpetArea
+    ? {
+        "@type": "QuantitativeValue",
+        value: property.carpetArea,
+        unitCode: property.areaUnit === "sqm" ? "MTK" : "FTK",
+      }
+    : undefined,
+  numberOfRooms: property.bhk || undefined,
+});
+
+export const buildAgentSchema = (agent = {}) => ({
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  name: agent.name || SITE_NAME,
+  url: absoluteUrl(getAgentPath(agent)),
+  email: agent.email || undefined,
+  telephone: agent.phone || undefined,
+  areaServed: agent.areaServed || "Hosur",
+  worksFor: {
+    "@type": "Organization",
+    name: SITE_NAME,
+  },
 });
 
 export const buildFaqSchema = (questions = []) => ({
@@ -154,3 +176,5 @@ export const buildFaqSchema = (questions = []) => ({
     },
   })),
 });
+
+export const getPropertyCategoryLink = (property = {}) => getCategoryPathForProperty(property);
