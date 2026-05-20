@@ -50,20 +50,6 @@ export const fetchPropertyById = async (id, token) => {
     throw error;
   }
 };
-export const fetchPropertyBySlug = async (slug, token) => {
-  try {
-    const config = token ? withAuth(token) : {};
-    const response = await apiClient.get(`/api/properties/slug/${slug}`, config);
-    return {
-      ...response.data,
-      property: normalizeProperty(response.data?.property),
-      similar: (response.data?.similar || []).map(normalizeProperty),
-    };
-  } catch (error) {
-    console.error("Error fetching property by slug:", error.response?.data || error.message);
-    throw error;
-  }
-};
 export const fetchMyProperties = async (token) =>
   normalizePropertyResponse((await apiClient.get("/api/properties/mine", withAuth(token))).data);
 export const createProperty = async (token, payload) =>

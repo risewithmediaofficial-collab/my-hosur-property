@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -15,11 +15,11 @@ import CountUpNumber from "../components/CountUpNumber";
 import PropertyCard from "../components/PropertyCard";
 import SeoHead from "../components/SeoHead";
 import AnimatedHeading from "../components/AnimatedHeading";
+import useDebounce from "../hooks/useDebounce";
 import useScrollToTop from "../hooks/useScrollToTop";
 import realEstateBackground from "../assets/real-estate-background-hero.jpg";
 import { fetchHomeProperties } from "../services/api/propertyApi";
 import { buildRealEstateAgentSchema, buildWebsiteSchema } from "../utils/seo";
-import { buildListingPath, getBestListingRoutePath } from "../utils/seoRoutes";
 
 const MotionSection = motion.section;
 
@@ -33,10 +33,10 @@ const reveal = {
 };
 
 const quickActions = [
-  { label: "Buy Property", to: "/buy" },
-  { label: "Rent Property", to: "/rent" },
-  { label: "Commercial", to: "/commercial" },
-  { label: "Plots & Land", to: "/plots" },
+  { label: "Buy Property", to: "/listings?intent=buy" },
+  { label: "Rent Property", to: "/listings?intent=rent" },
+  { label: "Commercial", to: "/listings?intent=buy&propertyType=Commercial" },
+  { label: "Plots & Land", to: "/listings?intent=buy&propertyType=Plot" },
 ];
 
 const propertyTypeOptions = [
@@ -52,17 +52,17 @@ const shortcutGroups = [
   {
     label: "Buy",
     items: [
-      { label: "Apartment", to: "/apartments" },
-      { label: "Villa", to: "/villas" },
-      { label: "Independent House", to: "/buy?propertyType=Independent%20House" },
-      { label: "Plot", to: "/plots" },
-      { label: "Commercial", to: "/commercial" },
+      { label: "Apartment", to: "/listings?intent=buy&propertyType=Apartment" },
+      { label: "Villa", to: "/listings?intent=buy&propertyType=Villa" },
+      { label: "Independent House", to: "/listings?intent=buy&propertyType=Independent House" },
+      { label: "Plot", to: "/listings?intent=buy&propertyType=Plot" },
+      { label: "Commercial", to: "/listings?intent=buy&propertyType=Commercial" },
     ],
   },
   {
     label: "Sell",
     items: [
-      { label: "Posted Properties", to: "/buy" },
+      { label: "Posted Properties", to: "/listings?intent=buy" },
       { label: "List Property", to: "/post-property" },
       { label: "Selling Support", to: "/request-service?category=property_sell" },
     ],
@@ -70,10 +70,10 @@ const shortcutGroups = [
   {
     label: "Rent",
     items: [
-      { label: "House", to: "/rent?propertyType=House" },
-      { label: "Office", to: "/rent?propertyType=Office" },
-      { label: "Commercial", to: "/rent?propertyType=Commercial" },
-      { label: "Warehouse", to: "/rent?propertyType=Warehouse" },
+      { label: "House", to: "/listings?intent=rent&propertyType=House" },
+      { label: "Office", to: "/listings?intent=rent&propertyType=Office" },
+      { label: "Commercial", to: "/listings?intent=rent&propertyType=Commercial" },
+      { label: "Warehouse", to: "/listings?intent=rent&propertyType=Warehouse" },
     ],
   },
   {
@@ -141,6 +141,8 @@ const HomePage = () => {
     propertyType: "",
   });
 
+  const debouncedSearch = useDebounce(search.search, 300);
+
   useEffect(() => {
     fetchHomeProperties()
       .then((res) => setFeatured(res.items || []))
@@ -174,6 +176,15 @@ const HomePage = () => {
       document.removeEventListener("keydown", handleEscape);
     };
   }, []);
+
+  const queryString = useMemo(() => {
+    const params = new URLSearchParams();
+    if (search.intent) params.set("intent", search.intent);
+    if (debouncedSearch) params.set("search", debouncedSearch);
+    if (search.city) params.set("city", search.city);
+    if (search.propertyType) params.set("propertyType", search.propertyType);
+    return params.toString();
+  }, [debouncedSearch, search.city, search.intent, search.propertyType]);
 
   const featuredListings = featured.slice(0, 4);
   const selectedPropertyTypeLabel =
@@ -252,7 +263,7 @@ const HomePage = () => {
               type="button"
               onClick={() => {
                 scrollToTop();
-                navigate(buildListingPath(getBestListingRoutePath(search), search, {}));
+                navigate(`/listings?${queryString || "intent=buy"}`);
               }}
               className="site-button-primary min-h-[56px] rounded-[1.3rem] px-6 text-sm"
             >
@@ -369,7 +380,7 @@ const HomePage = () => {
                   type="button"
                   onClick={() => {
                     scrollToTop();
-                    navigate(buildListingPath(getBestListingRoutePath(search), search, {}));
+                    navigate(`/listings?${queryString || "intent=buy"}`);
                   }}
                   className="site-button-primary min-h-[56px] rounded-[1.1rem] px-6 text-sm"
                 >
@@ -452,7 +463,7 @@ const HomePage = () => {
               Browse verified homes, plots, and commercial properties arranged in a cleaner, more readable listing flow.
             </p>
           </div>
-          <Link to="/buy" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900 transition hover:text-slate-600">
+          <Link to="/listings" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900 transition hover:text-slate-600">
             View all listings
             <ArrowRightIcon className="h-4 w-4" />
           </Link>

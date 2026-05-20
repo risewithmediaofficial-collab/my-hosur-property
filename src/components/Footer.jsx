@@ -3,16 +3,13 @@ import { primaryNavLinks } from "../constants/navigation";
 import { BuildingOffice2Icon, EnvelopeIcon, MapPinIcon, PhoneIcon } from "@heroicons/react/24/outline";
 
 const serviceLinks = [
-  { label: "Buy Property in Hosur", to: "/buy" },
-  { label: "Rent Property in Hosur", to: "/rent" },
-  { label: "Plots in Hosur", to: "/hosur/plots" },
-  { label: "Villas in Hosur", to: "/hosur/villas" },
-  { label: "Apartments in Hosur", to: "/hosur/apartments" },
-  { label: "Commercial Property", to: "/hosur/commercial" },
-  { label: "Property Agents", to: "/agents" },
+  { label: "Our Services", to: "/services" },
   { label: "Contact", to: "/contact" },
+  { label: "Buy Property in Hosur", to: "/listings?intent=buy" },
+  { label: "Rent Property in Hosur", to: "/listings?intent=rent" },
+  { label: "New Projects in Hosur", to: "/listings?intent=new-project" },
   { label: "Post Property Listing", to: "/post-property" },
-  { label: "About My Hosur Property", to: "/about" },
+  { label: "About MyHosurProperty", to: "/about" },
 ];
 
 const scrollToTop = () => {
@@ -41,7 +38,7 @@ const Footer = () => (
                 <BuildingOffice2Icon className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-lg font-extrabold tracking-tight text-slate-900">My Hosur Property</p>
+                <p className="text-lg font-extrabold tracking-tight text-slate-900">MyHosurProperty</p>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-slate-500">Professional platform</p>
               </div>
             </div>
@@ -93,13 +90,12 @@ const Footer = () => (
         </div>
 
         <div className="mt-10 flex flex-col gap-3 border-t border-slate-200 pt-6 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-          <p>Copyright 2026 My Hosur Property. All rights reserved.</p>
+          <p>Copyright 2026 MyHosurProperty. All rights reserved.</p>
           <div className="flex flex-wrap gap-4">
             <NavLink to="/about" onClick={scrollToTop} className="transition hover:text-slate-900">About Us</NavLink>
             <NavLink to="/contact" onClick={scrollToTop} className="transition hover:text-slate-900">Contact</NavLink>
-            <NavLink to="/buy" onClick={scrollToTop} className="transition hover:text-slate-900">Browse Listings</NavLink>
-            <NavLink to="/agents" onClick={scrollToTop} className="transition hover:text-slate-900">Agents</NavLink>
-            <NavLink to="/login" onClick={scrollToTop} className="transition hover:text-slate-900">Sign In</NavLink>
+            <NavLink to="/listings" onClick={scrollToTop} className="transition hover:text-slate-900">Browse Listings</NavLink>
+            <NavLink to="/auth" onClick={scrollToTop} className="transition hover:text-slate-900">Sign In</NavLink>
           </div>
         </div>
       </div>

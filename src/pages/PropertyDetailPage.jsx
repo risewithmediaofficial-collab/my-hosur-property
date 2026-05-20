@@ -12,23 +12,19 @@ import {
   PhoneIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
-import Breadcrumbs from "../components/Breadcrumbs";
 import ImageGallery from "../components/ImageGallery";
 import PropertyCard from "../components/PropertyCard";
 import ContactModal from "../components/ContactModal";
 import SeoHead from "../components/SeoHead";
 import useAuth from "../hooks/useAuth";
 import { checkMyLeadStatus, createLead } from "../services/api/leadApi";
-import { fetchPropertyById, fetchPropertyBySlug } from "../services/api/propertyApi";
+import { fetchPropertyById } from "../services/api/propertyApi";
 import { currency, formatArea } from "../utils/format";
 import {
-  buildAgentSchema,
-  getAgentPath,
   buildBreadcrumbSchema,
   buildFaqSchema,
-  buildPropertySchema,
+  buildPropertySlug,
   buildRealEstateAgentSchema,
-  getPropertyCategoryLink,
   getPropertyPath,
   truncateText,
 } from "../utils/seo";
@@ -48,8 +44,8 @@ const MotionDiv = motion.div;
 const MotionArticle = motion.article;
 const MotionSection = motion.section;
 
-const PropertyDetailPage = ({ lookupBy = "slug" }) => {
-  const { id, slug } = useParams();
+const PropertyDetailPage = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
   const { token, user } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -69,20 +65,14 @@ const PropertyDetailPage = ({ lookupBy = "slug" }) => {
   };
 
   const handleSubmitInquiry = async () => {
-    const propertyId = data.property?._id;
     if (!token) {
       toast.error("Please login to contact the owner.");
       return;
     }
 
-    if (!propertyId) {
-      toast.error("Property details are still loading.");
-      return;
-    }
-
     try {
       const res = await createLead(token, {
-        propertyId,
+        propertyId: id,
         intentType,
         message: inquiryText || "Hi, I am interested in this property.",
       });
@@ -104,25 +94,24 @@ const PropertyDetailPage = ({ lookupBy = "slug" }) => {
       try {
         setLoading(true);
         setError(null);
-        const result =
-          lookupBy === "id" ? await fetchPropertyById(id, token) : await fetchPropertyBySlug(slug, token);
+        const result = await fetchPropertyById(id, token);
         setData(result || { property: null, similar: [], localityInsights: null });
-        if (token && result?.property?._id) {
-          checkMyLeadStatus(token, result.property._id)
-            .then((res) => setMyLead(res.lead))
-            .catch(() => setMyLead(null));
-        }
       } catch (loadError) {
         setError(loadError.response?.data?.message || "Failed to load property details");
         setData({ property: null, similar: [], localityInsights: null });
-        setMyLead(null);
       } finally {
         setLoading(false);
       }
     };
 
     loadProperty();
-  }, [id, lookupBy, slug, token]);
+
+    if (token) {
+      checkMyLeadStatus(token, id)
+        .then((res) => setMyLead(res.lead))
+        .catch(() => setMyLead(null));
+    }
+  }, [id, token]);
 
   useEffect(() => {
     if (loading || error || !data.property) return undefined;
@@ -166,19 +155,18 @@ const PropertyDetailPage = ({ lookupBy = "slug" }) => {
 
   const p = data.property;
   const propertyPath = p ? getPropertyPath(p) : "";
-  const categoryPath = p ? getPropertyCategoryLink(p) : "/buy";
-  const ownerPath = p?.ownerId?.name ? getAgentPath(p.ownerId) : "";
+  const propertySlug = p ? buildPropertySlug(p) : "";
   const breadcrumbs = useMemo(
     () =>
       p
         ? [
             { label: "Home", to: "/" },
-            { label: p.location?.city || "Hosur", to: "/buy" },
-            { label: p.propertyType || "Property", to: categoryPath },
+            { label: "Listings", to: "/listings" },
+            { label: p.location?.city || "Hosur", to: `/listings?city=${encodeURIComponent(p.location?.city || "Hosur")}` },
             { label: p.title, to: propertyPath },
           ]
         : [],
-    [categoryPath, p, propertyPath]
+    [p, propertyPath]
   );
   const faqItems = useMemo(() => {
     if (!p) return [];
@@ -200,12 +188,12 @@ const PropertyDetailPage = ({ lookupBy = "slug" }) => {
   }, [p]);
 
   useEffect(() => {
-    if (!p || !propertyPath) return;
+    if (!p || !propertySlug) return;
 
     if (window.location.pathname !== propertyPath) {
       navigate(propertyPath, { replace: true });
     }
-  }, [navigate, p, propertyPath]);
+  }, [navigate, p, propertyPath, propertySlug]);
 
   if (loading) {
     return (
@@ -270,17 +258,8 @@ const PropertyDetailPage = ({ lookupBy = "slug" }) => {
         canonicalPath={propertyPath}
         image={p.images?.[0]}
         type="article"
-        schema={[
-          buildRealEstateAgentSchema(),
-          buildPropertySchema(p),
-          buildBreadcrumbSchema(breadcrumbs),
-          buildFaqSchema(faqItems),
-          p.ownerId?.name ? buildAgentSchema(p.ownerId) : null,
-        ]}
+        schema={[buildRealEstateAgentSchema(), buildBreadcrumbSchema(breadcrumbs), buildFaqSchema(faqItems)]}
       />
-      <section className="mx-auto w-full max-w-[1440px]">
-        <Breadcrumbs items={breadcrumbs} />
-      </section>
       <section
         ref={heroRef}
         className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-[0_12px_30px_rgba(17,17,17,0.04)] md:p-6 lg:p-8"
@@ -315,11 +294,6 @@ const PropertyDetailPage = ({ lookupBy = "slug" }) => {
             <p className="mt-2 text-sm font-medium text-slate-500">
               Listed by {p.ownerId?.name || "Owner"} ({p.ownerId?.role || p.listingSource || "owner"})
             </p>
-            {["agent", "broker", "builder"].includes(String(p.ownerId?.role || "").toLowerCase()) ? (
-              <Link to={ownerPath} className="mt-2 inline-flex text-sm font-semibold text-slate-900 transition hover:text-slate-600">
-                View agent profile
-              </Link>
-            ) : null}
 
             <div className="mt-6 rounded-[1.6rem] border border-slate-200 bg-slate-50 p-5">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Price</p>
@@ -510,20 +484,14 @@ const PropertyDetailPage = ({ lookupBy = "slug" }) => {
         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">Explore more</p>
         <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">Keep browsing related Hosur property pages</h2>
         <div className="mt-5 flex flex-wrap gap-3">
-          <Link to="/buy" className="site-button-primary px-5 py-3 text-sm">
-            Buy
+          <Link to="/listings" className="site-button-primary px-5 py-3 text-sm">
+            View all Hosur listings
           </Link>
-          <Link to="/plots" className="site-button-secondary px-5 py-3 text-sm">
-            Plots
+          <Link to={`/listings?city=${encodeURIComponent(p.location?.city || "Hosur")}`} className="site-button-secondary px-5 py-3 text-sm">
+            More property in {p.location?.city || "Hosur"}
           </Link>
-          <Link to="/villas" className="site-button-secondary px-5 py-3 text-sm">
-            Villas
-          </Link>
-          <Link to="/apartments" className="site-button-secondary px-5 py-3 text-sm">
-            Apartments
-          </Link>
-          <Link to="/agents" className="site-button-secondary px-5 py-3 text-sm">
-            Agents
+          <Link to={`/listings?propertyType=${encodeURIComponent(p.propertyType || "")}`} className="site-button-secondary px-5 py-3 text-sm">
+            More {p.propertyType} listings
           </Link>
         </div>
       </section>

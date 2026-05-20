@@ -18,7 +18,7 @@ const NotFoundPage = () => (
         <Link to="/" className="site-button-primary inline-flex px-5 py-3 text-sm">
           Go to homepage
         </Link>
-        <Link to="/buy" className="site-button-secondary inline-flex px-5 py-3 text-sm">
+        <Link to="/listings" className="site-button-secondary inline-flex px-5 py-3 text-sm">
           Browse listings
         </Link>
       </div>
