@@ -6,6 +6,7 @@ import { initEmailJs } from "./services/emailService";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Loader from "./components/Loader";
+import PageLoader from "./components/PageLoader";
 import { PrivateRouteSeo } from "./components/SeoHead";
 import ProtectedRoute from "./components/ProtectedRoute";
 import useLowMotionDevice from "./hooks/useLowMotionDevice";
@@ -76,6 +77,7 @@ const AppShell = () => {
   return (
     <MotionConfig reducedMotion={lowMotionDevice ? "always" : "never"}>
       <div className={`flex min-h-screen flex-col bg-transparent ${isDashboardRoute ? "md:h-screen md:overflow-hidden" : ""}`}>
+        <PageLoader />
         <Toaster position="top-right" toastOptions={{ duration: 2500 }} />
         {isPrivatePath ? <PrivateRouteSeo title="Account" /> : null}
         {!hideNavbar && <Navbar />}

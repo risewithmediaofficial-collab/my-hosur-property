@@ -15,40 +15,55 @@ const REQUEST_CATEGORIES = [
   "loan",
   "interior",
   "construction",
+  "property_management",
+  "home_office_services",
 ];
 
 const PROPERTY_REQUEST_CATEGORIES = ["property_buy", "property_sell", "property_rent"];
 
 const PROPERTY_TYPES = [
-  "Apartment",
+  "Plot",
   "Villa",
   "Independent House",
-  "Plot",
+  "Flat",
+  "Commercial Land",
+  "Agricultural Land",
+  "Home",
+  "Office",
+  "Apartment",
+  "Warehouse",
+  "Commercial Land & Building",
+  "Empty Land",
   "Commercial",
   "House",
-  "Office",
-  "Warehouse",
   "Land",
   "Industrial Shed",
 ];
 
 const PROPERTY_MATCH_MAP = {
-  House: ["House", "Independent House", "Villa", "Apartment"],
-  Apartment: ["Apartment"],
+  Home: ["Home", "House", "Independent House", "Villa", "Apartment"],
+  Apartment: ["Apartment", "Flat"],
   Villa: ["Villa"],
   "Independent House": ["Independent House", "House"],
   Plot: ["Plot", "Land"],
+  "Commercial Land": ["Commercial Land", "Commercial"],
+  "Agricultural Land": ["Agricultural Land", "Land"],
+  Flat: ["Flat", "Apartment"],
+  "Commercial Land & Building": ["Commercial Land & Building", "Commercial"],
+  "Empty Land": ["Empty Land", "Land"],
   Commercial: ["Commercial", "Office"],
   Office: ["Office", "Commercial"],
   Warehouse: ["Warehouse"],
-  Land: ["Land", "Plot"],
+  Land: ["Land", "Plot", "Empty Land", "Agricultural Land"],
   "Industrial Shed": ["Industrial Shed", "Warehouse"],
 };
 
 const SERVICE_TYPE_OPTIONS = {
-  loan: ["Plot Loan", "Private Finance", "House Loan"],
-  interior: ["House", "Office"],
-  construction: ["House", "Commercial"],
+  loan: ["Home Loan", "Plot Loan", "Mortgage Loan", "Private Finance"],
+  interior: ["Home Interior", "Office Interior"],
+  construction: ["House Construction", "Office Construction", "Commercial Building", "Apartment", "Industry & Warehouse"],
+  property_management: ["House & Office, Apartment, Industry Maintenance & AMC Service", "NRI Property Management Service", "Farm Management", "House Management", "Bungalow Management", "Agriculture Land Maintenance"],
+  home_office_services: ["Home & Office Cleaning", "Home & Office Shifting (Packers & Movers)", "Home Appliance Service (TV, Fridge, Washing Machine Repair)", "Electrical & Plumbing Service", "Carpentry & Interior Work", "Pest Control Service", "Bathroom Cleaning (Toilet Acid Wash)", "Tank & Sump Cleaning", "Painting Work", "Sofa Cleaning", "Carpet Cleaning", "Land Scaping", "Garden Maintenance"],
 };
 
 const isPropertyRequest = (requestCategory) => PROPERTY_REQUEST_CATEGORIES.includes(requestCategory);
@@ -110,11 +125,11 @@ exports.requestValidators = [
       throw new Error("Property type is required for property requests");
     }
 
-    if (requestCategory === "property_rent" && !["House", "Office", "Commercial", "Warehouse", "Land", "Industrial Shed"].includes(value.propertyType)) {
+    if (requestCategory === "property_rent" && !["Home", "Office", "Apartment", "Warehouse", "Commercial Land & Building", "Empty Land"].includes(value.propertyType)) {
       throw new Error("Invalid rent property type");
     }
 
-    if (["interior", "construction"].includes(requestCategory) && !value.serviceType) {
+    if (["interior", "construction", "property_management", "home_office_services"].includes(requestCategory) && !value.serviceType) {
       throw new Error("Service type is required");
     }
 
@@ -128,6 +143,14 @@ exports.requestValidators = [
 
     if (requestCategory === "construction" && value.serviceType && !SERVICE_TYPE_OPTIONS.construction.includes(value.serviceType)) {
       throw new Error("Invalid construction service type");
+    }
+
+    if (requestCategory === "property_management" && value.serviceType && !SERVICE_TYPE_OPTIONS.property_management.includes(value.serviceType)) {
+      throw new Error("Invalid property management service type");
+    }
+
+    if (requestCategory === "home_office_services" && value.serviceType && !SERVICE_TYPE_OPTIONS.home_office_services.includes(value.serviceType)) {
+      throw new Error("Invalid home & office service type");
     }
 
     return true;

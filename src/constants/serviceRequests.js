@@ -35,20 +35,32 @@ export const SERVICE_REQUEST_OPTIONS = {
   loan: {
     label: "Loan",
     requestCategory: "loan",
-    serviceTypes: ["Plot Loan", "Private Finance", "House Loan"],
+    serviceTypes: ["Home Loan", "Plot Loan", "Mortgage Loan", "Private Finance"],
     budgetLabel: "Loan Amount",
   },
   interior: {
     label: "Interior",
     requestCategory: "interior",
-    serviceTypes: ["House", "Office"],
+    serviceTypes: ["Home Interior", "Office Interior"],
     budgetLabel: "Project Budget",
   },
   construction: {
     label: "Construction",
     requestCategory: "construction",
-    serviceTypes: ["House", "Commercial"],
+    serviceTypes: ["House Construction", "Office Construction", "Commercial Building", "Apartment", "Industry & Warehouse"],
     budgetLabel: "Project Budget",
+  },
+  property_management: {
+    label: "Property Management",
+    requestCategory: "property_management",
+    serviceTypes: ["House & Office, Apartment, Industry Maintenance & AMC Service", "NRI Property Management Service", "Farm Management", "House Management", "Bungalow Management", "Agriculture Land Maintenance"],
+    budgetLabel: "Annual Budget",
+  },
+  home_office_services: {
+    label: "Home & Office Services",
+    requestCategory: "home_office_services",
+    serviceTypes: ["Home & Office Cleaning", "Home & Office Shifting (Packers & Movers)", "Home Appliance Service (TV, Fridge, Washing Machine Repair)", "Electrical & Plumbing Service", "Carpentry & Interior Work", "Pest Control Service", "Bathroom Cleaning (Toilet Acid Wash)", "Tank & Sump Cleaning", "Painting Work", "Sofa Cleaning", "Carpet Cleaning", "Land Scaping", "Garden Maintenance"],
+    budgetLabel: "Service Budget",
   },
 };
 

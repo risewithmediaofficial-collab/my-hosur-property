@@ -212,6 +212,41 @@ const serviceCategories = [
       { label: "General maintenance", icon: ShieldCheckIcon },
     ],
   },
+  {
+    key: "property-management",
+    title: "Property Management Service",
+    description: "Comprehensive maintenance and management for all types of properties.",
+    icon: HomeModernIcon,
+    services: [
+      { label: "House & Office, Apartment, Industry Maintenance & AMC Service", icon: BuildingOffice2Icon },
+      { label: "NRI Property Management Service", icon: HomeModernIcon },
+      { label: "Farm Management", icon: MapIcon },
+      { label: "House Management", icon: HomeModernIcon },
+      { label: "Bungalow Management", icon: HomeModernIcon },
+      { label: "Agriculture Land Maintenance", icon: MapIcon },
+    ],
+  },
+  {
+    key: "home-office-services",
+    title: "Home & Office Services",
+    description: "Complete maintenance and support services for homes and offices.",
+    icon: WrenchScrewdriverIcon,
+    services: [
+      { label: "Home & Office Cleaning", icon: SparklesIcon },
+      { label: "Home & Office Shifting (Packers & Movers)", icon: DocumentTextIcon },
+      { label: "Home Appliance Service (TV, Fridge, Washing Machine Repair)", icon: WrenchScrewdriverIcon },
+      { label: "Electrical & Plumbing Service", icon: SparklesIcon },
+      { label: "Carpentry & Interior Work", icon: PaintBrushIcon },
+      { label: "Pest Control Service", icon: ShieldCheckIcon },
+      { label: "Bathroom Cleaning (Toilet Acid Wash)", icon: SparklesIcon },
+      { label: "Tank & Sump Cleaning", icon: WrenchScrewdriverIcon },
+      { label: "Painting Work", icon: PaintBrushIcon },
+      { label: "Sofa Cleaning", icon: SparklesIcon },
+      { label: "Carpet Cleaning", icon: SparklesIcon },
+      { label: "Land Scaping", icon: MapIcon },
+      { label: "Garden Maintenance", icon: MapIcon },
+    ],
+  },
 ];
 
 const ServicesPage = () => {
@@ -272,7 +307,7 @@ const ServicesPage = () => {
             </div>
             <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
               <p className="text-3xl font-semibold text-slate-900">
-                <CountUpNumber value={23} suffix="+" />
+                <CountUpNumber value={42} suffix="+" />
               </p>
               <p className="mt-2 text-sm text-slate-500">Specialized support services</p>
             </div>

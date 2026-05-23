@@ -1,11 +1,24 @@
 import styled, { keyframes } from "styled-components";
 
-const bounce = keyframes`
-  0%, 100% {
-    transform: translateY(0);
+const rotate = keyframes`
+  100% {
+    transform: rotate(360deg);
   }
+`;
+
+const dash = keyframes`
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+
   50% {
-    transform: translateY(-12px);
+    stroke-dasharray: 90, 200;
+    stroke-dashoffset: -35px;
+  }
+
+  100% {
+    stroke-dashoffset: -125px;
   }
 `;
 
@@ -18,13 +31,21 @@ const LoaderContainer = styled.div`
   background: transparent;
 `;
 
-const LoadingBounce = styled.div`
+const Spinner = styled.svg`
   width: ${(props) => props.size}px;
   height: ${(props) => props.size}px;
-  border-radius: 50%;
-  border: 6px solid rgba(16, 185, 129, 0.3);
-  border-top-color: #16a34a;
-  animation: ${bounce} 1.2s ease-in-out infinite;
+  transform-origin: center;
+  animation: ${rotate} 2s linear infinite;
+
+  circle {
+    fill: none;
+    stroke: hsl(214, 97%, 59%);
+    stroke-width: 2;
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    animation: ${dash} 1.5s ease-in-out infinite;
+  }
 `;
 
 const LoaderText = styled.div`
@@ -39,7 +60,9 @@ const LoaderText = styled.div`
 const Loader = ({ text = "Loading...", size = 48 }) => (
   <LoaderContainer>
     <div className="flex flex-col items-center gap-4">
-      <LoadingBounce size={size} />
+      <Spinner size={size} viewBox="25 25 50 50" role="status" aria-label={text}>
+        <circle r={20} cy={50} cx={50} />
+      </Spinner>
       <LoaderText>{text}</LoaderText>
     </div>
   </LoaderContainer>

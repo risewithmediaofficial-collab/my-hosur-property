@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import {
   ArrowRightIcon,
@@ -7,6 +8,7 @@ import {
   CheckIcon,
   CheckBadgeIcon,
   ChevronDownIcon,
+  FlagIcon,
   MagnifyingGlassIcon,
   ScaleIcon,
   WrenchScrewdriverIcon,
@@ -16,6 +18,7 @@ import PropertyCard from "../components/PropertyCard";
 import SeoHead from "../components/SeoHead";
 import AnimatedHeading from "../components/AnimatedHeading";
 import useDebounce from "../hooks/useDebounce";
+import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
 import realEstateBackground from "../assets/real-estate-background-hero.jpg";
 import { fetchHomeProperties } from "../services/api/propertyApi";
@@ -41,22 +44,24 @@ const quickActions = [
 
 const propertyTypeOptions = [
   { label: "All types", value: "" },
-  { label: "Apartment", value: "Apartment" },
+  { label: "Plot", value: "Plot" },
   { label: "Villa", value: "Villa" },
   { label: "Independent House", value: "Independent House" },
-  { label: "Plot", value: "Plot" },
-  { label: "Commercial", value: "Commercial" },
+  { label: "Flat", value: "Flat" },
+  { label: "Commercial Land", value: "Commercial Land" },
+  { label: "Agricultural Land", value: "Agricultural Land" },
 ];
 
 const shortcutGroups = [
   {
     label: "Buy",
     items: [
-      { label: "Apartment", to: "/listings?intent=buy&propertyType=Apartment" },
+      { label: "Plot", to: "/listings?intent=buy&propertyType=Plot" },
       { label: "Villa", to: "/listings?intent=buy&propertyType=Villa" },
       { label: "Independent House", to: "/listings?intent=buy&propertyType=Independent House" },
-      { label: "Plot", to: "/listings?intent=buy&propertyType=Plot" },
-      { label: "Commercial", to: "/listings?intent=buy&propertyType=Commercial" },
+      { label: "Flat", to: "/listings?intent=buy&propertyType=Flat" },
+      { label: "Commercial Land", to: "/listings?intent=buy&propertyType=Commercial Land" },
+      { label: "Agricultural Land", to: "/listings?intent=buy&propertyType=Agricultural Land" },
     ],
   },
   {
@@ -70,32 +75,38 @@ const shortcutGroups = [
   {
     label: "Rent",
     items: [
-      { label: "House", to: "/listings?intent=rent&propertyType=House" },
+      { label: "Home", to: "/listings?intent=rent&propertyType=Home" },
       { label: "Office", to: "/listings?intent=rent&propertyType=Office" },
-      { label: "Commercial", to: "/listings?intent=rent&propertyType=Commercial" },
+      { label: "Apartment", to: "/listings?intent=rent&propertyType=Apartment" },
       { label: "Warehouse", to: "/listings?intent=rent&propertyType=Warehouse" },
+      { label: "Commercial Land & Building", to: "/listings?intent=rent&propertyType=Commercial Land & Building" },
+      { label: "Empty Land", to: "/listings?intent=rent&propertyType=Empty Land" },
     ],
   },
   {
     label: "Loan",
     items: [
-      { label: "Home Loan", to: "/request-service?category=loan&type=House%20Loan" },
+      { label: "Home Loan", to: "/request-service?category=loan&type=Home%20Loan" },
       { label: "Plot Loan", to: "/request-service?category=loan&type=Plot%20Loan" },
+      { label: "Mortgage Loan", to: "/request-service?category=loan&type=Mortgage%20Loan" },
       { label: "Private Finance", to: "/request-service?category=loan&type=Private%20Finance" },
     ],
   },
   {
     label: "Interior",
     items: [
-      { label: "House Interior", to: "/request-service?category=interior&type=House" },
-      { label: "Office Interior", to: "/request-service?category=interior&type=Office" },
+      { label: "Home Interior", to: "/request-service?category=interior&type=Home Interior" },
+      { label: "Office Interior", to: "/request-service?category=interior&type=Office Interior" },
     ],
   },
   {
     label: "Construction",
     items: [
-      { label: "House Construction", to: "/request-service?category=construction&type=House" },
-      { label: "Commercial Construction", to: "/request-service?category=construction&type=Commercial" },
+      { label: "House Construction", to: "/request-service?category=construction&type=House Construction" },
+      { label: "Office Construction", to: "/request-service?category=construction&type=Office Construction" },
+      { label: "Commercial Building", to: "/request-service?category=construction&type=Commercial Building" },
+      { label: "Apartment", to: "/request-service?category=construction&type=Apartment" },
+      { label: "Industry & Warehouse", to: "/request-service?category=construction&type=Industry & Warehouse" },
     ],
   },
 ];
@@ -127,6 +138,7 @@ const servicePreview = [
 const HomePage = () => {
   const navigate = useNavigate();
   const scrollToTop = useScrollToTop();
+  const { isAuthenticated } = useAuth();
   const [featured, setFeatured] = useState([]);
   const [featuredLoading, setFeaturedLoading] = useState(true);
   const [openShortcutMenu, setOpenShortcutMenu] = useState("");
@@ -190,6 +202,18 @@ const HomePage = () => {
   const selectedPropertyTypeLabel =
     propertyTypeOptions.find((option) => option.value === search.propertyType)?.label || "All types";
 
+  const handlePostFreeProperty = () => {
+    scrollToTop();
+
+    if (isAuthenticated) {
+      navigate("/post-property");
+      return;
+    }
+
+    toast.success("Sign in to post your free property listing.");
+    navigate("/auth", { state: { from: { pathname: "/post-property" } } });
+  };
+
   return (
     <main className="w-full space-y-6 bg-transparent px-4 py-6 sm:px-5 md:space-y-8 md:py-8 lg:px-6">
       <SeoHead
@@ -207,45 +231,56 @@ const HomePage = () => {
         className="relative z-30 rounded-[2rem] border border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.86),rgba(234,247,245,0.94))] p-4 shadow-[0_16px_34px_rgba(16,95,104,0.08)] backdrop-blur-xl sm:p-5"
       >
         <div className="flex flex-col gap-4">
-          <div ref={shortcutBarRef} className="relative z-40 flex flex-wrap gap-2">
-            {shortcutGroups.map((group) => (
-              <div
-                key={group.label}
-                className={`relative ${openShortcutMenu === group.label ? "z-50" : "z-10"}`}
-                onMouseEnter={() => setOpenShortcutMenu(group.label)}
-                onMouseLeave={() => setOpenShortcutMenu("")}
-              >
-                <button
-                  type="button"
-                  onClick={() => setOpenShortcutMenu((current) => (current === group.label ? "" : group.label))}
-                  className={`inline-flex min-h-[48px] items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold shadow-[0_10px_24px_rgba(16,95,104,0.08)] backdrop-blur-sm transition ${
-                    openShortcutMenu === group.label
-                      ? "border-slate-900 bg-[rgba(255,255,255,0.97)] text-slate-900"
-                      : "border-slate-200 bg-[rgba(255,255,255,0.93)] text-slate-700 hover:border-slate-300 hover:bg-[rgba(255,255,255,0.98)] hover:text-slate-900"
-                  }`}
+          <div className="relative z-40 flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+            <div ref={shortcutBarRef} className="flex flex-wrap gap-2">
+              {shortcutGroups.map((group) => (
+                <div
+                  key={group.label}
+                  className={`relative ${openShortcutMenu === group.label ? "z-50" : "z-10"}`}
+                  onMouseEnter={() => setOpenShortcutMenu(group.label)}
+                  onMouseLeave={() => setOpenShortcutMenu("")}
                 >
-                  <span>{group.label}</span>
-                  <ChevronDownIcon className={`h-4 w-4 text-slate-400 transition ${openShortcutMenu === group.label ? "rotate-180 text-slate-700" : ""}`} />
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setOpenShortcutMenu((current) => (current === group.label ? "" : group.label))}
+                    className={`inline-flex min-h-[48px] items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold shadow-[0_10px_24px_rgba(16,95,104,0.08)] backdrop-blur-sm transition ${
+                      openShortcutMenu === group.label
+                        ? "border-slate-900 bg-[rgba(255,255,255,0.97)] text-slate-900"
+                        : "border-slate-200 bg-[rgba(255,255,255,0.93)] text-slate-700 hover:border-slate-300 hover:bg-[rgba(255,255,255,0.98)] hover:text-slate-900"
+                    }`}
+                  >
+                    <span>{group.label}</span>
+                    <ChevronDownIcon className={`h-4 w-4 text-slate-400 transition ${openShortcutMenu === group.label ? "rotate-180 text-slate-700" : ""}`} />
+                  </button>
 
-                {openShortcutMenu === group.label ? (
-                  <div className="absolute left-0 top-full z-50 min-w-[240px] pt-3">
-                    <div className="rounded-[1.4rem] border border-white/85 bg-[rgba(255,255,255,0.99)] p-2 shadow-[0_24px_50px_rgba(16,95,104,0.2)] backdrop-blur-xl">
-                      {group.items.map((item) => (
-                        <Link
-                          key={`${group.label}-${item.label}`}
-                          to={item.to}
-                          className="block rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-[rgba(222,241,239,0.8)] hover:text-slate-900"
-                          onClick={() => setOpenShortcutMenu("")}
-                        >
-                          {item.label}
-                        </Link>
-                      ))}
+                  {openShortcutMenu === group.label ? (
+                    <div className="absolute left-0 top-full z-50 min-w-[240px] pt-3">
+                      <div className="rounded-[1.4rem] border border-white/85 bg-[rgba(255,255,255,0.99)] p-2 shadow-[0_24px_50px_rgba(16,95,104,0.2)] backdrop-blur-xl">
+                        {group.items.map((item) => (
+                          <Link
+                            key={`${group.label}-${item.label}`}
+                            to={item.to}
+                            className="block rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-[rgba(222,241,239,0.8)] hover:text-slate-900"
+                            onClick={() => setOpenShortcutMenu("")}
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ) : null}
-              </div>
-            ))}
+                  ) : null}
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={handlePostFreeProperty}
+              className="inline-flex min-h-[48px] shrink-0 animate-pulse items-center justify-center gap-2 rounded-full bg-red-600 px-5 py-2.5 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_14px_30px_rgba(220,38,38,0.28)] transition hover:animate-none hover:-translate-y-[4px] hover:bg-red-700"
+            >
+              <FlagIcon className="h-5 w-5" />
+              Post your free property
+            </button>
           </div>
 
           <div className="grid gap-3 lg:grid-cols-[1fr_auto_auto]">
