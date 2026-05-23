@@ -184,10 +184,10 @@ const fieldLabels = {
 };
 
 const fieldClass =
-  "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-[inset_0_1px_2px_rgba(17,17,17,0.03)] outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5";
+  "w-full rounded-[1.1rem] border border-transparent bg-white/90 px-4 py-3 text-sm text-slate-900 shadow-[0_1px_0_rgba(15,76,82,0.08),inset_0_0_0_1px_rgba(15,76,82,0.08)] outline-none transition duration-300 placeholder:text-slate-400 focus:bg-white focus:shadow-[0_12px_30px_rgba(15,76,82,0.1),inset_0_0_0_1px_rgba(15,118,110,0.42)]";
 
 const yesNoClass =
-  "rounded-full border px-4 py-2 text-xs font-extrabold uppercase tracking-[0.1em] transition";
+  "rounded-full px-4 py-2 text-xs font-extrabold uppercase tracking-[0.1em] transition duration-300";
 
 const toNumber = (value) => {
   if (!value) return 0;
@@ -424,13 +424,19 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   };
 
   return (
-    <section className="form-modern glass-panel space-y-6 rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_16px_32px_rgba(17,17,17,0.04)]">
-      <div>
-        <p className="text-[11px] font-extrabold uppercase tracking-[0.24em] text-red-600">Step 1</p>
-        <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900">{heading}</h2>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-          Select the property type first. The selected property form will open as a separate section on this page with only the fields needed for that type.
-        </p>
+    <section className="form-modern space-y-7 rounded-[2rem] bg-[linear-gradient(145deg,rgba(255,255,255,0.98),rgba(239,250,248,0.74))] p-4 shadow-[0_22px_70px_rgba(15,76,82,0.1)] sm:p-6 lg:p-8">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,0.88fr)_minmax(280px,0.38fr)] lg:items-end">
+        <div>
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.24em] text-teal-700">Step 1</p>
+          <h2 className="mt-2 max-w-2xl text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">{heading}</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+            Select the property type first. The selected property form will open as a separate section on this page with only the fields needed for that type.
+          </p>
+        </div>
+        <div className="rounded-[1.6rem] bg-white/75 p-4 shadow-[inset_0_0_0_1px_rgba(15,76,82,0.08)]">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Workflow</p>
+          <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">Choose type, complete details, upload media, and publish from your dashboard.</p>
+        </div>
       </div>
 
       {!hasPostingAccess && (
@@ -461,7 +467,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
           )}
 
           {!modalOpen ? (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-[1.1fr_0.9fr_1fr]">
             {propertyTypes.map((type) => {
               const item = typeFieldConfig[type];
               return (
@@ -469,9 +475,9 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
                   key={type}
                   type="button"
                   onClick={() => openTypeForm(type)}
-                  className="group min-h-[150px] rounded-[24px] border border-slate-200 bg-white p-5 text-left shadow-[0_14px_28px_rgba(17,17,17,0.04)] transition hover:-translate-y-1.5 hover:border-teal-600 hover:bg-teal-50"
+                  className="group min-h-[150px] rounded-[1.6rem] bg-white/85 p-5 text-left shadow-[0_16px_38px_rgba(15,76,82,0.08),inset_0_0_0_1px_rgba(15,76,82,0.07)] transition duration-300 hover:-translate-y-1.5 hover:bg-teal-50 hover:shadow-[0_24px_48px_rgba(15,76,82,0.14),inset_0_0_0_1px_rgba(15,118,110,0.22)]"
                 >
-                  <span className="inline-flex rounded-full bg-teal-700 px-3 py-1 text-xs font-extrabold uppercase tracking-[0.14em] text-white">
+                  <span className="inline-flex rounded-full bg-teal-700 px-3 py-1 text-xs font-extrabold uppercase tracking-[0.14em] text-white shadow-[0_8px_18px_rgba(15,118,110,0.18)]">
                     Open Form
                   </span>
                   <h3 className="mt-4 text-xl font-extrabold text-slate-900">{type}</h3>
@@ -483,8 +489,8 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
           ) : null}
 
           {modalOpen && config ? (
-            <div className="mt-6 rounded-[28px] border border-slate-200 bg-white shadow-[0_18px_40px_rgba(17,17,17,0.06)]">
-                <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 bg-teal-50 px-4 py-4 sm:px-5">
+            <div className="mt-6 overflow-hidden rounded-[2rem] bg-white/86 shadow-[0_24px_70px_rgba(15,76,82,0.12)]">
+                <div className="flex flex-wrap items-start justify-between gap-3 bg-[linear-gradient(135deg,rgba(230,247,244,0.96),rgba(255,255,255,0.86))] px-5 py-6 sm:px-7">
                   <div>
                     <p className="text-[11px] font-extrabold uppercase tracking-[0.22em] text-teal-700">Posting Form</p>
                     <h3 className="mt-1 text-2xl font-extrabold text-slate-900">{form.propertyType}</h3>
@@ -493,14 +499,14 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
                   <button
                     type="button"
                     onClick={() => setModalOpen(false)}
-                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-extrabold text-slate-700 transition hover:border-teal-500 hover:text-teal-700"
+                    className="rounded-full bg-white px-4 py-2 text-sm font-extrabold text-slate-700 shadow-[inset_0_0_0_1px_rgba(15,76,82,0.1)] transition duration-300 hover:-translate-y-0.5 hover:text-teal-700 hover:shadow-[0_12px_24px_rgba(15,76,82,0.12),inset_0_0_0_1px_rgba(15,118,110,0.28)]"
                   >
                     Back to property types
                   </button>
                 </div>
 
-                <form onSubmit={submitProperty} className="p-4 sm:p-5">
-                  <div className="space-y-5">
+                <form onSubmit={submitProperty} className="p-4 sm:p-6 lg:p-7">
+                  <div className="grid gap-5 xl:grid-cols-[0.92fr_1.08fr] xl:items-start">
                     <Section title="Contact Details">
                       <div className="grid gap-4 md:grid-cols-3">
                         <Field label="Contact Name" required><input className={fieldClass} value={form.contactName} onChange={(e) => update("contactName", e.target.value)} placeholder="Your Name" /></Field>
@@ -522,7 +528,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
                       </div>
                     </Section>
 
-                    <Section title="Price Details">
+                    <Section title="Price Details" tone="soft">
                       <div className="grid gap-4 md:grid-cols-3">
                         <Field label={config.priceLabel} required>{renderInput(config.priceLabel.includes("Rent") ? "monthlyRent" : "price")}</Field>
                         <Field label="Min Price">{renderInput("minPrice")}</Field>
@@ -540,10 +546,10 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
                       </div>
                     </Section>
 
-                    <Section title="Facilities / Features">
+                    <Section title="Facilities / Features" tone="soft">
                       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                         {config.featureFields.map((field) => (
-                          <div key={field} className="rounded-2xl border border-slate-200 bg-white p-3">
+                          <div key={field} className="rounded-2xl bg-white/85 p-3 shadow-[inset_0_0_0_1px_rgba(15,76,82,0.08)]">
                             <p className="mb-2 text-sm font-bold text-slate-700">{fieldLabels[field]}</p>
                             <YesNoGroup field={field} value={form[field]} onChange={update} />
                           </div>
@@ -570,9 +576,9 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
                       </div>
                     </Section>
 
-                    <Section title="Upload Images & Documents">
+                    <Section title="Upload Images & Documents" tone="soft" className="xl:col-span-2">
                       <div className="grid gap-4 lg:grid-cols-2">
-                        <div className="rounded-[24px] border border-slate-200 p-4">
+                        <div className="rounded-[1.5rem] bg-white/85 p-4 shadow-[inset_0_0_0_1px_rgba(15,76,82,0.08)]">
                           <h3 className="text-lg font-bold text-slate-900">Property Images</h3>
                           <p className="mb-3 mt-1 text-xs text-slate-500">Upload clear property images. Maximum 5 files per upload.</p>
                           <input className="w-full" type="file" multiple accept="image/*" onChange={(e) => setFiles(Array.from(e.target.files || []).slice(0, 5))} />
@@ -582,7 +588,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
                           {!!uploadedImages.length && (
                             <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-5">
                               {uploadedImages.map((src, idx) => (
-                                <div key={idx} className="aspect-square overflow-hidden rounded-md border border-slate-200">
+                                <div key={idx} className="aspect-square overflow-hidden rounded-xl bg-slate-100 shadow-[inset_0_0_0_1px_rgba(15,76,82,0.08)]">
                                   <img src={src} alt="Uploaded property" className="h-full w-full object-cover" />
                                 </div>
                               ))}
@@ -590,7 +596,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
                           )}
                         </div>
 
-                        <div className="rounded-[24px] border border-slate-200 p-4">
+                        <div className="rounded-[1.5rem] bg-white/85 p-4 shadow-[inset_0_0_0_1px_rgba(15,76,82,0.08)]">
                           <h3 className="text-lg font-bold text-slate-900">Brochure / Layout Plan</h3>
                           <p className="mb-3 mt-1 text-xs text-slate-500">Attach PDF layout, approval, or brochure files.</p>
                           <input className="w-full" type="file" multiple accept="application/pdf" onChange={(e) => setFiles(Array.from(e.target.files || []).slice(0, 5))} />
@@ -603,14 +609,14 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
                     </Section>
                   </div>
 
-                  <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 bg-white pt-4">
-                    <button type="button" onClick={() => setModalOpen(false)} className="rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-extrabold text-slate-700">
+                  <div className="mt-6 flex flex-wrap items-center justify-between gap-4 bg-white pt-4">
+                    <button type="button" onClick={() => setModalOpen(false)} className="rounded-2xl bg-white px-6 py-3 text-sm font-extrabold text-slate-700 shadow-[inset_0_0_0_1px_rgba(15,76,82,0.1)] transition hover:-translate-y-0.5 hover:text-teal-700">
                       Back to Types
                     </button>
                     <button
                       type="submit"
                       disabled={publishing}
-                      className="rounded-2xl bg-slate-900 px-10 py-3 text-sm font-extrabold text-white shadow-[0_12px_24px_rgba(17,17,17,0.08)] transition-all hover:-translate-y-[6px] hover:bg-black disabled:opacity-40"
+                      className="rounded-2xl bg-teal-800 px-10 py-3 text-sm font-extrabold text-white shadow-[0_16px_30px_rgba(15,76,82,0.22)] transition-all hover:-translate-y-[6px] hover:bg-teal-900 disabled:opacity-40"
                     >
                       {publishing ? "Saving..." : initialData ? "Save Changes" : "Publish Property"}
                     </button>
@@ -624,17 +630,17 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   );
 };
 
-const Section = ({ title, children }) => (
-  <div className="rounded-[24px] border border-slate-200 bg-slate-50/70 p-4">
-    <h3 className="mb-4 text-lg font-extrabold text-slate-900">{title}</h3>
+const Section = ({ title, children, tone = "plain", className = "" }) => (
+  <div className={`rounded-[1.7rem] p-4 sm:p-5 ${tone === "soft" ? "bg-teal-50/55" : "bg-slate-50/55"} shadow-[inset_0_0_0_1px_rgba(15,76,82,0.07)] ${className}`}>
+    <h3 className="mb-4 text-lg font-extrabold text-slate-950">{title}</h3>
     <div className="space-y-4">{children}</div>
   </div>
 );
 
 const Field = ({ label, required, className = "", children }) => (
   <label className={`block ${className}`}>
-    <span className="mb-1 block text-sm font-semibold text-ink/80">
-      {label} {required ? <span className="text-red-500">*</span> : null}
+    <span className="mb-1 block text-sm font-semibold text-slate-700">
+      {label} {required ? <span className="text-teal-700">*</span> : null}
     </span>
     {children}
   </label>
@@ -673,8 +679,8 @@ const YesNoGroup = ({ field, value, onChange }) => (
         onClick={() => onChange(field, option)}
         className={`${yesNoClass} ${
           value === option
-            ? "border-slate-900 bg-slate-900 text-white"
-            : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-400"
+            ? "bg-teal-800 text-white shadow-[0_10px_20px_rgba(15,76,82,0.18)]"
+            : "bg-white text-slate-600 shadow-[inset_0_0_0_1px_rgba(15,76,82,0.1)] hover:text-teal-700 hover:shadow-[inset_0_0_0_1px_rgba(15,118,110,0.28)]"
         }`}
       >
         {option}

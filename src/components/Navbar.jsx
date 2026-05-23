@@ -65,10 +65,10 @@ const Navbar = () => {
         to={item.to}
         onClick={scrollToTop}
         className={({ isActive }) =>
-          `group relative inline-flex items-center rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+          `group relative inline-flex items-center rounded-md px-3 py-2 text-xs font-semibold transition ${
             isActive
-              ? "text-slate-900"
-              : "text-slate-500 hover:text-slate-900"
+              ? "bg-white/10 text-white"
+              : "text-white/70 hover:bg-white/10 hover:text-white"
           }`
         }
       >
@@ -76,7 +76,7 @@ const Navbar = () => {
           <>
             <span>{item.label}</span>
             <span
-              className={`absolute inset-x-4 bottom-1 h-px origin-left bg-slate-900 transition duration-300 ${
+              className={`absolute inset-x-3 bottom-1 h-px origin-left bg-white transition duration-300 ${
                 isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
               }`}
             />
@@ -98,14 +98,14 @@ const Navbar = () => {
           closeMenu();
         }}
         className={({ isActive }) =>
-          `flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
-            isActive ? "border-slate-900 text-slate-900" : "border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-50 hover:text-slate-900"
+          `flex items-center gap-3 rounded-md px-4 py-3 text-sm font-semibold transition ${
+            isActive ? "bg-white/10 text-white" : "text-white/70 hover:bg-white/10 hover:text-white"
           }`
         }
       >
         {({ isActive }) => (
           <>
-            <Icon className={`h-5 w-5 ${isActive ? "text-slate-900" : "text-slate-400"}`} />
+            <Icon className={`h-5 w-5 ${isActive ? "text-white" : "text-white/50"}`} />
             <span>{item.label}</span>
           </>
         )}
@@ -114,23 +114,23 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-transparent">
-      <div className="px-4 py-3 sm:px-5 lg:px-6">
-        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3 rounded-[24px] border border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(234,247,245,0.88))] px-4 py-3 shadow-[0_18px_38px_rgba(16,95,104,0.1)] backdrop-blur-xl sm:px-5">
+    <header className="sticky top-0 z-50 bg-[#06233b]">
+      <div className="px-5 py-3 sm:px-8 lg:px-10">
+        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3 bg-transparent">
           <NavLink
             to="/"
             onClick={() => {
               scrollToTop();
               closeMenu();
             }}
-            className="inline-flex min-w-0 items-center gap-3 text-slate-900"
+            className="inline-flex min-w-0 items-center gap-3 text-white"
           >
-            <div className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-[linear-gradient(145deg,rgba(200,230,226,0.95),rgba(99,193,187,0.24))] text-slate-900 shadow-[0_10px_20px_rgba(16,95,104,0.1)]">
+            <div className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center text-white">
               <BuildingOffice2Icon className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <p className="truncate text-lg font-extrabold tracking-tight text-slate-900">MyHosurProperty</p>
-              <p className="truncate text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-500">Real Estate</p>
+              <p className="truncate text-sm font-extrabold tracking-tight text-white">MyHosurProperty</p>
+              <p className="hidden truncate text-[9px] font-semibold uppercase tracking-[0.26em] text-white/55 sm:block">Real Estate</p>
             </div>
           </NavLink>
 
@@ -143,10 +143,10 @@ const Navbar = () => {
               to={dashboardPath}
               onClick={scrollToTop}
               className={({ isActive }) =>
-                `group inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition ${
+                `group inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition ${
                   isActive
-                    ? "border-slate-900 text-slate-900"
-                    : "border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+                    ? "bg-white/10 text-white"
+                    : "text-white/70 hover:bg-white/10 hover:text-white"
                 }`
               }
             >
@@ -164,7 +164,7 @@ const Navbar = () => {
             {isAuthenticated ? (
               <button
                 onClick={onLogout}
-                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:-translate-y-1.5 hover:border-slate-900 hover:bg-slate-50 hover:text-slate-900"
+                className="inline-flex items-center gap-2 rounded-md border border-white/20 bg-transparent px-3 py-2 text-xs font-semibold text-white/80 transition hover:bg-white/10 hover:text-white"
               >
                 <ArrowRightOnRectangleIcon className="h-4 w-4" />
                 Logout
@@ -173,7 +173,7 @@ const Navbar = () => {
               <NavLink
                 to="/auth"
                 onClick={scrollToTop}
-                className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-1.5 hover:bg-black"
+                className="inline-flex items-center gap-2 rounded-md bg-[#0b74d1] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#075da8]"
               >
                 <ArrowRightOnRectangleIcon className="h-4 w-4" />
                 Sign in
@@ -183,7 +183,7 @@ const Navbar = () => {
 
           <button
             type="button"
-            className="inline-flex rounded-2xl border border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(234,247,245,0.78))] p-2.5 text-slate-700 transition hover:bg-slate-50 lg:hidden"
+            className="inline-flex rounded-md border border-white/20 p-2 text-white transition hover:bg-white/10 lg:hidden"
             onClick={() => setMobileMenuOpen((value) => !value)}
           >
             {mobileMenuOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
@@ -193,7 +193,7 @@ const Navbar = () => {
 
       {mobileMenuOpen ? (
         <div className="px-4 pb-3 sm:px-5 lg:hidden">
-          <div className="mx-auto max-h-[calc(100dvh-4.75rem)] max-w-[1440px] overflow-y-auto rounded-[24px] border border-slate-200 bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(234,247,245,0.9))] px-4 py-4 shadow-[0_20px_42px_rgba(16,95,104,0.12)] backdrop-blur-xl sm:px-5">
+          <div className="mx-auto max-h-[calc(100dvh-4.75rem)] max-w-[1440px] overflow-y-auto border-t border-white/10 bg-[#06233b] px-1 py-4 sm:px-2">
             <div className="flex flex-col gap-3">
               <nav className="flex flex-col gap-2">
                 {navLinks.map(renderMobileLink)}
@@ -204,8 +204,8 @@ const Navbar = () => {
                     closeMenu();
                   }}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
-                      isActive ? "border-slate-900 text-slate-900" : "border-transparent text-slate-600 hover:border-slate-200 hover:text-slate-900"
+                    `flex items-center gap-3 rounded-md px-4 py-3 text-sm font-semibold transition ${
+                      isActive ? "bg-white/10 text-white" : "text-white/70 hover:bg-white/10 hover:text-white"
                     }`
                   }
                 >
@@ -213,7 +213,7 @@ const Navbar = () => {
                     const DashboardIcon = isActive ? Squares2X2SolidIcon : Squares2X2Icon;
                     return (
                       <>
-                        <DashboardIcon className={`h-5 w-5 ${isActive ? "text-slate-900" : "text-slate-400"}`} />
+                        <DashboardIcon className={`h-5 w-5 ${isActive ? "text-white" : "text-white/50"}`} />
                         <span>Dashboard</span>
                       </>
                     );
@@ -221,12 +221,12 @@ const Navbar = () => {
                 </NavLink>
               </nav>
 
-              <div className="border-t border-slate-200/70 pt-3">
+              <div className="pt-3 shadow-[inset_0_1px_0_rgba(16,95,104,0.07)]">
                 {isAuthenticated ? (
                   <button
                     type="button"
                     onClick={onLogout}
-                    className="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                    className="flex w-full items-center justify-center gap-2 rounded-md border border-white/20 bg-transparent px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white"
                   >
                     <ArrowRightOnRectangleIcon className="h-5 w-5" />
                     Logout
@@ -238,7 +238,7 @@ const Navbar = () => {
                       scrollToTop();
                       closeMenu();
                     }}
-                    className="flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-black"
+                    className="flex items-center justify-center gap-2 rounded-md bg-[#0b74d1] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#075da8]"
                   >
                     <ArrowRightOnRectangleIcon className="h-5 w-5" />
                     Sign in / Create account

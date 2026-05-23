@@ -215,7 +215,7 @@ const HomePage = () => {
   };
 
   return (
-    <main className="w-full space-y-6 bg-transparent px-4 py-6 sm:px-5 md:space-y-8 md:py-8 lg:px-6">
+    <main className="w-full bg-white">
       <SeoHead
         title="Verified Property Listings in Hosur"
         description="Explore verified property listings, real-estate services, and professional local property support through My Hosur Property."
@@ -228,11 +228,11 @@ const HomePage = () => {
         initial="hidden"
         animate="show"
         variants={reveal}
-        className="relative z-30 rounded-[2rem] border border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.86),rgba(234,247,245,0.94))] p-4 shadow-[0_16px_34px_rgba(16,95,104,0.08)] backdrop-blur-xl sm:p-5"
+        className="relative z-30 bg-[#06233b] px-5 pb-12 pt-8 text-white sm:px-8 lg:px-10"
       >
-        <div className="flex flex-col gap-4">
-          <div className="relative z-40 flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
-            <div ref={shortcutBarRef} className="flex flex-wrap gap-2">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-6">
+          <div className="relative z-40 flex flex-col gap-4 rounded-2xl bg-white/7 p-3 xl:flex-row xl:items-center xl:justify-between">
+            <div ref={shortcutBarRef} className="flex flex-wrap gap-3">
               {shortcutGroups.map((group) => (
                 <div
                   key={group.label}
@@ -243,24 +243,24 @@ const HomePage = () => {
                   <button
                     type="button"
                     onClick={() => setOpenShortcutMenu((current) => (current === group.label ? "" : group.label))}
-                    className={`inline-flex min-h-[48px] items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold shadow-[0_10px_24px_rgba(16,95,104,0.08)] backdrop-blur-sm transition ${
+                    className={`inline-flex min-h-[54px] items-center gap-3 rounded-xl px-5 py-3 text-base font-extrabold transition sm:min-w-[118px] sm:justify-center ${
                       openShortcutMenu === group.label
-                        ? "border-slate-900 bg-[rgba(255,255,255,0.97)] text-slate-900"
-                        : "border-slate-200 bg-[rgba(255,255,255,0.93)] text-slate-700 hover:border-slate-300 hover:bg-[rgba(255,255,255,0.98)] hover:text-slate-900"
+                        ? "bg-white text-[#06233b]"
+                        : "bg-white/10 text-white hover:bg-white/18 hover:text-white"
                     }`}
                   >
                     <span>{group.label}</span>
-                    <ChevronDownIcon className={`h-4 w-4 text-slate-400 transition ${openShortcutMenu === group.label ? "rotate-180 text-slate-700" : ""}`} />
+                    <ChevronDownIcon className={`h-5 w-5 transition ${openShortcutMenu === group.label ? "rotate-180 text-[#06233b]" : "text-white/70"}`} />
                   </button>
 
                   {openShortcutMenu === group.label ? (
                     <div className="absolute left-0 top-full z-50 min-w-[240px] pt-3">
-                      <div className="rounded-[1.4rem] border border-white/85 bg-[rgba(255,255,255,0.99)] p-2 shadow-[0_24px_50px_rgba(16,95,104,0.2)] backdrop-blur-xl">
+                      <div className="rounded-md border border-slate-200 bg-white p-2 shadow-[0_18px_36px_rgba(0,0,0,0.18)]">
                         {group.items.map((item) => (
                           <Link
                             key={`${group.label}-${item.label}`}
                             to={item.to}
-                            className="block rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-[rgba(222,241,239,0.8)] hover:text-slate-900"
+                            className="block rounded px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
                             onClick={() => setOpenShortcutMenu("")}
                           >
                             {item.label}
@@ -276,15 +276,25 @@ const HomePage = () => {
             <button
               type="button"
               onClick={handlePostFreeProperty}
-              className="inline-flex min-h-[48px] shrink-0 animate-pulse items-center justify-center gap-2 rounded-full bg-red-600 px-5 py-2.5 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_14px_30px_rgba(220,38,38,0.28)] transition hover:animate-none hover:-translate-y-[4px] hover:bg-red-700"
+              className="inline-flex min-h-[54px] shrink-0 items-center justify-center gap-2 rounded-xl bg-[#0b74d1] px-6 py-3 text-sm font-extrabold text-white transition hover:bg-[#075da8]"
             >
               <FlagIcon className="h-5 w-5" />
               Post your free property
             </button>
           </div>
 
+          <div className="mx-auto max-w-2xl pt-7 text-center">
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/55">Verified real estate platform</p>
+            <h1 className="mt-4 text-4xl font-extrabold leading-[1.03] tracking-[-0.04em] text-white sm:text-5xl">
+              Verified property listings in Hosur
+            </h1>
+            <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-white/70">
+              Find verified properties for sale and rent across Hosur. Search apartments, villas, plots, and houses with clearer tools and local support.
+            </p>
+          </div>
+
           <div className="grid gap-3 lg:grid-cols-[1fr_auto_auto]">
-            <div className="flex items-center gap-3 rounded-[1.3rem] border border-slate-200 bg-white px-4 py-4">
+            <div className="flex items-center gap-3 rounded-md border border-white/10 bg-white px-4 py-3">
               <MagnifyingGlassIcon className="h-5 w-5 text-slate-400" />
               <input
                 value={search.search}
@@ -300,17 +310,37 @@ const HomePage = () => {
                 scrollToTop();
                 navigate(`/listings?${queryString || "intent=buy"}`);
               }}
-              className="site-button-primary min-h-[56px] rounded-[1.3rem] px-6 text-sm"
+              className="site-button-primary min-h-[48px] rounded-md px-6 text-sm"
             >
               Find Your Property
             </button>
 
             <Link
               to="/post-property"
-              className="inline-flex min-h-[56px] items-center justify-center rounded-[1.3rem] border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-900 transition hover:-translate-y-[6px] hover:border-slate-900 hover:bg-slate-50"
+              className="inline-flex min-h-[48px] items-center justify-center rounded-md border border-white/20 bg-transparent px-6 text-sm font-semibold text-white transition hover:bg-white/10"
             >
               List Property
             </Link>
+          </div>
+
+          <div className="mt-4 overflow-hidden">
+            <img
+              src={realEstateBackground}
+              alt="Modern real estate search experience in Hosur"
+              className="h-[260px] w-full object-cover sm:h-[360px]"
+              loading="eager"
+            />
+          </div>
+
+          <div className="grid gap-4 border-t border-white/10 pt-6 text-center sm:grid-cols-3">
+            {homeStats.map((item) => (
+              <div key={item.label}>
+                <p className="text-2xl font-semibold text-white">
+                  <CountUpNumber value={item.value} suffix={item.suffix} />
+                </p>
+                <p className="mt-1 text-xs text-white/55">{item.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </MotionSection>
@@ -319,7 +349,7 @@ const HomePage = () => {
         initial="hidden"
         animate="show"
         variants={reveal}
-        className="relative isolate overflow-hidden rounded-[2rem] border border-slate-200 px-6 py-8 shadow-[0_22px_46px_rgba(16,95,104,0.16)] sm:px-8 lg:px-10 lg:py-12"
+        className="hidden"
         style={{
           backgroundImage: `url(${realEstateBackground})`,
           backgroundSize: "cover",
@@ -458,7 +488,7 @@ const HomePage = () => {
         whileInView="show"
         viewport={{ once: true, amount: 0.18 }}
         variants={reveal}
-        className="grid gap-4 md:grid-cols-3"
+        className="mx-auto grid max-w-[1440px] gap-10 px-5 py-16 text-center md:grid-cols-3 lg:px-10"
       >
         {servicePreview.map((item, index) => {
           const Icon = item.icon;
@@ -467,9 +497,9 @@ const HomePage = () => {
               key={item.title}
               variants={reveal}
               custom={index * 0.05}
-              className="rounded-[1.7rem] border border-slate-200 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(234,247,245,0.82))] p-6 transition duration-300 hover:-translate-y-[6px] hover:border-slate-900 hover:shadow-[0_18px_34px_rgba(16,95,104,0.12)]"
+              className="bg-white p-2 transition duration-300 hover:-translate-y-1"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-[linear-gradient(145deg,rgba(200,230,226,0.92),rgba(99,193,187,0.22))] text-slate-900">
+              <div className="mx-auto flex h-10 w-10 items-center justify-center text-slate-900">
                 <Icon className="h-5 w-5" />
               </div>
               <h2 className="mt-5 text-2xl font-semibold tracking-tight text-slate-900">{item.title}</h2>
@@ -488,9 +518,9 @@ const HomePage = () => {
         whileInView="show"
         viewport={{ once: true, amount: 0.18 }}
         variants={reveal}
-        className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(135deg,rgba(234,247,245,0.9),rgba(255,255,255,0.85))] px-5 py-6 sm:px-6 lg:px-8"
+        className="border-t border-slate-200 bg-[#f6f6f3] px-5 py-16 sm:px-8 lg:px-10"
       >
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-4 text-center sm:items-center">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Featured properties</p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Cleanly presented, ready to compare.</h2>
@@ -504,14 +534,14 @@ const HomePage = () => {
           </Link>
         </div>
 
-        <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <div className="mx-auto mt-8 grid max-w-[1440px] gap-6 md:grid-cols-2 xl:grid-cols-4">
           {featuredListings.map((item) => (
             <PropertyCard key={item._id} item={item} />
           ))}
 
           {featuredLoading &&
             Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="overflow-hidden rounded-[1.7rem] border border-slate-200 bg-white p-4">
+              <div key={index} className="overflow-hidden border border-slate-200 bg-white p-4">
                 <div className="h-52 animate-pulse rounded-[1.2rem] bg-slate-100" />
                 <div className="mt-4 h-5 animate-pulse rounded-full bg-slate-100" />
                 <div className="mt-3 h-4 w-2/3 animate-pulse rounded-full bg-slate-100" />
@@ -526,9 +556,9 @@ const HomePage = () => {
         whileInView="show"
         viewport={{ once: true, amount: 0.2 }}
         variants={reveal}
-        className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(234,247,245,0.86))] px-6 py-8 shadow-[0_18px_38px_rgba(16,95,104,0.1)] sm:px-8"
+        className="px-5 py-16 sm:px-8 lg:px-10"
       >
-        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div className="mx-auto grid max-w-[1440px] gap-5 text-center lg:grid-cols-[1fr_auto] lg:items-center lg:text-left">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Need expert help</p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">

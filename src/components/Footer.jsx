@@ -28,13 +28,13 @@ const scrollToTop = () => {
 };
 
 const Footer = () => (
-  <footer className="mt-12 bg-transparent text-slate-600">
-    <div className="px-4 pb-10 pt-4 sm:px-5 lg:px-6 lg:pb-12">
-      <div className="mx-auto w-full max-w-[1440px] rounded-[28px] border border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(234,247,245,0.9))] px-6 py-10 shadow-[0_18px_40px_rgba(16,95,104,0.1)] backdrop-blur-xl sm:px-8">
+  <footer className="bg-white text-slate-600">
+    <div className="px-5 pb-10 pt-8 sm:px-8 lg:px-10">
+      <div className="mx-auto w-full max-w-[1440px] border border-slate-200 bg-white px-6 py-8 sm:px-8">
         <div className="grid gap-8 md:grid-cols-[1.15fr_0.8fr_0.9fr_1fr]">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-[linear-gradient(145deg,rgba(200,230,226,0.95),rgba(99,193,187,0.24))] text-slate-900 shadow-[0_10px_20px_rgba(16,95,104,0.1)]">
+              <div className="inline-flex h-9 w-9 items-center justify-center text-slate-900">
                 <BuildingOffice2Icon className="h-5 w-5" />
               </div>
               <div>
@@ -89,7 +89,7 @@ const Footer = () => (
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-3 border-t border-slate-200 pt-6 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-10 flex flex-col gap-3 pt-6 text-xs text-slate-400 shadow-[inset_0_1px_0_rgba(16,95,104,0.07)] sm:flex-row sm:items-center sm:justify-between">
           <p>Copyright 2026 MyHosurProperty. All rights reserved.</p>
           <div className="flex flex-wrap gap-4">
             <NavLink to="/about" onClick={scrollToTop} className="transition hover:text-slate-900">About Us</NavLink>

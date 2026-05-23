@@ -45,6 +45,7 @@ const AppShell = () => {
   const isFullHeight = FULL_HEIGHT_PATHS.some((p) => location.pathname.startsWith(p));
   const isPrivatePath = PRIVATE_PATHS.some((p) => location.pathname.startsWith(p));
   const isDashboardRoute = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/admin/dashboard");
+  const isHomeRoute = location.pathname === "/";
 
   useEffect(() => {
     initEmailJs();
@@ -76,12 +77,12 @@ const AppShell = () => {
 
   return (
     <MotionConfig reducedMotion={lowMotionDevice ? "always" : "never"}>
-      <div className={`flex min-h-screen flex-col bg-transparent ${isDashboardRoute ? "md:h-screen md:overflow-hidden" : ""}`}>
+      <div className={`site-app-shell flex min-h-screen flex-col ${isDashboardRoute ? "site-dashboard-app md:h-screen md:overflow-hidden" : ""}`}>
         <PageLoader />
         <Toaster position="top-right" toastOptions={{ duration: 2500 }} />
         {isPrivatePath ? <PrivateRouteSeo title="Account" /> : null}
         {!hideNavbar && <Navbar />}
-        <main className={`flex-1 ${isFullHeight || hideNavbar ? "" : "pt-4 pb-12 md:pt-6"} ${isDashboardRoute ? "md:min-h-0 md:overflow-hidden" : ""}`}>
+        <main className={`flex-1 ${isFullHeight || hideNavbar ? "" : isHomeRoute ? "pb-12" : "pt-4 pb-12 md:pt-6"} ${isDashboardRoute ? "md:min-h-0 md:overflow-hidden" : ""}`}>
           <Suspense fallback={<RouteFallback />}>
             <AnimatePresence mode="wait">
               <motion.div

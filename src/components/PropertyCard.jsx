@@ -15,8 +15,8 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
   ].filter(Boolean);
 
   return (
-    <article className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white transition duration-300 hover:-translate-y-[6px] hover:border-slate-900 hover:shadow-[0_16px_32px_rgba(17,17,17,0.08)]">
-      <div className="relative h-56 overflow-hidden border-b border-slate-200">
+    <article className="group overflow-hidden border border-slate-200 bg-white transition duration-300 hover:-translate-y-1">
+      <div className="relative h-56 overflow-hidden">
         <img
           src={item.images?.[0] || PROPERTY_PLACEHOLDER_IMAGE}
           alt={getPropertyImageAlt(item)}
@@ -28,12 +28,12 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
           }}
         />
         <div className="absolute left-4 top-4">
-          <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-700">
+          <span className="rounded bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-700">
             {item.propertyType || "Property"}
           </span>
         </div>
         <div className="absolute bottom-4 right-4">
-          <p className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-bold text-slate-900">
+          <p className="rounded bg-white px-3 py-1.5 text-sm font-bold text-slate-900">
             {currency(item.price)}
           </p>
         </div>
@@ -64,7 +64,7 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
             {badges.map((badge) => (
               <span
                 key={badge}
-                className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 sm:px-2.5 py-0.5 sm:py-1 text-slate-700"
+                className="inline-flex items-center gap-1 rounded bg-slate-50 px-2 py-0.5 text-slate-700 sm:px-2.5 sm:py-1"
               >
                 <CheckBadgeIcon className="h-3 w-3 flex-shrink-0 text-slate-900 sm:h-3.5 sm:w-3.5" />
                 {badge}
@@ -74,16 +74,16 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
         ) : null}
 
         <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-slate-600">
-          <div className="line-clamp-1 rounded-2xl border border-slate-200 bg-white px-2.5 py-1.5 sm:px-3 sm:py-2">
+          <div className="line-clamp-1 border border-slate-200 bg-white px-2.5 py-1.5 sm:px-3 sm:py-2">
             {item.furnishingStatus || "Unfurnished"}
           </div>
-          <div className="line-clamp-1 rounded-2xl border border-slate-200 bg-white px-2.5 py-1.5 capitalize sm:px-3 sm:py-2">
+          <div className="line-clamp-1 border border-slate-200 bg-white px-2.5 py-1.5 capitalize sm:px-3 sm:py-2">
             {item.listingSource || "owner"}
           </div>
-          <div className="line-clamp-1 rounded-2xl border border-slate-200 bg-white px-2.5 py-1.5 capitalize sm:px-3 sm:py-2">
+          <div className="line-clamp-1 border border-slate-200 bg-white px-2.5 py-1.5 capitalize sm:px-3 sm:py-2">
             {item.listingType || "sale"}
           </div>
-          <div className="line-clamp-1 rounded-2xl border border-slate-200 bg-white px-2.5 py-1.5 sm:px-3 sm:py-2">
+          <div className="line-clamp-1 border border-slate-200 bg-white px-2.5 py-1.5 sm:px-3 sm:py-2">
             {item.bhk || "Studio"} BHK
           </div>
         </div>
@@ -99,8 +99,8 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
               onClick={() => onSave?.(item._id)}
               className={`flex-1 sm:flex-none rounded-full px-2 sm:px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap ${
                 isSaved
-                  ? "border border-slate-900 bg-slate-900 text-white"
-                  : "border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-slate-900 text-white"
+                  : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               {isSaved ? "Saved" : "Save"}

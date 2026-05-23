@@ -103,7 +103,7 @@ const FilterSidebar = ({ filters, setFilters, clearFilters }) => {
           </select>
         </div>
 
-        <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700">
+        <label className="flex items-center gap-3 rounded-2xl bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-[inset_0_0_0_1px_rgba(16,95,104,0.08)]">
           <input
             type="checkbox"
             checked={filters.verified === "true"}
