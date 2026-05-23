@@ -608,6 +608,12 @@ a[href]:not(.no-underline):focus-visible {
   transition-duration: 0.16s !important;
 }
 
+.low-motion-ui .marketing-card,
+.low-motion-ui main article {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
 .low-motion-ui .neo-btn:hover,
 .low-motion-ui .uiverse-btn:hover,
 .low-motion-ui .dashboard-stat:hover,

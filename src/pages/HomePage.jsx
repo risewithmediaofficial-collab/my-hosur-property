@@ -37,6 +37,15 @@ const reveal = {
   }),
 };
 
+const cardReveal = {
+  hidden: { opacity: 0, y: 18 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
 const propertyTypeOptions = [
   { label: "All types", value: "" },
   { label: "Plot", value: "Plot" },
@@ -443,7 +452,7 @@ const HomePage = () => {
       <MotionSection
         initial="hidden"
         whileInView="show"
-        viewport={{ once: true, amount: 0.18 }}
+        viewport={{ once: true, amount: 0.05 }}
         variants={reveal}
         className="bg-surface px-5 py-16 sm:px-8 lg:px-10"
       >
@@ -452,13 +461,15 @@ const HomePage = () => {
           <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">Complete property support for Hosur</h2>
         </div>
         <div className="mx-auto mt-10 grid max-w-[1440px] gap-6 md:grid-cols-3">
-          {servicePreview.map((item, index) => {
+          {servicePreview.map((item) => {
             const Icon = item.icon;
             return (
               <motion.article
                 key={item.title}
-                variants={reveal}
-                custom={index * 0.05}
+                variants={cardReveal}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, amount: 0.01 }}
                 className="rounded-xl border border-slate-200 bg-white p-8 text-center shadow-card transition duration-300 hover:-translate-y-1 hover:border-orange"
               >
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-navy text-white">

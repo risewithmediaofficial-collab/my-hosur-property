@@ -12,48 +12,48 @@ const ImageGallery = ({ images = [], property = {} }) => {
   }, [primaryImage]);
 
   return (
-    <div className="space-y-4">
-      <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-[0_18px_36px_rgba(17,17,17,0.06)]">
-        <div className="aspect-[4/3] w-full overflow-hidden bg-slate-100">
+    <div className="space-y-3">
+      <div className="overflow-hidden rounded-xl bg-slate-100 shadow-card">
+        <div className="aspect-[4/3] w-full overflow-hidden">
           <img
             src={active}
             alt={safeImages.length ? getPropertyImageAlt(property, safeImages.indexOf(active)) : "No property image uploaded"}
-            className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
+            className="h-full w-full object-cover transition duration-500"
             decoding="async"
             onError={() => setActive(PROPERTY_PLACEHOLDER_IMAGE)}
           />
         </div>
       </div>
 
-      <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
-        {safeImages.slice(0, 8).map((img) => {
-          const isActive = active === img;
+      {safeImages.length > 1 ? (
+        <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
+          {safeImages.slice(0, 8).map((img) => {
+            const isActive = active === img;
 
-          return (
-            <button
-              key={img}
-              type="button"
-              onClick={() => setActive(img)}
-              className={`shrink-0 overflow-hidden rounded-2xl border transition ${
-                isActive
-                  ? "border-slate-900 shadow-[0_14px_28px_rgba(17,17,17,0.08)]"
-                  : "border-slate-200 bg-white hover:border-slate-900"
-              }`}
-            >
-              <img
-                src={img}
-                alt={getPropertyImageAlt(property, safeImages.indexOf(img))}
-                className="h-20 w-24 object-cover"
-                loading="lazy"
-                decoding="async"
-                onError={(event) => {
-                  event.currentTarget.src = PROPERTY_PLACEHOLDER_IMAGE;
-                }}
-              />
-            </button>
-          );
-        })}
-      </div>
+            return (
+              <button
+                key={img}
+                type="button"
+                onClick={() => setActive(img)}
+                className={`shrink-0 overflow-hidden rounded-lg transition ${
+                  isActive ? "ring-2 ring-orange ring-offset-2" : "opacity-70 hover:opacity-100"
+                }`}
+              >
+                <img
+                  src={img}
+                  alt={getPropertyImageAlt(property, safeImages.indexOf(img))}
+                  className="h-16 w-20 object-cover sm:h-20 sm:w-24"
+                  loading="lazy"
+                  decoding="async"
+                  onError={(event) => {
+                    event.currentTarget.src = PROPERTY_PLACEHOLDER_IMAGE;
+                  }}
+                />
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 };

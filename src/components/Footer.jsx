@@ -27,8 +27,8 @@ const Footer = () => (
   <footer className="bg-navy text-white">
     <div className="px-5 py-12 sm:px-8 lg:px-10">
       <div className="mx-auto w-full max-w-[1440px]">
-        <div className="grid gap-10 md:grid-cols-[1.15fr_0.8fr_0.9fr_1fr]">
-          <div className="space-y-4">
+        <div className="grid gap-8 lg:grid-cols-[1.15fr_1fr_1.1fr]">
+          <div className="space-y-4 lg:col-span-1">
             <div className="flex items-center gap-3">
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-orange text-white">
                 <BuildingOffice2Icon className="h-5 w-5" />
@@ -46,23 +46,12 @@ const Footer = () => (
             <p className="text-sm font-semibold text-orange">My Hosur Property - Trusted Real Estate Partner</p>
           </div>
 
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">Navigation</h4>
-            <nav className="flex flex-col gap-3">
-              {primaryNavLinks.map((link) => (
-                <NavLink key={link.to} to={link.to} onClick={scrollToTop} className="text-sm text-white/70 transition hover:text-orange">
+          <div className="space-y-3 lg:col-span-1">
+            <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">Quick links</h4>
+            <nav className="flex flex-row flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-4" aria-label="Footer navigation and services">
+              {[...primaryNavLinks, ...serviceLinks].map((link) => (
+                <NavLink key={`${link.to}-${link.label}`} to={link.to} onClick={scrollToTop} className="whitespace-nowrap text-sm text-white/70 transition hover:text-orange">
                   {link.label}
-                </NavLink>
-              ))}
-            </nav>
-          </div>
-
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">Services</h4>
-            <nav className="flex flex-col gap-3" aria-label="Footer services">
-              {serviceLinks.map((service) => (
-                <NavLink key={service.to} to={service.to} onClick={scrollToTop} className="text-sm text-white/70 transition hover:text-orange">
-                  {service.label}
                 </NavLink>
               ))}
             </nav>

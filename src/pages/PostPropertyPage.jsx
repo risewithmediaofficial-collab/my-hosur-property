@@ -10,9 +10,7 @@ const PostPropertyPage = () => (
       description="Add pricing, location, images, and property details in one guided workflow built for serious Hosur real estate listings."
     />
     <PageSection tone="surface" className="!pt-0">
-      <div className="marketing-card rounded-xl p-4 sm:p-6">
-        <PropertyPostingForm heading="Post Property With Plan, Maps & Uploads" />
-      </div>
+      <PropertyPostingForm heading="Post your property" />
     </PageSection>
   </main>
 );

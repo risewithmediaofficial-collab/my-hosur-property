@@ -41,22 +41,20 @@ const reveal = {
   }),
 };
 
-const fadeInFromLeft = {
-  hidden: { opacity: 0, x: -40 },
-  show: (delay = 0) => ({
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay },
-  }),
+const listReveal = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.06, delayChildren: 0.04 },
+  },
 };
 
-const fadeInFromRight = {
-  hidden: { opacity: 0, x: 40 },
-  show: (delay = 0) => ({
+const cardReveal = {
+  hidden: { opacity: 0, y: 18 },
+  show: {
     opacity: 1,
-    x: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay },
-  }),
+    y: 0,
+    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+  },
 };
 
 const serviceHighlights = [
@@ -324,12 +322,12 @@ const ServicesPage = () => {
       <MotionSection
         initial="hidden"
         whileInView="show"
-        viewport={{ once: true, amount: 0.18 }}
-        variants={reveal}
+        viewport={{ once: true, amount: 0.05 }}
+        variants={listReveal}
         className="bg-surface px-5 py-10 sm:px-8 lg:px-10"
       >
         <div className="mx-auto max-w-[1440px]">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <motion.div variants={cardReveal} className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="section-tag">Search services</p>
             <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl lg:text-4xl">Find the service that matches your property need.</h2>
@@ -345,17 +343,19 @@ const ServicesPage = () => {
               />
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="mt-6 grid items-start gap-5 sm:grid-cols-2 xl:grid-cols-3">
-          {filteredServices.map((category, index) => {
+        <div className="mt-6 grid grid-cols-1 items-start gap-5 min-w-0 sm:grid-cols-2 xl:grid-cols-3">
+          {filteredServices.map((category) => {
             const CategoryIcon = category.icon;
             return (
               <motion.article
                 key={category.key}
-                variants={reveal}
-                custom={index * 0.05}
-                className="marketing-card w-full p-5 transition duration-300 hover:-translate-y-1 hover:border-orange sm:p-6"
+                variants={cardReveal}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, amount: 0.01 }}
+                className="marketing-card w-full min-w-0 p-5 transition duration-300 hover:-translate-y-1 hover:border-orange sm:p-6"
               >
                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-navy text-white">
                   <CategoryIcon className="h-5 w-5" />
@@ -407,20 +407,12 @@ const ServicesPage = () => {
               key={service.id}
               initial="hidden"
               whileInView="show"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={reveal}
+              viewport={{ once: true, amount: 0.05 }}
+              variants={cardReveal}
               className="marketing-card w-full overflow-hidden p-0 hover:border-orange"
             >
               <div className="grid lg:grid-cols-2 lg:items-stretch">
-                {/* Content Section */}
-                <motion.div
-                  variants={isImageRight ? fadeInFromLeft : fadeInFromRight}
-                  initial="hidden"
-                  whileInView="show"
-                  viewport={{ once: true, amount: 0.3 }}
-                  custom={0.1}
-                  className={`p-6 sm:p-8 lg:p-10 ${!isImageRight ? "lg:order-2" : ""}`}
-                >
+                <div className={`p-6 sm:p-8 lg:p-10 ${!isImageRight ? "lg:order-2" : ""}`}>
                   <div>
                     <p className="section-tag">Service #{service.id}</p>
                     <h3 className="mt-3 text-2xl font-bold leading-tight text-navy sm:text-3xl">
@@ -455,15 +447,9 @@ const ServicesPage = () => {
                       <SparklesIcon className="h-4 w-4" />
                     </Link>
                   </div>
-                </motion.div>
+                </div>
 
-                {/* Image Section */}
-                <motion.div
-                  variants={isImageRight ? fadeInFromRight : fadeInFromLeft}
-                  initial="hidden"
-                  whileInView="show"
-                  viewport={{ once: true, amount: 0.3 }}
-                  custom={0.1}
+                <div
                   className={`relative h-56 overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 sm:h-64 lg:h-full lg:min-h-[260px] ${!isImageRight ? "lg:order-1" : ""}`}
                 >
                   <img
@@ -471,7 +457,7 @@ const ServicesPage = () => {
                     alt={service.title}
                     className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
                   />
-                </motion.div>
+                </div>
               </div>
             </motion.div>
           );

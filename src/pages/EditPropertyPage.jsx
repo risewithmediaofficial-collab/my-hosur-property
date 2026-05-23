@@ -78,9 +78,7 @@ const EditPropertyPage = () => {
         description="Update pricing, media, location, and listing information from one professional form."
       />
       <PageSection tone="surface" className="!pt-0">
-        <div className="marketing-card rounded-xl p-4 sm:p-6">
-          <PropertyPostingForm heading="Edit Property Details" initialData={property} onSuccess={() => navigate("/dashboard")} />
-        </div>
+        <PropertyPostingForm heading="Edit property details" initialData={property} onSuccess={() => navigate("/dashboard")} />
       </PageSection>
     </main>
   );
