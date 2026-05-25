@@ -47,7 +47,6 @@ const AppShell = () => {
   const isDashboardRoute = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/admin/dashboard");
   const isListingsRoute = location.pathname.startsWith("/listings");
   const isHomeRoute = location.pathname === "/";
-  const isContainedLayout = isDashboardRoute || isListingsRoute;
 
   useEffect(() => {
     initEmailJs();
@@ -88,7 +87,7 @@ const AppShell = () => {
         {isPrivatePath ? <PrivateRouteSeo title="Account" /> : null}
         {!hideNavbar && <Navbar />}
         <main
-          className={`flex-1 ${isFullHeight || hideNavbar ? "" : isHomeRoute ? "pb-0" : "pt-4 pb-12 md:pt-6"} ${isContainedLayout ? "flex min-h-0 flex-col overflow-hidden" : ""}`}
+          className={`flex-1 ${isFullHeight || hideNavbar ? "" : isHomeRoute ? "pb-0" : "pt-4 pb-12 md:pt-6"} ${isListingsRoute ? "md:flex md:min-h-0 md:flex-col md:overflow-hidden" : ""} ${isDashboardRoute ? "flex min-h-0 flex-col overflow-hidden" : ""}`}
         >
           <Suspense fallback={<RouteFallback />}>
             <AnimatePresence mode="wait">
@@ -98,7 +97,13 @@ const AppShell = () => {
                 initial={lowMotionDevice ? false : "initial"}
                 animate={lowMotionDevice ? false : "animate"}
                 exit={lowMotionDevice ? undefined : "exit"}
-                className={isContainedLayout ? "flex h-full min-h-0 flex-1 flex-col" : ""}
+                className={
+                  isListingsRoute
+                    ? "md:flex md:h-full md:min-h-0 md:flex-1 md:flex-col"
+                    : isDashboardRoute
+                      ? "flex h-full min-h-0 flex-1 flex-col"
+                      : ""
+                }
               >
                 <Routes location={location}>
                   <Route path="/" element={<HomePage />} />
