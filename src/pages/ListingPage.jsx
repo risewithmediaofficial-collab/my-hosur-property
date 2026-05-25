@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { AdjustmentsHorizontalIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -195,7 +196,7 @@ const ListingPage = () => {
 
       <div className="listing-page-layout mx-auto flex min-h-0 w-full max-w-[1440px] flex-1 flex-col">
         {/* Left: filters — own scrollbar, never tied to properties */}
-        <aside className="listing-filter-aside hidden md:flex" aria-label="Property filters">
+        <aside className="listing-filter-aside" aria-label="Property filters">
           <div className="listing-filter-shell">
             <div className="listing-filter-scroll" data-scroll-panel="filters">
               <PropertySearchFilterPanel
@@ -225,9 +226,10 @@ const ListingPage = () => {
               type="button"
               onClick={openMobileFilters}
               className="property-filter-mobile-btn md:hidden"
+              aria-expanded={mobileFilterOpen}
             >
               <AdjustmentsHorizontalIcon className="h-5 w-5" />
-              Open filters
+              Filters
               {filterChips.length ? <span className="property-filter-badge">{filterChips.length}</span> : null}
             </button>
 
@@ -254,7 +256,7 @@ const ListingPage = () => {
             data-scroll-panel="properties"
           >
             <div className="listing-results-scroll-inner">
-            <div className="mt-6">
+            <div className="mt-4 md:mt-6">
               {loading && !data.items.length ? (
                 <ListingSkeleton />
               ) : data.items.length ? (
@@ -286,37 +288,45 @@ const ListingPage = () => {
         </section>
       </div>
 
-      {/* Mobile drawer */}
-      {mobileFilterOpen ? (
-        <div className="property-filter-drawer-root md:hidden">
-          <button
-            type="button"
-            className="property-filter-drawer-backdrop"
-            aria-label="Close filters"
-            onClick={() => setMobileFilterOpen(false)}
-          />
-          <aside className="property-filter-drawer">
-            <div className="property-filter-drawer-header">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Filters</p>
-                <h2 className="text-lg font-bold text-navy">Search your property</h2>
-              </div>
-              <button type="button" onClick={() => setMobileFilterOpen(false)} className="property-filter-drawer-close" aria-label="Close">
-                <XMarkIcon className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="property-filter-drawer-body">
-              <PropertySearchFilterPanel
-                category={draft.category}
-                values={draft}
-                onCategoryChange={handleCategoryChange}
-                onFieldChange={handleFieldChange}
+      {/* Mobile: filters slide in from the left; properties stay visible behind backdrop */}
+      {mobileFilterOpen && typeof document !== "undefined"
+        ? createPortal(
+            <div className="property-filter-drawer-root md:hidden" role="dialog" aria-modal="true" aria-label="Property filters">
+              <button
+                type="button"
+                className="property-filter-drawer-backdrop"
+                aria-label="Close filters"
+                onClick={() => setMobileFilterOpen(false)}
               />
-            </div>
-            <div className="property-filter-drawer-footer listing-filter-footer">{filterActions}</div>
-          </aside>
-        </div>
-      ) : null}
+              <aside className="property-filter-drawer">
+                <div className="property-filter-drawer-header">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Filters</p>
+                    <h2 className="text-lg font-bold text-navy">Search your property</h2>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setMobileFilterOpen(false)}
+                    className="property-filter-drawer-close"
+                    aria-label="Close"
+                  >
+                    <XMarkIcon className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="property-filter-drawer-body">
+                  <PropertySearchFilterPanel
+                    category={draft.category}
+                    values={draft}
+                    onCategoryChange={handleCategoryChange}
+                    onFieldChange={handleFieldChange}
+                  />
+                </div>
+                <div className="property-filter-drawer-footer listing-filter-footer">{filterActions}</div>
+              </aside>
+            </div>,
+            document.body
+          )
+        : null}
     </div>
   );
 };

@@ -1329,13 +1329,19 @@ body {
   }
 }
 
-/* —— Left panel: filters (scrolls alone) —— */
+/* —— Left panel: filters (desktop only; mobile uses drawer) —— */
 .listing-filter-aside {
-  display: flex;
+  display: none;
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
   background: #ffffff;
+}
+
+@media (min-width: 768px) {
+  .listing-filter-aside {
+    display: flex;
+  }
 }
 
 .listing-filter-shell {
@@ -1463,14 +1469,35 @@ body {
   }
 }
 
-/* Mobile: full-width results, scroll inside property panel */
+/* Mobile: properties first; filters open in left drawer */
 @media (max-width: 767px) {
   .listing-page-layout {
     flex-direction: column;
   }
 
+  .listing-filter-aside {
+    display: none !important;
+  }
+
   .listing-results-header {
     padding: 1rem 1rem 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 1px 0 #f1f5f9;
+  }
+
+  .listing-results-intro h1 {
+    font-size: 1.25rem;
+    line-height: 1.35;
+  }
+
+  .property-filter-mobile-btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+    border-color: #e67e22;
+    color: #1a2b4e;
   }
 
   .listing-results-scroll-inner {
@@ -1850,8 +1877,9 @@ body {
 .property-filter-drawer-root {
   position: fixed;
   inset: 0;
-  z-index: 60;
+  z-index: 70;
   display: flex;
+  justify-content: flex-start;
 }
 
 .property-filter-drawer-backdrop {
@@ -1879,14 +1907,6 @@ body {
   to {
     transform: translateX(0);
   }
-}
-
-.property-filter-drawer-root {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  display: flex;
-  justify-content: flex-start;
 }
 
 .property-filter-drawer-header {
