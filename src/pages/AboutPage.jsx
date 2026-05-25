@@ -109,7 +109,7 @@ const AboutPage = () => {
           <h2 className="mt-2 text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
             A local real-estate platform that feels simple, premium, and trustworthy.
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-8 text-white/75 sm:text-base lg:mx-0">
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-8 text-white sm:text-base lg:mx-0">
             We combine property discovery, documentation support, service assistance, and local market knowledge into one structured platform for Hosur.
           </p>
         </div>

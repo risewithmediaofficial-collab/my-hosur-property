@@ -37,10 +37,10 @@ const Footer = () => (
                 <p className="text-lg font-extrabold tracking-tight">
                   MyHosur<span className="text-orange">Property</span>
                 </p>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/50">Professional platform</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white">Professional platform</p>
               </div>
             </div>
-            <p className="max-w-sm text-sm leading-7 text-white/70">
+            <p className="max-w-sm text-sm leading-7 text-white">
               A refined property platform for verified listings, clearer property discovery, and reliable buyer-owner communication in Hosur.
             </p>
             <p className="text-sm font-semibold text-orange">My Hosur Property - Trusted Real Estate Partner</p>
@@ -50,7 +50,7 @@ const Footer = () => (
             <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">Quick links</h4>
             <nav className="flex flex-row flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-4" aria-label="Footer navigation and services">
               {[...primaryNavLinks, ...serviceLinks].map((link) => (
-                <NavLink key={`${link.to}-${link.label}`} to={link.to} onClick={scrollToTop} className="whitespace-nowrap text-sm text-white/70 transition hover:text-orange">
+                <NavLink key={`${link.to}-${link.label}`} to={link.to} onClick={scrollToTop} className="whitespace-nowrap text-sm text-white transition hover:text-orange">
                   {link.label}
                 </NavLink>
               ))}
@@ -59,24 +59,24 @@ const Footer = () => (
 
           <div className="space-y-4">
             <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">Contact</h4>
-            <div className="space-y-4 text-sm text-white/70">
+            <div className="space-y-5 text-sm text-white">
               <a href="mailto:support@myhosurproperty.com" className="flex items-start gap-3 transition hover:text-orange">
-                <EnvelopeIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-orange" />
-                <span>support@myhosurproperty.com</span>
+                <EnvelopeIcon className="mt-1 h-4 w-4 flex-shrink-0 text-orange" />
+                <span className="leading-5">support@myhosurproperty.com</span>
               </a>
-              <a href="tel:+919876543210" className="flex items-center gap-3 transition hover:text-orange">
-                <PhoneIcon className="h-4 w-4 flex-shrink-0 text-orange" />
-                <span>+91 98765 43210</span>
+              <a href="tel:+919876543210" className="flex items-start gap-3 transition hover:text-orange">
+                <PhoneIcon className="mt-1 h-4 w-4 flex-shrink-0 text-orange" />
+                <span className="leading-5">+91 98765 43210</span>
               </a>
               <div className="flex items-start gap-3">
-                <MapPinIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-orange" />
-                <span>Hosur, Krishnagiri District, Tamil Nadu 635109, India</span>
+                <MapPinIcon className="mt-1 h-4 w-4 flex-shrink-0 text-orange" />
+                <span className="leading-5">Hosur, Krishnagiri District, Tamil Nadu 635109, India</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-white sm:flex-row sm:items-center sm:justify-between">
           <p>Copyright 2026 MyHosurProperty. All rights reserved.</p>
           <div className="flex flex-wrap gap-4">
             <NavLink to="/about" onClick={scrollToTop} className="transition hover:text-orange">

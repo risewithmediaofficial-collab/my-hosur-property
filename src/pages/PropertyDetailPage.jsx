@@ -437,7 +437,7 @@ const PropertyDetailPage = () => {
         <div className="mx-auto max-w-[1440px] text-center lg:text-left">
           <p className="section-tag text-orange">Explore more</p>
           <h2 className="mt-3 text-2xl font-bold sm:text-3xl">Keep browsing Hosur properties</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-white/75 lg:mx-0">
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-white lg:mx-0">
             View more listings in {p.location?.city || "Hosur"} or filter by {p.propertyType} to compare similar options.
           </p>
           <div className="mt-6 flex flex-col flex-wrap justify-center gap-3 sm:flex-row lg:justify-start">

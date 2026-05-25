@@ -43,7 +43,7 @@ const PageSection = ({
             </h2>
           ) : null}
           {description ? (
-            <p className={`mx-auto mt-3 max-w-2xl text-sm leading-7 sm:text-base ${tone === "navy" ? "text-white/75" : "text-slate-600"}`}>
+            <p className={`mx-auto mt-3 max-w-2xl text-sm leading-7 sm:text-base ${tone === "navy" ? "text-white" : "text-slate-600"}`}>
               {description}
             </p>
           ) : null}

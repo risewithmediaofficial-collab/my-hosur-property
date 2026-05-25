@@ -8,7 +8,7 @@ const PlanCard = ({ plan, onSelect, active }) => (
   >
     <h3 className="text-lg font-bold">{plan.name}</h3>
     <p className={`mt-2 text-2xl font-extrabold ${active ? "text-orange" : "text-navy"}`}>{currency(plan.price)}</p>
-    <p className={`mt-2 text-sm ${active ? "text-white/70" : "text-slate-600"}`}>
+    <p className={`mt-2 text-sm ${active ? "text-white" : "text-slate-600"}`}>
       {plan.listingLimit} listings, {plan.durationDays} days
     </p>
     <button

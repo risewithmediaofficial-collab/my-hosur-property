@@ -476,7 +476,7 @@ const ServicesPage = () => {
           <div className="text-center lg:text-left">
             <p className="section-tag !text-orange">Need support</p>
             <h2 className="mt-2 text-2xl font-bold sm:text-3xl lg:text-4xl">Need Help Finding Your Property Solution?</h2>
-            <p className="mx-auto mt-4 max-w-2xl text-sm leading-8 text-white/75 sm:text-base lg:mx-0">
+            <p className="mx-auto mt-4 max-w-2xl text-sm leading-8 text-white sm:text-base lg:mx-0">
               Connect with My Hosur Property for help across buying, selling, registration, finance, construction, and local property support.
             </p>
             <p className="mt-5 text-sm font-semibold text-orange">My Hosur Property - Trusted Real Estate Partner</p>

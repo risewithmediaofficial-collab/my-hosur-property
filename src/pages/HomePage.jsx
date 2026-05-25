@@ -284,7 +284,7 @@ const HomePage = () => {
                 <p className="text-xl font-bold text-white sm:text-2xl lg:text-3xl">
                   <CountUpNumber value={item.value} suffix={item.suffix} />
                 </p>
-                <p className="mt-1 text-[11px] text-white/65 sm:text-sm">{item.label}</p>
+                <p className="mt-1 text-[11px] text-white sm:text-sm">{item.label}</p>
               </div>
             ))}
           </div>
@@ -536,7 +536,7 @@ const HomePage = () => {
           <div>
             <p className="section-tag text-orange">Need expert help</p>
             <h2 className="mt-3 text-3xl font-bold sm:text-4xl">Complete property support beyond listings.</h2>
-            <p className="mt-4 max-w-2xl text-sm leading-8 text-white/75 sm:text-base">
+            <p className="mt-4 max-w-2xl text-sm leading-8 text-white sm:text-base">
               From property search and loans to documentation, registration, construction, and local service coordination, our team helps you move with clarity.
             </p>
           </div>
