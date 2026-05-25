@@ -92,7 +92,7 @@ const ListingPage = () => {
 
   useEffect(() => {
     const scrollRoot = resultsScrollRef.current;
-    const usePanelRoot = typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches;
+    if (!scrollRoot || !sentinelRef.current) return undefined;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -101,14 +101,15 @@ const ListingPage = () => {
         }
       },
       {
-        threshold: 0.5,
-        root: usePanelRoot && scrollRoot ? scrollRoot : null,
+        threshold: 0.25,
+        root: scrollRoot,
+        rootMargin: "120px",
       }
     );
 
-    if (sentinelRef.current) observer.observe(sentinelRef.current);
+    observer.observe(sentinelRef.current);
     return () => observer.disconnect();
-  }, [data.page, data.totalPages, loading]);
+  }, [data.page, data.totalPages, loading, data.items.length]);
 
   const handleCategoryChange = (categoryId) => {
     setDraft((prev) => {
@@ -184,7 +185,7 @@ const ListingPage = () => {
   );
 
   return (
-    <div className="listing-page-root w-full bg-white">
+    <div className="listing-page-root flex min-h-0 flex-1 flex-col w-full bg-white">
       <SeoHead
         title={listingTitle}
         description={listingDescription}
@@ -192,7 +193,7 @@ const ListingPage = () => {
         canonicalPath={buildCanonicalListingQuery(applied)}
       />
 
-      <div className="listing-page-layout mx-auto w-full max-w-[1440px]">
+      <div className="listing-page-layout mx-auto flex min-h-0 w-full max-w-[1440px] flex-1 flex-col">
         {/* Left: filters — own scrollbar, never tied to properties */}
         <aside className="listing-filter-aside hidden md:flex" aria-label="Property filters">
           <div className="listing-filter-shell">
@@ -209,7 +210,7 @@ const ListingPage = () => {
         </aside>
 
         {/* Right: properties — own scrollbar, independent from filters */}
-        <section className="listing-results" aria-label="Property results">
+        <section className="listing-results flex min-h-0 flex-1 flex-col" aria-label="Property results">
           <div className="listing-results-header">
             <div className="listing-results-intro">
               <p className="section-tag">Property listings</p>
@@ -247,7 +248,11 @@ const ListingPage = () => {
             ) : null}
           </div>
 
-          <div ref={resultsScrollRef} className="listing-results-scroll" data-scroll-panel="properties">
+          <div
+            ref={resultsScrollRef}
+            className="listing-results-scroll min-h-0 flex-1"
+            data-scroll-panel="properties"
+          >
             <div className="listing-results-scroll-inner">
             <div className="mt-6">
               {loading && !data.items.length ? (

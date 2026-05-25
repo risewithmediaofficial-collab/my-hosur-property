@@ -57,21 +57,38 @@ const AppShell = () => {
     return () => document.documentElement.classList.remove("low-motion-ui");
   }, [lowMotionDevice]);
 
-  // Scroll to top when route changes
+  // Listings uses an internal scroll panel; lock document scroll so mobile can pan results
   useEffect(() => {
-    // Temporarily disable smooth scroll for immediate scroll to top
+    if (!isListingsRoute) return undefined;
+
+    const { documentElement, body } = document;
+    const prevHtmlOverflow = documentElement.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+
+    documentElement.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+
+    return () => {
+      documentElement.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+    };
+  }, [isListingsRoute]);
+
+  // Scroll to top when route changes (skip listings — it scrolls inside the results panel)
+  useEffect(() => {
+    if (isListingsRoute) return;
+
     const htmlElement = document.documentElement;
     const originalScroll = htmlElement.style.scrollBehavior;
-    htmlElement.style.scrollBehavior = 'auto';
-    
+    htmlElement.style.scrollBehavior = "auto";
+
     window.scrollTo(0, 0);
     document.body.scrollTop = 0;
-    
-    // Restore smooth scroll after a brief delay
+
     setTimeout(() => {
       htmlElement.style.scrollBehavior = originalScroll;
     }, 50);
-  }, [location.pathname]);
+  }, [location.pathname, isListingsRoute]);
 
   const hideNavbar = ["/admin/login"].some((p) => location.pathname.startsWith(p));
   const hideFooter =
@@ -80,14 +97,14 @@ const AppShell = () => {
   return (
     <MotionConfig reducedMotion={lowMotionDevice ? "always" : "never"}>
       <div
-        className={`site-app-shell flex min-h-screen flex-col ${isDashboardRoute ? "site-dashboard-app md:h-screen md:overflow-hidden" : ""} ${isListingsRoute ? "site-listings-active md:h-dvh md:max-h-dvh md:overflow-hidden" : ""}`}
+        className={`site-app-shell flex min-h-screen flex-col ${isDashboardRoute ? "site-dashboard-app md:h-screen md:overflow-hidden" : ""} ${isListingsRoute ? "site-listings-active h-dvh max-h-dvh overflow-hidden" : ""}`}
       >
         <PageLoader />
         <Toaster position="top-right" toastOptions={{ duration: 2500 }} />
         {isPrivatePath ? <PrivateRouteSeo title="Account" /> : null}
         {!hideNavbar && <Navbar />}
         <main
-          className={`flex-1 ${isFullHeight || hideNavbar ? "" : isHomeRoute ? "pb-0" : "pt-4 pb-12 md:pt-6"} ${isListingsRoute ? "md:flex md:min-h-0 md:flex-col md:overflow-hidden" : ""} ${isDashboardRoute ? "flex min-h-0 flex-col overflow-hidden" : ""}`}
+          className={`flex-1 ${isFullHeight || hideNavbar ? "" : isHomeRoute ? "pb-0" : isListingsRoute ? "" : "pt-4 pb-12 md:pt-6"} ${isListingsRoute ? "flex min-h-0 flex-col overflow-hidden" : ""} ${isDashboardRoute ? "flex min-h-0 flex-col overflow-hidden" : ""}`}
         >
           <Suspense fallback={<RouteFallback />}>
             <AnimatePresence mode="wait">
@@ -98,11 +115,9 @@ const AppShell = () => {
                 animate={lowMotionDevice ? false : "animate"}
                 exit={lowMotionDevice ? undefined : "exit"}
                 className={
-                  isListingsRoute
-                    ? "md:flex md:h-full md:min-h-0 md:flex-1 md:flex-col"
-                    : isDashboardRoute
-                      ? "flex h-full min-h-0 flex-1 flex-col"
-                      : ""
+                  isListingsRoute || isDashboardRoute
+                    ? "flex h-full min-h-0 flex-1 flex-col"
+                    : ""
                 }
               >
                 <Routes location={location}>

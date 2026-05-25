@@ -12,6 +12,12 @@ body,
   padding: 0;
 }
 
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
 :root {
   color: #14363b;
   background: #f3fbfa;
@@ -1268,46 +1274,34 @@ body {
   background: #1a2b4e !important;
 }
 
-/* Listings page — two independent scroll panels (filters | properties) */
+/* Listings page — scroll panels (mobile: one column | desktop: sidebar + results) */
 :root {
   --listing-nav-offset: 7.75rem;
 }
 
-@media (min-width: 768px) {
-  .site-listings-active main {
-    overflow: hidden;
-    min-height: 0;
-  }
+.site-listings-active main {
+  overflow: hidden;
+  min-height: 0;
 }
 
 .listing-page-root {
-  display: block;
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
   width: 100%;
+  height: 100%;
+  overflow: hidden;
   background: #ffffff;
-}
-
-@media (min-width: 768px) {
-  .listing-page-root {
-    display: flex;
-    min-height: 0;
-    flex: 1;
-    flex-direction: column;
-  }
-}
-
-@media (min-width: 768px) {
-  .listing-page-root {
-    height: calc(100dvh - var(--listing-nav-offset));
-    max-height: calc(100dvh - var(--listing-nav-offset));
-    overflow: hidden;
-  }
 }
 
 .listing-page-layout {
   display: flex;
   min-height: 0;
   flex: 1;
+  flex-direction: column;
   width: 100%;
+  overflow: hidden;
 }
 
 @media (min-width: 768px) {
@@ -1394,21 +1388,15 @@ body {
   padding: 0.85rem 1rem 1rem;
 }
 
-/* —— Right panel: properties (scrolls alone on desktop) —— */
+/* —— Right panel: properties —— */
 .listing-results {
-  display: block;
+  display: flex;
   min-width: 0;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
   background: #ffffff;
-}
-
-@media (min-width: 768px) {
-  .listing-results {
-    display: flex;
-    min-height: 0;
-    flex: 1;
-    flex-direction: column;
-    overflow: hidden;
-  }
 }
 
 .listing-results-header {
@@ -1436,42 +1424,33 @@ body {
 }
 
 .listing-results-scroll {
-  display: block;
-  overflow: visible;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 #f1f5f9;
 }
 
-@media (min-width: 768px) {
-  .listing-results-scroll {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-    scrollbar-width: thin;
-    scrollbar-color: #94a3b8 #f1f5f9;
-  }
+.listing-results-scroll::-webkit-scrollbar {
+  width: 8px;
 }
 
-@media (min-width: 768px) {
-  .listing-results-scroll::-webkit-scrollbar {
-    width: 8px;
-  }
+.listing-results-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
 
-  .listing-results-scroll::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 4px;
-  }
+.listing-results-scroll::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background: #94a3b8;
+}
 
-  .listing-results-scroll::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-    background: #94a3b8;
-  }
-
-  .listing-results-scroll::-webkit-scrollbar-thumb:hover {
-    background: #64748b;
-  }
+.listing-results-scroll::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }
 
 .listing-results-scroll-inner {
@@ -1484,36 +1463,28 @@ body {
   }
 }
 
-/* Mobile: normal page scroll (no trapped flex panels) */
+/* Mobile: full-width results, scroll inside property panel */
 @media (max-width: 767px) {
-  .site-listings-active {
-    height: auto !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
-
-  .site-listings-active main {
-    overflow: visible !important;
-    min-height: 0;
-    display: block;
-  }
-
-  .listing-page-root,
-  .listing-page-layout,
-  .listing-results,
-  .listing-results-scroll,
-  .listing-results-scroll-inner {
-    height: auto;
-    max-height: none;
-    overflow: visible;
-  }
-
   .listing-page-layout {
-    display: block;
+    flex-direction: column;
+  }
+
+  .listing-results-header {
+    padding: 1rem 1rem 0.75rem;
+  }
+
+  .listing-results-scroll-inner {
+    padding: 0.75rem 1rem 1.5rem;
   }
 
   .listing-results-scroll {
-    touch-action: auto;
+    /* iOS needs explicit scroll container below navbar */
+    overflow-y: scroll;
+  }
+
+  .listing-results .grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 
