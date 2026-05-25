@@ -96,17 +96,17 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-lg font-bold text-navy">{currency(item.price)}</p>
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="border-t border-slate-100 pt-4">
+          <p className="text-xl font-bold leading-tight text-navy">{currency(item.price)}</p>
+          <div className="mt-3 flex items-stretch gap-2">
             {onSave ? (
               <button
                 type="button"
                 onClick={() => onSave?.(item._id)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                className={`inline-flex h-10 shrink-0 items-center justify-center rounded-lg px-4 text-sm font-semibold transition ${
                   isSaved
                     ? "bg-navy text-white"
-                    : "border border-slate-200 text-navy hover:border-orange hover:text-orange"
+                    : "border border-slate-200 bg-white text-navy hover:border-orange hover:text-orange"
                 }`}
               >
                 {isSaved ? "Saved" : "Save"}
@@ -116,10 +116,10 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
               to={href}
               onClick={scrollToTop}
               aria-label={`View ${item.title} property details`}
-              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-orange px-4 py-2 text-xs font-bold text-white transition hover:bg-orange-hover sm:flex-none"
+              className="inline-flex h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-lg bg-orange px-3 text-xs font-bold whitespace-nowrap text-white transition hover:bg-orange-hover sm:text-sm"
             >
-              View Property
-              <ArrowRightIcon className="h-3.5 w-3.5" />
+              <span>View Property</span>
+              <ArrowRightIcon className="h-4 w-4 shrink-0" />
             </Link>
           </div>
         </div>

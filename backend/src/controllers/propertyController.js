@@ -57,8 +57,9 @@ const buildQuery = (q) => {
     query.status = "approved";
   }
 
-  if (q.search) {
-    query.$text = { $search: q.search };
+  if (q.search || q.filterTags) {
+    const searchText = [q.search, q.filterTags].filter(Boolean).join(" ").trim();
+    if (searchText) query.$text = { $search: searchText };
   }
 
   if (q.ownerId) {
@@ -69,16 +70,60 @@ const buildQuery = (q) => {
   if (q.intent === "rent") query.listingType = "rent";
   if (q.intent === "new-project") query.listingType = "new-project";
 
+  if (q.category === "rentLease") query.listingType = "rent";
+  if (q.category === "buy") query.listingType = "sale";
+  if (q.category === "commercial" && !q.propertyType) {
+    query.propertyType = {
+      $in: ["Commercial Land / Building", "Commercial Land & Building", "Commercial Land", "Commercial", "Office", "Warehouse"],
+    };
+  }
+  if (q.category === "agricultural" && !q.propertyType) {
+    query.propertyType = { $in: ["Agricultural Land", "Agri Land"] };
+  }
+  if (q.category === "individualHouse" && !q.propertyType) query.propertyType = "Individual House";
+  if (q.category === "apartment" && !q.propertyType) {
+    query.propertyType = { $in: ["Apartment", "Flat"] };
+  }
+
   if (q.city) query["location.city"] = new RegExp(q.city, "i");
   if (q.area) query["location.area"] = new RegExp(q.area, "i");
-  if (q.propertyType) query.propertyType = q.propertyType;
+
+  if (q.propertyType) {
+    const types = String(q.propertyType)
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+    if (types.length > 1) query.propertyType = { $in: types };
+    else if (types.length === 1) query.propertyType = types[0];
+  }
+
   if (q.listingType) query.listingType = q.listingType;
   if (q.furnishingStatus) query.furnishingStatus = q.furnishingStatus;
   if (q.listingSource) query.listingSource = q.listingSource;
   if (q.possessionStatus) query.possessionStatus = q.possessionStatus;
   if (q.verified === "true") query["verification.isVerified"] = true;
-  if (q.bhk) query.bhk = Number(q.bhk);
-  if (q.minBhk || q.maxBhk) {
+
+  if (q.facing) {
+    const facings = String(q.facing)
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+    if (facings.length > 1) query.facing = { $in: facings };
+    else if (facings.length === 1) query.facing = facings[0];
+  }
+
+  if (q.bhk) {
+    const bhkValues = String(q.bhk)
+      .split(",")
+      .map((item) => {
+        const match = item.match(/(\d+)/);
+        return match ? Number(match[1]) : null;
+      })
+      .filter((value) => value != null);
+
+    if (bhkValues.length === 1) query.bhk = bhkValues[0];
+    else if (bhkValues.length > 1) query.bhk = { $in: bhkValues };
+  } else if (q.minBhk || q.maxBhk) {
     query.bhk = {};
     if (q.minBhk) query.bhk.$gte = Number(q.minBhk);
     if (q.maxBhk) query.bhk.$lte = Number(q.maxBhk);
@@ -150,6 +195,7 @@ const listProperties = async (req, res) => {
     if (sortKey === "price") return a.price - b.price;
     if (sortKey === "-price") return b.price - a.price;
     if (sortKey === "-createdAt") return new Date(b.createdAt) - new Date(a.createdAt);
+    if (sortKey === "-viewCount") return (b.viewCount || 0) - (a.viewCount || 0);
     return b.rankScore - a.rankScore;
   });
 

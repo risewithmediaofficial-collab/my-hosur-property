@@ -1,211 +1,151 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { motion } from "framer-motion";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import {
-  AdjustmentsHorizontalIcon,
-  MagnifyingGlassIcon,
-  SparklesIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { AdjustmentsHorizontalIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import PropertyCard from "../components/PropertyCard";
-import FilterSidebar from "../components/FilterSidebar";
+import PropertySearchFilterPanel from "../components/PropertySearchFilterPanel";
 import SeoHead from "../components/SeoHead";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
-import useDebounce from "../hooks/useDebounce";
 import useAuth from "../hooks/useAuth";
-import useLowMotionDevice from "../hooks/useLowMotionDevice";
 import { fetchProperties } from "../services/api/propertyApi";
 import { toggleSavedProperty } from "../services/api/userApi";
+import {
+  buildFilterChips,
+  clearCategoryFields,
+  clientRefineProperties,
+  createDefaultFilterState,
+  filtersToApiParams,
+  getCategoryLabel,
+  parseFiltersFromSearchParams,
+  removeChipFromState,
+  resetAllFilters,
+  serializeFiltersToSearchParams,
+} from "../utils/propertyFilters";
 import { buildCanonicalListingQuery } from "../utils/seo";
 
-gsap.registerPlugin(ScrollTrigger);
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  show: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1], delay },
-  }),
-};
-
-const MotionDiv = motion.div;
-
-const filterLabels = {
-  intent: "Intent",
-  search: "Search",
-  city: "City",
-  area: "Area",
-  propertyType: "Type",
-  furnishingStatus: "Furnishing",
-  minBhk: "Min BHK",
-  maxBhk: "Max BHK",
-  possessionStatus: "Possession",
-  verified: "Verified",
-  listingSource: "Source",
-  amenities: "Amenities",
-  minPrice: "Min price",
-  maxPrice: "Max price",
-};
+const ListingSkeleton = () => (
+  <div className="grid gap-6 sm:grid-cols-2 2xl:grid-cols-3">
+    {Array.from({ length: 6 }).map((_, index) => (
+      <div key={index} className="overflow-hidden rounded-xl border border-slate-200 bg-white p-4">
+        <div className="h-52 animate-pulse rounded-lg bg-slate-100" />
+        <div className="mt-4 h-5 w-3/4 animate-pulse rounded bg-slate-100" />
+        <div className="mt-3 h-4 w-1/2 animate-pulse rounded bg-slate-100" />
+        <div className="mt-5 h-10 animate-pulse rounded-lg bg-slate-100" />
+      </div>
+    ))}
+  </div>
+);
 
 const ListingPage = () => {
   const [params, setParams] = useSearchParams();
   const { token, isAuthenticated } = useAuth();
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-  const [filters, setFilters] = useState({
-    intent: params.get("intent") || "",
-    search: params.get("search") || "",
-    city: params.get("city") || "",
-    area: params.get("area") || "",
-    propertyType: params.get("propertyType") || "",
-    furnishingStatus: params.get("furnishingStatus") || "",
-    minBhk: params.get("minBhk") || "",
-    maxBhk: params.get("maxBhk") || "",
-    possessionStatus: params.get("possessionStatus") || "",
-    verified: params.get("verified") || "",
-    listingSource: params.get("listingSource") || "",
-    amenities: params.get("amenities") || "",
-    minPrice: params.get("minPrice") || "",
-    maxPrice: params.get("maxPrice") || "",
-    sort: params.get("sort") || "rank",
-    page: 1,
-    limit: 12,
-  });
-
-  const debounced = useDebounce(filters, 400);
+  const [loading, setLoading] = useState(true);
+  const [draft, setDraft] = useState(() => parseFiltersFromSearchParams(params));
+  const [applied, setApplied] = useState(() => parseFiltersFromSearchParams(params));
   const [data, setData] = useState({ items: [], totalPages: 0, page: 1, total: 0 });
   const [savedIds, setSavedIds] = useState([]);
   const sentinelRef = useRef(null);
-  const heroRef = useRef(null);
-  const revealRefs = useRef([]);
-  const lowMotionDevice = useLowMotionDevice();
+  const resultsScrollRef = useRef(null);
 
   useBodyScrollLock(mobileFilterOpen);
 
-  const setRevealRef = (node) => {
-    if (node && !revealRefs.current.includes(node)) {
-      revealRefs.current.push(node);
-    }
-  };
-
-  const query = useMemo(() => {
-    const out = { ...debounced };
-    Object.keys(out).forEach((key) => {
-      if (out[key] === "") delete out[key];
-    });
-    if (out.page === 1) delete out.page;
-    if (out.limit === 12) delete out.limit;
-    if (out.sort === "rank") delete out.sort;
-    return out;
-  }, [debounced]);
+  const apiQuery = useMemo(() => filtersToApiParams(applied), [applied]);
 
   const listingTitle = useMemo(() => {
-    const type = filters.propertyType ? `${filters.propertyType} ` : "";
-    const intent =
-      filters.intent === "rent" ? "for Rent" : filters.intent === "new-project" ? "New Projects" : "for Sale";
-    const city = filters.city || "Hosur";
-
-    return `${type}Properties ${intent} in ${city}`;
-  }, [filters.city, filters.intent, filters.propertyType]);
+    const cat = getCategoryLabel(applied.category);
+    const location = applied.location || "Hosur";
+    return `${cat} properties in ${location}`;
+  }, [applied.category, applied.location]);
 
   const listingDescription = useMemo(() => {
-    const city = filters.city || "Hosur";
-    const searchLabel = filters.search ? ` matching "${filters.search}"` : "";
-    return `Browse verified ${filters.propertyType || "property"} listings${searchLabel} in ${city}. Compare apartments, villas, plots, and houses with detailed filters, local insights, and direct listing access.`;
-  }, [filters.city, filters.propertyType, filters.search]);
+    const location = applied.location || "Hosur";
+    return `Browse ${getCategoryLabel(applied.category).toLowerCase()} property listings in ${location} with advanced filters for budget, BHK, facing, and locality.`;
+  }, [applied.category, applied.location]);
 
-  useEffect(() => {
-    const searchParams = new URLSearchParams();
-    Object.entries(query).forEach(([key, value]) => searchParams.set(key, String(value)));
-    setParams(searchParams);
+  const filterChips = useMemo(() => buildFilterChips(applied), [applied]);
 
-    fetchProperties(query, token)
-      .then((res) => {
+  const loadProperties = useCallback(
+    async (query, append = false) => {
+      setLoading(!append);
+      try {
+        const res = await fetchProperties(query, token);
+        const refined = clientRefineProperties(res.items || [], applied);
         setData((prev) => ({
           ...res,
-          items: query.page > 1 ? [...prev.items, ...(res.items || [])] : res.items || [],
+          items: append ? [...prev.items, ...refined] : refined,
+          total: append ? res.total : refined.length,
         }));
-      })
-      .catch(() => setData({ items: [], totalPages: 0, page: 1, total: 0 }));
-  }, [query, setParams, token]);
+      } catch {
+        setData({ items: [], totalPages: 0, page: 1, total: 0 });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [applied, token]
+  );
 
   useEffect(() => {
+    setParams(serializeFiltersToSearchParams(applied), { replace: true });
+    loadProperties(apiQuery, applied.page > 1);
+  }, [apiQuery, applied.page, loadProperties, setParams]);
+
+  useEffect(() => {
+    const scrollRoot = resultsScrollRef.current;
+    const usePanelRoot = typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches;
+
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && data.page < data.totalPages) {
-          setFilters((prev) => ({ ...prev, page: prev.page + 1 }));
+        if (entries[0].isIntersecting && data.page < data.totalPages && !loading) {
+          setApplied((prev) => ({ ...prev, page: prev.page + 1 }));
         }
       },
-      { threshold: 0.8 }
+      {
+        threshold: 0.5,
+        root: usePanelRoot && scrollRoot ? scrollRoot : null,
+      }
     );
 
     if (sentinelRef.current) observer.observe(sentinelRef.current);
     return () => observer.disconnect();
-  }, [data.page, data.totalPages]);
+  }, [data.page, data.totalPages, loading]);
 
-  useEffect(() => {
-    if (lowMotionDevice) return undefined;
-
-    const ctx = gsap.context(() => {
-      if (heroRef.current) {
-        gsap.fromTo(
-          heroRef.current.querySelectorAll("[data-listing-hero]"),
-          { opacity: 0, y: 28 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.85,
-            ease: "power3.out",
-            stagger: 0.1,
-          }
-        );
-      }
-
-      revealRefs.current.forEach((node, index) => {
-        gsap.fromTo(
-          node,
-          { opacity: 0, y: 36 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: "power3.out",
-            delay: index * 0.04,
-            scrollTrigger: {
-              trigger: node,
-              start: "top 84%",
-            },
-          }
-        );
-      });
+  const handleCategoryChange = (categoryId) => {
+    setDraft((prev) => {
+      const cleared = clearCategoryFields(prev, prev.category);
+      return { ...cleared, category: categoryId, page: 1 };
     });
+  };
 
-    return () => ctx.revert();
-  }, [lowMotionDevice]);
+  const handleFieldChange = (key, value) => {
+    if (typeof key === "object" && key !== null) {
+      setDraft((prev) => ({ ...prev, ...key }));
+      return;
+    }
+    setDraft((prev) => ({ ...prev, [key]: value }));
+  };
 
-  const clearFilters = () =>
-    setFilters({
-      intent: "",
-      search: "",
-      city: "",
-      area: "",
-      propertyType: "",
-      furnishingStatus: "",
-      minBhk: "",
-      maxBhk: "",
-      possessionStatus: "",
-      verified: "",
-      listingSource: "",
-      amenities: "",
-      minPrice: "",
-      maxPrice: "",
-      sort: "rank",
-      page: 1,
-      limit: 12,
-    });
+  const applyFilters = () => {
+    setApplied({ ...draft, page: 1 });
+    setMobileFilterOpen(false);
+  };
+
+  const clearFilters = () => {
+    setDraft((prev) => clearCategoryFields(prev, prev.category));
+  };
+
+  const resetAll = () => {
+    const fresh = resetAllFilters();
+    setDraft(fresh);
+    setApplied(fresh);
+    setMobileFilterOpen(false);
+  };
+
+  const removeChip = (chip) => {
+    const next = removeChipFromState(applied, chip);
+    setApplied(next);
+    setDraft(next);
+  };
 
   const onSave = async (propertyId) => {
     if (!isAuthenticated) {
@@ -222,188 +162,156 @@ const ListingPage = () => {
     }
   };
 
-  const activeFilterCount = Object.entries(filters).filter(([key, value]) => {
-    if (["sort", "page", "limit"].includes(key)) return false;
-    return value !== "";
-  }).length;
+  const openMobileFilters = () => {
+    setDraft({ ...applied });
+    setMobileFilterOpen(true);
+  };
 
-  const activeFilterChips = Object.entries(filters)
-    .filter(([key, value]) => !["sort", "page", "limit"].includes(key) && value !== "")
-    .map(([key, value]) => ({
-      key,
-      label: filterLabels[key] || key,
-      value: key === "verified" ? "Yes" : value,
-    }));
+  const filterActions = (
+    <>
+      <button type="button" onClick={applyFilters} className="property-filter-btn-primary w-full">
+        Apply filters
+      </button>
+      <div className="property-filter-footer-row">
+        <button type="button" onClick={clearFilters} className="property-filter-btn-secondary flex-1">
+          Clear
+        </button>
+        <button type="button" onClick={resetAll} className="property-filter-btn-ghost flex-1">
+          Reset all
+        </button>
+      </div>
+    </>
+  );
 
   return (
-    <div className="page-shell-muted flex min-h-screen w-full flex-col gap-5 px-4 py-6 sm:px-5 sm:py-8 md:flex-row md:gap-6 lg:px-6">
+    <div className="listing-page-root w-full bg-white">
       <SeoHead
         title={listingTitle}
         description={listingDescription}
-        keywords={`Hosur property listings, ${filters.propertyType || "property"} in ${filters.city || "Hosur"}, property for sale in Hosur, property for rent in Hosur`}
-        canonicalPath={buildCanonicalListingQuery(filters)}
+        keywords={`Hosur property listings, ${getCategoryLabel(applied.category)} properties Hosur`}
+        canonicalPath={buildCanonicalListingQuery(applied)}
       />
-      <aside className="filter-panel sticky top-24 hidden h-[calc(100vh-7rem)] w-80 shrink-0 overflow-y-auto p-5 md:block md:p-6">
-        <div className="mb-4 flex items-center justify-between gap-3 md:mb-6">
-          <div className="min-w-0">
-            <p className="section-tag">Search studio</p>
-            <h2 className="mt-2 text-lg font-bold text-navy">Filter results</h2>
+
+      <div className="listing-page-layout mx-auto w-full max-w-[1440px]">
+        {/* Left: filters — own scrollbar, never tied to properties */}
+        <aside className="listing-filter-aside hidden md:flex" aria-label="Property filters">
+          <div className="listing-filter-shell">
+            <div className="listing-filter-scroll" data-scroll-panel="filters">
+              <PropertySearchFilterPanel
+                category={draft.category}
+                values={draft}
+                onCategoryChange={handleCategoryChange}
+                onFieldChange={handleFieldChange}
+              />
+            </div>
+            <div className="listing-filter-footer">{filterActions}</div>
           </div>
-          <button type="button" onClick={clearFilters} className="text-xs font-semibold text-slate-500 transition hover:text-slate-900 whitespace-nowrap">
-            Reset
-          </button>
-        </div>
-        <FilterSidebar filters={filters} setFilters={setFilters} clearFilters={clearFilters} />
-      </aside>
+        </aside>
 
-      {mobileFilterOpen ? (
-        <div className="fixed inset-0 z-50 flex md:hidden">
-          <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[3px]" onClick={() => setMobileFilterOpen(false)} />
-          <aside className="relative ml-auto flex h-full w-full max-w-[88vw] flex-col overflow-hidden rounded-l-[32px] border-l border-slate-200 bg-[linear-gradient(180deg,rgba(252,255,254,1),rgba(238,247,246,1))] shadow-[0_28px_60px_rgba(16,95,104,0.18)]">
-            <div className="border-b border-slate-200 bg-[rgba(252,255,254,0.98)] px-5 py-5">
-              <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">Filters</p>
-                  <h2 className="mt-1 text-lg font-bold text-slate-900">Refine search</h2>
-                </div>
-                <button type="button" onClick={() => setMobileFilterOpen(false)} className="flex-shrink-0 rounded-2xl border border-slate-200 bg-[rgba(255,255,255,0.98)] p-2 text-slate-600 shadow-[0_12px_22px_rgba(16,95,104,0.08)]">
-                  <XMarkIcon className="h-5 w-5" />
-                </button>
-              </div>
-              <p className="mt-3 text-sm text-slate-500">Use the controls below to tighten price, type, and locality without leaving the results.</p>
-            </div>
-            <div className="flex-1 overflow-y-auto px-5 py-5">
-              <div className="rounded-[1.75rem] border border-white/70 bg-[rgba(255,255,255,0.97)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
-                <FilterSidebar
-                  filters={filters}
-                  setFilters={setFilters}
-                  clearFilters={() => {
-                    clearFilters();
-                    setMobileFilterOpen(false);
-                  }}
-                />
-              </div>
-            </div>
-            <div className="border-t border-slate-200 bg-[rgba(252,255,254,0.98)] px-5 py-4">
-              <button type="button" onClick={() => setMobileFilterOpen(false)} className="site-button-primary w-full px-4 py-3 text-sm">
-                View {data.total || data.items.length || 0} Properties
-              </button>
-            </div>
-          </aside>
-        </div>
-      ) : null}
-
-      <section className="min-w-0 flex-1 space-y-6">
-        <section
-          ref={heroRef}
-          className="marketing-hero p-6 md:p-8"
-        >
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <div
-                  data-listing-hero
-                  className="section-tag inline-flex items-center gap-2 rounded-full bg-orange/20 px-4 py-2"
-                >
-                  <SparklesIcon className="h-4 w-4" />
-                  Property catalog
-                </div>
-                <h1
-                  data-listing-hero
-                  className="mt-4 max-w-3xl text-4xl font-bold leading-tight sm:text-5xl"
-                >
-                  Browse verified Hosur listings in a cleaner, more premium flow.
-                </h1>
-                <p data-listing-hero className="mt-4 max-w-2xl text-sm leading-8 sm:text-base">
-                  Explore sale and rent inventory with calmer filters, stronger hierarchy, and a more editorial result grid.
-                </p>
-              </div>
-
-              <div data-listing-hero className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl bg-white/10 px-5 py-4 backdrop-blur-sm">
-                  <p className="text-xs uppercase tracking-[0.18em] text-white/60">Results</p>
-                  <p className="mt-2 text-2xl font-bold text-white">{data.total || data.items.length}</p>
-                </div>
-                <div className="rounded-xl bg-white/10 px-5 py-4 backdrop-blur-sm">
-                  <p className="text-xs uppercase tracking-[0.18em] text-white/60">Active filters</p>
-                  <p className="mt-2 text-2xl font-bold text-white">{activeFilterCount}</p>
-                </div>
-              </div>
+        {/* Right: properties — own scrollbar, independent from filters */}
+        <section className="listing-results" aria-label="Property results">
+          <div className="listing-results-header">
+            <div className="listing-results-intro">
+              <p className="section-tag">Property listings</p>
+              <h1 className="mt-2 text-2xl font-bold text-navy sm:text-3xl">Search your property in Hosur</h1>
+              <p className="mt-2 text-sm text-slate-600">
+                {loading ? "Searching properties..." : `${data.total || data.items.length} properties found`}
+                {applied.category ? ` · ${getCategoryLabel(applied.category)}` : ""}
+              </p>
             </div>
 
-            <div
-              data-listing-hero
-              className="flex flex-col gap-3 rounded-xl bg-white/10 p-4 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between"
+            <button
+              type="button"
+              onClick={openMobileFilters}
+              className="property-filter-mobile-btn md:hidden"
             >
-              <div className="flex min-w-0 items-start gap-3">
-                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-orange text-white">
-                  <MagnifyingGlassIcon className="h-5 w-5" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-white">Showing matched inventory for your current search.</p>
-                  <p className="mt-1 text-sm text-white/70">Adjust locality, price, or type to widen or sharpen the result set.</p>
-                </div>
-              </div>
+              <AdjustmentsHorizontalIcon className="h-5 w-5" />
+              Open filters
+              {filterChips.length ? <span className="property-filter-badge">{filterChips.length}</span> : null}
+            </button>
 
-              <button
-                type="button"
-                onClick={() => setMobileFilterOpen(true)}
-                className="site-button-primary inline-flex w-full items-center justify-center gap-2 px-4 py-3 text-sm sm:w-auto md:hidden"
-              >
-                <AdjustmentsHorizontalIcon className="h-4 w-4" />
-                Open filters
-              </button>
-            </div>
-
-            {activeFilterChips.length ? (
-              <div data-listing-hero className="flex flex-wrap gap-2">
-                {activeFilterChips.map((chip) => (
-                  <span key={chip.key} className="rounded-full border border-white/30 bg-white/15 px-3 py-1.5 text-xs font-semibold text-white">
+            {filterChips.length ? (
+              <div className="listing-results-chips">
+                {filterChips.map((chip) => (
+                  <button
+                    key={chip.key}
+                    type="button"
+                    onClick={() => removeChip(chip)}
+                    className="property-filter-chip"
+                  >
                     {chip.label}: {chip.value}
-                  </span>
+                    <XMarkIcon className="h-3.5 w-3.5" />
+                  </button>
                 ))}
               </div>
             ) : null}
           </div>
-        </section>
 
-        {data.items.length ? (
-          <MotionDiv
-            ref={setRevealRef}
-            initial={lowMotionDevice ? false : "hidden"}
-            whileInView={lowMotionDevice ? undefined : "show"}
-            viewport={{ once: true, amount: 0.08 }}
-            variants={fadeUp}
-            className="grid gap-6 sm:grid-cols-2 2xl:grid-cols-3"
-          >
-            {data.items.map((item, index) => (
-              <MotionDiv
-                key={item._id}
-                initial={lowMotionDevice ? false : { opacity: 0, y: 24 }}
-                animate={lowMotionDevice ? undefined : { opacity: 1, y: 0 }}
-                transition={lowMotionDevice ? undefined : { duration: 0.5, delay: Math.min(index * 0.03, 0.18) }}
-                whileHover={lowMotionDevice ? undefined : { y: -6 }}
-              >
-                <PropertyCard item={item} onSave={onSave} isSaved={savedIds.includes(item._id)} />
-              </MotionDiv>
-            ))}
-          </MotionDiv>
-        ) : (
-          <div ref={setRevealRef} className="marketing-card px-6 py-16 text-center">
-            <h3 className="text-2xl font-bold text-navy sm:text-3xl">No properties found</h3>
-            <p className="mt-4 mx-auto max-w-xl text-sm leading-8 text-slate-600">
-              Try widening your city, budget, or property-type filters to bring more inventory into view.
-            </p>
-            <button type="button" onClick={clearFilters} className="site-button-primary mt-6 px-5 py-3 text-sm">
-              Clear filters
-            </button>
+          <div ref={resultsScrollRef} className="listing-results-scroll" data-scroll-panel="properties">
+            <div className="listing-results-scroll-inner">
+            <div className="mt-6">
+              {loading && !data.items.length ? (
+                <ListingSkeleton />
+              ) : data.items.length ? (
+                <div className="grid gap-6 sm:grid-cols-2 2xl:grid-cols-3">
+                  {data.items.map((item) => (
+                    <PropertyCard key={item._id} item={item} onSave={onSave} isSaved={savedIds.includes(item._id)} />
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-xl bg-surface px-6 py-16 text-center">
+                  <h3 className="text-xl font-bold text-navy">No properties found</h3>
+                  <p className="mx-auto mt-3 max-w-md text-sm leading-7 text-slate-600">
+                    No properties found. Try changing your filters.
+                  </p>
+                  <button type="button" onClick={resetAll} className="site-button-primary mt-6 px-5 py-3 text-sm">
+                    Reset all filters
+                  </button>
+                </div>
+              )}
+            </div>
+
+              <div ref={sentinelRef} className="py-8 text-center text-sm text-slate-400">
+                {loading && data.items.length ? "Loading..." : null}
+                {!loading && data.page < data.totalPages ? "Loading more properties..." : null}
+                {!loading && data.items.length && data.page >= data.totalPages ? "You have reached the end of the results." : null}
+              </div>
+            </div>
           </div>
-        )}
+        </section>
+      </div>
 
-        <div ref={sentinelRef} className="py-6 text-center text-sm text-slate-400">
-          {data.page < data.totalPages ? "Loading more properties..." : data.items.length ? "You have reached the end of the results." : null}
+      {/* Mobile drawer */}
+      {mobileFilterOpen ? (
+        <div className="property-filter-drawer-root md:hidden">
+          <button
+            type="button"
+            className="property-filter-drawer-backdrop"
+            aria-label="Close filters"
+            onClick={() => setMobileFilterOpen(false)}
+          />
+          <aside className="property-filter-drawer">
+            <div className="property-filter-drawer-header">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Filters</p>
+                <h2 className="text-lg font-bold text-navy">Search your property</h2>
+              </div>
+              <button type="button" onClick={() => setMobileFilterOpen(false)} className="property-filter-drawer-close" aria-label="Close">
+                <XMarkIcon className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="property-filter-drawer-body">
+              <PropertySearchFilterPanel
+                category={draft.category}
+                values={draft}
+                onCategoryChange={handleCategoryChange}
+                onFieldChange={handleFieldChange}
+              />
+            </div>
+            <div className="property-filter-drawer-footer listing-filter-footer">{filterActions}</div>
+          </aside>
         </div>
-      </section>
+      ) : null}
     </div>
   );
 };

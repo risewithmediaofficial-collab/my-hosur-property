@@ -73,26 +73,12 @@ export const getPropertyImageAlt = (property = {}, index = 0) => {
 
 export const buildCanonicalListingQuery = (filters = {}) => {
   const query = new URLSearchParams();
-  [
-    "intent",
-    "search",
-    "city",
-    "area",
-    "propertyType",
-    "furnishingStatus",
-    "minBhk",
-    "maxBhk",
-    "possessionStatus",
-    "verified",
-    "listingSource",
-    "amenities",
-    "minPrice",
-    "maxPrice",
-  ].forEach((key) => {
-    if (filters[key]) {
-      query.set(key, String(filters[key]));
-    }
-  });
+  if (filters.category) query.set("category", filters.category);
+  if (filters.sort && filters.sort !== "latest") query.set("sort", filters.sort);
+  if (filters.location) query.set("location", filters.location);
+  if (filters.minPrice) query.set("minPrice", String(filters.minPrice));
+  if (filters.maxPrice) query.set("maxPrice", String(filters.maxPrice));
+  if (filters.propertyType) query.set("propertyType", String(filters.propertyType));
 
   const qs = query.toString();
   return qs ? `/listings?${qs}` : "/listings";

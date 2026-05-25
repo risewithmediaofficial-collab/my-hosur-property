@@ -45,7 +45,9 @@ const AppShell = () => {
   const isFullHeight = FULL_HEIGHT_PATHS.some((p) => location.pathname.startsWith(p));
   const isPrivatePath = PRIVATE_PATHS.some((p) => location.pathname.startsWith(p));
   const isDashboardRoute = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/admin/dashboard");
+  const isListingsRoute = location.pathname.startsWith("/listings");
   const isHomeRoute = location.pathname === "/";
+  const isContainedLayout = isDashboardRoute || isListingsRoute;
 
   useEffect(() => {
     initEmailJs();
@@ -73,16 +75,21 @@ const AppShell = () => {
   }, [location.pathname]);
 
   const hideNavbar = ["/admin/login"].some((p) => location.pathname.startsWith(p));
-  const hideFooter = ["/auth", "/admin/login"].some((p) => location.pathname.startsWith(p)) || isDashboardRoute;
+  const hideFooter =
+    ["/auth", "/admin/login"].some((p) => location.pathname.startsWith(p)) || isDashboardRoute || isListingsRoute;
 
   return (
     <MotionConfig reducedMotion={lowMotionDevice ? "always" : "never"}>
-      <div className={`site-app-shell flex min-h-screen flex-col ${isDashboardRoute ? "site-dashboard-app md:h-screen md:overflow-hidden" : ""}`}>
+      <div
+        className={`site-app-shell flex min-h-screen flex-col ${isDashboardRoute ? "site-dashboard-app md:h-screen md:overflow-hidden" : ""} ${isListingsRoute ? "site-listings-active md:h-dvh md:max-h-dvh md:overflow-hidden" : ""}`}
+      >
         <PageLoader />
         <Toaster position="top-right" toastOptions={{ duration: 2500 }} />
         {isPrivatePath ? <PrivateRouteSeo title="Account" /> : null}
         {!hideNavbar && <Navbar />}
-        <main className={`flex-1 ${isFullHeight || hideNavbar ? "" : isHomeRoute ? "pb-0" : "pt-4 pb-12 md:pt-6"} ${isDashboardRoute ? "md:min-h-0 md:overflow-hidden" : ""}`}>
+        <main
+          className={`flex-1 ${isFullHeight || hideNavbar ? "" : isHomeRoute ? "pb-0" : "pt-4 pb-12 md:pt-6"} ${isContainedLayout ? "flex min-h-0 flex-col overflow-hidden" : ""}`}
+        >
           <Suspense fallback={<RouteFallback />}>
             <AnimatePresence mode="wait">
               <motion.div
@@ -91,7 +98,7 @@ const AppShell = () => {
                 initial={lowMotionDevice ? false : "initial"}
                 animate={lowMotionDevice ? false : "animate"}
                 exit={lowMotionDevice ? undefined : "exit"}
-                className={isDashboardRoute ? "h-full min-h-0" : ""}
+                className={isContainedLayout ? "flex h-full min-h-0 flex-1 flex-col" : ""}
               >
                 <Routes location={location}>
                   <Route path="/" element={<HomePage />} />
