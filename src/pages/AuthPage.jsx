@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheckIcon, EnvelopeIcon, LockClosedIcon, PhoneIcon, MapPinIcon, UserIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { ShieldCheckIcon, EnvelopeIcon, LockClosedIcon, PhoneIcon, MapPinIcon, UserIcon, UserCircleIcon } from "../components/AppIcons";
 import { loginUser, signupUser } from "../services/api/authApi";
 import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
@@ -649,7 +649,7 @@ const AuthPage = () => {
                           label="Phone Number"
                           icon={PhoneIcon}
                           type="tel"
-                          placeholder="+91 98765 43210"
+                          placeholder="+91 99940 05086"
                           value={form.phone}
                           onChange={(event) => onChange("phone", event.target.value)}
                         />
@@ -695,7 +695,7 @@ const AuthPage = () => {
                         <motion.div variants={item} className="auth-free-badge">
                           <ShieldCheckIcon className="auth-free-badge-icon" />
                           <span>
-                            New accounts include <strong>1 free property listing</strong> for 30 days.
+                            New accounts include <strong>1 free property listing</strong> for 90 days.
                           </span>
                         </motion.div>
                       ) : null}

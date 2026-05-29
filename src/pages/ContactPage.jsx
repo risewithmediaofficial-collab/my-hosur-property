@@ -1,28 +1,29 @@
-import { EnvelopeIcon, MapPinIcon, PhoneIcon } from "@heroicons/react/24/outline";
+import { EnvelopeIcon, MapPinIcon, PhoneIcon } from "../components/AppIcons";
 import MarketingCard, { IconCircle } from "../components/MarketingCard";
 import PageHero from "../components/PageHero";
 import PageSection from "../components/PageSection";
 import SeoHead from "../components/SeoHead";
+import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL } from "../constants/contactInfo";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
 
 const contactCards = [
   {
     title: "Email us",
-    value: "support@myhosurproperty.com",
+    value: CONTACT_EMAIL,
     caption: "For property enquiries, support, and service requests.",
     icon: EnvelopeIcon,
-    href: "mailto:support@myhosurproperty.com",
+    href: `mailto:${CONTACT_EMAIL}`,
   },
   {
     title: "Call us",
-    value: "+91 98765 43210",
+    value: CONTACT_PHONE_DISPLAY,
     caption: "Speak with our team for direct real-estate assistance.",
     icon: PhoneIcon,
-    href: "tel:+919876543210",
+    href: `tel:${CONTACT_PHONE_TEL}`,
   },
   {
     title: "Visit us",
-    value: "Hosur, Tamil Nadu",
+    value: CONTACT_ADDRESS,
     caption: "Serving local property buyers, sellers, and service needs.",
     icon: MapPinIcon,
     href: null,

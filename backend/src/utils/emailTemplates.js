@@ -20,6 +20,7 @@ const baseColors = {
 
 const brandName = "MyHosurProperty";
 const siteUrl = process.env.CLIENT_URL || "http://localhost:5173";
+const businessAddress = "No 4 /409-4, First floor, Movendar Nagar, Vinayagapuram, Bagalur Road, Hosur, Krishnagiri - 635109.";
 const extractEmailAddress = (value = "") => {
   const match = String(value).match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
   return match ? match[0] : "";
@@ -29,7 +30,7 @@ const supportEmail =
   extractEmailAddress(process.env.SUPPORT_EMAIL) ||
   extractEmailAddress(process.env.EMAIL_FROM) ||
   extractEmailAddress(process.env.SMTP_REPLY_TO) ||
-  "support@myhosurproperty.com";
+  "myhosurproperty786@gmail.com";
 
 /**
  * Base email layout wrapper
@@ -81,7 +82,7 @@ const baseEmailLayout = (content, headerTitle = "Welcome") => {
                 © ${year} ${brandName}. All rights reserved.
               </p>
               <p style="margin:0 0 12px;font-size:11px;color:#94A3B8;">
-                Hosur, Tamil Nadu, India
+                ${businessAddress}
               </p>
               <p style="margin:0;font-size:11px;">
                 <a href="${siteUrl}" style="color:${baseColors.accent};text-decoration:none;margin:0 8px;">Visit Website</a>
@@ -130,7 +131,7 @@ const welcomeEmail = (user) => {
     <div style="background:${baseColors.accentLight};border-left:4px solid ${baseColors.accent};padding:16px;margin:24px 0;border-radius:4px;">
       <p style="margin:0;color:${baseColors.accent};font-weight:600;font-size:14px;">🎁 Your Welcome Gift</p>
       <p style="margin:8px 0 0;color:${baseColors.text};font-size:14px;">
-        As a welcome bonus, you get <strong>1 FREE property listing</strong> valid for 30 days. Start posting your property today!
+        As a welcome bonus, you get <strong>1 FREE property listing</strong> valid for 90 days. Start posting your property today!
       </p>
     </div>
 

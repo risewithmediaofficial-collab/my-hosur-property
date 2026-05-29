@@ -4,17 +4,22 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import {
   ArrowRightIcon,
+  BanknotesIcon,
   BuildingOffice2Icon,
   BuildingOfficeIcon,
   CheckIcon,
   ChevronDownIcon,
+  DocumentTextIcon,
   FlagIcon,
-  HomeIcon,
+  LandIcon,
   HomeModernIcon,
   MagnifyingGlassIcon,
+  PaintBrushIcon,
+  RentIcon,
   ScaleIcon,
+  VillaIcon,
   WrenchScrewdriverIcon,
-} from "@heroicons/react/24/outline";
+} from "../components/AppIcons";
 import CountUpNumber from "../components/CountUpNumber";
 import PropertyCard from "../components/PropertyCard";
 import SeoHead from "../components/SeoHead";
@@ -57,12 +62,12 @@ const propertyTypeOptions = [
 ];
 
 const propertyTypeIcons = {
-  Plot: HomeIcon,
-  Villa: HomeModernIcon,
-  "Independent House": HomeIcon,
+  Plot: LandIcon,
+  Villa: VillaIcon,
+  "Independent House": HomeModernIcon,
   Flat: BuildingOfficeIcon,
   "Commercial Land": BuildingOffice2Icon,
-  "Agricultural Land": HomeIcon,
+  "Agricultural Land": LandIcon,
 };
 
 const shortcutGroups = [
@@ -122,6 +127,14 @@ const shortcutGroups = [
       { label: "Industry & Warehouse", to: "/request-service?category=construction&type=Industry & Warehouse" },
     ],
   },
+  {
+    label: "Management",
+    items: [
+      { label: "Home Management", to: "/request-service?category=management&type=Home Management" },
+      { label: "Office Management", to: "/request-service?category=management&type=Office Management" },
+      { label: "Property Management", to: "/request-service?category=management&type=Property Management" },
+    ],
+  },
 ];
 
 const homeStats = [
@@ -146,6 +159,17 @@ const servicePreview = [
     description: "Interior planning, construction services, electrical, plumbing, and trusted contractor support.",
     icon: WrenchScrewdriverIcon,
   },
+];
+
+const showcaseItems = [
+  { title: "Buy Property", description: "Find your dream home", icon: HomeModernIcon },
+  { title: "Sell Property", description: "Quick and verified sales", icon: BanknotesIcon },
+  { title: "Rent Property", description: "Lease verified homes", icon: RentIcon },
+  { title: "Commercial", description: "Office & retail spaces", icon: BuildingOffice2Icon },
+  { title: "Land Sale", description: "Agricultural & residential land", icon: LandIcon },
+  { title: "Interior Design", description: "Customized interiors", icon: PaintBrushIcon },
+  { title: "Construction", description: "Build your project", icon: WrenchScrewdriverIcon },
+  { title: "Legal Support", description: "Documentation assistance", icon: DocumentTextIcon },
 ];
 
 const HomePage = () => {
@@ -255,27 +279,138 @@ const HomePage = () => {
           <h1 className="hero-title mt-4 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
             Verified property listings in <span className="text-orange">Hosur</span>
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-white/85 sm:mt-5 sm:text-base">
-            Find verified properties for sale and rent across Hosur. Search apartments, villas, plots, and houses with clearer tools and local support.
-          </p>
+          
+          <div className="mt-8 flex flex-col gap-6 w-full sm:mt-10">
+            <p className="mx-auto text-sm leading-7 text-white/85 sm:text-base">
+              Find verified properties for sale and rent across Hosur. Search apartments, villas, plots, and houses with clearer tools and local support.
+            </p>
+            
+            <div ref={shortcutBarRef} className="flex flex-wrap justify-center gap-2 sm:gap-2.5 lg:gap-3">
+              {shortcutGroups.map((group) => (
+                <div
+                  key={group.label}
+                  className={`relative ${openShortcutMenu === group.label ? "z-50" : "z-10"}`}
+                  onMouseEnter={() => setOpenShortcutMenu(group.label)}
+                  onMouseLeave={() => setOpenShortcutMenu("")}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenShortcutMenu((current) => (current === group.label ? "" : group.label))}
+                    className={`inline-flex min-h-[40px] items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition duration-200 ${
+                      openShortcutMenu === group.label
+                        ? "bg-white text-navy shadow-lg"
+                        : "bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 hover:shadow-md border border-white/30"
+                    }`}
+                  >
+                    {group.label}
+                    <ChevronDownIcon className={`h-4 w-4 transition duration-300 ${openShortcutMenu === group.label ? "rotate-180" : ""}`} />
+                  </button>
+                  {openShortcutMenu === group.label ? (
+                    <motion.div 
+                      className="absolute left-0 top-full z-50 min-w-[220px] pt-2"
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-lg">
+                        {group.items.map((item) => (
+                          <Link
+                            key={`${group.label}-${item.label}`}
+                            to={item.to}
+                            className="block rounded-lg px-4 py-2.5 text-sm font-medium text-navy transition duration-150 hover:bg-orange/5 hover:text-orange"
+                            onClick={() => setOpenShortcutMenu("")}
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </motion.div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
 
-          <div className="mt-6 flex w-full max-w-md flex-col gap-3 sm:mt-8 sm:max-w-none sm:flex-row sm:justify-center">
-            <button
-              type="button"
-              onClick={() => {
-                scrollToTop();
-                navigate(`/listings?${queryString || "intent=buy"}`);
-              }}
-              className="site-button-primary w-full rounded-lg px-8 py-3 text-sm font-bold sm:w-auto"
-            >
-              Find Your Property
-            </button>
-            <Link
-              to="/contact"
-              className="inline-flex w-full items-center justify-center rounded-lg border-2 border-white px-8 py-3 text-sm font-bold text-white transition hover:bg-white/10 sm:w-auto"
-            >
-              Contact Us
-            </Link>
+            <div className="mt-4 flex w-full max-w-md flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center mx-auto">
+              <motion.button
+                type="button"
+                onClick={handlePostFreeProperty}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
+                className="group relative inline-flex min-h-[44px] w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange to-orange-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg transition duration-200 hover:shadow-2xl sm:w-auto overflow-hidden"
+              >
+                <style>{`
+                  @keyframes boom {
+                    0% {
+                      box-shadow: 0 0 0 0 rgba(255, 127, 14, 0.7);
+                      transform: scale(1);
+                    }
+                    50% {
+                      box-shadow: 0 0 0 10px rgba(255, 127, 14, 0.4);
+                    }
+                    100% {
+                      box-shadow: 0 0 0 20px rgba(255, 127, 14, 0);
+                      transform: scale(1);
+                    }
+                  }
+                  
+                  @keyframes blink {
+                    0%, 100% {
+                      opacity: 1;
+                    }
+                    50% {
+                      opacity: 0.7;
+                    }
+                  }
+                  
+                  @keyframes wave {
+                    0%, 100% { transform: scaleX(1); }
+                    50% { transform: scaleX(1.08); }
+                  }
+                  
+                  @keyframes shine {
+                    0% {
+                      left: -100%;
+                    }
+                    100% {
+                      left: 100%;
+                    }
+                  }
+                  
+                  .boom-button {
+                    animation: boom 2s infinite, blink 1.5s ease-in-out infinite;
+                  }
+                  
+                  .group:hover .wave-icon {
+                    animation: wave 0.5s ease-in-out infinite;
+                  }
+                  
+                  .shine-effect {
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                    animation: shine 1.2s infinite;
+                  }
+                `}</style>
+                <div className="shine-effect"></div>
+                <FlagIcon className="wave-icon h-5 w-5 transition-transform duration-300 relative z-10" />
+                <span className="relative z-10">Post your free property</span>
+                <div className="boom-button absolute inset-0 -z-10 rounded-lg bg-gradient-to-r from-orange to-orange-600" />
+              </motion.button>
+              <button
+                type="button"
+                onClick={() => {
+                  scrollToTop();
+                  navigate(`/listings?${queryString || "intent=buy"}`);
+                }}
+                className="inline-flex items-center justify-center rounded-lg border-2 border-white px-8 py-2.5 text-sm font-bold text-white transition hover:bg-white/10 w-full sm:w-auto"
+              >
+                Find Your Property
+              </button>
+            </div>
           </div>
 
           <div className="mt-8 grid w-full max-w-3xl grid-cols-3 gap-3 text-center sm:mt-10 sm:gap-6">
@@ -291,12 +426,12 @@ const HomePage = () => {
         </div>
       </MotionSection>
 
-      <section className="bg-surface px-5 py-8 sm:px-8 sm:py-10 lg:px-10">
-        <div className="mx-auto max-w-[1440px] space-y-4">
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-search sm:p-6">
-            <p className="mb-4 text-center text-sm font-semibold text-navy sm:text-left">Search properties in Hosur</p>
+      <section className="relative bg-gradient-to-b from-slate-50 to-white px-5 py-8 sm:px-8 sm:py-12 lg:px-10">
+        <div className="mx-auto max-w-[1440px] space-y-5">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-lg sm:p-7">
+            <p className="mb-5 text-center text-base font-semibold text-navy sm:text-left">Search properties in Hosur</p>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.8fr_0.9fr_auto] lg:items-stretch">
-              <div className="flex min-h-[52px] items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 sm:col-span-2 lg:col-span-1">
+              <div className="flex min-h-[52px] items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 transition focus-within:border-orange focus-within:ring-2 focus-within:ring-orange/20 sm:col-span-2 lg:col-span-1">
                 <MagnifyingGlassIcon className="h-5 w-5 flex-shrink-0 text-orange" />
                 <input
                   value={search.search}
@@ -362,56 +497,6 @@ const HomePage = () => {
                 Search
               </button>
             </div>
-          </div>
-
-          <div className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-card sm:p-5 lg:flex-row lg:items-center lg:justify-between">
-            <div ref={shortcutBarRef} className="flex flex-wrap gap-2 sm:gap-3">
-              {shortcutGroups.map((group) => (
-                <div
-                  key={group.label}
-                  className={`relative ${openShortcutMenu === group.label ? "z-50" : "z-10"}`}
-                  onMouseEnter={() => setOpenShortcutMenu(group.label)}
-                  onMouseLeave={() => setOpenShortcutMenu("")}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setOpenShortcutMenu((current) => (current === group.label ? "" : group.label))}
-                    className={`inline-flex min-h-[44px] items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition ${
-                      openShortcutMenu === group.label
-                        ? "bg-navy text-white"
-                        : "bg-surface text-navy hover:bg-orange/10 hover:text-orange"
-                    }`}
-                  >
-                    {group.label}
-                    <ChevronDownIcon className={`h-4 w-4 transition ${openShortcutMenu === group.label ? "rotate-180" : ""}`} />
-                  </button>
-                  {openShortcutMenu === group.label ? (
-                    <div className="absolute left-0 top-full z-50 min-w-[220px] pt-2">
-                      <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-card">
-                        {group.items.map((item) => (
-                          <Link
-                            key={`${group.label}-${item.label}`}
-                            to={item.to}
-                            className="block rounded-lg px-4 py-2.5 text-sm font-semibold text-navy transition hover:bg-surface hover:text-orange"
-                            onClick={() => setOpenShortcutMenu("")}
-                          >
-                            {item.label}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={handlePostFreeProperty}
-              className="inline-flex min-h-[44px] w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-orange px-6 py-2.5 text-sm font-bold text-white transition hover:bg-orange-hover sm:w-auto"
-            >
-              <FlagIcon className="h-5 w-5" />
-              Post your free property
-            </button>
           </div>
         </div>
       </section>
@@ -490,6 +575,128 @@ const HomePage = () => {
       <MotionSection
         initial="hidden"
         whileInView="show"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={reveal}
+        className="bg-gradient-to-b from-surface to-white px-5 py-16 sm:px-8 lg:px-10"
+      >
+        <div className="mx-auto max-w-[1440px] text-center">
+          <p className="section-tag">Property Showcase</p>
+          <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">Services & Property Types</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+            Explore the diverse range of properties and services we provide in Hosur
+          </p>
+        </div>
+
+        <div className="mx-auto mt-12 max-w-[1440px]">
+          <div className="relative overflow-hidden">
+            <style>{`
+              @keyframes scroll-services {
+                0% {
+                  transform: translateX(0);
+                }
+                100% {
+                  transform: translateX(-50%);
+                }
+              }
+
+              .services-scroll {
+                display: flex;
+                gap: 1.5rem;
+                animation: scroll-services 40s linear infinite;
+                width: max-content;
+              }
+
+              .services-scroll:hover {
+                animation-play-state: paused;
+              }
+
+              .service-card {
+                flex-shrink: 0;
+                width: 280px;
+                background: white;
+                border: 2px solid #e9ecef;
+                border-radius: 16px;
+                padding: 24px;
+                text-align: center;
+                transition: all 0.3s ease;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+              }
+
+              .service-card:hover {
+                border-color: #ff7f0e;
+                transform: translateY(-8px);
+                box-shadow: 0 12px 24px rgba(255, 127, 14, 0.15);
+                background: linear-gradient(135deg, #fff5e6 0%, #fffbf0 100%);
+              }
+
+              .service-icon {
+                width: 60px;
+                height: 60px;
+                margin: 0 auto;
+                background: linear-gradient(135deg, #001a4d 0%, #002d7a 100%);
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+              }
+
+              .service-card:hover .service-icon {
+                background: linear-gradient(135deg, #ff7f0e 0%, #ff9933 100%);
+                transform: scale(1.1);
+              }
+
+              .gradient-fade-services {
+                pointer-events: none;
+              }
+
+              .gradient-fade-left-services {
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 100px;
+                background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+                z-index: 10;
+              }
+
+              .gradient-fade-right-services {
+                position: absolute;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                width: 100px;
+                background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+                z-index: 10;
+              }
+            `}</style>
+
+            <div className="gradient-fade-services gradient-fade-left-services"></div>
+            <div className="overflow-hidden">
+              <div className="services-scroll">
+                {[...showcaseItems, ...showcaseItems].map((service, index) => {
+                  const Icon = service.icon;
+                  return (
+                  <div key={`${service.title}-${index}`} className="service-card group">
+                    <div className="service-icon">
+                      <Icon className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="mt-4 text-lg font-bold text-navy">{service.title}</h3>
+                    <p className="mt-2 text-sm text-slate-600 group-hover:text-orange transition">{service.description}</p>
+                  </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="gradient-fade-services gradient-fade-right-services"></div>
+          </div>
+        </div>
+      </MotionSection>
+
+      <MotionSection
+        initial="hidden"
+        whileInView="show"
         viewport={{ once: true, amount: 0.18 }}
         variants={reveal}
         className="bg-white px-5 py-16 sm:px-8 lg:px-10"
@@ -522,6 +729,121 @@ const HomePage = () => {
                 <div className="mt-5 h-10 animate-pulse rounded-full bg-slate-100" />
               </div>
             ))}
+        </div>
+      </MotionSection>
+
+      <MotionSection
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={reveal}
+        className="bg-white px-5 py-16 sm:px-8 lg:px-10"
+      >
+        <div className="mx-auto max-w-[1440px] text-center">
+          <p className="section-tag">Trusted partnerships</p>
+          <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">Our Partners</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+            Working with industry leaders to provide comprehensive real estate solutions
+          </p>
+        </div>
+
+        <div className="mx-auto mt-12 max-w-[1440px]">
+          <div className="relative overflow-hidden">
+            <style>{`
+              @keyframes scroll-partners {
+                0% {
+                  transform: translateX(0);
+                }
+                100% {
+                  transform: translateX(-50%);
+                }
+              }
+
+              .partners-scroll {
+                display: flex;
+                gap: 2rem;
+                animation: scroll-partners 30s linear infinite;
+                width: max-content;
+              }
+
+              .partners-scroll:hover {
+                animation-play-state: paused;
+              }
+
+              .partner-item {
+                flex-shrink: 0;
+                width: 200px;
+                height: 120px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                border: 2px solid #e9ecef;
+                border-radius: 12px;
+                transition: all 0.3s ease;
+                cursor: pointer;
+              }
+
+              .partner-item:hover {
+                border-color: #ff7f0e;
+                background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%);
+                transform: translateY(-4px);
+                box-shadow: 0 8px 16px rgba(255, 127, 14, 0.15);
+              }
+
+              .gradient-fade {
+                pointer-events: none;
+              }
+
+              .gradient-fade-left {
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 80px;
+                background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+                z-index: 10;
+              }
+
+              .gradient-fade-right {
+                position: absolute;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                width: 80px;
+                background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+                z-index: 10;
+              }
+            `}</style>
+
+            <div className="gradient-fade gradient-fade-left"></div>
+            <div className="overflow-hidden">
+              <div className="partners-scroll">
+                {[
+                  { name: "Partner 1", logo: "P1" },
+                  { name: "Partner 2", logo: "P2" },
+                  { name: "Partner 3", logo: "P3" },
+                  { name: "Partner 4", logo: "P4" },
+                  { name: "Partner 5", logo: "P5" },
+                  { name: "Partner 6", logo: "P6" },
+                  { name: "Partner 1", logo: "P1" },
+                  { name: "Partner 2", logo: "P2" },
+                  { name: "Partner 3", logo: "P3" },
+                  { name: "Partner 4", logo: "P4" },
+                  { name: "Partner 5", logo: "P5" },
+                  { name: "Partner 6", logo: "P6" },
+                ].map((partner, index) => (
+                  <div key={index} className="partner-item group">
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-navy">{partner.logo}</p>
+                      <p className="mt-1 text-xs text-slate-600 group-hover:text-orange transition">{partner.name}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="gradient-fade gradient-fade-right"></div>
+          </div>
         </div>
       </MotionSection>
 

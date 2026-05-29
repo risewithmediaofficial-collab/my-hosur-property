@@ -1,25 +1,32 @@
 import { useMemo, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 import useAuth from "../hooks/useAuth";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
+import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL } from "../constants/contactInfo";
 import { primaryNavLinks } from "../constants/navigation";
 import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   BuildingOffice2Icon,
   BriefcaseIcon,
+  ChevronDownIcon,
   EnvelopeIcon,
+  FlagIcon,
   HomeIcon,
   InformationCircleIcon,
+  LoanIcon,
   PhoneIcon,
   PlusCircleIcon,
   Squares2X2Icon,
+  Squares2X2SolidIcon,
   XMarkIcon,
-} from "@heroicons/react/24/outline";
-import { Squares2X2Icon as Squares2X2SolidIcon } from "@heroicons/react/24/solid";
+} from "./AppIcons";
 
 const navIconMap = {
   "Our Services": BriefcaseIcon,
+  Plans: LoanIcon,
   "About Us": InformationCircleIcon,
   Contact: PhoneIcon,
   "List My Property": PlusCircleIcon,
@@ -29,6 +36,7 @@ const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
   const dashboardPath = user?.role === "admin" ? "/admin/dashboard" : "/dashboard";
 
   useBodyScrollLock(mobileMenuOpen);
@@ -51,6 +59,18 @@ const Navbar = () => {
     closeMenu();
     scrollToTop();
     navigate("/");
+  };
+
+  const handlePostFreeProperty = () => {
+    scrollToTop();
+
+    if (isAuthenticated) {
+      navigate("/post-property");
+      return;
+    }
+
+    toast.success("Sign in to post your free property listing.");
+    navigate("/auth", { state: { from: { pathname: "/post-property" } } });
   };
 
   const navLinks = useMemo(() => primaryNavLinks, []);
@@ -97,13 +117,13 @@ const Navbar = () => {
       <div className="hidden bg-navy text-white sm:block">
         <div className="mx-auto flex max-w-[1440px] items-center px-5 py-2.5 text-xs sm:px-8 lg:px-10">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
-            <a href="tel:+919876543210" className="inline-flex items-center gap-2 transition hover:text-orange">
+            <a href={`tel:${CONTACT_PHONE_TEL}`} className="inline-flex items-center gap-2 transition hover:text-orange">
               <PhoneIcon className="h-3.5 w-3.5 flex-shrink-0 text-orange" />
-              +91 98765 43210
+              {CONTACT_PHONE_DISPLAY}
             </a>
-            <a href="mailto:support@myhosurproperty.com" className="inline-flex items-center gap-2 transition hover:text-orange">
+            <a href={`mailto:${CONTACT_EMAIL}`} className="inline-flex items-center gap-2 transition hover:text-orange">
               <EnvelopeIcon className="h-3.5 w-3.5 flex-shrink-0 text-orange" />
-              support@myhosurproperty.com
+              {CONTACT_EMAIL}
             </a>
           </div>
         </div>
@@ -131,72 +151,140 @@ const Navbar = () => {
                 <p className="hidden truncate text-[9px] font-semibold uppercase tracking-[0.22em] text-slate-500 sm:block">
                   Real Estate
                 </p>
+                <p className="hidden truncate text-[10px] font-semibold text-slate-500 sm:block">
+                  Powered by <span className="text-navy">GYES Construction</span>
+                </p>
               </div>
             </NavLink>
 
             <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex">{navLinks.map(renderDesktopLink)}</nav>
 
-            <div className="hidden items-center gap-2 lg:flex">
+            <div className="hidden items-center gap-3 lg:flex">
               {isAuthenticated ? (
-                <button
-                  type="button"
-                  onClick={onLogout}
-                  className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-navy transition hover:text-orange"
-                >
-                  <ArrowRightOnRectangleIcon className="h-4 w-4" />
-                  Logout
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={onLogout}
+                    className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-navy transition hover:text-orange"
+                  >
+                    <ArrowRightOnRectangleIcon className="h-4 w-4" />
+                    Logout
+                  </button>
+
+                  <span className="h-6 w-px bg-slate-200" aria-hidden="true" />
+
+                  <NavLink
+                    to={dashboardPath}
+                    onClick={scrollToTop}
+                    className={({ isActive }) =>
+                      `inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                        isActive ? "text-orange" : "text-navy hover:text-orange"
+                      }`
+                    }
+                  >
+                    {({ isActive }) => {
+                      const DashboardIcon = isActive ? Squares2X2SolidIcon : Squares2X2Icon;
+                      return (
+                        <>
+                          <DashboardIcon className="h-4 w-4" />
+                          Dashboard
+                        </>
+                      );
+                    }}
+                  </NavLink>
+
+                  <motion.button
+                    type="button"
+                    onClick={handlePostFreeProperty}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="group relative inline-flex min-h-[40px] items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange to-orange-600 px-4 py-2 text-sm font-bold text-white shadow-lg transition duration-200 hover:shadow-xl overflow-hidden"
+                  >
+                    <style>{`
+                      @keyframes nav-wave {
+                        0%, 100% { transform: scaleX(1); }
+                        50% { transform: scaleX(1.05); }
+                      }
+                      .nav-wave-icon {
+                        animation: nav-wave 1s ease-in-out infinite;
+                      }
+                    `}</style>
+                    <FlagIcon className="nav-wave-icon h-4 w-4" />
+                    <span>Post property</span>
+                  </motion.button>
+                </>
               ) : (
                 <>
-                  <NavLink
-                    to="/auth"
-                    onClick={scrollToTop}
-                    className="inline-flex items-center rounded-lg px-3 py-2 text-sm font-semibold text-navy transition hover:text-orange"
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setLoginDropdownOpen(!loginDropdownOpen)}
+                      className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                        loginDropdownOpen
+                          ? "bg-orange text-white"
+                          : "bg-slate-100 text-navy hover:bg-orange/10 hover:text-orange"
+                      }`}
+                    >
+                      Login
+                      <ChevronDownIcon className={`h-4 w-4 transition ${loginDropdownOpen ? "rotate-180" : ""}`} />
+                    </button>
+
+                    {loginDropdownOpen && (
+                      <motion.div
+                        className="absolute right-0 top-full z-50 mt-2 w-48 rounded-xl border border-slate-200 bg-white shadow-lg"
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.15 }}
+                      >
+                        <NavLink
+                          to="/auth"
+                          onClick={() => {
+                            scrollToTop();
+                            setLoginDropdownOpen(false);
+                          }}
+                          className="flex items-center gap-3 rounded-t-lg px-4 py-3 text-sm font-semibold text-navy transition hover:bg-orange/5 hover:text-orange"
+                        >
+                          <ArrowRightOnRectangleIcon className="h-4 w-4" />
+                          Login
+                        </NavLink>
+                        <div className="border-t border-slate-200" />
+                        <NavLink
+                          to="/auth"
+                          onClick={() => {
+                            scrollToTop();
+                            setLoginDropdownOpen(false);
+                          }}
+                          className="flex items-center gap-3 rounded-b-lg px-4 py-3 text-sm font-semibold text-navy transition hover:bg-orange/5 hover:text-orange"
+                        >
+                          <PlusCircleIcon className="h-4 w-4" />
+                          Create Account
+                        </NavLink>
+                      </motion.div>
+                    )}
+                  </div>
+
+                  <motion.button
+                    type="button"
+                    onClick={handlePostFreeProperty}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="group relative inline-flex min-h-[40px] items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange to-orange-600 px-4 py-2 text-sm font-bold text-white shadow-lg transition duration-200 hover:shadow-xl overflow-hidden"
                   >
-                    Login
-                  </NavLink>
-                  <span className="text-slate-300" aria-hidden="true">
-                    |
-                  </span>
-                  <NavLink
-                    to="/auth"
-                    onClick={scrollToTop}
-                    className="inline-flex items-center rounded-lg px-3 py-2 text-sm font-semibold text-navy transition hover:text-orange"
-                  >
-                    Register
-                  </NavLink>
+                    <style>{`
+                      @keyframes nav-wave {
+                        0%, 100% { transform: scaleX(1); }
+                        50% { transform: scaleX(1.05); }
+                      }
+                      .nav-wave-icon {
+                        animation: nav-wave 1s ease-in-out infinite;
+                      }
+                    `}</style>
+                    <FlagIcon className="nav-wave-icon h-4 w-4" />
+                    <span>Post property</span>
+                  </motion.button>
                 </>
               )}
-
-              <span className="mx-1 h-6 w-px bg-slate-200" aria-hidden="true" />
-
-              <NavLink
-                to={dashboardPath}
-                onClick={scrollToTop}
-                className={({ isActive }) =>
-                  `inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition ${
-                    isActive ? "text-orange" : "text-navy hover:text-orange"
-                  }`
-                }
-              >
-                {({ isActive }) => {
-                  const DashboardIcon = isActive ? Squares2X2SolidIcon : Squares2X2Icon;
-                  return (
-                    <>
-                      <DashboardIcon className="h-4 w-4" />
-                      Dashboard
-                    </>
-                  );
-                }}
-              </NavLink>
-
-              <NavLink
-                to="/listings"
-                onClick={scrollToTop}
-                className="inline-flex items-center rounded-lg bg-orange px-5 py-2.5 text-sm font-bold text-white transition hover:bg-orange-hover"
-              >
-                Browse Listings
-              </NavLink>
             </div>
 
             <div className="flex items-center gap-2 lg:hidden">
@@ -238,28 +326,53 @@ const Navbar = () => {
                 <Squares2X2Icon className="h-5 w-5" />
                 Dashboard
               </NavLink>
-              <NavLink
-                to="/listings"
+              <motion.button
+                type="button"
                 onClick={() => {
-                  scrollToTop();
+                  handlePostFreeProperty();
                   closeMenu();
                 }}
-                className="flex items-center justify-center rounded-lg bg-orange px-4 py-3 text-sm font-bold text-white"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="group relative flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange to-orange-600 px-4 py-3 text-sm font-bold text-white shadow-lg overflow-hidden"
               >
-                Browse Listings
-              </NavLink>
+                <style>{`
+                  @keyframes nav-wave {
+                    0%, 100% { transform: scaleX(1); }
+                    50% { transform: scaleX(1.05); }
+                  }
+                  .nav-wave-icon {
+                    animation: nav-wave 1s ease-in-out infinite;
+                  }
+                `}</style>
+                <FlagIcon className="nav-wave-icon h-5 w-5" />
+                Post your free property
+              </motion.button>
               {!isAuthenticated ? (
-                <NavLink
-                  to="/auth"
-                  onClick={() => {
-                    scrollToTop();
-                    closeMenu();
-                  }}
-                  className="flex items-center justify-center gap-2 rounded-lg bg-navy px-4 py-3 text-sm font-semibold text-white"
-                >
-                  <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                  Sign in / Create account
-                </NavLink>
+                <div className="flex flex-col gap-2">
+                  <NavLink
+                    to="/auth"
+                    onClick={() => {
+                      scrollToTop();
+                      closeMenu();
+                    }}
+                    className="flex items-center justify-center gap-2 rounded-lg bg-navy px-4 py-3 text-sm font-semibold text-white"
+                  >
+                    <ArrowRightOnRectangleIcon className="h-5 w-5" />
+                    Login
+                  </NavLink>
+                  <NavLink
+                    to="/auth"
+                    onClick={() => {
+                      scrollToTop();
+                      closeMenu();
+                    }}
+                    className="flex items-center justify-center gap-2 rounded-lg border border-navy bg-white px-4 py-3 text-sm font-semibold text-navy"
+                  >
+                    <PlusCircleIcon className="h-5 w-5" />
+                    Create Account
+                  </NavLink>
+                </div>
               ) : (
                 <button
                   type="button"

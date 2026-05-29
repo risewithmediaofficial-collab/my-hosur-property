@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
 import {
   ArrowRightIcon,
+  BedIcon,
   CheckBadgeIcon,
-  HomeModernIcon,
+  InteriorIcon,
+  LandIcon,
   MapPinIcon,
   RectangleStackIcon,
-  Square3Stack3DIcon,
   UserIcon,
-} from "@heroicons/react/24/outline";
+} from "./AppIcons";
 import { currency, formatArea } from "../utils/format";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
 import { getPropertyImageAlt, getPropertyPath } from "../utils/seo";
@@ -79,11 +80,11 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
 
         <div className="grid grid-cols-2 gap-3 text-xs text-slate-600">
           <div className="flex items-center gap-2">
-            <HomeModernIcon className="h-4 w-4 text-slate-400" />
+            <BedIcon className="h-4 w-4 text-slate-400" />
             <span>{item.bhk || "Studio"} BHK</span>
           </div>
           <div className="flex items-center gap-2">
-            <Square3Stack3DIcon className="h-4 w-4 text-slate-400" />
+            <InteriorIcon className="h-4 w-4 text-slate-400" />
             <span className="truncate capitalize">{item.furnishingStatus || "Unfurnished"}</span>
           </div>
           <div className="flex items-center gap-2">
@@ -91,7 +92,7 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
             <span className="truncate">{item.carpetArea ? formatArea(item.carpetArea, item.areaUnit) : "Area on request"}</span>
           </div>
           <div className="flex items-center gap-2">
-            <HomeModernIcon className="h-4 w-4 text-slate-400" />
+            <LandIcon className="h-4 w-4 text-slate-400" />
             <span className="truncate capitalize">{item.propertyType || "Property"}</span>
           </div>
         </div>

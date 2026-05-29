@@ -21,15 +21,16 @@ const start = async () => {
     console.log(`[boot] Mongo URI present: ${process.env.MONGO_URI ? "yes" : "no"}`);
     console.log(`[boot] Client URL: ${process.env.CLIENT_URL || "not set"}`);
 
+    const server = app.listen(PORT, HOST, () => {
+      console.log(`[boot] Server running on ${HOST}:${PORT}`);
+    });
+
     await connectDB();
     await ensurePlansSeeded();
 
     const mailReady = await verifyMailConnection();
     console.log(`[boot] Mail verification status: ${mailReady ? "ready" : "skipped or failed"}`);
-
-    app.listen(PORT, HOST, () => {
-      console.log(`[boot] Server running on ${HOST}:${PORT}`);
-    });
+    return server;
   } catch (err) {
     console.error("[boot] Failed to start server:", err);
     process.exit(1);

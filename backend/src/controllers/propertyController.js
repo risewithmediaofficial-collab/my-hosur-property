@@ -143,6 +143,37 @@ const buildQuery = (q) => {
   return query;
 };
 
+const applyPublicVisibility = (query, req) => {
+  if (req.user?.role === "admin") return query;
+
+  const ownerId = query.ownerId ? String(query.ownerId) : "";
+  if (ownerId && String(req.user?._id || "") === ownerId) return query;
+
+  if (query.status === "approved") {
+    query.$and = [
+      ...(query.$and || []),
+      {
+        $or: [
+          { expiresAt: { $exists: false } },
+          { expiresAt: null },
+          { expiresAt: { $gt: new Date() } },
+        ],
+      },
+    ];
+  }
+
+  return query;
+};
+
+const activeListingQuery = () => ({
+  status: "approved",
+  $or: [
+    { expiresAt: { $exists: false } },
+    { expiresAt: null },
+    { expiresAt: { $gt: new Date() } },
+  ],
+});
+
 const calculateRankScore = (item, user, query) => {
   const now = Date.now();
   const ageDays = Math.max((now - new Date(item.createdAt).getTime()) / (1000 * 60 * 60 * 24), 0);
@@ -183,7 +214,7 @@ const listProperties = async (req, res) => {
     }
   }
 
-  const query = buildQuery(req.query);
+  const query = applyPublicVisibility(buildQuery(req.query), req);
   const itemsRaw = await Property.find(query).populate("ownerId", "name email phone role");
 
   const itemsWithRank = itemsRaw.map((item) => ({
@@ -244,13 +275,25 @@ const getPropertyById = async (req, res) => {
       return res.status(404).json({ message: "Property not found" });
     }
 
+    const isOwner = String(property.ownerId?._id || property.ownerId) === String(req.user?._id || "");
+    const isAdmin = req.user?.role === "admin";
+    const isExpired = property.expiresAt && new Date(property.expiresAt) <= new Date();
+
+    if (property.status !== "approved" && !isOwner && !isAdmin) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+
+    if (isExpired && !isOwner && !isAdmin) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+
     console.log("Property found:", property._id);
     
     await Property.findByIdAndUpdate(req.params.id, { $inc: { viewCount: 1 } });
 
     const similar = await Property.find({
       _id: { $ne: property._id },
-      status: "approved",
+      ...activeListingQuery(),
       propertyType: property.propertyType,
       "location.city": property.location.city,
     })
@@ -297,6 +340,7 @@ const createProperty = async (req, res) => {
   const boostDays = Math.max(user?.activePlan?.boostDays || 0, 3);
   const featuredUntil = new Date();
   featuredUntil.setDate(featuredUntil.getDate() + boostDays);
+  const expiresAt = user?.activePlan?.expiresAt ? new Date(user.activePlan.expiresAt) : null;
 
   const payload = {
     ...req.body,
@@ -305,6 +349,7 @@ const createProperty = async (req, res) => {
     ownerId: req.user._id,
     ownerType,
     listingSource: req.body.listingSource || defaultSource,
+    expiresAt,
     featuredUntil,
     promotionalScore: Math.max(req.body?.promotionalScore || 0, 10),
     verification:
@@ -441,6 +486,10 @@ const updateProperty = async (req, res) => {
     images: normalizeUploadList(req.body.images),
     documents: normalizeUploadList(req.body.documents),
   });
+  if (!property.expiresAt) {
+    const user = await User.findById(property.ownerId).select("activePlan");
+    if (user?.activePlan?.expiresAt) property.expiresAt = user.activePlan.expiresAt;
+  }
   property.status = "approved";
   await property.save();
 
@@ -464,7 +513,7 @@ const featured = async (req, res) => {
   const now = new Date();
 
   let items = await Property.find({
-    status: "approved",
+    ...activeListingQuery(),
     featuredUntil: { $gt: now },
   })
     .populate("ownerId", "name role")
@@ -473,7 +522,7 @@ const featured = async (req, res) => {
 
   // Fall back to the latest approved inventory when no active boosts exist.
   if (!items.length) {
-    items = await Property.find({ status: "approved" })
+    items = await Property.find(activeListingQuery())
       .populate("ownerId", "name role")
       .sort({ promotionalScore: -1, createdAt: -1 })
       .limit(8);
@@ -527,7 +576,7 @@ const uploadAssets = async (req, res) => {
 };
 
 const seoListings = async (_req, res) => {
-  const items = await Property.find({ status: "approved" })
+  const items = await Property.find(activeListingQuery())
     .select("title propertyType bhk listingType location featuredUntil createdAt updatedAt")
     .sort({ updatedAt: -1 })
     .lean();

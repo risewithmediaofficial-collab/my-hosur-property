@@ -52,6 +52,42 @@ body,
   box-sizing: border-box;
 }
 
+.MuiSvgIcon-root.h-3 {
+  width: 0.75rem !important;
+  height: 0.75rem !important;
+  font-size: 0.75rem !important;
+}
+
+.MuiSvgIcon-root.h-3\.5 {
+  width: 0.875rem !important;
+  height: 0.875rem !important;
+  font-size: 0.875rem !important;
+}
+
+.MuiSvgIcon-root.h-4 {
+  width: 1rem !important;
+  height: 1rem !important;
+  font-size: 1rem !important;
+}
+
+.MuiSvgIcon-root.h-5 {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  font-size: 1.25rem !important;
+}
+
+.MuiSvgIcon-root.h-6 {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  font-size: 1.5rem !important;
+}
+
+.MuiSvgIcon-root.h-12 {
+  width: 3rem !important;
+  height: 3rem !important;
+  font-size: 3rem !important;
+}
+
 html {
   scroll-behavior: smooth;
 }

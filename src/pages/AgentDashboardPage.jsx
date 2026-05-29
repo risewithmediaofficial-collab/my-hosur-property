@@ -8,7 +8,7 @@ import {
   Squares2X2Icon,
   TicketIcon,
   UserGroupIcon,
-} from "@heroicons/react/24/outline";
+} from "../components/AppIcons";
 import useAuth from "../hooks/useAuth";
 import { fetchMyProperties, promoteProperty } from "../services/api/propertyApi";
 import { fetchMyLeads, unlockInboxLead, updateLeadApproval, updateLeadStatus } from "../services/api/leadApi";
@@ -34,6 +34,7 @@ const StatusBadge = ({ status }) => {
     approved: "bg-green-100 text-green-700",
     pending: "bg-amber-100 text-amber-700",
     rejected: "bg-red-100 text-red-700",
+    expired: "bg-slate-200 text-slate-700",
   };
 
   return (
@@ -298,7 +299,9 @@ const AgentDashboardPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {properties.map((property) => (
+                {properties.map((property) => {
+                  const isExpired = property.expiresAt && new Date(property.expiresAt) <= new Date();
+                  return (
                   <tr key={property._id}>
                     <td>
                       <img
@@ -312,7 +315,7 @@ const AgentDashboardPage = () => {
                     <td className="font-medium text-slate-900">{property.title}</td>
                     <td>{property.location?.city}</td>
                     <td>
-                      <StatusBadge status={property.status} />
+                      {isExpired ? <StatusBadge status="expired" /> : <StatusBadge status={property.status} />}
                     </td>
                     <td>Rs.{(property.price || 0).toLocaleString("en-IN")}</td>
                     <td className="space-x-2 text-right">
@@ -325,7 +328,8 @@ const AgentDashboardPage = () => {
                       </button>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
                 {properties.length === 0 && (
                   <tr>
                     <td colSpan={6} className="py-12 text-center text-slate-500">

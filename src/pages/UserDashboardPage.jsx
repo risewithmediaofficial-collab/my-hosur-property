@@ -10,7 +10,7 @@ import {
   Squares2X2Icon,
   TicketIcon,
   UserGroupIcon,
-} from "@heroicons/react/24/outline";
+} from "../components/AppIcons";
 import PropertyCard from "../components/PropertyCard";
 import DashboardSidebar from "../components/DashboardSidebar";
 import Loader from "../components/Loader";
@@ -274,7 +274,9 @@ const UserDashboardPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {myProperties.map((property) => (
+                  {myProperties.map((property) => {
+                    const isExpired = property.expiresAt && new Date(property.expiresAt) <= new Date();
+                    return (
                     <tr key={property._id}>
                       <td>
                         <img
@@ -288,8 +290,8 @@ const UserDashboardPage = () => {
                       <td className="font-medium text-slate-900">{property.title}</td>
                       <td>{property.location?.city}</td>
                       <td>
-                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                          {property.status}
+                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${isExpired ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-600"}`}>
+                          {isExpired ? "expired" : property.status}
                         </span>
                       </td>
                       <td className="text-right">
@@ -298,7 +300,8 @@ const UserDashboardPage = () => {
                         </button>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

@@ -1,24 +1,36 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
-  BanknotesIcon,
+  ArrowRightIcon,
+  BrokerIcon,
   BuildingOffice2Icon,
   CreditCardIcon,
   DocumentMagnifyingGlassIcon,
   DocumentTextIcon,
-  HandRaisedIcon,
+  ElectricalIcon,
+  EngineeringIcon,
+  GardenIcon,
+  HandshakeIcon,
   HomeModernIcon,
+  InteriorIcon,
+  LandIcon,
+  LoanIcon,
   MagnifyingGlassIcon,
+  ManagementIcon,
   MapIcon,
-  MapPinIcon,
   PaintBrushIcon,
+  PestControlIcon,
+  PlumbingIcon,
+  PropertySearchIcon,
+  RegistrationIcon,
   ScaleIcon,
   ShieldCheckIcon,
   SparklesIcon,
+  TransportIcon,
+  VillaIcon,
   WrenchScrewdriverIcon,
-} from "@heroicons/react/24/outline";
-import CountUpNumber from "../components/CountUpNumber";
+} from "../components/AppIcons";
 import SeoHead from "../components/SeoHead";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
 
@@ -28,7 +40,6 @@ import loanImg from "../assets/Home loan.jpg";
 import registrationImg from "../assets/Sale deed registration.jpg";
 import searchImg from "../assets/plot search.jpg";
 import interiorImg from "../assets/interiros.jpg";
-import contractorImg from "../assets/contarcts works.jpg";
 
 const MotionSection = motion.section;
 
@@ -122,19 +133,6 @@ const serviceHighlights = [
       "Budget-friendly"
     ],
     imagePosition: "right"
-  },
-  {
-    id: 6,
-    title: "Skilled Contractor Services",
-    description: "Access our network of skilled contractors for electrical work, plumbing, masonry, and general maintenance. Quality workmanship, reliable service, and fair pricing for all your maintenance needs.",
-    image: contractorImg,
-    highlights: [
-      "Certified workers",
-      "Quality assured",
-      "Fair pricing",
-      "Quick response"
-    ],
-    imagePosition: "left"
   }
 ];
 
@@ -143,35 +141,35 @@ const serviceCategories = [
     key: "buy-sell-rent",
     title: "Buy / Sell / Rent",
     description: "We help customers buy, sell, and rent properties with complete assistance.",
-    icon: HomeModernIcon,
+    icon: BrokerIcon,
     services: [
       { label: "Property legal service", icon: ScaleIcon },
-      { label: "Sale agreement support", icon: HandRaisedIcon },
+      { label: "Sale agreement support", icon: HandshakeIcon },
       { label: "Property buying guidance", icon: HomeModernIcon },
-      { label: "Property selling guidance", icon: SparklesIcon },
+      { label: "Property selling guidance", icon: BrokerIcon },
     ],
   },
   {
     key: "loan-services",
     title: "Loan Services",
     description: "Fast and reliable loan assistance for various property requirements.",
-    icon: BanknotesIcon,
+    icon: LoanIcon,
     services: [
-      { label: "Home loan", icon: CreditCardIcon },
-      { label: "Plot loan", icon: BanknotesIcon },
+      { label: "Home loan", icon: HomeModernIcon },
+      { label: "Plot loan", icon: LandIcon },
       { label: "Commercial loan", icon: BuildingOffice2Icon },
-      { label: "Agriculture loan", icon: MapIcon },
-      { label: "Home loan balance transfer", icon: DocumentTextIcon },
+      { label: "Agriculture loan", icon: GardenIcon },
+      { label: "Home loan balance transfer", icon: CreditCardIcon },
     ],
   },
   {
     key: "registration-services",
     title: "Registration Services",
     description: "End-to-end documentation and registration assistance.",
-    icon: DocumentTextIcon,
+    icon: RegistrationIcon,
     services: [
       { label: "Sale deed registration", icon: DocumentTextIcon },
-      { label: "Patta transfer", icon: ShieldCheckIcon },
+      { label: "Patta transfer", icon: RegistrationIcon },
       { label: "Land survey", icon: MapIcon },
     ],
   },
@@ -179,49 +177,37 @@ const serviceCategories = [
     key: "property-search",
     title: "Property Search",
     description: "Find suitable properties based on your requirements.",
-    icon: MagnifyingGlassIcon,
+    icon: PropertySearchIcon,
     services: [
-      { label: "Plot search", icon: MapPinIcon },
+      { label: "Plot search", icon: LandIcon },
       { label: "Commercial property search", icon: BuildingOffice2Icon },
-      { label: "Agriculture land search", icon: MapIcon },
+      { label: "Agriculture land search", icon: GardenIcon },
     ],
   },
   {
     key: "interior-construction",
     title: "Interior & Construction",
     description: "Premium interior and construction solutions.",
-    icon: PaintBrushIcon,
+    icon: InteriorIcon,
     services: [
-      { label: "Home interiors", icon: HomeModernIcon },
+      { label: "Home interiors", icon: InteriorIcon },
       { label: "Office interiors", icon: PaintBrushIcon },
-      { label: "Construction services", icon: BuildingOffice2Icon },
+      { label: "Construction services", icon: EngineeringIcon },
       { label: "Approval plans", icon: DocumentMagnifyingGlassIcon },
-    ],
-  },
-  {
-    key: "contractor-services",
-    title: "Contractor Services",
-    description: "Professional workers and construction support.",
-    icon: WrenchScrewdriverIcon,
-    services: [
-      { label: "Electrical", icon: SparklesIcon },
-      { label: "Plumbing", icon: WrenchScrewdriverIcon },
-      { label: "Masonry work", icon: BuildingOffice2Icon },
-      { label: "General maintenance", icon: ShieldCheckIcon },
     ],
   },
   {
     key: "property-management",
     title: "Property Management Service",
     description: "Comprehensive maintenance and management for all types of properties.",
-    icon: HomeModernIcon,
+    icon: ManagementIcon,
     services: [
-      { label: "House & Office, Apartment, Industry Maintenance & AMC Service", icon: BuildingOffice2Icon },
-      { label: "NRI Property Management Service", icon: HomeModernIcon },
-      { label: "Farm Management", icon: MapIcon },
+      { label: "House & Office, Apartment, Industry Maintenance & AMC Service", icon: ManagementIcon },
+      { label: "NRI Property Management Service", icon: ShieldCheckIcon },
+      { label: "Farm Management", icon: GardenIcon },
       { label: "House Management", icon: HomeModernIcon },
-      { label: "Bungalow Management", icon: HomeModernIcon },
-      { label: "Agriculture Land Maintenance", icon: MapIcon },
+      { label: "Bungalow Management", icon: VillaIcon },
+      { label: "Agriculture Land Maintenance", icon: GardenIcon },
     ],
   },
   {
@@ -231,21 +217,28 @@ const serviceCategories = [
     icon: WrenchScrewdriverIcon,
     services: [
       { label: "Home & Office Cleaning", icon: SparklesIcon },
-      { label: "Home & Office Shifting (Packers & Movers)", icon: DocumentTextIcon },
+      { label: "Home & Office Shifting (Packers & Movers)", icon: TransportIcon },
       { label: "Home Appliance Service (TV, Fridge, Washing Machine Repair)", icon: WrenchScrewdriverIcon },
-      { label: "Electrical & Plumbing Service", icon: SparklesIcon },
+      { label: "Electrical & Plumbing Service", icon: ElectricalIcon },
       { label: "Carpentry & Interior Work", icon: PaintBrushIcon },
-      { label: "Pest Control Service", icon: ShieldCheckIcon },
+      { label: "Pest Control Service", icon: PestControlIcon },
       { label: "Bathroom Cleaning (Toilet Acid Wash)", icon: SparklesIcon },
-      { label: "Tank & Sump Cleaning", icon: WrenchScrewdriverIcon },
+      { label: "Tank & Sump Cleaning", icon: PlumbingIcon },
       { label: "Painting Work", icon: PaintBrushIcon },
       { label: "Sofa Cleaning", icon: SparklesIcon },
       { label: "Carpet Cleaning", icon: SparklesIcon },
-      { label: "Land Scaping", icon: MapIcon },
-      { label: "Garden Maintenance", icon: MapIcon },
+      { label: "Land Scaping", icon: GardenIcon },
+      { label: "Garden Maintenance", icon: GardenIcon },
     ],
   },
 ];
+
+const serviceQuickLinks = serviceCategories.map(({ key, title, icon }) => ({
+  key,
+  title,
+  icon,
+  href: `#service-${key}`,
+}));
 
 const ServicesPage = () => {
   const [search, setSearch] = useState("");
@@ -255,17 +248,16 @@ const ServicesPage = () => {
     { label: "Our Services", to: "/services" },
   ];
 
-  const filteredServices = useMemo(() => {
-    const term = search.trim().toLowerCase();
-    if (!term) return serviceCategories;
-    return serviceCategories.filter((category) => {
-      return (
-        category.title.toLowerCase().includes(term) ||
-        category.description.toLowerCase().includes(term) ||
-        category.services.some((item) => item.label.toLowerCase().includes(term))
-      );
-    });
-  }, [search]);
+  const term = search.trim().toLowerCase();
+  const filteredServices = term
+    ? serviceCategories.filter((category) => {
+        return (
+          category.title.toLowerCase().includes(term) ||
+          category.description.toLowerCase().includes(term) ||
+          category.services.some((item) => item.label.toLowerCase().includes(term))
+        );
+      })
+    : serviceCategories;
 
   return (
     <main className="page-shell w-full">
@@ -296,24 +288,24 @@ const ServicesPage = () => {
             </motion.p>
           </div>
 
-          <motion.div variants={reveal} custom={0.2} className="grid gap-3 sm:grid-cols-3">
-            <div className="stat-card text-center">
-              <p className="stat-value">
-                <CountUpNumber value={serviceCategories.length} />
-              </p>
-              <p className="stat-label">Core service categories</p>
-            </div>
-            <div className="stat-card text-center">
-              <p className="stat-value">
-                <CountUpNumber value={42} suffix="+" />
-              </p>
-              <p className="stat-label">Specialized support services</p>
-            </div>
-            <div className="stat-card text-center">
-              <p className="stat-value">
-                <CountUpNumber value={1} />
-              </p>
-              <p className="stat-label">Trusted platform partner</p>
+          <motion.div variants={reveal} custom={0.2} className="rounded-xl border border-white/15 bg-white/10 p-4 backdrop-blur sm:p-5">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange">Quick service links</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {serviceQuickLinks.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <a
+                    key={item.key}
+                    href={item.href}
+                    className="group inline-flex min-h-[52px] items-center gap-3 rounded-lg border border-white/15 bg-white px-4 py-3 text-sm font-bold text-navy shadow-sm transition hover:-translate-y-0.5 hover:border-orange hover:text-orange"
+                  >
+                    <span className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-orange/10 text-orange transition group-hover:bg-orange group-hover:text-white">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <span className="leading-snug">{item.title}</span>
+                  </a>
+                );
+              })}
             </div>
           </motion.div>
         </div>
@@ -345,45 +337,65 @@ const ServicesPage = () => {
           </div>
         </motion.div>
 
-        <div className="mt-6 grid grid-cols-1 items-start gap-5 min-w-0 sm:grid-cols-2 xl:grid-cols-3">
-          {filteredServices.map((category) => {
+        <div className="mt-8 grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {filteredServices.map((category, categoryIndex) => {
             const CategoryIcon = category.icon;
             return (
               <motion.article
                 key={category.key}
+                id={`service-${category.key}`}
                 variants={cardReveal}
                 initial="hidden"
                 whileInView="show"
                 viewport={{ once: true, amount: 0.01 }}
-                className="marketing-card w-full min-w-0 p-5 transition duration-300 hover:-translate-y-1 hover:border-orange sm:p-6"
+                className="group relative flex h-full min-h-[520px] w-full min-w-0 scroll-mt-32 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card transition duration-300 hover:-translate-y-1 hover:border-orange hover:shadow-[0_18px_42px_rgba(26,43,78,0.12)]"
               >
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-navy text-white">
-                  <CategoryIcon className="h-5 w-5" />
-                </div>
-                <h3 className="mt-4 text-lg font-bold text-navy sm:text-xl">{category.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{category.description}</p>
+                <div className="h-1.5 w-full bg-gradient-to-r from-orange via-orange to-navy" />
 
-                <div className="mt-4 space-y-2">
+                <div className="flex items-start gap-4 border-b border-slate-100 p-6">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-navy text-white shadow-[0_10px_24px_rgba(26,43,78,0.18)] transition duration-300 group-hover:bg-orange">
+                    <CategoryIcon className="h-6 w-6" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-orange">
+                        {String(categoryIndex + 1).padStart(2, "0")}
+                      </span>
+                      <span className="h-px flex-1 bg-slate-200" />
+                    </div>
+                    <h3 className="mt-2 text-xl font-bold leading-tight text-navy">{category.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">{category.description}</p>
+                  </div>
+                </div>
+
+                <div className="flex-1 p-6">
+                  <div className="space-y-1">
                   {category.services.map((service) => {
                     const ServiceIcon = service.icon;
                     return (
                       <div
                         key={service.label}
-                        className="flex w-full items-center gap-2.5 rounded-lg border border-slate-200 bg-surface px-3 py-2"
+                        className="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 transition duration-200 hover:bg-surface"
                       >
-                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-navy text-white">
+                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-orange/10 text-orange">
                           <ServiceIcon className="h-4 w-4" />
                         </div>
-                        <p className="min-w-0 flex-1 text-sm font-medium leading-snug text-navy">{service.label}</p>
+                        <p className="min-w-0 flex-1 text-sm font-semibold leading-snug text-navy">{service.label}</p>
                       </div>
                     );
                   })}
+                  </div>
                 </div>
 
-                <Link to="/contact" className="link-orange mt-5 inline-flex items-center gap-2">
-                  Contact Us
-                  <SparklesIcon className="h-4 w-4" />
-                </Link>
+                <div className="mt-auto border-t border-slate-100 bg-slate-50/80 px-6 py-4">
+                  <Link
+                    to="/contact"
+                    className="inline-flex w-full items-center justify-between rounded-lg bg-white px-4 py-3 text-sm font-bold text-navy ring-1 ring-slate-200 transition hover:bg-orange hover:text-white hover:ring-orange"
+                  >
+                    <span>Request this service</span>
+                    <ArrowRightIcon className="h-4 w-4" />
+                  </Link>
+                </div>
               </motion.article>
             );
           })}

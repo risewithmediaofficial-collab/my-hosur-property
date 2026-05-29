@@ -6,6 +6,8 @@
 const generateHtmlEmail = ({ name, title, message, buttonText, buttonUrl, type = "general" }) => {
   const brandName = "MyHosurProperty";
   const siteUrl = process.env.CLIENT_URL || "http://localhost:5173";
+  const supportEmail = process.env.SUPPORT_EMAIL || "myhosurproperty786@gmail.com";
+  const businessAddress = "No 4 /409-4, First floor, Movendar Nagar, Vinayagapuram, Bagalur Road, Hosur, Krishnagiri - 635109.";
 
   // Theme colours
   const colors = {
@@ -134,7 +136,7 @@ const generateHtmlEmail = ({ name, title, message, buttonText, buttonUrl, type =
                 © ${year} ${brandName}. All rights reserved.
               </p>
               <p style="margin:0 0 8px;font-size:12px;color:#94A3B8;">
-                Hosur, Tamil Nadu, India
+                ${businessAddress}
               </p>
               <p style="margin:0;font-size:12px;color:#94A3B8;">
                 <a href="${siteUrl}" style="color:${colors.accent};text-decoration:none;">Visit Website</a>
@@ -154,7 +156,7 @@ const generateHtmlEmail = ({ name, title, message, buttonText, buttonUrl, type =
             <td align="center" style="padding:0 20px;">
               <p style="font-size:11px;color:#94A3B8;margin:0;line-height:1.6;">
                 You're receiving this email because you registered on ${brandName}.<br/>
-                If you have concerns, please contact <a href="mailto:${process.env.SMTP_USER || 'support@myhosurproperty.com'}" style="color:${colors.accent};text-decoration:none;">${process.env.SMTP_USER || 'support@myhosurproperty.com'}</a>
+                If you have concerns, please contact <a href="mailto:${supportEmail}" style="color:${colors.accent};text-decoration:none;">${supportEmail}</a>
               </p>
             </td>
           </tr>

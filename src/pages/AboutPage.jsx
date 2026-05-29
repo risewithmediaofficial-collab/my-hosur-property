@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRightIcon, CheckCircleIcon, ShieldCheckIcon, UsersIcon } from "@heroicons/react/24/outline";
+import { ArrowRightIcon, CheckCircleIcon, ShieldCheckIcon, UsersIcon } from "../components/AppIcons";
 import CountUpNumber from "../components/CountUpNumber";
 import MarketingCard, { IconCircle } from "../components/MarketingCard";
 import PageHero from "../components/PageHero";

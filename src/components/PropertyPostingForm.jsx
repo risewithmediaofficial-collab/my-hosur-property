@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { ClipboardDocumentCheckIcon, CreditCardIcon, TicketIcon, UserCircleIcon, XMarkIcon } from "./AppIcons";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import useAuth from "../hooks/useAuth";
@@ -201,6 +201,23 @@ const getApiPropertyType = (type) => {
 
 const getListingType = (type) => (type === "Rent" || type === "PG" ? "rent" : "sale");
 
+const roleLabels = {
+  buyer: "Buyer",
+  customer: "Customer",
+  seller: "Owner / Seller",
+  agent: "Agent",
+  broker: "Broker",
+  builder: "Builder",
+  admin: "Admin",
+};
+
+const formatDate = (value) => {
+  if (!value) return "No expiry";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "No expiry";
+  return date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+};
+
 const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData = null }) => {
   const navigate = useNavigate();
   const { token, user, refreshProfile } = useAuth();
@@ -234,6 +251,15 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
   const remainingPosts = Math.max((user?.activePlan?.listingLimit || 0) - (user?.activePlan?.listingsUsed || 0), 0);
   const canPostForFree = hasActivePlan && hasPostingQuota;
+  const postingLimit = user?.activePlan?.listingLimit || 0;
+  const postingUsed = user?.activePlan?.listingsUsed || 0;
+  const contactLimit = user?.contactAccess?.monthlyLimit || user?.activePlan?.contactUnlocks || 0;
+  const contactUsed = user?.contactAccess?.usedCount || 0;
+  const contactLeft = Math.max(contactLimit - contactUsed, 0);
+  const leadCreditsLeft = Math.max((user?.activePlan?.leadCredits || 0) + (user?.leadCredits || 0), 0);
+  const planExpired = Boolean(user?.activePlan?.expiresAt && new Date(user.activePlan.expiresAt) < new Date());
+  const activePlanName = user?.activePlan?.planId?.name || (isAdmin ? "Admin access" : postingLimit === 1 ? "Free 90-day listing" : "Active posting plan");
+  const accountType = roleLabels[user?.role] || "User";
 
   useEffect(() => {
     refreshProfile?.().catch(() => {});
@@ -241,7 +267,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
   useEffect(() => {
     if (!isAdmin && hasPostingAccess && !canPostForFree && !initialData) {
-      toast.error("Your free 30-day posting period has ended or no plan credits left. Buy a plan to post.");
+      toast.error("Your free 90-day posting period has ended or no plan credits left. Buy a plan to post.");
       navigate("/plans");
     }
   }, [canPostForFree, isAdmin, hasPostingAccess, navigate, initialData]);
@@ -583,9 +609,51 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         </div>
       )}
 
+      {user ? (
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-card sm:p-5">
+          <div className="flex flex-col gap-3 border-b border-slate-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-orange">Account posting details</p>
+              <h3 className="mt-1 text-lg font-bold text-navy">Signed in as {user.name || accountType}</h3>
+            </div>
+            <span className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] ${hasPostingAccess ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>
+              {hasPostingAccess ? "Posting enabled" : "Posting disabled"}
+            </span>
+          </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <StatusCard
+              icon={<UserCircleIcon className="h-5 w-5" />}
+              label="Account type"
+              value={accountType}
+              helper={user.email || "Registered user"}
+            />
+            <StatusCard
+              icon={<CreditCardIcon className="h-5 w-5" />}
+              label="Current plan"
+              value={activePlanName}
+              helper={`${planExpired ? "Expired on" : "Valid till"} ${formatDate(user?.activePlan?.expiresAt)}`}
+            />
+            <StatusCard
+              icon={<ClipboardDocumentCheckIcon className="h-5 w-5" />}
+              label="Posting credits left"
+              value={isAdmin ? "Unlimited" : `${remainingPosts} left`}
+              helper={isAdmin ? "Admin can post without limit" : `${postingUsed} used of ${postingLimit || 0}`}
+              tone={remainingPosts > 0 || isAdmin ? "default" : "warning"}
+            />
+            <StatusCard
+              icon={<TicketIcon className="h-5 w-5" />}
+              label="Contact / lead credits"
+              value={`${contactLeft} contacts`}
+              helper={`${leadCreditsLeft} lead credits left`}
+            />
+          </div>
+        </div>
+      ) : null}
+
       {hasPostingAccess && !isAdmin && !canPostForFree && !initialData && (
         <div className="rounded-xl bg-surface p-4">
-          <p className="text-sm text-slate-600">Your free 30-day period has expired or your plan credits are used up. Buy a plan to continue posting properties.</p>
+          <p className="text-sm text-slate-600">Your free 90-day period has expired or your plan credits are used up. Buy a plan to continue posting properties.</p>
           <button onClick={() => navigate("/plans")} className="site-button-primary mt-3 px-4 py-2 text-sm">
             Go to plans
           </button>
@@ -670,6 +738,21 @@ const Field = ({ label, required, className = "", children }) => (
     </span>
     {children}
   </label>
+);
+
+const StatusCard = ({ icon, label, value, helper, tone = "default" }) => (
+  <div className={`rounded-xl border p-4 ${tone === "warning" ? "border-orange/30 bg-orange/5" : "border-slate-100 bg-surface"}`}>
+    <div className="flex items-start gap-3">
+      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${tone === "warning" ? "bg-orange text-white" : "bg-navy text-white"}`}>
+        {icon}
+      </span>
+      <div className="min-w-0">
+        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500">{label}</p>
+        <p className="mt-1 truncate text-base font-bold text-navy">{value}</p>
+        <p className="mt-1 text-xs leading-5 text-slate-500">{helper}</p>
+      </div>
+    </div>
+  </div>
 );
 
 const Select = ({ field, value, options, onChange }) => (

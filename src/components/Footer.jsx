@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { primaryNavLinks } from "../constants/navigation";
-import { BuildingOffice2Icon, EnvelopeIcon, MapPinIcon, PhoneIcon } from "@heroicons/react/24/outline";
+import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL } from "../constants/contactInfo";
+import { BuildingOffice2Icon, EnvelopeIcon, MapPinIcon, PhoneIcon } from "./AppIcons";
 
 const serviceLinks = [
   { label: "Our Services", to: "/services" },
@@ -60,17 +61,17 @@ const Footer = () => (
           <div className="space-y-4">
             <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">Contact</h4>
             <div className="space-y-5 text-sm text-white">
-              <a href="mailto:support@myhosurproperty.com" className="flex items-start gap-3 transition hover:text-orange">
+              <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-start gap-3 transition hover:text-orange">
                 <EnvelopeIcon className="mt-1 h-4 w-4 flex-shrink-0 text-orange" />
-                <span className="leading-5">support@myhosurproperty.com</span>
+                <span className="leading-5">{CONTACT_EMAIL}</span>
               </a>
-              <a href="tel:+919876543210" className="flex items-start gap-3 transition hover:text-orange">
+              <a href={`tel:${CONTACT_PHONE_TEL}`} className="flex items-start gap-3 transition hover:text-orange">
                 <PhoneIcon className="mt-1 h-4 w-4 flex-shrink-0 text-orange" />
-                <span className="leading-5">+91 98765 43210</span>
+                <span className="leading-5">{CONTACT_PHONE_DISPLAY}</span>
               </a>
               <div className="flex items-start gap-3">
                 <MapPinIcon className="mt-1 h-4 w-4 flex-shrink-0 text-orange" />
-                <span className="leading-5">Hosur, Krishnagiri District, Tamil Nadu 635109, India</span>
+                <span className="leading-5">{CONTACT_ADDRESS}</span>
               </div>
             </div>
           </div>

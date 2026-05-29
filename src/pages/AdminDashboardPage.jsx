@@ -35,7 +35,7 @@ import {
   EnvelopeIcon,
   TicketIcon,
   XMarkIcon,
-} from "@heroicons/react/24/outline";
+} from "../components/AppIcons";
 
 const formatCustomerRequestLabel = (item) => {
   if (item.requestCategory === "loan") return "Loan";

@@ -87,6 +87,7 @@ const propertySchema = new mongoose.Schema(
     status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
     listingType: { type: String, enum: ["sale", "rent", "new-project"], default: "sale" },
     listingSource: { type: String, enum: ["owner", "builder", "agent"], default: "owner" },
+    expiresAt: Date,
     featuredUntil: Date,
     promotionalScore: { type: Number, default: 0 },
     viewCount: { type: Number, default: 0 },

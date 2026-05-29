@@ -7,7 +7,7 @@ import {
   HomeModernIcon,
   PlusIcon,
   Squares2X2Icon,
-} from "@heroicons/react/24/outline";
+} from "../components/AppIcons";
 import DashboardSidebar from "../components/DashboardSidebar";
 import Loader from "../components/Loader";
 import useAuth from "../hooks/useAuth";

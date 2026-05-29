@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { BuildingOffice2Icon, ClipboardDocumentCheckIcon, CurrencyRupeeIcon, WrenchScrewdriverIcon } from "@heroicons/react/24/outline";
+import { BuildingOffice2Icon, ClipboardDocumentCheckIcon, CurrencyRupeeIcon, WrenchScrewdriverIcon } from "../components/AppIcons";
 import SeoHead from "../components/SeoHead";
 import useAuth from "../hooks/useAuth";
 import { createCustomerRequest } from "../services/api/customerRequestApi";

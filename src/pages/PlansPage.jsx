@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { CheckCircleIcon, ShieldCheckIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, ShieldCheckIcon } from "../components/AppIcons";
 import useAuth from "../hooks/useAuth";
 import { fetchPlans } from "../services/api/planApi";
 import { createPaymentIntent, fetchMyPayments, verifyPayment } from "../services/api/paymentApi";

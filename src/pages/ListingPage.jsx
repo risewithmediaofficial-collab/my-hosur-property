@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { AdjustmentsHorizontalIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { AdjustmentsHorizontalIcon, XMarkIcon } from "../components/AppIcons";
 import PropertyCard from "../components/PropertyCard";
 import PropertySearchFilterPanel from "../components/PropertySearchFilterPanel";
 import SeoHead from "../components/SeoHead";

@@ -34,7 +34,7 @@ const sendWelcomeTemplateEmail = async (user, providerLabel = "signing up") => {
   const siteUrl = process.env.CLIENT_URL || "http://localhost:5173";
   const dashboardUrl = `${siteUrl.replace(/\/$/, "")}/dashboard`;
   const loginUrl = `${siteUrl.replace(/\/$/, "")}/auth`;
-  const supportEmail = process.env.SUPPORT_EMAIL || process.env.SMTP_USER || "support@myhosurproperty.com";
+  const supportEmail = process.env.SUPPORT_EMAIL || process.env.SMTP_USER || "myhosurproperty786@gmail.com";
   const userName = user.name || "Member";
   const firstName = userName.trim().split(/\s+/)[0] || userName;
   const roleLabel = getRoleLabel(user.role);

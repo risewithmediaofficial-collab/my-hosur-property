@@ -1,5 +1,5 @@
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { ShieldCheckIcon, UserIcon } from "@heroicons/react/24/outline";
+import { ShieldCheckIcon, UserIcon } from "./AppIcons";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
 
 const ContactModal = ({ open, onClose, onSubmit, value, setValue, contact, intentType, user }) => {

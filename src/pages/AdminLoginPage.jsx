@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
 import { adminLoginUser } from "../services/api/adminAuthApi";
-import { ShieldCheckIcon } from "@heroicons/react/24/outline";
+import { ShieldCheckIcon } from "../components/AppIcons";
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();

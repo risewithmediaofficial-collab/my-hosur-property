@@ -9,7 +9,7 @@ import {
   HomeModernIcon,
   MapPinIcon,
   PhoneIcon,
-} from "@heroicons/react/24/outline";
+} from "../components/AppIcons";
 import ImageGallery from "../components/ImageGallery";
 import PropertyCard from "../components/PropertyCard";
 import ContactModal from "../components/ContactModal";

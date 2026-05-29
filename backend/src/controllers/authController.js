@@ -6,12 +6,19 @@ const sendEmail = require("../utils/sendEmail");
 const generateHtmlEmail = require("../utils/emailFormatter");
 const { sendWelcomeTemplateEmail } = require("../utils/sendEmailJs");
 
+const FREE_POST_VALIDITY_DAYS = 90;
+
+const addDays = (date, days) => {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+};
+
 const buildFreeOnboardingPack = () => {
   const resetAt = new Date();
   resetAt.setDate(resetAt.getDate() + 30);
 
-  const freePostExpiry = new Date();
-  freePostExpiry.setDate(freePostExpiry.getDate() + 30);
+  const freePostExpiry = addDays(new Date(), FREE_POST_VALIDITY_DAYS);
 
   return {
     leadCredits: 5,
@@ -37,6 +44,32 @@ const buildFreeOnboardingPack = () => {
       boostDays: 0,
     },
   };
+};
+
+const ensureFreeOnboardingValidity = async (user) => {
+  if (!user || user.activePlan?.planId) return user;
+
+  const isFreeListingPlan = (user.activePlan?.listingLimit || 0) === 1;
+  if (!isFreeListingPlan) return user;
+
+  const accountStart = user.createdAt || new Date();
+  const expectedExpiry = addDays(accountStart, FREE_POST_VALIDITY_DAYS);
+  const currentFreeExpiry = user.freePost?.expiresAt ? new Date(user.freePost.expiresAt) : null;
+  const currentPlanExpiry = user.activePlan?.expiresAt ? new Date(user.activePlan.expiresAt) : null;
+
+  if ((!currentFreeExpiry || currentFreeExpiry < expectedExpiry) || (!currentPlanExpiry || currentPlanExpiry < expectedExpiry)) {
+    user.freePost = {
+      ...(user.freePost?.toObject ? user.freePost.toObject() : user.freePost || {}),
+      expiresAt: expectedExpiry,
+    };
+    user.activePlan = {
+      ...(user.activePlan?.toObject ? user.activePlan.toObject() : user.activePlan || {}),
+      expiresAt: expectedExpiry,
+    };
+    await user.save();
+  }
+
+  return user;
 };
 
 const signupValidators = [
@@ -210,6 +243,8 @@ const login = async (req, res) => {
     return res.status(403).json({ message: "Your account has been deactivated by the admin." });
   }
 
+  await ensureFreeOnboardingValidity(user);
+
   const token = generateToken({ id: user._id, role: user.role });
 
   try {
@@ -264,6 +299,8 @@ const otpVerify = async (req, res) => {
     }
   }
 
+  await ensureFreeOnboardingValidity(user);
+
   const token = generateToken({ id: user._id, role: user.role });
   return res.json({
     token,
@@ -308,6 +345,8 @@ const socialLogin = async (req, res) => {
     }
   }
 
+  await ensureFreeOnboardingValidity(user);
+
   const jwt = generateToken({ id: user._id, role: user.role });
   return res.json({
     token: jwt,
@@ -316,6 +355,7 @@ const socialLogin = async (req, res) => {
 };
 
 const me = async (req, res) => {
+  await ensureFreeOnboardingValidity(req.user);
   return res.json({ user: req.user });
 };
 
