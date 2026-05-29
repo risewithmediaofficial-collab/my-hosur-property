@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ArrowRightIcon,
   BanknotesIcon,
@@ -30,6 +32,8 @@ const HERO_BG =
   "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1920&q=80";
 import { fetchHomeProperties } from "../services/api/propertyApi";
 import { buildRealEstateAgentSchema, buildWebsiteSchema } from "../utils/seo";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const MotionSection = motion.section;
 
@@ -180,6 +184,10 @@ const HomePage = () => {
   const [featuredLoading, setFeaturedLoading] = useState(true);
   const [openShortcutMenu, setOpenShortcutMenu] = useState("");
   const [propertyTypeMenuOpen, setPropertyTypeMenuOpen] = useState(false);
+  const homeRootRef = useRef(null);
+  const heroRef = useRef(null);
+  const heroBgRef = useRef(null);
+  const heroContentRef = useRef(null);
   const shortcutBarRef = useRef(null);
   const propertyTypeMenuRef = useRef(null);
 
@@ -226,6 +234,110 @@ const HomePage = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return undefined;
+
+    const ctx = gsap.context(() => {
+      gsap.from(".home-gsap-hero-item", {
+        autoAlpha: 0,
+        y: 28,
+        duration: 0.8,
+        ease: "power3.out",
+        stagger: 0.08,
+        delay: 0.1,
+      });
+
+      if (heroBgRef.current && heroRef.current) {
+        gsap.to(heroBgRef.current, {
+          yPercent: 14,
+          scale: 1.08,
+          ease: "none",
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+      }
+
+      if (heroContentRef.current && heroRef.current) {
+        gsap.to(heroContentRef.current, {
+          yPercent: -7,
+          ease: "none",
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+      }
+
+      gsap.utils.toArray(".home-gsap-section").forEach((section) => {
+        gsap.from(section.querySelectorAll(".section-tag, h2, .home-gsap-copy"), {
+          y: 24,
+          duration: 0.7,
+          ease: "power3.out",
+          stagger: 0.08,
+          scrollTrigger: {
+            trigger: section,
+            start: "top 82%",
+            once: true,
+          },
+        });
+      });
+
+      gsap.utils.toArray(".home-gsap-card").forEach((card, index) => {
+        gsap.from(card, {
+          y: 34,
+          scale: 0.97,
+          duration: 0.65,
+          delay: (index % 6) * 0.035,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: card,
+            start: "top 88%",
+            once: true,
+          },
+        });
+      });
+
+      gsap.utils.toArray(".home-scroll-track").forEach((track) => {
+        gsap.fromTo(
+          track,
+          { xPercent: 2 },
+          {
+            xPercent: -2,
+            ease: "none",
+            scrollTrigger: {
+              trigger: track,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 1,
+            },
+          }
+        );
+      });
+
+      gsap.utils.toArray(".home-parallax-soft").forEach((item) => {
+        gsap.to(item, {
+          y: -30,
+          ease: "none",
+          scrollTrigger: {
+            trigger: item,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1,
+          },
+        });
+      });
+    }, homeRootRef);
+
+    return () => ctx.revert();
+  }, [featured.length]);
+
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
     if (search.intent) params.set("intent", search.intent);
@@ -265,7 +377,7 @@ const HomePage = () => {
   };
 
   return (
-    <main className="page-shell w-full">
+    <main ref={homeRootRef} className="page-shell w-full overflow-hidden">
       <SeoHead
         title="Verified Property Listings in Hosur"
         description="Explore verified property listings, real-estate services, and professional local property support through My Hosur Property."
@@ -275,25 +387,26 @@ const HomePage = () => {
       />
 
       <MotionSection
+        ref={heroRef}
         initial="hidden"
         animate="show"
         variants={reveal}
-        className="relative min-h-[380px] sm:min-h-[460px] lg:min-h-[500px]"
-        style={{
-          backgroundImage: `url(${HERO_BG})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
+        className="relative min-h-[380px] overflow-hidden sm:min-h-[460px] lg:min-h-[500px]"
       >
+        <div
+          ref={heroBgRef}
+          className="absolute -inset-y-16 inset-x-0 bg-cover bg-center will-change-transform"
+          style={{ backgroundImage: `url(${HERO_BG})` }}
+        />
         <div className="absolute inset-0 bg-navy/75" />
 
-        <div className="relative z-10 mx-auto flex max-w-[1440px] flex-col items-center px-5 py-12 text-center sm:px-8 sm:py-16 lg:px-10 lg:py-20">
-          <p className="section-tag !text-orange">Verified real estate platform</p>
-          <h1 className="hero-title mt-4 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
+        <div ref={heroContentRef} className="relative z-10 mx-auto flex max-w-[1440px] flex-col items-center px-5 py-12 text-center will-change-transform sm:px-8 sm:py-16 lg:px-10 lg:py-20">
+          <p className="home-gsap-hero-item section-tag !text-orange">Verified real estate platform</p>
+          <h1 className="home-gsap-hero-item hero-title mt-4 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
             Verified property listings in <span className="text-orange">Hosur</span>
           </h1>
           
-          <div className="mt-8 flex flex-col gap-6 w-full sm:mt-10">
+          <div className="home-gsap-hero-item mt-8 flex flex-col gap-6 w-full sm:mt-10">
             <p className="mx-auto text-sm leading-7 text-white/85 sm:text-base">
               Find verified properties for sale and rent across Hosur. Search apartments, villas, plots, and houses with clearer tools and local support.
             </p>
@@ -366,7 +479,7 @@ const HomePage = () => {
               ) : null}
             </div>
 
-            <div className="mt-4 flex w-full max-w-md flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center mx-auto">
+            <div className="home-gsap-hero-item mt-4 flex w-full max-w-md flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center mx-auto">
               <motion.button
                 type="button"
                 onClick={handlePostFreeProperty}
@@ -448,7 +561,7 @@ const HomePage = () => {
             </div>
           </div>
 
-          <div className="mt-8 grid w-full max-w-3xl grid-cols-3 gap-3 text-center sm:mt-10 sm:gap-6">
+          <div className="home-gsap-hero-item mt-8 grid w-full max-w-3xl grid-cols-3 gap-3 text-center sm:mt-10 sm:gap-6">
             {homeStats.map((item) => (
               <div key={item.label}>
                 <p className="text-xl font-bold text-white sm:text-2xl lg:text-3xl">
@@ -461,9 +574,9 @@ const HomePage = () => {
         </div>
       </MotionSection>
 
-      <section className="relative bg-gradient-to-b from-slate-50 to-white px-5 py-8 sm:px-8 sm:py-12 lg:px-10">
+      <section className="home-gsap-section relative bg-gradient-to-b from-slate-50 to-white px-5 py-8 sm:px-8 sm:py-12 lg:px-10">
         <div className="mx-auto max-w-[1440px] space-y-5">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-lg sm:p-7">
+          <div className="home-gsap-card rounded-2xl border border-slate-200 bg-white p-5 shadow-lg sm:p-7">
             <p className="mb-5 text-center text-base font-semibold text-navy sm:text-left">Search properties in Hosur</p>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.8fr_0.9fr_auto] lg:items-stretch">
               <div className="flex min-h-[52px] items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 transition focus-within:border-orange focus-within:ring-2 focus-within:ring-orange/20 sm:col-span-2 lg:col-span-1">
@@ -541,7 +654,7 @@ const HomePage = () => {
         whileInView="show"
         viewport={{ once: true, amount: 0.18 }}
         variants={reveal}
-        className="bg-white px-5 py-16 sm:px-8 lg:px-10"
+        className="home-gsap-section bg-white px-5 py-16 sm:px-8 lg:px-10"
       >
         <div className="mx-auto max-w-[1440px] text-center">
           <p className="section-tag">Property types</p>
@@ -556,7 +669,7 @@ const HomePage = () => {
                 <Link
                   key={option.value}
                   to={`/listings?intent=buy&propertyType=${encodeURIComponent(option.value)}`}
-                  className="property-type-card flex flex-col items-center p-6 text-center"
+                  className="home-gsap-card property-type-card flex flex-col items-center p-6 text-center"
                 >
                   <div className="flex h-14 w-14 items-center justify-center rounded-full bg-navy text-white">
                     <Icon className="h-6 w-6" />
@@ -574,7 +687,7 @@ const HomePage = () => {
         whileInView="show"
         viewport={{ once: true, amount: 0.05 }}
         variants={reveal}
-        className="bg-surface px-5 py-16 sm:px-8 lg:px-10"
+        className="home-gsap-section bg-surface px-5 py-16 sm:px-8 lg:px-10"
       >
         <div className="mx-auto max-w-[1440px] text-center">
           <p className="section-tag">Our services</p>
@@ -590,7 +703,7 @@ const HomePage = () => {
                 initial="hidden"
                 whileInView="show"
                 viewport={{ once: true, amount: 0.01 }}
-                className="rounded-xl border border-slate-200 bg-white p-8 text-center shadow-card transition duration-300 hover:-translate-y-1 hover:border-orange"
+                className="home-gsap-card home-parallax-soft rounded-xl border border-slate-200 bg-white p-8 text-center shadow-card transition duration-300 hover:-translate-y-1 hover:border-orange"
               >
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-navy text-white">
                   <Icon className="h-6 w-6" />
@@ -612,12 +725,12 @@ const HomePage = () => {
         whileInView="show"
         viewport={{ once: true, amount: 0.2 }}
         variants={reveal}
-        className="bg-gradient-to-b from-surface to-white px-5 py-16 sm:px-8 lg:px-10"
+        className="home-gsap-section bg-gradient-to-b from-surface to-white px-5 py-16 sm:px-8 lg:px-10"
       >
         <div className="mx-auto max-w-[1440px] text-center">
           <p className="section-tag">Property Showcase</p>
           <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">Services & Property Types</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+          <p className="home-gsap-copy mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-600">
             Explore the diverse range of properties and services we provide in Hosur
           </p>
         </div>
@@ -648,14 +761,14 @@ const HomePage = () => {
               .service-card {
                 flex-shrink: 0;
                 width: 280px;
-                background: white;
-                border: 2px solid #e9ecef;
+                background: #ffffff;
+                border: 2px solid #dfe6ee;
                 border-radius: 16px;
                 padding: 24px;
                 text-align: center;
                 transition: all 0.3s ease;
                 cursor: pointer;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
               }
 
               .service-card:hover {
@@ -709,7 +822,7 @@ const HomePage = () => {
 
             <div className="gradient-fade-services gradient-fade-left-services"></div>
             <div className="overflow-hidden">
-              <div className="services-scroll">
+              <div className="home-scroll-track services-scroll">
                 {[...showcaseItems, ...showcaseItems].map((service, index) => {
                   const Icon = service.icon;
                   return (
@@ -734,13 +847,13 @@ const HomePage = () => {
         whileInView="show"
         viewport={{ once: true, amount: 0.18 }}
         variants={reveal}
-        className="bg-white px-5 py-16 sm:px-8 lg:px-10"
+        className="home-gsap-section bg-white px-5 py-16 sm:px-8 lg:px-10"
       >
         <div className="mx-auto flex max-w-[1440px] flex-col gap-4 text-center sm:items-center">
           <div>
             <p className="section-tag">Featured properties</p>
             <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">Cleanly presented, ready to compare.</h2>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+            <p className="home-gsap-copy mt-3 max-w-2xl text-sm leading-7 text-slate-600">
               Browse verified homes, plots, and commercial properties arranged in a cleaner, more readable listing flow.
             </p>
           </div>
@@ -752,7 +865,9 @@ const HomePage = () => {
 
         <div className="mx-auto mt-8 grid max-w-[1440px] gap-6 md:grid-cols-2 xl:grid-cols-3">
           {featuredListings.map((item) => (
-            <PropertyCard key={item._id} item={item} />
+            <div key={item._id} className="home-gsap-card">
+              <PropertyCard item={item} />
+            </div>
           ))}
 
           {featuredLoading &&
@@ -772,12 +887,12 @@ const HomePage = () => {
         whileInView="show"
         viewport={{ once: true, amount: 0.2 }}
         variants={reveal}
-        className="bg-white px-5 py-16 sm:px-8 lg:px-10"
+        className="home-gsap-section bg-white px-5 py-16 sm:px-8 lg:px-10"
       >
         <div className="mx-auto max-w-[1440px] text-center">
           <p className="section-tag">Trusted partnerships</p>
           <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">Our Partners</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+          <p className="home-gsap-copy mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-600">
             Working with industry leaders to provide comprehensive real estate solutions
           </p>
         </div>
@@ -812,11 +927,12 @@ const HomePage = () => {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-                border: 2px solid #e9ecef;
+                background: linear-gradient(135deg, #ffffff 0%, #eef5f4 100%);
+                border: 2px solid #cfdcde;
                 border-radius: 12px;
                 transition: all 0.3s ease;
                 cursor: pointer;
+                box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
               }
 
               .partner-item:hover {
@@ -853,7 +969,7 @@ const HomePage = () => {
 
             <div className="gradient-fade gradient-fade-left"></div>
             <div className="overflow-hidden">
-              <div className="partners-scroll">
+              <div className="home-scroll-track partners-scroll">
                 {[
                   { name: "Partner 1", logo: "P1" },
                   { name: "Partner 2", logo: "P2" },
@@ -887,7 +1003,7 @@ const HomePage = () => {
         whileInView="show"
         viewport={{ once: true, amount: 0.2 }}
         variants={reveal}
-        className="bg-navy px-5 py-16 text-white sm:px-8 lg:px-10"
+        className="home-gsap-section bg-navy px-5 py-16 text-white sm:px-8 lg:px-10"
       >
         <div className="mx-auto grid max-w-[1440px] gap-5 text-center lg:grid-cols-[1fr_auto] lg:items-center lg:text-left">
           <div>
