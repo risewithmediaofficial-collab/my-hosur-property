@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDownIcon } from "./AppIcons";
+import { bankLoans } from "../constants/bankLoans";
 
 const LoanCalculator = ({ bank, onBankChange }) => {
   const [loanAmount, setLoanAmount] = useState(25); // in lakhs
@@ -8,6 +9,11 @@ const LoanCalculator = ({ bank, onBankChange }) => {
   const [tenure, setTenure] = useState(180); // 15 years in months
   const [processingFeePercent, setProcessingFeePercent] = useState(0.75);
   const [showAmortization, setShowAmortization] = useState(false);
+  const selectedBank = bankLoans.find((item) => item.id === bank?.id) || bankLoans[0];
+
+  useEffect(() => {
+    setInterestRate((selectedBank.minRate + selectedBank.maxRate) / 2);
+  }, [selectedBank.id, selectedBank.minRate, selectedBank.maxRate]);
 
   // Calculate EMI and total interest with processing fee
   const calculations = useMemo(() => {
@@ -116,7 +122,7 @@ const LoanCalculator = ({ bank, onBankChange }) => {
   }, [calculations, tenure, interestRate]);
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4">
+    <div className="w-full max-w-4xl mx-auto px-2 sm:px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -124,32 +130,27 @@ const LoanCalculator = ({ bank, onBankChange }) => {
         className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200"
       >
         {/* Bank Selection */}
-        <div className="p-8 bg-gradient-to-r from-blue-50 to-blue-100 border-b border-slate-200">
-          <h3 className="text-2xl font-bold text-slate-900 mb-6">Loan Calculator</h3>
+        <div className="p-4 sm:p-6 md:p-8 bg-gradient-to-r from-blue-50 to-blue-100 border-b border-slate-200">
+          <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-4 sm:mb-6">Loan Calculator</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              { id: 1, name: "PNB", shortName: "PNB", minRate: 7.3, maxRate: 7.8 },
-              { id: 2, name: "HDFC", shortName: "HDFC", minRate: 7.3, maxRate: 7.8 },
-              { id: 3, name: "LIC", shortName: "LIC", minRate: 7.3, maxRate: 7.8 },
-              { id: 4, name: "IDBI", shortName: "IDBI", minRate: 6.7, maxRate: 7.5 },
-            ].map((b) => (
+            {bankLoans.map((bankOption) => (
               <motion.button
-                key={b.id}
+                key={bankOption.id}
                 onClick={() => {
-                  onBankChange(b);
-                  setInterestRate((b.minRate + b.maxRate) / 2);
+                  onBankChange(bankOption);
+                  setInterestRate((bankOption.minRate + bankOption.maxRate) / 2);
                 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
-                className={`p-4 rounded-xl font-semibold transition-all duration-300 ${
-                  bank.id === b.id
+                className={`p-3 sm:p-4 rounded-xl font-semibold transition-all duration-300 min-w-0 ${
+                  selectedBank.id === bankOption.id
                     ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg ring-2 ring-blue-300"
                     : "bg-white text-slate-700 border border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                 }`}
               >
-                <div className="text-sm mb-1">{b.shortName}</div>
-                <div className="text-xs opacity-75">
-                  {b.minRate}%-{b.maxRate}%
+                <div className="text-sm mb-1">{bankOption.shortName}</div>
+                <div className="text-[11px] sm:text-xs opacity-75">
+                  {bankOption.minRate}%-{bankOption.maxRate}%
                 </div>
               </motion.button>
             ))}
@@ -157,12 +158,12 @@ const LoanCalculator = ({ bank, onBankChange }) => {
         </div>
 
         {/* Calculator Body */}
-        <div className="p-8 space-y-8 bg-white">
+        <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 bg-white">
           {/* Loan Amount Slider */}
           <div className="space-y-4">
-            <div className="flex justify-between items-end">
+            <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-end">
               <label className="text-lg font-semibold text-slate-900">Loan Amount</label>
-              <span className="text-3xl font-bold text-blue-600">{formatCurrency(loanAmount * 100000)}</span>
+              <span className="text-2xl sm:text-3xl font-bold text-blue-600 break-words">{formatCurrency(loanAmount * 100000)}</span>
             </div>
             <input
               type="range"
@@ -185,29 +186,29 @@ const LoanCalculator = ({ bank, onBankChange }) => {
 
           {/* Interest Rate Slider */}
           <div className="space-y-4">
-            <div className="flex justify-between items-end">
+            <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-end">
               <label className="text-lg font-semibold text-slate-900">Interest Rate (%)</label>
-              <span className="text-3xl font-bold text-green-600">{interestRate.toFixed(2)}%</span>
+              <span className="text-2xl sm:text-3xl font-bold text-green-600">{interestRate.toFixed(2)}%</span>
             </div>
             <input
               type="range"
-              min={bank.minRate}
-              max={bank.maxRate}
+              min={selectedBank.minRate}
+              max={selectedBank.maxRate}
               step="0.01"
               value={interestRate}
               onChange={(e) => setInterestRate(Number(e.target.value))}
               className="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-green-500"
               style={{
                 background: `linear-gradient(to right, rgb(34, 197, 94) 0%, rgb(34, 197, 94) ${
-                  ((interestRate - bank.minRate) / (bank.maxRate - bank.minRate)) * 100
+                  ((interestRate - selectedBank.minRate) / (selectedBank.maxRate - selectedBank.minRate)) * 100
                 }%, rgb(226, 232, 240) ${
-                  ((interestRate - bank.minRate) / (bank.maxRate - bank.minRate)) * 100
+                  ((interestRate - selectedBank.minRate) / (selectedBank.maxRate - selectedBank.minRate)) * 100
                 }%, rgb(226, 232, 240) 100%)`,
               }}
             />
             <div className="flex justify-between text-xs text-slate-600 font-medium">
-              <span>{bank.minRate}%</span>
-              <span>{bank.maxRate}%</span>
+              <span>{selectedBank.minRate}%</span>
+              <span>{selectedBank.maxRate}%</span>
             </div>
           </div>
 
@@ -235,9 +236,9 @@ const LoanCalculator = ({ bank, onBankChange }) => {
 
           {/* Processing Fee Slider */}
           <div className="space-y-4">
-            <div className="flex justify-between items-end">
+            <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-end">
               <label className="text-lg font-semibold text-slate-900">Processing Fee</label>
-              <span className="text-2xl font-bold text-orange-600">{processingFeePercent.toFixed(2)}% ({formatCurrency(calculations.processingFee)})</span>
+              <span className="text-xl sm:text-2xl font-bold text-orange-600 break-words">{processingFeePercent.toFixed(2)}% ({formatCurrency(calculations.processingFee)})</span>
             </div>
             <input
               type="range"
@@ -260,13 +261,13 @@ const LoanCalculator = ({ bank, onBankChange }) => {
           </div>
 
           {/* Results Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 pt-6 border-t border-slate-200">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 pt-6 border-t border-slate-200">
             <motion.div
               whileHover={{ y: -5 }}
               className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200"
             >
               <p className="text-slate-600 text-sm mb-2">Monthly EMI</p>
-              <p className="text-2xl font-bold text-blue-700">
+              <p className="text-xl sm:text-2xl font-bold text-blue-700 break-words">
                 {formatCurrency(calculations.emi)}
               </p>
             </motion.div>
@@ -276,7 +277,7 @@ const LoanCalculator = ({ bank, onBankChange }) => {
               className="bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-xl border border-amber-200"
             >
               <p className="text-slate-600 text-sm mb-2">Total Interest</p>
-              <p className="text-2xl font-bold text-amber-700">
+              <p className="text-xl sm:text-2xl font-bold text-amber-700 break-words">
                 {formatCurrency(calculations.totalInterest)}
               </p>
             </motion.div>
@@ -286,7 +287,7 @@ const LoanCalculator = ({ bank, onBankChange }) => {
               className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200"
             >
               <p className="text-slate-600 text-sm mb-2">Total Amount</p>
-              <p className="text-2xl font-bold text-green-700">
+              <p className="text-xl sm:text-2xl font-bold text-green-700 break-words">
                 {formatCurrency(calculations.totalAmount)}
               </p>
             </motion.div>
@@ -296,7 +297,7 @@ const LoanCalculator = ({ bank, onBankChange }) => {
               className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl border border-orange-200"
             >
               <p className="text-slate-600 text-sm mb-2">Processing Fee</p>
-              <p className="text-2xl font-bold text-orange-700">
+              <p className="text-xl sm:text-2xl font-bold text-orange-700 break-words">
                 {formatCurrency(calculations.processingFee)}
               </p>
             </motion.div>
@@ -306,7 +307,7 @@ const LoanCalculator = ({ bank, onBankChange }) => {
               className="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-xl border border-red-200"
             >
               <p className="text-slate-600 text-sm mb-2">Total Outgo</p>
-              <p className="text-2xl font-bold text-red-700">
+              <p className="text-xl sm:text-2xl font-bold text-red-700 break-words">
                 {formatCurrency(calculations.totalWithProcessingFee)}
               </p>
             </motion.div>
@@ -315,7 +316,7 @@ const LoanCalculator = ({ bank, onBankChange }) => {
           {/* Loan Summary */}
           <div className="bg-slate-50 p-6 rounded-xl space-y-3 border border-slate-200">
             <h4 className="text-lg font-semibold text-slate-900 mb-4">Loan Summary</h4>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
                 <p className="text-slate-600 mb-1">Principal Amount</p>
                 <p className="text-slate-900 font-semibold">{formatCurrency(calculations.principal)}</p>
@@ -413,10 +414,10 @@ const LoanCalculator = ({ bank, onBankChange }) => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="bg-slate-50 p-6 rounded-xl overflow-x-auto border border-slate-200"
+              className="bg-slate-50 p-4 sm:p-6 rounded-xl overflow-x-auto border border-slate-200"
             >
               <h4 className="text-lg font-semibold text-slate-900 mb-4">Payment Schedule</h4>
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[640px] text-sm">
                 <thead>
                   <tr className="border-b-2 border-slate-300">
                     <th className="text-left py-2 px-2 text-slate-700 font-semibold">Month</th>

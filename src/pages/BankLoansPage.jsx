@@ -115,7 +115,7 @@ const BankLoansPage = () => {
                     : "bg-slate-50 border border-slate-200"
                 }`}
               >
-                <div className="flex items-start gap-6 mb-6">
+                <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-6">
                   <div className="text-5xl">{bank.logo}</div>
                   <div className="flex-1">
                     <h3 className={`text-2xl font-bold mb-2 ${selectedBank.id === bank.id ? "text-white" : "text-slate-900"}`}>
@@ -304,36 +304,68 @@ const BankLoansPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
             viewport={{ once: true, amount: 0.2 }}
-            className="bg-white rounded-2xl p-8 overflow-x-auto shadow-lg"
+            className="bg-white rounded-2xl p-5 sm:p-8 shadow-lg"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-8">Bank Comparison</h2>
-            
-            <table className="w-full text-sm md:text-base">
-              <thead>
-                <tr className="border-b-2 border-slate-300">
-                  <th className="text-left py-4 px-4 font-semibold text-slate-900">Bank</th>
-                  <th className="text-center py-4 px-4 font-semibold text-slate-900">Interest Rate</th>
-                  <th className="text-center py-4 px-4 font-semibold text-slate-900">Processing Fee</th>
-                  <th className="text-center py-4 px-4 font-semibold text-slate-900">Max Loan</th>
-                  <th className="text-center py-4 px-4 font-semibold text-slate-900">Max Tenure</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bankLoans.map((bank, index) => (
-                  <tr key={bank.id} className={`border-b ${index % 2 === 0 ? "bg-slate-50" : "bg-white"} hover:bg-blue-50 transition`}>
-                    <td className="py-4 px-4 font-semibold text-slate-900">{bank.shortName}</td>
-                    <td className="text-center py-4 px-4">
-                      <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
-                        {bank.minRate}% - {bank.maxRate}%
-                      </span>
-                    </td>
-                    <td className="text-center py-4 px-4 text-slate-600">{bank.processingFee}</td>
-                    <td className="text-center py-4 px-4 text-slate-600">{bank.maxLoanAmount}</td>
-                    <td className="text-center py-4 px-4 text-slate-600">{bank.maxTenure}</td>
+            <div className="space-y-4 md:hidden">
+              {bankLoans.map((bank) => (
+                <div key={bank.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <h3 className="text-lg font-semibold text-slate-900">{bank.shortName}</h3>
+                    <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+                      {bank.minRate}% - {bank.maxRate}%
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-slate-500">Processing Fee</p>
+                      <p className="font-medium text-slate-900">{bank.processingFee}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500">Max Loan</p>
+                      <p className="font-medium text-slate-900">{bank.maxLoanAmount}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500">Max Tenure</p>
+                      <p className="font-medium text-slate-900">{bank.maxTenure}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500">Type</p>
+                      <p className="font-medium text-slate-900">{bank.description}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="hidden overflow-x-auto md:block">
+              <table className="w-full text-sm md:text-base">
+                <thead>
+                  <tr className="border-b-2 border-slate-300">
+                    <th className="text-left py-4 px-4 font-semibold text-slate-900">Bank</th>
+                    <th className="text-center py-4 px-4 font-semibold text-slate-900">Interest Rate</th>
+                    <th className="text-center py-4 px-4 font-semibold text-slate-900">Processing Fee</th>
+                    <th className="text-center py-4 px-4 font-semibold text-slate-900">Max Loan</th>
+                    <th className="text-center py-4 px-4 font-semibold text-slate-900">Max Tenure</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {bankLoans.map((bank, index) => (
+                    <tr key={bank.id} className={`border-b ${index % 2 === 0 ? "bg-slate-50" : "bg-white"} hover:bg-blue-50 transition`}>
+                      <td className="py-4 px-4 font-semibold text-slate-900">{bank.shortName}</td>
+                      <td className="text-center py-4 px-4">
+                        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
+                          {bank.minRate}% - {bank.maxRate}%
+                        </span>
+                      </td>
+                      <td className="text-center py-4 px-4 text-slate-600">{bank.processingFee}</td>
+                      <td className="text-center py-4 px-4 text-slate-600">{bank.maxLoanAmount}</td>
+                      <td className="text-center py-4 px-4 text-slate-600">{bank.maxTenure}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </motion.div>
 
           {/* Eligibility & Requirements */}
