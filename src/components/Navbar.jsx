@@ -10,6 +10,7 @@ import BrandLogo from "./BrandLogo";
 import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
+  BookmarkIcon,
   BriefcaseIcon,
   ChevronDownIcon,
   EnvelopeIcon,
@@ -38,6 +39,7 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
   const dashboardPath = user?.role === "admin" ? "/admin/dashboard" : "/dashboard";
+  const canShowSavedShortcut = Boolean(isAuthenticated && user?.role !== "admin");
 
   useBodyScrollLock(mobileMenuOpen);
 
@@ -179,6 +181,21 @@ const Navbar = () => {
                     }}
                   </NavLink>
 
+                  {canShowSavedShortcut ? (
+                    <NavLink
+                      to="/dashboard?tab=saved"
+                      onClick={scrollToTop}
+                      className={({ isActive }) =>
+                        `inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                          isActive ? "text-orange" : "text-navy hover:text-orange"
+                        }`
+                      }
+                    >
+                      <BookmarkIcon className="h-4 w-4" />
+                      Saved
+                    </NavLink>
+                  ) : null}
+
                   <motion.button
                     type="button"
                     onClick={handlePostFreeProperty}
@@ -312,6 +329,19 @@ const Navbar = () => {
                 <Squares2X2Icon className="h-5 w-5" />
                 Dashboard
               </NavLink>
+              {canShowSavedShortcut ? (
+                <NavLink
+                  to="/dashboard?tab=saved"
+                  onClick={() => {
+                    scrollToTop();
+                    closeMenu();
+                  }}
+                  className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-navy"
+                >
+                  <BookmarkIcon className="h-5 w-5" />
+                  Saved Properties
+                </NavLink>
+              ) : null}
               <motion.button
                 type="button"
                 onClick={() => {

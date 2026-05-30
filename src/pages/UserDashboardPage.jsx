@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
   ArrowLeftOnRectangleIcon,
@@ -10,6 +10,7 @@ import {
   Squares2X2Icon,
   TicketIcon,
   UserGroupIcon,
+  ChatBubbleLeftRightIcon,
 } from "../components/AppIcons";
 import PropertyCard from "../components/PropertyCard";
 import DashboardSidebar from "../components/DashboardSidebar";
@@ -23,18 +24,20 @@ import { buyLeadPackIntent, verifyLeadPackPayment } from "../services/api/custom
 import { loadExternalScript } from "../utils/loadExternalScript";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
 import { getPropertyImageAlt } from "../utils/seo";
+import { getInquiryHistory } from "../utils/inquiryHistory";
 
 const SELLER_ROLES = ["seller", "agent", "broker", "builder", "admin"];
 
 const UserDashboardPage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user, token, logout } = useAuth();
   const [myProperties, setMyProperties] = useState([]);
   const [incomingLeads, setIncomingLeads] = useState([]);
   const [customerLeadCredits, setCustomerLeadCredits] = useState(0);
   const [saved, setSaved] = useState([]);
   const [payments, setPayments] = useState([]);
-  const [tab, setTab] = useState("overview");
+  const [tab, setTab] = useState(searchParams.get("tab") || "overview");
   const [loading, setLoading] = useState(true);
 
   const canPostProperty = useMemo(
@@ -139,6 +142,7 @@ const UserDashboardPage = () => {
   };
 
   const pendingLeads = incomingLeads.filter((lead) => lead.status === "pending");
+  const inquiryHistory = useMemo(() => getInquiryHistory(user?._id), [user?._id, myProperties.length, incomingLeads.length]);
   const sidebarStats = [
     { label: "Properties", value: myProperties.length, icon: <HomeModernIcon className="h-4 w-4" /> },
     { label: "Lead Credits", value: customerLeadCredits, icon: <TicketIcon className="h-4 w-4" /> },
@@ -148,6 +152,7 @@ const UserDashboardPage = () => {
     { key: "overview", label: "Overview", icon: <Squares2X2Icon className="h-4 w-4" /> },
     { key: "listings", label: "My Listings", icon: <HomeModernIcon className="h-4 w-4" /> },
     { key: "leads", label: "Leads", icon: <UserGroupIcon className="h-4 w-4" /> },
+    { key: "inquiries", label: "My Inquiries", icon: <ChatBubbleLeftRightIcon className="h-4 w-4" /> },
     { key: "payments", label: "Payments", icon: <CreditCardIcon className="h-4 w-4" /> },
     { key: "saved", label: "Saved", icon: <BookmarkIcon className="h-4 w-4" /> },
   ].map((item) => ({
@@ -155,6 +160,20 @@ const UserDashboardPage = () => {
     active: tab === item.key,
     onClick: setTab,
   }));
+
+  useEffect(() => {
+    const nextTab = searchParams.get("tab");
+    if (nextTab && navItems.some((item) => item.key === nextTab) && nextTab !== tab) {
+      setTab(nextTab);
+    }
+  }, [navItems, searchParams, tab]);
+
+  useEffect(() => {
+    const current = searchParams.get("tab") || "overview";
+    if (tab !== current) {
+      setSearchParams(tab === "overview" ? {} : { tab }, { replace: true });
+    }
+  }, [searchParams, setSearchParams, tab]);
 
   if (loading) {
     return (
@@ -209,6 +228,13 @@ const UserDashboardPage = () => {
               <button onClick={onBuyPack} className="dashboard-primary mt-3 px-4 py-2 text-xs">
                 <TicketIcon className="h-4 w-4" />
                 Buy 5 Credits
+              </button>
+            </div>
+            <div className="dashboard-stat p-5">
+              <p className="text-sm text-slate-500">My inquiries</p>
+              <p className="mt-2 text-xl font-bold text-slate-900">{inquiryHistory.length}</p>
+              <button onClick={() => setTab("inquiries")} className="dashboard-secondary mt-3 px-4 py-2 text-xs">
+                View history
               </button>
             </div>
           </section>
@@ -356,6 +382,44 @@ const UserDashboardPage = () => {
               <div className="dashboard-empty p-10 text-center">No pending leads found.</div>
             )}
           </div>
+        </section>
+      )}
+
+      {tab === "inquiries" && (
+        <section className="dashboard-shell p-6">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="dashboard-display text-2xl font-semibold text-slate-900">My Property Inquiries</h2>
+              <p className="dashboard-muted text-sm">Track the messages you sent to property owners and the current approval status.</p>
+            </div>
+          </div>
+          {inquiryHistory.length === 0 ? (
+            <div className="dashboard-empty p-12 text-center">No property inquiries yet. Open a property and send a message to the owner.</div>
+          ) : (
+            <div className="space-y-4">
+              {inquiryHistory.map((item) => (
+                <div key={item.id} className="dashboard-subpanel p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-slate-900">{item.propertyTitle}</p>
+                      <p className="dashboard-muted text-sm">{item.propertyLocation || "Hosur property inquiry"}</p>
+                      <p className="mt-1 text-xs text-slate-500">Owner: {item.ownerName} • {new Date(item.createdAt).toLocaleString("en-IN")}</p>
+                    </div>
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${
+                      item.status === "approved"
+                        ? "bg-green-100 text-green-700"
+                        : item.status === "rejected"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-amber-100 text-amber-700"
+                    }`}>
+                      {item.status || "pending"}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm text-slate-700">{item.message}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       )}
 

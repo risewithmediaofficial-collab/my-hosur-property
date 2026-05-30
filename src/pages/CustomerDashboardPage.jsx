@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
   BellIcon,
+  BookmarkIcon,
+  ChatBubbleLeftRightIcon,
   ClipboardDocumentListIcon,
   HomeModernIcon,
   PlusIcon,
@@ -13,7 +15,10 @@ import Loader from "../components/Loader";
 import useAuth from "../hooks/useAuth";
 import { createCustomerRequest, fetchMyCustomerRequests } from "../services/api/customerRequestApi";
 import { fetchMyNotifications, markNotificationRead } from "../services/api/notificationApi";
+import { fetchSavedProperties } from "../services/api/userApi";
 import { PROPERTY_REQUEST_TYPES } from "../constants/serviceRequests";
+import PropertyCard from "../components/PropertyCard";
+import { getInquiryHistory } from "../utils/inquiryHistory";
 
 const STATUS_CONFIG = {
   open: { label: "Open", cls: "bg-slate-100 text-slate-700" },
@@ -47,22 +52,25 @@ const formatRequestTitle = (item) => {
 
 const CustomerDashboardPage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { token, user } = useAuth();
 
   const [requests, setRequests] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [saved, setSaved] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
-  const [tab, setTab] = useState("overview");
+  const [tab, setTab] = useState(searchParams.get("tab") || "overview");
 
   const loadAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [reqRes, notifRes] = await Promise.allSettled([fetchMyCustomerRequests(token), fetchMyNotifications(token)]);
+      const [reqRes, notifRes, savedRes] = await Promise.allSettled([fetchMyCustomerRequests(token), fetchMyNotifications(token), fetchSavedProperties(token)]);
       if (reqRes.status === "fulfilled") setRequests(reqRes.value.items || []);
       if (notifRes.status === "fulfilled") setNotifications(notifRes.value.items || []);
+      if (savedRes.status === "fulfilled") setSaved(savedRes.value.items || []);
     } finally {
       setLoading(false);
     }
@@ -112,6 +120,7 @@ const CustomerDashboardPage = () => {
   };
 
   const unreadCount = useMemo(() => notifications.filter((item) => !item.readAt).length, [notifications]);
+  const inquiryHistory = useMemo(() => getInquiryHistory(user?._id), [user?._id, requests.length, notifications.length]);
   const openCount = useMemo(() => requests.filter((item) => item.status === "open").length, [requests]);
   const matchedCount = useMemo(() => requests.filter((item) => item.status === "matched").length, [requests]);
   const matchNotifications = useMemo(() => notifications.filter((item) => item.type === "match"), [notifications]);
@@ -120,6 +129,22 @@ const CustomerDashboardPage = () => {
     () => requests.filter((item) => (item.matchedAgents?.length || 0) > 0 || item.status === "matched"),
     [requests]
   );
+
+  const allowedTabs = ["overview", "requests", "matches", "notifications", "saved", "inquiries"];
+
+  useEffect(() => {
+    const nextTab = searchParams.get("tab");
+    if (nextTab && allowedTabs.includes(nextTab) && nextTab !== tab) {
+      setTab(nextTab);
+    }
+  }, [searchParams, tab]);
+
+  useEffect(() => {
+    const current = searchParams.get("tab") || "overview";
+    if (tab !== current) {
+      setSearchParams(tab === "overview" ? {} : { tab }, { replace: true });
+    }
+  }, [searchParams, setSearchParams, tab]);
 
   if (loading) {
     return (
@@ -141,12 +166,15 @@ const CustomerDashboardPage = () => {
         { label: "Open", value: openCount, icon: <Squares2X2Icon className="h-4 w-4" /> },
         { label: "Matches", value: matchedCount, icon: <HomeModernIcon className="h-4 w-4" /> },
         { label: "Unread", value: unreadCount, icon: <BellIcon className="h-4 w-4" /> },
+        { label: "Saved", value: saved.length, icon: <BookmarkIcon className="h-4 w-4" /> },
       ]}
       navItems={[
         { key: "overview", label: "Overview", icon: <Squares2X2Icon className="h-4 w-4" />, badge: undefined },
         { key: "requests", label: "My Requests", icon: <ClipboardDocumentListIcon className="h-4 w-4" />, badge: requests.length || undefined },
         { key: "matches", label: "Matches", icon: <HomeModernIcon className="h-4 w-4" />, badge: matchedCount || undefined },
         { key: "notifications", label: "Notifications", icon: <BellIcon className="h-4 w-4" />, badge: unreadCount || undefined },
+        { key: "inquiries", label: "Property Chats", icon: <ChatBubbleLeftRightIcon className="h-4 w-4" />, badge: inquiryHistory.length || undefined },
+        { key: "saved", label: "Saved", icon: <BookmarkIcon className="h-4 w-4" />, badge: saved.length || undefined },
       ].map((item) => ({
         ...item,
         active: tab === item.key,
@@ -176,6 +204,8 @@ const CustomerDashboardPage = () => {
               { label: "Open Requirements", value: openCount },
               { label: "Matched Requirements", value: matchedCount },
               { label: "Unread Notifications", value: unreadCount },
+              { label: "Saved Properties", value: saved.length },
+              { label: "Property Chats", value: inquiryHistory.length },
             ].map((item) => (
               <div key={item.label} className="dashboard-stat p-5 text-slate-900">
                 <p className="text-sm uppercase tracking-[0.18em] text-slate-600">{item.label}</p>
@@ -495,6 +525,65 @@ const CustomerDashboardPage = () => {
                 </div>
               </div>
             ))
+          )}
+        </section>
+      )}
+
+      {tab === "inquiries" && (
+        <section className="dashboard-shell p-6">
+          <div className="mb-6">
+            <h2 className="dashboard-display text-2xl font-semibold text-slate-900">Property Chat History</h2>
+            <p className="dashboard-muted mt-1 text-sm">Every property contact request you sent is listed here for easy follow-up.</p>
+          </div>
+          {inquiryHistory.length === 0 ? (
+            <div className="dashboard-empty p-10 text-center">No property chats yet.</div>
+          ) : (
+            <div className="space-y-4">
+              {inquiryHistory.map((item) => (
+                <div key={item.id} className="dashboard-subpanel p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-slate-900">{item.propertyTitle}</p>
+                      <p className="text-sm text-slate-600">{item.propertyLocation || "Hosur property inquiry"}</p>
+                      <p className="mt-1 text-xs text-slate-500">Posted by: {item.ownerName} • {new Date(item.createdAt).toLocaleString("en-IN")}</p>
+                    </div>
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${
+                      item.status === "approved"
+                        ? "bg-green-100 text-green-700"
+                        : item.status === "rejected"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-amber-100 text-amber-700"
+                    }`}>
+                      {item.status || "pending"}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm text-slate-700">{item.message}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      {tab === "saved" && (
+        <section className="dashboard-shell p-6">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="dashboard-display text-2xl font-semibold text-slate-900">Saved Properties</h2>
+              <p className="dashboard-muted text-sm">Quick access to the homes you bookmarked.</p>
+            </div>
+            <button onClick={() => navigate("/listings")} className="dashboard-secondary px-4 py-2 text-sm">
+              Explore Listings
+            </button>
+          </div>
+          {saved.length === 0 ? (
+            <div className="dashboard-empty p-12 text-center">You haven&apos;t saved any properties yet.</div>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {saved.map((item) => (
+                <PropertyCard key={item._id} item={item} />
+              ))}
+            </div>
           )}
         </section>
       )}

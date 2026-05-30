@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
   BoltIcon,
+  BookmarkIcon,
   ClipboardDocumentListIcon,
   HomeModernIcon,
   Squares2X2Icon,
@@ -23,7 +24,9 @@ import {
 import { loadExternalScript } from "../utils/loadExternalScript";
 import DashboardSidebar from "../components/DashboardSidebar";
 import Loader from "../components/Loader";
+import PropertyCard from "../components/PropertyCard";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
+import { fetchSavedProperties } from "../services/api/userApi";
 import { getPropertyImageAlt } from "../utils/seo";
 
 const fmt = (value) =>
@@ -46,6 +49,7 @@ const StatusBadge = ({ status }) => {
 
 const AgentDashboardPage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { token, user } = useAuth();
   const isBroker = ["agent", "broker"].includes(user?.role);
 
@@ -53,15 +57,17 @@ const AgentDashboardPage = () => {
   const [leads, setLeads] = useState([]);
   const [customerRequests, setCustomerRequests] = useState([]);
   const [customerLeadCredits, setCustomerLeadCredits] = useState(0);
+  const [saved, setSaved] = useState([]);
   const [leadUnlockPrice] = useState(200);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState("overview");
+  const [tab, setTab] = useState(searchParams.get("tab") || "overview");
 
   const loadAll = useCallback(async () => {
     try {
       const results = await Promise.allSettled([
         fetchMyProperties(token),
         fetchMyLeads(token),
+        fetchSavedProperties(token),
         isBroker ? fetchCustomerRequestsForAgents(token) : Promise.resolve({ items: [], customerLeadCredits: 0 }),
       ]);
 
@@ -70,10 +76,11 @@ const AgentDashboardPage = () => {
         setLeads(results[1].value.items || []);
         setCustomerLeadCredits(results[1].value.customerLeadCredits || 0);
       }
-      if (results[2].status === "fulfilled") {
-        setCustomerRequests(results[2].value.items || []);
-        if (results[2].value.customerLeadCredits !== undefined) {
-          setCustomerLeadCredits(results[2].value.customerLeadCredits);
+      if (results[2].status === "fulfilled") setSaved(results[2].value.items || []);
+      if (results[3].status === "fulfilled") {
+        setCustomerRequests(results[3].value.items || []);
+        if (results[3].value.customerLeadCredits !== undefined) {
+          setCustomerLeadCredits(results[3].value.customerLeadCredits);
         }
       }
     } finally {
@@ -206,13 +213,29 @@ const AgentDashboardPage = () => {
     { key: "overview", label: "Overview", icon: <Squares2X2Icon className="h-4 w-4" /> },
     { key: "listings", label: "Listings", icon: <HomeModernIcon className="h-4 w-4" /> },
     { key: "leads", label: "Leads", icon: <UserGroupIcon className="h-4 w-4" /> },
+    { key: "saved", label: "Saved", icon: <BookmarkIcon className="h-4 w-4" /> },
     ...(isBroker ? [{ key: "requests", label: "Requests", icon: <ClipboardDocumentListIcon className="h-4 w-4" /> }] : []),
   ];
   const sidebarStats = [
     { label: "Total Listings", value: properties.length, icon: <HomeModernIcon className="h-4 w-4" /> },
     { label: "Active Leads", value: leads.length, icon: <UserGroupIcon className="h-4 w-4" /> },
     { label: "Lead Credits", value: customerLeadCredits, icon: <TicketIcon className="h-4 w-4" /> },
+    { label: "Saved", value: saved.length, icon: <BookmarkIcon className="h-4 w-4" /> },
   ];
+
+  useEffect(() => {
+    const nextTab = searchParams.get("tab");
+    if (nextTab && tabs.some((item) => item.key === nextTab) && nextTab !== tab) {
+      setTab(nextTab);
+    }
+  }, [searchParams, tab, tabs]);
+
+  useEffect(() => {
+    const current = searchParams.get("tab") || "overview";
+    if (tab !== current) {
+      setSearchParams(tab === "overview" ? {} : { tab }, { replace: true });
+    }
+  }, [searchParams, setSearchParams, tab]);
 
   if (loading) {
     return (
@@ -430,6 +453,29 @@ const AgentDashboardPage = () => {
               </tbody>
             </table>
           </div>
+        </section>
+      )}
+
+      {tab === "saved" && (
+        <section className="dashboard-shell p-6">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="dashboard-display text-2xl font-semibold text-slate-900">Saved Properties</h2>
+              <p className="dashboard-muted text-sm">Keep your shortlisted homes close while managing leads and listings.</p>
+            </div>
+            <button onClick={() => navigate("/listings")} className="dashboard-secondary px-4 py-2 text-sm">
+              Explore Listings
+            </button>
+          </div>
+          {saved.length === 0 ? (
+            <div className="dashboard-empty p-12 text-center">You haven&apos;t saved any properties yet.</div>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              {saved.map((item) => (
+                <PropertyCard key={item._id} item={item} />
+              ))}
+            </div>
+          )}
         </section>
       )}
 

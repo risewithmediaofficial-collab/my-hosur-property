@@ -26,6 +26,7 @@ import {
   getPropertyPath,
   truncateText,
 } from "../utils/seo";
+import { saveInquiryHistoryItem, updateInquiryHistoryItem } from "../utils/inquiryHistory";
 
 const PropertyDetailPage = () => {
   const { id } = useParams();
@@ -52,6 +53,17 @@ const PropertyDetailPage = () => {
         message: inquiryText || "Hi, I am interested in this property.",
       });
       setMyLead(res.lead);
+      saveInquiryHistoryItem(user?._id, {
+        id: res.lead?._id || `${id}-${Date.now()}`,
+        propertyId: id,
+        propertyTitle: p?.title || "Property inquiry",
+        propertyLocation: [p?.location?.area, p?.location?.city].filter(Boolean).join(", "),
+        ownerName: p?.listingContact?.name || p?.ownerId?.name || "Owner",
+        intentType,
+        message: inquiryText || "Hi, I am interested in this property.",
+        status: res.lead?.status || "pending",
+        createdAt: res.lead?.createdAt || new Date().toISOString(),
+      });
       toast.success(intentType === "brochure" ? "Request sent" : "Contact request sent to owner for approval.");
       setModalOpen(false);
       setInquiryText("");
@@ -83,10 +95,18 @@ const PropertyDetailPage = () => {
 
     if (token) {
       checkMyLeadStatus(token, id)
-        .then((res) => setMyLead(res.lead))
+        .then((res) => {
+          setMyLead(res.lead);
+          if (res?.lead?._id && user?._id) {
+            updateInquiryHistoryItem(user._id, res.lead._id, {
+              status: res.lead.status,
+              createdAt: res.lead.createdAt,
+            });
+          }
+        })
         .catch(() => setMyLead(null));
     }
-  }, [id, token]);
+  }, [id, token, user?._id]);
 
   const p = data.property;
   const propertyPath = p ? getPropertyPath(p) : "";
