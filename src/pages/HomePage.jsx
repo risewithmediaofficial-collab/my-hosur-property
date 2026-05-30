@@ -24,6 +24,7 @@ import {
 } from "../components/AppIcons";
 import CountUpNumber from "../components/CountUpNumber";
 import PropertyCard from "../components/PropertyCard";
+import LocalitySearch from "../components/LocalitySearch";
 import SeoHead from "../components/SeoHead";
 import useDebounce from "../hooks/useDebounce";
 import useAuth from "../hooks/useAuth";
@@ -752,10 +753,7 @@ const HomePage = () => {
                 gap: 1.5rem;
                 animation: scroll-services 40s linear infinite;
                 width: max-content;
-              }
-
-              .services-scroll:hover {
-                animation-play-state: paused;
+                will-change: transform;
               }
 
               .service-card {
@@ -769,6 +767,7 @@ const HomePage = () => {
                 transition: all 0.3s ease;
                 cursor: pointer;
                 box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+                user-select: none;
               }
 
               .service-card:hover {
@@ -797,6 +796,7 @@ const HomePage = () => {
 
               .gradient-fade-services {
                 pointer-events: none;
+                user-select: none;
               }
 
               .gradient-fade-left-services {
@@ -807,6 +807,7 @@ const HomePage = () => {
                 width: 100px;
                 background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
                 z-index: 10;
+                pointer-events: none;
               }
 
               .gradient-fade-right-services {
@@ -817,12 +818,13 @@ const HomePage = () => {
                 width: 100px;
                 background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
                 z-index: 10;
+                pointer-events: none;
               }
             `}</style>
 
             <div className="gradient-fade-services gradient-fade-left-services"></div>
-            <div className="overflow-hidden">
-              <div className="home-scroll-track services-scroll">
+            <div className="overflow-hidden pointer-events-none">
+              <div className="home-scroll-track services-scroll pointer-events-auto">
                 {[...showcaseItems, ...showcaseItems].map((service, index) => {
                   const Icon = service.icon;
                   return (
@@ -882,6 +884,8 @@ const HomePage = () => {
         </div>
       </MotionSection>
 
+      <LocalitySearch />
+
       <MotionSection
         initial="hidden"
         whileInView="show"
@@ -914,10 +918,7 @@ const HomePage = () => {
                 gap: 2rem;
                 animation: scroll-partners 30s linear infinite;
                 width: max-content;
-              }
-
-              .partners-scroll:hover {
-                animation-play-state: paused;
+                will-change: transform;
               }
 
               .partner-item {
@@ -933,6 +934,7 @@ const HomePage = () => {
                 transition: all 0.3s ease;
                 cursor: pointer;
                 box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+                user-select: none;
               }
 
               .partner-item:hover {
@@ -944,6 +946,7 @@ const HomePage = () => {
 
               .gradient-fade {
                 pointer-events: none;
+                user-select: none;
               }
 
               .gradient-fade-left {
@@ -954,6 +957,7 @@ const HomePage = () => {
                 width: 80px;
                 background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
                 z-index: 10;
+                pointer-events: none;
               }
 
               .gradient-fade-right {
@@ -964,12 +968,13 @@ const HomePage = () => {
                 width: 80px;
                 background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
                 z-index: 10;
+                pointer-events: none;
               }
             `}</style>
 
             <div className="gradient-fade gradient-fade-left"></div>
-            <div className="overflow-hidden">
-              <div className="home-scroll-track partners-scroll">
+            <div className="overflow-hidden pointer-events-none">
+              <div className="home-scroll-track partners-scroll pointer-events-auto">
                 {[
                   { name: "Partner 1", logo: "P1" },
                   { name: "Partner 2", logo: "P2" },
