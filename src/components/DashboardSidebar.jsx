@@ -59,27 +59,27 @@ const DashboardSidebar = ({
         </div>
       </aside>
 
-      <div className="sticky top-[4.5rem] z-20 w-full shrink-0 overflow-x-hidden bg-white px-3 py-3 shadow-[0_12px_28px_rgba(0,66,162,0.08)] md:hidden">
-        <div className="mb-3 rounded-[24px] bg-white px-4 py-4 shadow-[inset_0_0_0_1px_rgba(0,66,162,0.07)]">
+      <div className="relative z-10 w-full shrink-0 overflow-x-hidden bg-white px-3 py-3 md:hidden">
+        <div className="mb-3 rounded-[24px] bg-white px-4 py-4 shadow-[inset_0_0_0_1px_rgba(0,66,162,0.07),0_8px_20px_rgba(0,66,162,0.06)]">
           <p className="dashboard-kicker">{subtitle}</p>
           <h1 className="dashboard-display mt-2 break-words text-[1.9rem] font-semibold leading-tight text-slate-900">{title}</h1>
           {description ? <p className="dashboard-muted mt-2 text-sm leading-6">{description}</p> : null}
         </div>
-        <div className="hide-scrollbar flex gap-2 overflow-x-auto px-0.5 pb-2">
+        <div className="flex flex-wrap gap-2 px-0.5 pb-2">
           {navItems.map((item) => (
             <button
               key={item.key}
               type="button"
               onClick={() => item.onClick?.(item.key)}
-              className={`flex-shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition ${
+              className={`min-w-0 rounded-full px-4 py-2 text-xs font-semibold transition ${
                 item.active
                   ? "bg-slate-900 text-white shadow-sm"
                   : "bg-white text-slate-600 shadow-[inset_0_0_0_1px_rgba(0,66,162,0.08)] hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <span className="flex items-center gap-1.5 whitespace-nowrap">
-                {item.icon ? <span>{item.icon}</span> : null}
-                {item.label}
+                {item.icon ? <span className="flex-shrink-0">{item.icon}</span> : null}
+                <span>{item.label}</span>
                 {item.badge ? <span className="rounded-full bg-black/10 px-1.5 py-0.5 text-[9px] font-bold">{item.badge}</span> : null}
               </span>
             </button>
