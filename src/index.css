@@ -860,6 +860,14 @@ select:focus-visible {
 }
 
 @media (max-width: 640px) {
+  .site-dashboard-app,
+  .site-dashboard-app main,
+  .site-dashboard-app section,
+  .site-dashboard-app article,
+  .site-dashboard-app div {
+    max-width: 100%;
+  }
+
   .site-section,
   .site-panel,
   .dashboard-shell,
@@ -901,6 +909,27 @@ select:focus-visible {
   .text-xs {
     font-size: 0.7rem;
     line-height: 1rem;
+  }
+
+  .dashboard-display {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .dashboard-shell,
+  .dashboard-panel,
+  .dashboard-stat,
+  .dashboard-subpanel,
+  .dashboard-empty {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .dashboard-primary,
+  .dashboard-secondary,
+  .dashboard-danger {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .dashboard-table thead th,

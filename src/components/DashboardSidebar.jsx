@@ -13,7 +13,7 @@ const DashboardSidebar = ({
   contentClassName = "",
 }) => {
   return (
-    <div className={`flex min-h-[calc(100vh-4rem)] flex-col bg-transparent md:min-h-0 md:flex-row ${rootClassName}`}>
+    <div className={`flex min-h-[calc(100vh-4rem)] flex-col overflow-x-hidden bg-transparent md:min-h-0 md:flex-row ${rootClassName}`}>
       <aside className={`sticky top-20 z-10 hidden h-[calc(100vh-5rem)] w-[21rem] shrink-0 overflow-y-auto px-4 pb-6 pt-4 md:flex md:min-h-0 md:flex-col ${asideClassName}`}>
         <div className="dashboard-shell flex h-full min-h-0 flex-col gap-6 p-6">
           <div>
@@ -59,13 +59,13 @@ const DashboardSidebar = ({
         </div>
       </aside>
 
-      <div className="sticky top-[4.5rem] z-20 w-full shrink-0 bg-white px-4 py-3 shadow-[0_12px_28px_rgba(0,66,162,0.08)] md:hidden">
+      <div className="sticky top-[4.5rem] z-20 w-full shrink-0 overflow-x-hidden bg-white px-3 py-3 shadow-[0_12px_28px_rgba(0,66,162,0.08)] md:hidden">
         <div className="mb-3 rounded-[24px] bg-white px-4 py-4 shadow-[inset_0_0_0_1px_rgba(0,66,162,0.07)]">
           <p className="dashboard-kicker">{subtitle}</p>
-          <h1 className="dashboard-display mt-2 text-[1.9rem] font-semibold leading-none text-slate-900">{title}</h1>
+          <h1 className="dashboard-display mt-2 break-words text-[1.9rem] font-semibold leading-tight text-slate-900">{title}</h1>
           {description ? <p className="dashboard-muted mt-2 text-sm leading-6">{description}</p> : null}
         </div>
-        <div className="hide-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
+        <div className="hide-scrollbar flex gap-2 overflow-x-auto px-0.5 pb-2">
           {navItems.map((item) => (
             <button
               key={item.key}
@@ -87,8 +87,8 @@ const DashboardSidebar = ({
         </div>
       </div>
 
-      <main className={`min-w-0 flex-1 overflow-visible md:h-full md:min-h-0 md:overflow-y-auto ${mainClassName}`}>
-        <div className="mx-auto min-h-full max-w-6xl px-4 py-6 md:px-6 md:py-8 xl:px-8">
+      <main className={`min-w-0 flex-1 overflow-x-hidden overflow-y-visible md:h-full md:min-h-0 md:overflow-y-auto ${mainClassName}`}>
+        <div className="mx-auto min-h-full max-w-6xl px-3 py-4 md:px-6 md:py-8 xl:px-8">
           <section className={`space-y-6 ${contentClassName}`}>{children}</section>
         </div>
       </main>
