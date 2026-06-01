@@ -7,4 +7,4 @@ Disallow: /post-property
 Disallow: /edit-property
 Disallow: /plans
 
-Sitemap: https://my-hosur-property.onrender.com/sitemap.xml
+Sitemap: https://myhosurproperty.com/sitemap.xml
