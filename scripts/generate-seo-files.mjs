@@ -8,7 +8,7 @@ const projectRoot = path.resolve(__dirname, "..");
 const publicDir = path.join(projectRoot, "public");
 
 const trimTrailingSlash = (value = "") => String(value).replace(/\/+$/, "");
-const siteUrl = trimTrailingSlash(process.env.VITE_SITE_URL || process.env.CLIENT_URL || "https://my-hosur-property.onrender.com");
+const siteUrl = trimTrailingSlash(process.env.VITE_SITE_URL || process.env.CLIENT_URL || "https://myhosurproperty.com");
 const apiBaseUrl = trimTrailingSlash(
   process.env.VITE_API_URL ||
     process.env.VITE_API_BASE_URL ||
