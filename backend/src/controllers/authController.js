@@ -1,5 +1,4 @@
 const { body } = require("express-validator");
-const axios = require("axios");
 const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 const sendEmail = require("../utils/sendEmail");
@@ -7,11 +6,24 @@ const generateHtmlEmail = require("../utils/emailFormatter");
 const { sendWelcomeTemplateEmail } = require("../utils/sendEmailJs");
 
 const FREE_POST_VALIDITY_DAYS = 90;
-
 const addDays = (date, days) => {
   const next = new Date(date);
   next.setDate(next.getDate() + days);
   return next;
+};
+
+const normalizeIndianPhone = (value) => {
+  const digits = String(value || "").replace(/\D/g, "");
+
+  if (digits.length === 10) {
+    return `91${digits}`;
+  }
+
+  if (digits.length === 12 && digits.startsWith("91")) {
+    return digits;
+  }
+
+  return "";
 };
 
 const buildFreeOnboardingPack = () => {
@@ -75,6 +87,7 @@ const ensureFreeOnboardingValidity = async (user) => {
 const signupValidators = [
   body("name").trim().notEmpty(),
   body("email").isEmail().normalizeEmail(),
+  body("phone").trim().notEmpty(),
   body("password").isLength({ min: 6 }),
   body("role").optional().isIn(["buyer", "customer", "seller", "agent", "broker", "builder", "admin"]),
   body("address").optional().trim(),
@@ -82,6 +95,7 @@ const signupValidators = [
 
 const loginValidators = [
   body("email").isEmail().normalizeEmail(),
+  body("phone").trim().notEmpty(),
   body("password").notEmpty(),
 ];
 
@@ -106,6 +120,20 @@ const sanitizeUser = (user) => ({
 });
 
 const getClientUrl = () => process.env.CLIENT_URL || "http://localhost:5173";
+
+const ensureValidPhone = (phone) => {
+  const normalizedPhone = normalizeIndianPhone(phone);
+
+  if (!normalizedPhone) {
+    const error = new Error("Enter a valid Indian mobile number.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return {
+    normalizedPhone,
+  };
+};
 
 const sendWelcomeEmail = async (user, providerLabel = "signing up") => {
   const emailJsResult = await sendWelcomeTemplateEmail(user, providerLabel);
@@ -199,17 +227,23 @@ const verifyFacebookToken = async (token) => {
 
 const signup = async (req, res) => {
   const { name, email, password, phone, address, role = "buyer" } = req.body;
+  const { normalizedPhone } = ensureValidPhone(phone);
 
   const exists = await User.findOne({ email });
   if (exists) {
     return res.status(409).json({ message: "Email already in use" });
   }
 
+  const phoneExists = await User.findOne({ phone: normalizedPhone });
+  if (phoneExists) {
+    return res.status(409).json({ message: "Mobile number already in use" });
+  }
+
   const user = await User.create({
     name,
     email,
     password,
-    phone,
+    phone: normalizedPhone,
     address,
     role,
     canPostProperty: true,
@@ -232,7 +266,8 @@ const signup = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, phone } = req.body;
+  const { normalizedPhone } = ensureValidPhone(phone);
   const user = await User.findOne({ email });
 
   if (!user || !(await user.comparePassword(password))) {
@@ -241,6 +276,15 @@ const login = async (req, res) => {
 
   if (user.status === "deactivated") {
     return res.status(403).json({ message: "Your account has been deactivated by the admin." });
+  }
+
+  if (user.phone) {
+    if (normalizeIndianPhone(user.phone) !== normalizedPhone) {
+      return res.status(401).json({ message: "The verified mobile number does not match this account." });
+    }
+  } else {
+    user.phone = normalizedPhone;
+    await user.save();
   }
 
   await ensureFreeOnboardingValidity(user);
@@ -254,54 +298,6 @@ const login = async (req, res) => {
     console.error("[login] Login alert email failed:", error.message);
   }
 
-  return res.json({
-    token,
-    user: sanitizeUser(user),
-  });
-};
-
-const otpRequest = async (req, res) => {
-  const { email } = req.body;
-  const otp = "123456";
-  return res.json({ message: "OTP sent (simulated)", email, otp });
-};
-
-const otpVerify = async (req, res) => {
-  const { email, otp } = req.body;
-  if (otp !== "123456") {
-    return res.status(401).json({ message: "Invalid OTP" });
-  }
-
-  let user = await User.findOne({ email });
-  if (user && user.status === "deactivated") {
-    return res.status(403).json({ message: "Your account has been deactivated by the admin." });
-  }
-
-  const isNewUser = !user;
-
-  if (!user) {
-    user = await User.create({
-      name: email.split("@")[0],
-      email,
-      password: Math.random().toString(36).slice(2),
-      role: "buyer",
-      canPostProperty: false,
-      ...buildFreeOnboardingPack(),
-    });
-  }
-
-  if (isNewUser) {
-    try {
-      await sendWelcomeEmail(user, "registering with OTP");
-      console.log(`[otpVerify] Welcome email sent to ${user.email}`);
-    } catch (error) {
-      console.error("[otpVerify] Welcome email failed:", error.message);
-    }
-  }
-
-  await ensureFreeOnboardingValidity(user);
-
-  const token = generateToken({ id: user._id, role: user.role });
   return res.json({
     token,
     user: sanitizeUser(user),
@@ -365,8 +361,6 @@ module.exports = {
   socialLoginValidators,
   signup,
   login,
-  otpRequest,
-  otpVerify,
   socialLogin,
   me,
 };

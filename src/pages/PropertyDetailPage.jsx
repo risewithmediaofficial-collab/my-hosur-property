@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
   ArrowTopRightOnSquareIcon,
+  BookmarkIcon,
   CheckBadgeIcon,
   ChevronRightIcon,
   DocumentTextIcon,
@@ -17,6 +18,7 @@ import SeoHead from "../components/SeoHead";
 import useAuth from "../hooks/useAuth";
 import { checkMyLeadStatus, createLead } from "../services/api/leadApi";
 import { fetchPropertyById } from "../services/api/propertyApi";
+import { fetchSavedProperties, toggleSavedProperty } from "../services/api/userApi";
 import { currency, formatArea } from "../utils/format";
 import {
   buildBreadcrumbSchema,
@@ -39,6 +41,7 @@ const PropertyDetailPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [inquiryText, setInquiryText] = useState("");
   const [intentType, setIntentType] = useState("contact");
+  const [savedIds, setSavedIds] = useState([]);
 
   const handleSubmitInquiry = async () => {
     if (!token) {
@@ -94,6 +97,10 @@ const PropertyDetailPage = () => {
     loadProperty();
 
     if (token) {
+      fetchSavedProperties(token)
+        .then((res) => setSavedIds((res.items || []).map((item) => item._id)))
+        .catch(() => setSavedIds([]));
+
       checkMyLeadStatus(token, id)
         .then((res) => {
           setMyLead(res.lead);
@@ -107,6 +114,23 @@ const PropertyDetailPage = () => {
         .catch(() => setMyLead(null));
     }
   }, [id, token, user?._id]);
+
+  const handleToggleSaved = async (propertyId) => {
+    if (!token) {
+      toast.error("Please login to save properties");
+      return;
+    }
+
+    const wasSaved = savedIds.includes(propertyId);
+
+    try {
+      const res = await toggleSavedProperty(token, { propertyId });
+      setSavedIds(res.savedProperties || []);
+      toast.success(wasSaved ? "Removed from saved properties" : "Property saved to your dashboard");
+    } catch {
+      toast.error("Unable to update saved properties");
+    }
+  };
 
   const p = data.property;
   const propertyPath = p ? getPropertyPath(p) : "";
@@ -198,6 +222,7 @@ const PropertyDetailPage = () => {
 
   const isApproved = myLead?.status === "approved" || String(p.ownerId?._id || p.ownerId) === String(user?._id);
   const isPending = myLead?.status === "pending";
+  const isSaved = savedIds.includes(p._id);
   const localityEntries = Object.entries(data.localityInsights || {}).filter(([key]) => key !== "notes");
   const statusPills = [
     p.verification?.isVerified ? "Verified listing" : "",
@@ -284,6 +309,19 @@ const PropertyDetailPage = () => {
             </div>
 
             <div className="mt-5 space-y-3">
+              <button
+                type="button"
+                onClick={() => handleToggleSaved(p._id)}
+                className={`flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold transition ${
+                  isSaved
+                    ? "bg-navy text-white"
+                    : "border border-slate-200 bg-white text-navy hover:border-orange hover:text-orange"
+                }`}
+              >
+                <BookmarkIcon className="h-4 w-4" />
+                {isSaved ? "Saved to dashboard" : "Save this property"}
+              </button>
+
               {isApproved ? (
                 <div className="rounded-xl bg-surface p-5">
                   <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Approved contact</p>
@@ -429,7 +467,12 @@ const PropertyDetailPage = () => {
             <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl">Similar properties</h2>
             <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {data.similar.map((item) => (
-                <PropertyCard key={item._id} item={item} />
+                <PropertyCard
+                  key={item._id}
+                  item={item}
+                  onSave={handleToggleSaved}
+                  isSaved={savedIds.includes(item._id)}
+                />
               ))}
             </div>
           </div>

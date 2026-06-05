@@ -26,7 +26,7 @@ import DashboardSidebar from "../components/DashboardSidebar";
 import Loader from "../components/Loader";
 import PropertyCard from "../components/PropertyCard";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
-import { fetchSavedProperties } from "../services/api/userApi";
+import { fetchSavedProperties, toggleSavedProperty } from "../services/api/userApi";
 import { getPropertyImageAlt } from "../utils/seo";
 
 const fmt = (value) =>
@@ -206,6 +206,17 @@ const AgentDashboardPage = () => {
       loadAll();
     } catch (error) {
       toast.error(error.response?.data?.message || error.message || "Purchase failed");
+    }
+  };
+
+  const onToggleSaved = async (propertyId) => {
+    try {
+      await toggleSavedProperty(token, { propertyId });
+      const savedResponse = await fetchSavedProperties(token);
+      setSaved(savedResponse.items || []);
+      toast.success("Saved properties updated");
+    } catch {
+      toast.error("Unable to update saved properties");
     }
   };
 
@@ -472,7 +483,7 @@ const AgentDashboardPage = () => {
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {saved.map((item) => (
-                <PropertyCard key={item._id} item={item} />
+                <PropertyCard key={item._id} item={item} isSaved={true} onSave={onToggleSaved} />
               ))}
             </div>
           )}

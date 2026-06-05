@@ -69,10 +69,13 @@ const AuthPage = () => {
 
   const submit = async (event) => {
     event.preventDefault();
+
     setLoading(true);
 
     try {
-      const data = mode === "signup" ? await signupUser(form) : await loginUser(form);
+      const payload = { ...form };
+
+      const data = mode === "signup" ? await signupUser(payload) : await loginUser(payload);
       login(data);
       toast.success(mode === "signup" ? "Account created successfully" : "Welcome back");
       scrollToTop();
@@ -85,6 +88,7 @@ const AuthPage = () => {
   };
 
   const isSignup = mode === "signup";
+  const submitDisabled = loading;
   const headingText = isSignup ? "Create your account" : "Welcome back";
   const subText = isSignup
     ? "Create a simple profile to browse listings, connect with sellers, and manage your property activity."
@@ -633,16 +637,15 @@ const AuthPage = () => {
                         required
                       />
 
-                      {isSignup ? (
-                        <Field
-                          label="Phone Number"
-                          icon={PhoneIcon}
-                          type="tel"
-                          placeholder="+91 99940 05086"
-                          value={form.phone}
-                          onChange={(event) => onChange("phone", event.target.value)}
-                        />
-                      ) : null}
+                      <Field
+                        label="Mobile Number"
+                        icon={PhoneIcon}
+                        type="tel"
+                        placeholder="9994005086"
+                        value={form.phone}
+                        onChange={(event) => onChange("phone", event.target.value)}
+                        required
+                      />
 
                       {isSignup ? (
                         <Field
@@ -690,7 +693,7 @@ const AuthPage = () => {
                       ) : null}
 
                       <motion.div variants={item}>
-                        <button type="submit" className="auth-submit" disabled={loading}>
+                        <button type="submit" className="auth-submit" disabled={submitDisabled}>
                           {loading ? <span className="auth-spinner" /> : null}
                           {loading ? "Please wait..." : isSignup ? "Create Account" : "Sign In"}
                         </button>

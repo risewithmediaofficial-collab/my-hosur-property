@@ -185,18 +185,21 @@ const Navbar = () => {
                   </NavLink>
 
                   {canShowSavedShortcut ? (
-                    <NavLink
-                      to="/dashboard?tab=saved"
-                      onClick={scrollToTop}
-                      className={({ isActive }) =>
-                        `inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition ${
-                          isActive ? "text-orange" : "text-navy hover:text-orange"
-                        }`
-                      }
-                    >
-                      <BookmarkIcon className="h-4 w-4" />
-                      Saved
-                    </NavLink>
+                  <NavLink
+                    to="/dashboard?tab=saved"
+                    onClick={scrollToTop}
+                    className={({ isActive }) =>
+                      `inline-flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-semibold transition ${
+                        isActive
+                          ? "border-orange bg-orange/10 text-orange"
+                          : "border-slate-200 text-navy hover:border-orange hover:text-orange"
+                      }`
+                    }
+                    aria-label="Saved properties"
+                    title="Saved properties"
+                  >
+                    <BookmarkIcon className="h-4 w-4" />
+                  </NavLink>
                   ) : null}
 
                   <motion.button
@@ -294,6 +297,20 @@ const Navbar = () => {
             </div>
 
             <div className="flex items-center gap-2 lg:hidden">
+              {canShowSavedShortcut ? (
+                <NavLink
+                  to="/dashboard?tab=saved"
+                  onClick={() => {
+                    scrollToTop();
+                    closeMenu();
+                  }}
+                  className="inline-flex rounded-lg border border-slate-200 p-2 text-navy transition hover:border-orange hover:text-orange"
+                  aria-label="Saved properties"
+                  title="Saved properties"
+                >
+                  <BookmarkIcon className="h-5 w-5" />
+                </NavLink>
+              ) : null}
               {!isAuthenticated ? (
                 <NavLink
                   to="/auth"

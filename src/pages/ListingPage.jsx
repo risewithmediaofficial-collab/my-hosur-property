@@ -9,7 +9,7 @@ import SeoHead from "../components/SeoHead";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
 import useAuth from "../hooks/useAuth";
 import { fetchProperties } from "../services/api/propertyApi";
-import { toggleSavedProperty } from "../services/api/userApi";
+import { fetchSavedProperties, toggleSavedProperty } from "../services/api/userApi";
 import {
   buildFilterChips,
   clearCategoryFields,
@@ -90,6 +90,17 @@ const ListingPage = () => {
     setParams(serializeFiltersToSearchParams(applied), { replace: true });
     loadProperties(apiQuery, applied.page > 1);
   }, [apiQuery, applied.page, loadProperties, setParams]);
+
+  useEffect(() => {
+    if (!token) {
+      setSavedIds([]);
+      return;
+    }
+
+    fetchSavedProperties(token)
+      .then((res) => setSavedIds((res.items || []).map((item) => item._id)))
+      .catch(() => setSavedIds([]));
+  }, [token]);
 
   useEffect(() => {
     const scrollRoot = resultsScrollRef.current;

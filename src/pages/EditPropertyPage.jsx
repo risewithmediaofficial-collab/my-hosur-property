@@ -10,7 +10,7 @@ import PageSection from "../components/PageSection";
 const EditPropertyPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -19,6 +19,15 @@ const EditPropertyPage = () => {
       try {
         const res = await fetchPropertyById(id, token);
         const p = res.property;
+        const ownerId = String(p.ownerId?._id || p.ownerId || "");
+        const currentUserId = String(user?._id || "");
+        const canEdit = Boolean(user?.role === "admin" || (ownerId && currentUserId && ownerId === currentUserId));
+
+        if (!canEdit) {
+          toast.error("Only the person who posted this property can edit it.");
+          navigate("/dashboard");
+          return;
+        }
 
         const initialForm = {
           title: p.title || "",
@@ -58,7 +67,7 @@ const EditPropertyPage = () => {
       }
     };
     load();
-  }, [id, token, navigate]);
+  }, [id, navigate, token, user?._id, user?.role]);
 
   if (loading) {
     return (

@@ -94,8 +94,6 @@ backend/
 ### Auth
 - `POST /api/auth/signup`
 - `POST /api/auth/login`
-- `POST /api/auth/otp/request`
-- `POST /api/auth/otp/verify`
 - `GET /api/auth/me`
 
 ### Properties
@@ -205,7 +203,7 @@ npm run dev:full
 - Backend: `http://localhost:5001`
 
 ## Notes for Production Hardening
-- Replace simulated OTP/payment with real providers (Twilio/Razorpay/Stripe).
+- Replace simulated payment flows with real providers (Razorpay/Stripe).
 - Configure SMTP for live lead alerts.
 - Add Redis for distributed caching.
 - Add rate limiting, CSRF strategy, audit logs.

@@ -263,10 +263,28 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   const planExpired = Boolean(user?.activePlan?.expiresAt && new Date(user.activePlan.expiresAt) < new Date());
   const activePlanName = user?.activePlan?.planId?.name || (isAdmin ? "Admin access" : postingLimit === 1 ? "Free 90-day listing" : "Active posting plan");
   const accountType = roleLabels[user?.role] || "User";
+  const accountContact = useMemo(
+    () => ({
+      name: user?.name?.trim() || form.contactName.trim(),
+      phone: user?.phone?.trim() || form.contactPhone.trim(),
+      email: user?.email?.trim() || form.contactEmail.trim(),
+    }),
+    [form.contactEmail, form.contactName, form.contactPhone, user?.email, user?.name, user?.phone]
+  );
 
   useEffect(() => {
     refreshProfile?.().catch(() => {});
   }, [refreshProfile]);
+
+  useEffect(() => {
+    if (!user) return;
+    setForm((prev) => ({
+      ...prev,
+      contactName: user.name || prev.contactName,
+      contactPhone: user.phone || prev.contactPhone,
+      contactEmail: user.email || prev.contactEmail,
+    }));
+  }, [user]);
 
   useEffect(() => {
     if (!isAdmin && hasPostingAccess && !canPostForFree && !initialData) {
@@ -278,9 +296,6 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
   const preserveContactFields = (prev) => ({
-    contactName: prev.contactName,
-    contactPhone: prev.contactPhone,
-    contactEmail: prev.contactEmail,
     country: prev.country || defaultForm.country,
     state: prev.state || defaultForm.state,
     district: prev.district || defaultForm.district,
@@ -309,11 +324,12 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   };
 
   const validateForm = () => {
+    if (!accountContact.name || !accountContact.phone) {
+      return "Your account details are incomplete. Please make sure your name and phone number are available before posting.";
+    }
+
     const required = [
       form.propertyType,
-      form.contactName.trim(),
-      form.contactPhone.trim(),
-      form.contactEmail.trim(),
       form.country.trim(),
       form.state.trim(),
       form.district.trim(),
@@ -324,12 +340,12 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
       form.description.trim(),
     ];
 
-    if (required.some((value) => !value)) return false;
-    if (!form.price && !form.maxPrice && !form.monthlyRent) return false;
-    if (form.propertyType === "Independent House" && !form.minPrice) return false;
-    if (form.description.trim().length < 10) return false;
+    if (required.some((value) => !value)) return "Please fill location, price, and description details.";
+    if (!form.price && !form.maxPrice && !form.monthlyRent) return "Please fill location, price, and description details.";
+    if (form.propertyType === "Independent House" && !form.minPrice) return "Please select the minimum price range for the independent house listing.";
+    if (form.description.trim().length < 10) return "Please add a more detailed property description.";
 
-    return true;
+    return "";
   };
 
   const uploadAssets = async () => {
@@ -352,8 +368,9 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   const submitProperty = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      toast.error("Please fill contact, location, price, and description details.");
+    const validationError = validateForm();
+    if (validationError) {
+      toast.error(validationError);
       return;
     }
 
@@ -411,9 +428,9 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
           reraId: form.rera === "Yes" ? form.reraId : "",
         },
         listingContact: {
-          name: form.contactName,
-          phone: form.contactPhone,
-          email: form.contactEmail || user?.email || "",
+          name: accountContact.name,
+          phone: accountContact.phone,
+          email: accountContact.email || "",
         },
         location: {
           city: (form.city || form.taluk || "Hosur").trim(),
@@ -470,16 +487,24 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
     return (
       <form onSubmit={submitProperty} className="space-y-8">
         <FormSection title="Contact Details">
-          <div className="grid gap-4 md:grid-cols-3">
-            <Field label="Contact Name" required>
-              <input className="site-input" value={form.contactName} onChange={(e) => update("contactName", e.target.value)} placeholder="Your name" />
-            </Field>
-            <Field label="Mobile Number" required>
-              <input className="site-input" type="tel" value={form.contactPhone} onChange={(e) => update("contactPhone", e.target.value)} placeholder="Mobile number" />
-            </Field>
-            <Field label="Email ID" required>
-              <input className="site-input" type="email" value={form.contactEmail} onChange={(e) => update("contactEmail", e.target.value)} placeholder="Contact email" />
-            </Field>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+            <div className="flex flex-col gap-2 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-orange">Auto-filled from your account</p>
+                <h4 className="mt-1 text-base font-bold text-navy">Registered contact details</h4>
+              </div>
+              <span className="inline-flex w-fit rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">
+                Locked to account
+              </span>
+            </div>
+            <div className="mt-4 grid gap-4 md:grid-cols-3">
+              <ReadOnlyField label="Contact Name" value={accountContact.name} fallback="Name not available" />
+              <ReadOnlyField label="Mobile Number" value={accountContact.phone} fallback="Phone not available" />
+              <ReadOnlyField label="Email ID" value={accountContact.email} fallback="Email not available" />
+            </div>
+            <p className="mt-4 text-xs leading-6 text-slate-500">
+              These details come directly from the logged-in account, so owners and agents do not need to enter them again while posting.
+            </p>
           </div>
         </FormSection>
 
@@ -751,6 +776,15 @@ const Field = ({ label, required, className = "", children }) => (
     </span>
     {children}
   </label>
+);
+
+const ReadOnlyField = ({ label, value, fallback }) => (
+  <div>
+    <p className="mb-1.5 block text-sm font-semibold text-slate-700">{label}</p>
+    <div className="site-input flex min-h-[44px] items-center bg-white text-slate-700">
+      {value || fallback}
+    </div>
+  </div>
 );
 
 const StatusCard = ({ icon, label, value, helper, tone = "default" }) => (

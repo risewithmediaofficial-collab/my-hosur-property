@@ -19,7 +19,7 @@ import useAuth from "../hooks/useAuth";
 import { fetchMyProperties } from "../services/api/propertyApi";
 import { fetchMyLeads, unlockInboxLead, updateLeadApproval } from "../services/api/leadApi";
 import { fetchMyPayments } from "../services/api/paymentApi";
-import { fetchSavedProperties } from "../services/api/userApi";
+import { fetchSavedProperties, toggleSavedProperty } from "../services/api/userApi";
 import { buyLeadPackIntent, verifyLeadPackPayment } from "../services/api/customerRequestApi";
 import { loadExternalScript } from "../utils/loadExternalScript";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
@@ -138,6 +138,17 @@ const UserDashboardPage = () => {
       loadDashboard();
     } catch (error) {
       toast.error(error.response?.data?.message || error.message || "Purchase failed");
+    }
+  };
+
+  const onToggleSaved = async (propertyId) => {
+    try {
+      await toggleSavedProperty(token, { propertyId });
+      const savedProps = await fetchSavedProperties(token);
+      setSaved(savedProps.items || []);
+      toast.success("Saved properties updated");
+    } catch {
+      toast.error("Unable to update saved properties");
     }
   };
 
@@ -473,7 +484,7 @@ const UserDashboardPage = () => {
               <h2 className="dashboard-display text-2xl font-semibold text-slate-900">Saved Properties</h2>
               <p className="dashboard-muted text-sm">Review the homes you've bookmarked.</p>
             </div>
-            <button onClick={() => navigate("/")} className="dashboard-secondary px-4 py-2 text-sm">
+            <button onClick={() => navigate("/listings")} className="dashboard-secondary px-4 py-2 text-sm">
               <Squares2X2Icon className="h-4 w-4" />
               Explore Listings
             </button>
@@ -483,7 +494,7 @@ const UserDashboardPage = () => {
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {saved.map((item) => (
-                <PropertyCard key={item._id} item={item} isSaved={true} />
+                <PropertyCard key={item._id} item={item} isSaved={true} onSave={onToggleSaved} />
               ))}
             </div>
           )}
