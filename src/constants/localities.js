@@ -1,8 +1,11 @@
 /** Main Hosur localities */
 export const MAIN_AREAS = [
   "Hosur City",
-  "Jeemangalam",
+  "Bagalur",
+  "Alasanatham",
+  "Avalapalli",
   "Mathigiri",
+  "Jeemangalam",
   "Anthivadi",
   "Belagondapalli",
   "Nagondapalli",
@@ -11,14 +14,12 @@ export const MAIN_AREAS = [
   "Bathalapalli",
   "Perandapalli",
   "Barandhur",
-  "Alasanatham",
 ];
 
 /** Surrounding localities — shown first in dropdown */
 export const NEARBY_AREAS = [
   "Kamandoddi",
   "Shoolagiri",
-  "Bagalur",
   "Berigai",
   "Denkanikottai",
   "Kelamangalam",
@@ -28,6 +29,6 @@ export const NEARBY_AREAS = [
 ];
 
 export const LOCALITY_SECTIONS = [
-  { key: "nearby-areas", label: "Nearby Areas", items: NEARBY_AREAS },
   { key: "main-areas", label: "Main Areas", items: MAIN_AREAS },
+  { key: "nearby-areas", label: "Nearby Areas", items: NEARBY_AREAS },
 ];

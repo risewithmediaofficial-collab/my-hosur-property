@@ -34,8 +34,8 @@ const BankLoansPage = () => {
     <>
       <SeoHead
         title="Bank Home Loans - Compare Rates & Calculate EMI"
-        description="Compare home loan rates from PNB, HDFC, LIC, and IDBI banks. Use our EMI calculator to see your monthly payments and total interest."
-        keywords="home loans, bank loans, EMI calculator, loan rates, PNB, HDFC, LIC, IDBI"
+        description="Compare home loan rates from SBI, PNB, HDFC, LIC, IDBI, Can Fin Homes, and Aditya Birla Capital. Use our EMI calculator to review monthly payments and total interest."
+        keywords="home loans, bank loans, EMI calculator, loan rates, SBI, PNB, HDFC, LIC, IDBI, Can Fin Homes, Aditya Birla Capital"
       />
 
       {/* Hero Section */}
@@ -53,7 +53,7 @@ const BankLoansPage = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 lg:grid-cols-3"
           >
             {bankLoans.map((bank) => (
               <motion.div
@@ -256,7 +256,7 @@ const BankLoansPage = () => {
                   step: 1,
                   title: "Select Your Bank",
                   description:
-                    "Choose from PNB, HDFC, LIC, or IDBI. Each bank has different interest rates and terms.",
+                    "Choose from SBI, PNB, HDFC, LIC, IDBI, Can Fin Homes, or Aditya Birla Capital. Each lender has different rates and terms.",
                 },
                 {
                   step: 2,
@@ -316,6 +316,11 @@ const BankLoansPage = () => {
                       {bank.minRate}% - {bank.maxRate}%
                     </span>
                   </div>
+                  <div className="mb-3">
+                    <span className="rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-700">
+                      {bank.description}
+                    </span>
+                  </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
                       <p className="text-slate-500">Processing Fee</p>
@@ -343,6 +348,7 @@ const BankLoansPage = () => {
                 <thead>
                   <tr className="border-b-2 border-slate-300">
                     <th className="text-left py-4 px-4 font-semibold text-slate-900">Bank</th>
+                    <th className="text-center py-4 px-4 font-semibold text-slate-900">Bank Type</th>
                     <th className="text-center py-4 px-4 font-semibold text-slate-900">Interest Rate</th>
                     <th className="text-center py-4 px-4 font-semibold text-slate-900">Processing Fee</th>
                     <th className="text-center py-4 px-4 font-semibold text-slate-900">Max Loan</th>
@@ -353,6 +359,7 @@ const BankLoansPage = () => {
                   {bankLoans.map((bank, index) => (
                     <tr key={bank.id} className={`border-b ${index % 2 === 0 ? "bg-slate-50" : "bg-white"} hover:bg-blue-50 transition`}>
                       <td className="py-4 px-4 font-semibold text-slate-900">{bank.shortName}</td>
+                      <td className="text-center py-4 px-4 text-slate-600">{bank.description}</td>
                       <td className="text-center py-4 px-4">
                         <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
                           {bank.minRate}% - {bank.maxRate}%
@@ -378,7 +385,7 @@ const BankLoansPage = () => {
           >
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900">Eligibility & Requirements</h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 lg:grid-cols-3">
               {bankLoans.map((bank) => (
                 <motion.div
                   key={bank.id}
