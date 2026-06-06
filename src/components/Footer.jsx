@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { primaryNavLinks } from "../constants/navigation";
-import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL } from "../constants/contactInfo";
+import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE_NUMBERS } from "../constants/contactInfo";
 import BrandLogo from "./BrandLogo";
 import { EnvelopeIcon, MapPinIcon, PhoneIcon } from "./AppIcons";
 
@@ -63,10 +63,16 @@ const Footer = () => (
                 <EnvelopeIcon className="mt-1 h-4 w-4 flex-shrink-0 text-orange" />
                 <span className="leading-5">{CONTACT_EMAIL}</span>
               </a>
-              <a href={`tel:${CONTACT_PHONE_TEL}`} className="flex items-start gap-3 transition hover:text-orange">
+              <div className="flex items-start gap-3">
                 <PhoneIcon className="mt-1 h-4 w-4 flex-shrink-0 text-orange" />
-                <span className="leading-5">{CONTACT_PHONE_DISPLAY}</span>
-              </a>
+                <div className="space-y-1">
+                  {CONTACT_PHONE_NUMBERS.map((phone) => (
+                    <a key={phone.tel} href={`tel:${phone.tel}`} className="block leading-5 transition hover:text-orange">
+                      {phone.display}
+                    </a>
+                  ))}
+                </div>
+              </div>
               <div className="flex items-start gap-3">
                 <MapPinIcon className="mt-1 h-4 w-4 flex-shrink-0 text-orange" />
                 <span className="leading-5">{CONTACT_ADDRESS}</span>

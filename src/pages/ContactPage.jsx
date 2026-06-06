@@ -3,7 +3,7 @@ import MarketingCard, { IconCircle } from "../components/MarketingCard";
 import PageHero from "../components/PageHero";
 import PageSection from "../components/PageSection";
 import SeoHead from "../components/SeoHead";
-import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL } from "../constants/contactInfo";
+import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE_NUMBERS } from "../constants/contactInfo";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
 
 const contactCards = [
@@ -16,10 +16,11 @@ const contactCards = [
   },
   {
     title: "Call us",
-    value: CONTACT_PHONE_DISPLAY,
+    value: CONTACT_PHONE_NUMBERS.map((item) => item.display).join(" / "),
+    valueLines: CONTACT_PHONE_NUMBERS,
     caption: "Speak with our team for direct real-estate assistance.",
     icon: PhoneIcon,
-    href: `tel:${CONTACT_PHONE_TEL}`,
+    href: null,
   },
   {
     title: "Visit us",
@@ -62,7 +63,17 @@ const ContactPage = () => {
                   <Icon className="h-6 w-6" />
                 </IconCircle>
                 <h2 className="mt-5 text-xl font-bold text-navy">{item.title}</h2>
-                <p className="mt-3 text-lg font-semibold text-navy">{item.value}</p>
+                {item.valueLines ? (
+                  <div className="mt-3 space-y-1">
+                    {item.valueLines.map((phone) => (
+                      <a key={phone.tel} href={`tel:${phone.tel}`} className="block text-lg font-semibold text-navy transition hover:text-orange">
+                        {phone.display}
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-3 text-lg font-semibold text-navy">{item.value}</p>
+                )}
                 <p className="mt-2 text-sm leading-7 text-slate-600">{item.caption}</p>
               </MarketingCard>
             );

@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import useAuth from "../hooks/useAuth";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
-import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL } from "../constants/contactInfo";
+import { CONTACT_EMAIL, CONTACT_PHONE_NUMBERS } from "../constants/contactInfo";
 import { primaryNavLinks } from "../constants/navigation";
 import BrandLogo from "./BrandLogo";
 import {
@@ -119,10 +119,14 @@ const Navbar = () => {
       <div className="hidden bg-navy text-white sm:block">
         <div className="mx-auto flex max-w-[1440px] items-center px-5 py-2.5 text-xs sm:px-8 lg:px-10">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
-            <a href={`tel:${CONTACT_PHONE_TEL}`} className="inline-flex items-center gap-2 transition hover:text-orange">
-              <PhoneIcon className="h-3.5 w-3.5 flex-shrink-0 text-orange" />
-              {CONTACT_PHONE_DISPLAY}
-            </a>
+            <div className="inline-flex flex-wrap items-center gap-x-4 gap-y-1">
+              {CONTACT_PHONE_NUMBERS.map((phone) => (
+                <a key={phone.tel} href={`tel:${phone.tel}`} className="inline-flex items-center gap-2 transition hover:text-orange">
+                  <PhoneIcon className="h-3.5 w-3.5 flex-shrink-0 text-orange" />
+                  {phone.display}
+                </a>
+              ))}
+            </div>
             <a href={`mailto:${CONTACT_EMAIL}`} className="inline-flex items-center gap-2 transition hover:text-orange">
               <EnvelopeIcon className="h-3.5 w-3.5 flex-shrink-0 text-orange" />
               {CONTACT_EMAIL}
