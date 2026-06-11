@@ -137,6 +137,12 @@ const AuthPage = () => {
   const submit = async (event) => {
     event.preventDefault();
 
+    // Validation for login mode
+    if (mode === "login" && !form.email && !form.phone) {
+      toast.error("Please enter your email address or mobile number");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -166,7 +172,8 @@ const AuthPage = () => {
           mode === "signup"
             ? { ...form }
             : {
-                email: form.email,
+                email: form.email || undefined,
+                phone: form.phone || undefined,
                 password: form.password,
               };
 
@@ -870,7 +877,7 @@ const AuthPage = () => {
                             placeholder="you@example.com"
                             value={form.email}
                             onChange={(event) => onChange("email", event.target.value)}
-                            required
+                            required={isSignup}
                           />
 
                           {isSignup ? (
@@ -885,7 +892,18 @@ const AuthPage = () => {
                               onChange={(event) => onChange("phone", event.target.value)}
                               required
                             />
-                          ) : null}
+                          ) : (
+                            <Field
+                              label="Mobile Number (Optional)"
+                              icon={PhoneIcon}
+                              type="tel"
+                              inputMode="tel"
+                              autoComplete="tel"
+                              placeholder="9994005086"
+                              value={form.phone}
+                              onChange={(event) => onChange("phone", event.target.value)}
+                            />
+                          )}
 
                           {isSignup ? (
                             <Field

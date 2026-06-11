@@ -44,6 +44,7 @@ const propertyValidators = [
   body("listingSource").optional().isIn(["owner", "builder", "agent"]),
   body("possessionStatus").optional().isIn(["Ready to Move", "Under Construction"]),
   body("areaUnit").optional().isIn(["sqft", "sqm"]),
+  body("isSold").optional().isBoolean(),
   body("location.city").trim().notEmpty(),
   body("location.area").trim().notEmpty(),
 ];
@@ -486,6 +487,14 @@ const updateProperty = async (req, res) => {
     images: normalizeUploadList(req.body.images),
     documents: normalizeUploadList(req.body.documents),
   });
+
+  // Set or clear soldAt date based on isSold status
+  if (req.body.isSold && !property.soldAt) {
+    property.soldAt = new Date();
+  } else if (!req.body.isSold) {
+    property.soldAt = undefined;
+  }
+
   if (!property.expiresAt) {
     const user = await User.findById(property.ownerId).select("activePlan");
     if (user?.activePlan?.expiresAt) property.expiresAt = user.activePlan.expiresAt;

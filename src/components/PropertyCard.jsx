@@ -17,6 +17,7 @@ import useScrollToTop from "../hooks/useScrollToTop";
 const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
   const href = getPropertyPath(item);
   const scrollToTop = useScrollToTop();
+  const isSold = Boolean(item.isSold);
   const badges = [
     item.verification?.isVerified ? "Verified" : "",
     item.verification?.reraId ? "RERA" : "",
@@ -26,12 +27,12 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
   const listingLabel = item.listingType === "rent" ? "Rent" : item.listingType === "sale" ? "Sale" : item.listingType || "Property";
 
   return (
-    <article className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,66,162,0.12)]">
+    <article className={`group overflow-hidden rounded-xl border ${isSold ? 'border-slate-300 bg-slate-50' : 'border-slate-200 bg-white'} shadow-card transition duration-300 ${isSold ? 'hover:shadow-card' : 'hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,66,162,0.12)]'}`}>
       <div className="relative h-56 overflow-hidden">
         <img
           src={item.images?.[0] || PROPERTY_PLACEHOLDER_IMAGE}
           alt={getPropertyImageAlt(item)}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+          className={`h-full w-full object-cover transition duration-500 ${isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'}`}
           loading="lazy"
           decoding="async"
           onError={(event) => {
@@ -39,13 +40,21 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
           }}
         />
         <div className="absolute left-4 top-4">
-          <span className="rounded-md bg-navy px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
-            {listingLabel}
+          <span className={`rounded-md px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white ${isSold ? 'bg-slate-600' : 'bg-navy'}`}>
+            {isSold ? 'Sold' : listingLabel}
           </span>
         </div>
+        {isSold && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+            <div className="rounded-lg bg-white px-6 py-3 text-center shadow-lg">
+              <p className="text-lg font-bold text-navy">SOLD</p>
+              <p className="text-xs text-slate-600">This property has been sold</p>
+            </div>
+          </div>
+        )}
       </div>
 
-      <div className="space-y-4 p-5">
+      <div className={`space-y-4 p-5 ${isSold ? 'opacity-70' : ''}`}>
         <div className="space-y-2">
           <p className="line-clamp-2 text-lg font-bold tracking-tight text-navy">{item.title}</p>
           <p className="inline-flex items-center gap-2 text-sm text-slate-500">
@@ -100,7 +109,7 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
         <div className="border-t border-slate-100 pt-4">
           <p className="text-xl font-bold leading-tight text-navy">{currency(item.price)}</p>
           <div className="mt-3 flex items-stretch gap-2">
-            {onSave ? (
+            {onSave && !isSold ? (
               <button
                 type="button"
                 onClick={() => onSave?.(item._id)}
@@ -113,15 +122,21 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
                 {isSaved ? "Saved" : "Save"}
               </button>
             ) : null}
-            <Link
-              to={href}
-              onClick={scrollToTop}
-              aria-label={`View ${item.title} property details`}
-              className="inline-flex h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-lg bg-orange px-3 text-xs font-bold whitespace-nowrap text-white transition hover:bg-orange-hover sm:text-sm"
-            >
-              <span>View Property</span>
-              <ArrowRightIcon className="h-4 w-4 shrink-0" />
-            </Link>
+            {isSold ? (
+              <div className="inline-flex h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-lg bg-slate-400 px-3 text-xs font-bold text-white cursor-not-allowed sm:text-sm">
+                <span>Property Sold</span>
+              </div>
+            ) : (
+              <Link
+                to={href}
+                onClick={scrollToTop}
+                aria-label={`View ${item.title} property details`}
+                className="inline-flex h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-lg bg-orange px-3 text-xs font-bold whitespace-nowrap text-white transition hover:bg-orange-hover sm:text-sm"
+              >
+                <span>View Property</span>
+                <ArrowRightIcon className="h-4 w-4 shrink-0" />
+              </Link>
+            )}
           </div>
         </div>
       </div>

@@ -111,7 +111,25 @@ const signupValidators = [
   body("address").optional().trim(),
 ];
 
-const loginValidators = [body("email").isEmail().normalizeEmail(), body("password").notEmpty()];
+const loginValidators = [
+  body().custom((value) => {
+    const hasEmail = typeof value.email === "string" && value.email.trim().length > 0;
+    const hasPhone = typeof value.phone === "string" && value.phone.trim().length > 0;
+
+    if (!hasEmail && !hasPhone) {
+      throw new Error("Email or mobile number is required.");
+    }
+
+    if (hasEmail && !value.email.includes("@")) {
+      throw new Error("Please enter a valid email address.");
+    }
+
+    return true;
+  }),
+  body("password").notEmpty().withMessage("Password is required"),
+  body("email").optional().isEmail().normalizeEmail(),
+  body("phone").optional().trim(),
+];
 
 const socialLoginValidators = [body("provider").isIn(["google", "facebook"]), body("token").notEmpty()];
 
@@ -417,8 +435,15 @@ const signup = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
+  const { email, phone, password } = req.body;
+  
+  let user = null;
+  if (email) {
+    user = await User.findOne({ email });
+  } else if (phone) {
+    const normalizedPhone = normalizeIndianPhone(phone);
+    user = await User.findOne({ phone: normalizedPhone });
+  }
 
   if (!user || !(await user.comparePassword(password))) {
     return res.status(401).json({ message: "Invalid credentials" });

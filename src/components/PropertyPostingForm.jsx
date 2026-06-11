@@ -29,6 +29,7 @@ const defaultForm = {
   propertyType: "",
   title: "",
   description: "",
+  isSold: false,
   contactName: "",
   contactPhone: "",
   contactEmail: "",
@@ -419,6 +420,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         facing: form.facing || undefined,
         floorNumber: form.floorNumber ? Number(form.floorNumber) : undefined,
         totalFloors: form.totalFloors ? Number(form.totalFloors) : undefined,
+        isSold: form.isSold === true || form.isSold === "true",
         amenities,
         nearbyFacilities: [],
         virtualTourUrl: "",
@@ -580,6 +582,25 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
             </Field>
           </div>
         </FormSection>
+
+        {isEditMode && (
+          <FormSection title="Property Status">
+            <div className="rounded-lg bg-surface p-4">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.isSold === true || form.isSold === "true"}
+                  onChange={(e) => update("isSold", e.target.checked)}
+                  className="h-5 w-5 cursor-pointer rounded border-slate-300"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-navy">Mark this property as sold</p>
+                  <p className="text-xs text-slate-600">Check this box if this property has been sold and is no longer available for sale or rent.</p>
+                </div>
+              </label>
+            </div>
+          </FormSection>
+        )}
 
         <FormSection title="Upload Images & Documents">
           <div className="grid gap-5 lg:grid-cols-2">

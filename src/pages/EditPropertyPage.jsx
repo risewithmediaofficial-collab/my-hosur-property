@@ -32,6 +32,7 @@ const EditPropertyPage = () => {
         const initialForm = {
           title: p.title || "",
           description: p.description || "",
+          isSold: Boolean(p.isSold || false),
           contactName: p.listingContact?.name || "",
           contactPhone: p.listingContact?.phone || "",
           houseAddress: p.location?.address || "",
