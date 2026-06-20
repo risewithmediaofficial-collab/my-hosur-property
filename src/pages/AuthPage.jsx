@@ -1,14 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { ShieldCheckIcon, EnvelopeIcon, LockClosedIcon, PhoneIcon, MapPinIcon, UserIcon, UserCircleIcon } from "../components/AppIcons";
 import BrandLogo from "../components/BrandLogo";
 import { loginUser, resendOtp, signupUser, verifyOtp } from "../services/api/authApi";
 import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
-import { auth } from "../lib/firebase";
 
 const MotionDiv = motion.div;
 const AUTH_FORM = {
@@ -72,8 +70,6 @@ const AuthPage = () => {
   const [resendCountdown, setResendCountdown] = useState(0);
   const [otpExpiryCountdown, setOtpExpiryCountdown] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [firebaseConfirmation, setFirebaseConfirmation] = useState(null);
-  const recaptchaVerifierRef = useRef(null);
 
   const onChange = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -101,7 +97,6 @@ const AuthPage = () => {
     setStep("credentials");
     setOtpCode("");
     setOtpState(null);
-    setFirebaseConfirmation(null);
     setResendCountdown(0);
     setOtpExpiryCountdown(0);
   };
@@ -109,29 +104,6 @@ const AuthPage = () => {
   const switchMode = (nextMode) => {
     setMode(nextMode);
     resetOtpFlow();
-  };
-
-  const getRecaptchaVerifier = () => {
-    if (!recaptchaVerifierRef.current) {
-      recaptchaVerifierRef.current = new RecaptchaVerifier(auth, "firebase-recaptcha-container", {
-        size: "invisible",
-      });
-    }
-
-    return recaptchaVerifierRef.current;
-  };
-
-  const sendFirebaseOtp = async (challenge) => {
-    if (challenge.provider !== "firebase") return null;
-
-    const phoneNumber = challenge.firebasePhoneNumber;
-    if (!phoneNumber) {
-      throw new Error("Firebase phone number is missing from the OTP challenge.");
-    }
-
-    const confirmation = await signInWithPhoneNumber(auth, phoneNumber, getRecaptchaVerifier());
-    setFirebaseConfirmation(confirmation);
-    return confirmation;
   };
 
   const submit = async (event) => {
@@ -147,20 +119,9 @@ const AuthPage = () => {
 
     try {
       if (step === "otp") {
-        let firebaseIdToken = "";
-
-        if (otpState?.provider === "firebase") {
-          if (!firebaseConfirmation) {
-            throw new Error("OTP session expired. Please resend the code.");
-          }
-
-          const firebaseCredential = await firebaseConfirmation.confirm(otpCode.trim());
-          firebaseIdToken = await firebaseCredential.user.getIdToken();
-        }
-
         const data = await verifyOtp({
           challengeId: otpState?.challengeId,
-          ...(firebaseIdToken ? { firebaseIdToken } : { otp: otpCode.trim() }),
+          otp: otpCode.trim(),
         });
 
         login(data);
@@ -177,14 +138,21 @@ const AuthPage = () => {
                 password: form.password,
               };
 
-        const challenge = mode === "signup" ? await signupUser(payload) : await loginUser(payload);
-        await sendFirebaseOtp(challenge);
-        setOtpState(challenge);
-        setOtpCode("");
-        setStep("otp");
-        setResendCountdown(challenge.resendAvailableInSeconds || 0);
-        setOtpExpiryCountdown(challenge.expiresInSeconds || 0);
-        toast.success(challenge.message || "OTP sent successfully");
+        if (mode === "signup") {
+          const challenge = await signupUser(payload);
+          setOtpState(challenge);
+          setOtpCode("");
+          setStep("otp");
+          setResendCountdown(challenge.resendAvailableInSeconds || 0);
+          setOtpExpiryCountdown(challenge.expiresInSeconds || 0);
+          toast.success(challenge.message || "OTP sent successfully");
+        } else {
+          const data = await loginUser(payload);
+          login(data);
+          toast.success("Welcome back");
+          scrollToTop();
+          navigate(redirectTo);
+        }
       }
     } catch (error) {
       toast.error(error.response?.data?.message || error.message || "Authentication failed");
@@ -199,7 +167,6 @@ const AuthPage = () => {
     setLoading(true);
     try {
       const refreshedChallenge = await resendOtp({ challengeId: otpState.challengeId });
-      await sendFirebaseOtp(refreshedChallenge);
       setOtpState(refreshedChallenge);
       setOtpCode("");
       setResendCountdown(refreshedChallenge.resendAvailableInSeconds || 0);
@@ -751,7 +718,6 @@ const AuthPage = () => {
       `}</style>
 
       <div className="auth-page">
-        <div id="firebase-recaptcha-container" />
         <div className="auth-left">
           <img
             className="auth-left-img"
@@ -962,7 +928,7 @@ const AuthPage = () => {
                               ? "Verify & Continue"
                               : isSignup
                                 ? "Send OTP"
-                                : "Send Login OTP"}
+                                : "Sign In"}
                         </button>
                       </motion.div>
                     </motion.div>

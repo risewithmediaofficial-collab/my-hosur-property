@@ -7,15 +7,12 @@ const sendEmail = require("../utils/sendEmail");
 const generateHtmlEmail = require("../utils/emailFormatter");
 const { sendWelcomeTemplateEmail } = require("../utils/sendEmailJs");
 const { sendOtp, hasMsg91Config } = require("../utils/sendOtp");
-const { verifyFirebaseIdToken } = require("../utils/firebaseAuth");
 
 const FREE_POST_VALIDITY_DAYS = 90;
 const OTP_EXPIRY_MINUTES = Math.max(Number(process.env.OTP_EXPIRY_MINUTES) || 5, 1);
 const OTP_RESEND_COOLDOWN_SECONDS = Math.max(Number(process.env.OTP_RESEND_COOLDOWN_SECONDS) || 45, 15);
 const OTP_MAX_ATTEMPTS = Math.max(Number(process.env.OTP_MAX_ATTEMPTS) || 5, 3);
 const OTP_HASH_SECRET = process.env.OTP_SECRET || process.env.JWT_SECRET || "myhosurproperty-otp-secret";
-const OTP_PROVIDER = (process.env.OTP_PROVIDER || "auto").toLowerCase();
-const usesFirebaseOtp = OTP_PROVIDER === "firebase";
 
 const addDays = (date, days) => {
   const next = new Date(date);
@@ -135,16 +132,7 @@ const socialLoginValidators = [body("provider").isIn(["google", "facebook"]), bo
 
 const verifyOtpValidators = [
   body("challengeId").trim().notEmpty(),
-  body().custom((value) => {
-    const hasOtp = typeof value.otp === "string" && value.otp.trim().length >= 4 && value.otp.trim().length <= 8;
-    const hasFirebaseIdToken = typeof value.firebaseIdToken === "string" && value.firebaseIdToken.trim().length > 0;
-
-    if (!hasOtp && !hasFirebaseIdToken) {
-      throw new Error("OTP or Firebase verification token is required.");
-    }
-
-    return true;
-  }),
+  body("otp").trim().isLength({ min: 4, max: 8 }).withMessage("OTP is required."),
 ];
 
 const resendOtpValidators = [body("challengeId").trim().notEmpty()];
@@ -223,8 +211,7 @@ const buildOtpResponse = (user, meta = {}) => {
     destination: maskPhoneNumber(user.phone),
     expiresInSeconds,
     resendAvailableInSeconds,
-    provider: meta.provider || (usesFirebaseOtp ? "firebase" : hasMsg91Config ? "msg91" : "development"),
-    ...(meta.firebasePhoneNumber ? { firebasePhoneNumber: meta.firebasePhoneNumber } : {}),
+    provider: meta.provider || (hasMsg91Config ? "msg91" : "development"),
     ...(meta.developmentOtp ? { developmentOtp: meta.developmentOtp } : {}),
   };
 };
@@ -266,7 +253,7 @@ const sendLoginAlert = async (user) => {
 };
 
 const createOtpChallenge = async (user, purpose) => {
-  const otp = usesFirebaseOtp ? "" : createOtpCode();
+  const otp = createOtpCode();
   const now = new Date();
   const expiresAt = new Date(now.getTime() + OTP_EXPIRY_MINUTES * 60 * 1000);
   const resendAvailableAt = new Date(now.getTime() + OTP_RESEND_COOLDOWN_SECONDS * 1000);
@@ -274,7 +261,7 @@ const createOtpChallenge = async (user, purpose) => {
   user.otpVerification = {
     challengeId: crypto.randomUUID(),
     purpose,
-    codeHash: usesFirebaseOtp ? "" : hashOtp(otp),
+    codeHash: hashOtp(otp),
     expiresAt,
     resendAvailableAt,
     attempts: 0,
@@ -284,13 +271,6 @@ const createOtpChallenge = async (user, purpose) => {
   };
 
   await user.save();
-
-  if (usesFirebaseOtp) {
-    return buildOtpResponse(user, {
-      provider: "firebase",
-      firebasePhoneNumber: `+${normalizeIndianPhone(user.phone)}`,
-    });
-  }
 
   const delivery = await sendOtp({
     phoneNumber: user.phone,
@@ -458,16 +438,18 @@ const login = async (req, res) => {
   }
 
   await ensureFreeOnboardingValidity(user);
+  try {
+    await sendLoginAlert(user);
+    console.log(`[login] Login alert email sent to ${user.email}`);
+  } catch (error) {
+    console.error("[login] Login alert email failed:", error.message);
+  }
 
-  const challenge = await createOtpChallenge(user, "login");
-  return res.status(202).json({
-    ...challenge,
-    message: "OTP sent to your registered mobile number.",
-  });
+  return res.json(issueAuthResponse(user));
 };
 
 const verifyOtp = async (req, res) => {
-  const { challengeId, otp, firebaseIdToken } = req.body;
+  const { challengeId, otp } = req.body;
   const user = await User.findOne({ "otpVerification.challengeId": challengeId });
 
   if (!user || !user.otpVerification?.challengeId) {
@@ -487,18 +469,7 @@ const verifyOtp = async (req, res) => {
   }
 
   let otpMatches = false;
-
-  if (firebaseIdToken) {
-    try {
-      const firebaseUser = await verifyFirebaseIdToken(firebaseIdToken);
-      const firebasePhone = normalizeIndianPhone(firebaseUser.phone_number);
-      otpMatches = Boolean(firebasePhone && firebasePhone === normalizeIndianPhone(user.phone));
-    } catch (error) {
-      return res.status(error.statusCode || 401).json({ message: error.message || "Firebase phone verification failed." });
-    }
-  } else {
-    otpMatches = user.otpVerification.codeHash === hashOtp(otp);
-  }
+  otpMatches = user.otpVerification.codeHash === hashOtp(otp);
 
   if (!otpMatches) {
     user.otpVerification.attempts = (user.otpVerification.attempts || 0) + 1;
