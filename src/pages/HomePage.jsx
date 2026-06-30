@@ -81,6 +81,23 @@ const propertyTypeIcons = {
   "Agricultural Land": LandIcon,
 };
 
+/* Background images for each property type card hover */
+const propertyTypeImages = {
+  Plot: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
+  Villa: "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80",
+  "Independent House": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80",
+  Flat: "https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=800&q=80",
+  "Commercial Land": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+  "Agricultural Land": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
+};
+
+/* Background images for service preview cards */
+const serviceImages = {
+  "Property Transactions": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80",
+  "Legal & Registration": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80",
+  "Construction & Support": "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=800&q=80",
+};
+
 const shortcutGroups = [
   {
     label: "Buy",
@@ -179,6 +196,13 @@ const showcaseItems = [
   { title: "Legal Support", description: "Documentation assistance", icon: DocumentTextIcon },
 ];
 
+/* Testimonial placeholder data */
+const testimonialPlaceholders = [
+  { id: 1, name: "Mr. Ramesh", role: "Property Buyer" },
+  { id: 2, name: "Mrs. Priya", role: "Plot Owner" },
+  { id: 3, name: "Mr. Karthik", role: "Home Buyer" },
+];
+
 const HomePage = () => {
   const navigate = useNavigate();
   const scrollToTop = useScrollToTop();
@@ -216,22 +240,18 @@ const HomePage = () => {
       if (shortcutBarRef.current && !shortcutBarRef.current.contains(event.target)) {
         setOpenShortcutMenu("");
       }
-
       if (propertyTypeMenuRef.current && !propertyTypeMenuRef.current.contains(event.target)) {
         setPropertyTypeMenuOpen(false);
       }
     };
-
     const handleEscape = (event) => {
       if (event.key === "Escape") {
         setOpenShortcutMenu("");
         setPropertyTypeMenuOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handlePointerDown);
     document.addEventListener("keydown", handleEscape);
-
     return () => {
       document.removeEventListener("mousedown", handlePointerDown);
       document.removeEventListener("keydown", handleEscape);
@@ -358,12 +378,10 @@ const HomePage = () => {
 
   const handlePostFreeProperty = () => {
     scrollToTop();
-
     if (isAuthenticated) {
       navigate("/post-property");
       return;
     }
-
     toast.success("Sign in to post your free property listing.");
     navigate("/auth", { state: { from: { pathname: "/post-property" } } });
   };
@@ -390,36 +408,45 @@ const HomePage = () => {
         schema={[buildWebsiteSchema(), buildRealEstateAgentSchema()]}
       />
 
+      {/* ── HERO SECTION ── */}
+      {/* NOTE: overflow is on the bg wrapper only, NOT on the section — so dropdowns can escape */}
       <MotionSection
         ref={heroRef}
         initial="hidden"
         animate="show"
         variants={reveal}
-        className="relative min-h-[380px] overflow-hidden sm:min-h-[460px] lg:min-h-[500px]"
+        className="relative min-h-[380px] sm:min-h-[460px] lg:min-h-[500px]"
+        style={{ zIndex: 1 }}
       >
-        <div
-          ref={heroBgRef}
-          className="absolute -inset-y-16 inset-x-0 bg-cover bg-center will-change-transform"
-          style={{ backgroundImage: `url(${HERO_BG})` }}
-        />
-        <div className="absolute inset-0 bg-navy/75" />
+        {/* Background clipped inside its own div */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div
+            ref={heroBgRef}
+            className="absolute -inset-y-16 inset-x-0 bg-cover bg-center will-change-transform"
+            style={{ backgroundImage: `url(${HERO_BG})` }}
+          />
+          <div className="absolute inset-0 bg-navy/75" />
+        </div>
 
-        <div ref={heroContentRef} className="relative z-10 mx-auto flex max-w-[1440px] flex-col items-center px-5 py-12 text-center will-change-transform sm:px-8 sm:py-16 lg:px-10 lg:py-20">
+        {/* Shortcut dropdowns need z-index above the hero */}
+        <div ref={heroContentRef} className="relative mx-auto flex max-w-[1440px] flex-col items-center px-5 py-12 text-center will-change-transform sm:px-8 sm:py-16 lg:px-10 lg:py-20" style={{ zIndex: 20 }}>
           <p className="home-gsap-hero-item section-tag !text-orange">Verified real estate platform</p>
           <h1 className="home-gsap-hero-item hero-title mt-4 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
             Verified property listings in <span className="text-orange">Hosur</span>
           </h1>
-          
+
           <div className="home-gsap-hero-item mt-8 flex flex-col gap-6 w-full sm:mt-10">
             <p className="mx-auto text-sm leading-7 text-white/85 sm:text-base">
               Find verified properties for sale and rent across Hosur. Search apartments, villas, plots, and houses with clearer tools and local support.
             </p>
-            
+
+            {/* ── Shortcut bar — now outside overflow-hidden, uses z-index ── */}
             <div ref={shortcutBarRef} className="relative flex flex-wrap justify-center gap-2 sm:gap-2.5 lg:gap-3">
               {shortcutGroups.map((group) => (
                 <div
                   key={group.label}
-                  className={`relative ${openShortcutMenu === group.label ? "z-50" : "z-10"}`}
+                  className="relative"
+                  style={{ zIndex: openShortcutMenu === group.label ? 9999 : 10 }}
                   onMouseEnter={() => handleShortcutHover(group.label)}
                   onMouseLeave={handleShortcutLeave}
                 >
@@ -435,15 +462,18 @@ const HomePage = () => {
                     <span>{group.label}</span>
                     <ChevronDownIcon className={`h-4 w-4 transition duration-300 max-sm:!hidden sm:block ${openShortcutMenu === group.label ? "rotate-180" : ""}`} />
                   </button>
-                  {openShortcutMenu === group.label ? (
+
+                  {/* Desktop dropdown */}
+                  {openShortcutMenu === group.label && (
                     <motion.div
-                      className="absolute left-0 top-full z-50 hidden min-w-[220px] pt-2 sm:block"
+                      className="absolute left-0 top-full hidden pt-2 sm:block"
+                      style={{ zIndex: 9999, minWidth: "220px" }}
                       initial={{ opacity: 0, y: -8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.15 }}
                     >
-                      <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-lg">
+                      <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl max-h-[60vh] overflow-y-auto">
                         {group.items.map((item) => (
                           <Link
                             key={`${group.label}-${item.label}`}
@@ -456,10 +486,12 @@ const HomePage = () => {
                         ))}
                       </div>
                     </motion.div>
-                  ) : null}
+                  )}
                 </div>
               ))}
-              {openShortcutGroup ? (
+
+              {/* Mobile expanded menu */}
+              {openShortcutGroup && (
                 <motion.div
                   className="z-50 mt-2 w-full basis-full sm:hidden"
                   initial={{ opacity: 0, y: -8 }}
@@ -480,7 +512,7 @@ const HomePage = () => {
                     ))}
                   </div>
                 </motion.div>
-              ) : null}
+              )}
             </div>
 
             <div className="home-gsap-hero-item mt-4 flex w-full max-w-md flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center mx-auto">
@@ -493,59 +525,16 @@ const HomePage = () => {
               >
                 <style>{`
                   @keyframes boom {
-                    0% {
-                      box-shadow: 0 0 0 0 rgba(255, 127, 14, 0.7);
-                      transform: scale(1);
-                    }
-                    50% {
-                      box-shadow: 0 0 0 10px rgba(255, 127, 14, 0.4);
-                    }
-                    100% {
-                      box-shadow: 0 0 0 20px rgba(255, 127, 14, 0);
-                      transform: scale(1);
-                    }
+                    0% { box-shadow: 0 0 0 0 rgba(255, 127, 14, 0.7); transform: scale(1); }
+                    50% { box-shadow: 0 0 0 10px rgba(255, 127, 14, 0.4); }
+                    100% { box-shadow: 0 0 0 20px rgba(255, 127, 14, 0); transform: scale(1); }
                   }
-                  
-                  @keyframes blink {
-                    0%, 100% {
-                      opacity: 1;
-                    }
-                    50% {
-                      opacity: 0.7;
-                    }
-                  }
-                  
-                  @keyframes wave {
-                    0%, 100% { transform: scaleX(1); }
-                    50% { transform: scaleX(1.08); }
-                  }
-                  
-                  @keyframes shine {
-                    0% {
-                      left: -100%;
-                    }
-                    100% {
-                      left: 100%;
-                    }
-                  }
-                  
-                  .boom-button {
-                    animation: boom 2s infinite, blink 1.5s ease-in-out infinite;
-                  }
-                  
-                  .group:hover .wave-icon {
-                    animation: wave 0.5s ease-in-out infinite;
-                  }
-                  
-                  .shine-effect {
-                    position: absolute;
-                    top: 0;
-                    left: -100%;
-                    width: 100%;
-                    height: 100%;
-                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-                    animation: shine 1.2s infinite;
-                  }
+                  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+                  @keyframes wave { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(1.08); } }
+                  @keyframes shine { 0% { left: -100%; } 100% { left: 100%; } }
+                  .boom-button { animation: boom 2s infinite, blink 1.5s ease-in-out infinite; }
+                  .group:hover .wave-icon { animation: wave 0.5s ease-in-out infinite; }
+                  .shine-effect { position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: shine 1.2s infinite; }
                 `}</style>
                 <div className="shine-effect"></div>
                 <FlagIcon className="wave-icon h-5 w-5 transition-transform duration-300 relative z-10" />
@@ -578,6 +567,7 @@ const HomePage = () => {
         </div>
       </MotionSection>
 
+      {/* ── Search bar section ── */}
       <section className="home-gsap-section relative bg-gradient-to-b from-slate-50 to-white px-5 py-8 sm:px-8 sm:py-12 lg:px-10">
         <div className="mx-auto max-w-[1440px] space-y-5">
           <div
@@ -608,6 +598,7 @@ const HomePage = () => {
                 <option value="new-project">New Project</option>
               </select>
 
+              {/* Property type custom dropdown */}
               <div ref={propertyTypeMenuRef} className="relative w-full">
                 <button
                   type="button"
@@ -619,9 +610,9 @@ const HomePage = () => {
                   <span className="truncate">{selectedPropertyTypeLabel}</span>
                   <ChevronDownIcon className={`h-4 w-4 flex-shrink-0 transition ${propertyTypeMenuOpen ? "rotate-180" : ""}`} />
                 </button>
-                {propertyTypeMenuOpen ? (
+                {propertyTypeMenuOpen && (
                   <div
-                    className="absolute left-0 right-0 top-full z-50 mt-2 max-h-60 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-card"
+                    className="absolute left-0 right-0 top-full z-[9999] mt-2 max-h-60 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl"
                     role="listbox"
                   >
                     {propertyTypeOptions.map((option) => (
@@ -639,7 +630,7 @@ const HomePage = () => {
                       </button>
                     ))}
                   </div>
-                ) : null}
+                )}
               </div>
 
               <button
@@ -657,6 +648,7 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* ── Property Types ── */}
       <MotionSection
         initial="hidden"
         whileInView="show"
@@ -673,23 +665,38 @@ const HomePage = () => {
             .filter((option) => option.value)
             .map((option) => {
               const Icon = propertyTypeIcons[option.value] || BuildingOffice2Icon;
+              const bgImg = propertyTypeImages[option.value];
               return (
                 <Link
                   key={option.value}
                   to={`/listings?intent=buy&propertyType=${encodeURIComponent(option.value)}`}
-                  className="home-gsap-card property-type-card flex flex-col items-center p-6 text-center"
+                  className="home-gsap-card group relative flex flex-col items-center overflow-hidden rounded-xl border border-slate-200 bg-white p-6 text-center shadow-card transition-all duration-300"
                 >
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-navy text-white">
-                    <Icon className="h-6 w-6" />
+                  {/* Hover background image */}
+                  {bgImg && (
+                    <div
+                      className="absolute inset-0 bg-cover bg-center opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                      style={{ backgroundImage: `url(${bgImg})` }}
+                    />
+                  )}
+                  {/* Dark overlay on hover */}
+                  <div className="absolute inset-0 bg-navy/70 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+                  {/* Content sits above image */}
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-navy text-navy transition-all duration-300 group-hover:border-white group-hover:text-white">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <p className="mt-4 text-base font-bold text-navy transition-colors duration-300 group-hover:text-white">{option.label}</p>
+                    <p className="mt-1 text-xs text-slate-500 transition-colors duration-300 group-hover:text-white/80">Browse listings</p>
                   </div>
-                  <p className="mt-4 text-base font-bold text-navy">{option.label}</p>
-                  <p className="mt-1 text-xs text-slate-500">Browse listings</p>
                 </Link>
               );
             })}
         </div>
       </MotionSection>
 
+      {/* ── Our Services ── */}
       <MotionSection
         initial="hidden"
         whileInView="show"
@@ -704,6 +711,7 @@ const HomePage = () => {
         <div className="mx-auto mt-10 grid max-w-[1440px] gap-6 md:grid-cols-3">
           {servicePreview.map((item) => {
             const Icon = item.icon;
+            const bgImg = serviceImages[item.title];
             return (
               <motion.article
                 key={item.title}
@@ -711,23 +719,37 @@ const HomePage = () => {
                 initial="hidden"
                 whileInView="show"
                 viewport={{ once: true, amount: 0.01 }}
-                className="home-gsap-card home-parallax-soft rounded-xl border border-slate-200 bg-white p-8 text-center shadow-card transition duration-300 hover:-translate-y-1 hover:border-orange"
+                className="home-gsap-card home-parallax-soft group relative overflow-hidden rounded-xl border border-slate-200 bg-white p-8 text-center shadow-card transition-all duration-300"
               >
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-navy text-white">
-                  <Icon className="h-6 w-6" />
+                {/* Hover background image */}
+                {bgImg && (
+                  <div
+                    className="absolute inset-0 bg-cover bg-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                    style={{ backgroundImage: `url(${bgImg})` }}
+                  />
+                )}
+                {/* Dark overlay */}
+                <div className="absolute inset-0 bg-navy/75 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+                {/* Content */}
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-navy text-navy transition-all duration-300 group-hover:border-white group-hover:text-white">
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <h2 className="mt-5 text-xl font-bold text-navy transition-colors duration-300 group-hover:text-white">{item.title}</h2>
+                  <p className="mt-3 text-sm leading-7 text-slate-600 transition-colors duration-300 group-hover:text-white/90">{item.description}</p>
+                  <Link to="/services" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-orange transition-colors duration-300 hover:text-orange-hover group-hover:text-orange">
+                    Learn more
+                    <ArrowRightIcon className="h-4 w-4" />
+                  </Link>
                 </div>
-                <h2 className="mt-5 text-xl font-bold text-navy">{item.title}</h2>
-                <p className="mt-3 text-sm leading-7 text-slate-600">{item.description}</p>
-                <Link to="/services" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-orange transition hover:text-orange-hover">
-                  Learn more
-                  <ArrowRightIcon className="h-4 w-4" />
-                </Link>
               </motion.article>
             );
           })}
         </div>
       </MotionSection>
 
+      {/* ── Property Showcase scrolling strip ── */}
       <MotionSection
         initial="hidden"
         whileInView="show"
@@ -737,7 +759,7 @@ const HomePage = () => {
       >
         <div className="mx-auto max-w-[1440px] text-center">
           <p className="section-tag">Property Showcase</p>
-          <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">Services & Property Types</h2>
+          <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">Services &amp; Property Types</h2>
           <p className="home-gsap-copy mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-600">
             Explore the diverse range of properties and services we provide in Hosur
           </p>
@@ -746,87 +768,20 @@ const HomePage = () => {
         <div className="mx-auto mt-12 max-w-[1440px]">
           <div className="relative overflow-hidden">
             <style>{`
-              @keyframes scroll-services {
-                0% {
-                  transform: translateX(0);
-                }
-                100% {
-                  transform: translateX(-50%);
-                }
-              }
-
-              .services-scroll {
-                display: flex;
-                gap: 1.5rem;
-                animation: scroll-services 40s linear infinite;
-                width: max-content;
-                will-change: transform;
-              }
-
-              .service-card {
-                flex-shrink: 0;
-                width: 280px;
-                background: #ffffff;
-                border: 2px solid #dfe6ee;
-                border-radius: 16px;
-                padding: 24px;
-                text-align: center;
-                transition: all 0.3s ease;
-                cursor: pointer;
-                box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-                user-select: none;
-              }
-
-              .service-card:hover {
-                border-color: #ff7f0e;
-                transform: translateY(-8px);
-                box-shadow: 0 12px 24px rgba(255, 127, 14, 0.15);
-                background: linear-gradient(135deg, #fff5e6 0%, #fffbf0 100%);
-              }
-
-              .service-icon {
-                width: 60px;
-                height: 60px;
-                margin: 0 auto;
-                background: linear-gradient(135deg, #001a4d 0%, #002d7a 100%);
-                border-radius: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.3s ease;
-              }
-
-              .service-card:hover .service-icon {
-                background: linear-gradient(135deg, #ff7f0e 0%, #ff9933 100%);
-                transform: scale(1.1);
-              }
-
-              .gradient-fade-services {
-                pointer-events: none;
-                user-select: none;
-              }
-
-              .gradient-fade-left-services {
-                position: absolute;
-                left: 0;
-                top: 0;
-                bottom: 0;
-                width: 100px;
-                background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
-                z-index: 10;
-                pointer-events: none;
-              }
-
-              .gradient-fade-right-services {
-                position: absolute;
-                right: 0;
-                top: 0;
-                bottom: 0;
-                width: 100px;
-                background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
-                z-index: 10;
-                pointer-events: none;
-              }
+              @keyframes scroll-services { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+              .services-scroll { display: flex; gap: 1.5rem; animation: scroll-services 40s linear infinite; width: max-content; will-change: transform; }
+              .service-card { flex-shrink: 0; width: 280px; background: #ffffff; border: 2px solid #dfe6ee; border-radius: 16px; padding: 24px; text-align: center; transition: all 0.3s ease; cursor: pointer; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08); user-select: none; position: relative; overflow: hidden; }
+              .service-card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 0.4s ease; }
+              .service-card-overlay { position: absolute; inset: 0; background: rgba(0, 66, 162, 0.75); opacity: 0; transition: opacity 0.4s ease; }
+              .service-card:hover .service-card-bg { opacity: 1; }
+              .service-card:hover .service-card-overlay { opacity: 1; }
+              .service-card-content { position: relative; z-index: 10; }
+              .service-card:hover { border-color: #ff7f0e; transform: translateY(-8px); box-shadow: 0 12px 24px rgba(255, 127, 14, 0.15); }
+              .service-icon { width: 60px; height: 60px; margin: 0 auto; border: 2px solid #0042a2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0042a2; transition: all 0.3s ease; }
+              .service-card:hover .service-icon { border-color: #ffffff; color: #ffffff; }
+              .gradient-fade-services { pointer-events: none; user-select: none; }
+              .gradient-fade-left-services { position: absolute; left: 0; top: 0; bottom: 0; width: 100px; background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }
+              .gradient-fade-right-services { position: absolute; right: 0; top: 0; bottom: 0; width: 100px; background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }
             `}</style>
 
             <div className="gradient-fade-services gradient-fade-left-services"></div>
@@ -835,13 +790,17 @@ const HomePage = () => {
                 {[...showcaseItems, ...showcaseItems].map((service, index) => {
                   const Icon = service.icon;
                   return (
-                  <div key={`${service.title}-${index}`} className="service-card group">
-                    <div className="service-icon">
-                      <Icon className="h-6 w-6 text-white" />
+                    <div key={`${service.title}-${index}`} className="service-card group">
+                      <div className="service-card-bg" style={{ backgroundImage: `url(${propertyTypeImages[service.title] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80"})` }} />
+                      <div className="service-card-overlay" />
+                      <div className="service-card-content">
+                        <div className="service-icon">
+                          <Icon className="h-6 w-6" />
+                        </div>
+                        <h3 className="mt-4 text-lg font-bold text-navy transition group-hover:text-white">{service.title}</h3>
+                        <p className="mt-2 text-sm text-slate-600 transition group-hover:text-white/90">{service.description}</p>
+                      </div>
                     </div>
-                    <h3 className="mt-4 text-lg font-bold text-navy">{service.title}</h3>
-                    <p className="mt-2 text-sm text-slate-600 group-hover:text-orange transition">{service.description}</p>
-                  </div>
                   );
                 })}
               </div>
@@ -851,6 +810,7 @@ const HomePage = () => {
         </div>
       </MotionSection>
 
+      {/* ── Featured Properties ── */}
       <MotionSection
         initial="hidden"
         whileInView="show"
@@ -878,7 +838,6 @@ const HomePage = () => {
               <PropertyCard item={item} />
             </div>
           ))}
-
           {featuredLoading &&
             Array.from({ length: 4 }).map((_, index) => (
               <div key={index} className="overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-card">
@@ -891,6 +850,7 @@ const HomePage = () => {
         </div>
       </MotionSection>
 
+      {/* ── Partners ── */}
       <MotionSection
         initial="hidden"
         whileInView="show"
@@ -909,72 +869,13 @@ const HomePage = () => {
         <div className="mx-auto mt-12 max-w-[1440px]">
           <div className="relative overflow-hidden">
             <style>{`
-              @keyframes scroll-partners {
-                0% {
-                  transform: translateX(0);
-                }
-                100% {
-                  transform: translateX(-50%);
-                }
-              }
-
-              .partners-scroll {
-                display: flex;
-                gap: 2rem;
-                animation: scroll-partners 30s linear infinite;
-                width: max-content;
-                will-change: transform;
-              }
-
-              .partner-item {
-                flex-shrink: 0;
-                width: 200px;
-                height: 120px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: linear-gradient(135deg, #ffffff 0%, #eef5f4 100%);
-                border: 2px solid #cfdcde;
-                border-radius: 12px;
-                transition: all 0.3s ease;
-                cursor: pointer;
-                box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
-                user-select: none;
-              }
-
-              .partner-item:hover {
-                border-color: #ff7f0e;
-                background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%);
-                transform: translateY(-4px);
-                box-shadow: 0 8px 16px rgba(255, 127, 14, 0.15);
-              }
-
-              .gradient-fade {
-                pointer-events: none;
-                user-select: none;
-              }
-
-              .gradient-fade-left {
-                position: absolute;
-                left: 0;
-                top: 0;
-                bottom: 0;
-                width: 80px;
-                background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
-                z-index: 10;
-                pointer-events: none;
-              }
-
-              .gradient-fade-right {
-                position: absolute;
-                right: 0;
-                top: 0;
-                bottom: 0;
-                width: 80px;
-                background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
-                z-index: 10;
-                pointer-events: none;
-              }
+              @keyframes scroll-partners { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+              .partners-scroll { display: flex; gap: 2rem; animation: scroll-partners 30s linear infinite; width: max-content; will-change: transform; }
+              .partner-item { flex-shrink: 0; width: 200px; height: 120px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ffffff 0%, #eef5f4 100%); border: 2px solid #cfdcde; border-radius: 12px; transition: all 0.3s ease; cursor: pointer; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08); user-select: none; }
+              .partner-item:hover { border-color: #f79e26; background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%); transform: translateY(-4px); box-shadow: 0 8px 16px rgba(247, 158, 38, 0.15); }
+              .gradient-fade { pointer-events: none; user-select: none; }
+              .gradient-fade-left { position: absolute; left: 0; top: 0; bottom: 0; width: 80px; background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }
+              .gradient-fade-right { position: absolute; right: 0; top: 0; bottom: 0; width: 80px; background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }
             `}</style>
 
             <div className="gradient-fade gradient-fade-left"></div>
@@ -1008,6 +909,90 @@ const HomePage = () => {
         </div>
       </MotionSection>
 
+      {/* ── TESTIMONIALS placeholder ── */}
+      <MotionSection
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.15 }}
+        variants={reveal}
+        className="home-gsap-section bg-[#eef4fb] px-5 py-16 sm:px-8 lg:px-10"
+      >
+        <div className="mx-auto max-w-[1440px] text-center">
+          <p className="section-tag">Testimonials</p>
+          <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl lg:text-5xl">
+            Stories That Inspire{" "}
+            <span className="text-orange">Confidence</span> !!
+          </h2>
+          <p className="home-gsap-copy mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-600">
+            Hear from our happy customers who found their perfect property through MyHosurProperty.
+          </p>
+        </div>
+
+        {/* Testimonial cards — placeholder layout matching reference carousel style */}
+        <div className="mx-auto mt-12 max-w-[1440px]">
+          <div className="grid gap-6 md:grid-cols-3">
+            {testimonialPlaceholders.map((t, idx) => (
+              <div
+                key={t.id}
+                className={`group relative flex flex-col items-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-xl ${idx === 1 ? "md:-translate-y-4 md:scale-105 ring-2 ring-navy/20" : ""}`}
+              >
+                {/* Play button area */}
+                <div className="relative flex h-52 w-full items-center justify-center bg-gradient-to-br from-navy to-navy-light">
+                  {/* Decorative building silhouette */}
+                  <div className="absolute inset-0 opacity-10">
+                    <svg viewBox="0 0 400 200" className="h-full w-full" fill="white">
+                      <rect x="50" y="60" width="60" height="140" />
+                      <rect x="130" y="30" width="80" height="170" />
+                      <rect x="230" y="50" width="70" height="150" />
+                      <rect x="320" y="70" width="50" height="130" />
+                    </svg>
+                  </div>
+                  {/* Play button */}
+                  <button
+                    type="button"
+                    aria-label={`Play testimonial from ${t.name}`}
+                    className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm border-2 border-white text-white transition hover:bg-white hover:text-navy"
+                  >
+                    <svg className="h-7 w-7 translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </button>
+                  {/* Customer badge */}
+                  <div className="absolute bottom-3 left-3 rounded-md bg-orange px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
+                    {t.name}
+                  </div>
+                </div>
+
+                <div className="p-5 text-center w-full">
+                  <p className="font-bold text-navy">{t.name}</p>
+                  <p className="mt-1 text-sm text-slate-500">{t.role}</p>
+                  <p className="mt-3 text-sm leading-6 text-slate-600 italic">
+                    "An excellent experience. The team at MyHosurProperty guided us through the entire process."
+                  </p>
+                  {/* Stars */}
+                  <div className="mt-3 flex justify-center gap-1 text-orange">
+                    {[1,2,3,4,5].map((s) => (
+                      <svg key={s} className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 flex justify-center gap-3">
+            <button type="button" className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition hover:border-navy hover:text-navy" aria-label="Previous testimonial">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <button type="button" className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition hover:border-navy hover:text-navy" aria-label="Next testimonial">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            </button>
+          </div>
+        </div>
+      </MotionSection>
+
+      {/* ── CTA Banner ── */}
       <MotionSection
         initial="hidden"
         whileInView="show"

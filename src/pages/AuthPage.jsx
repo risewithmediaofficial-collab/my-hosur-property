@@ -609,7 +609,7 @@ const AuthPage = () => {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 12px;
-          margin-top: 28px;
+          margin-top: 0;
           max-width: 460px;
         }
         @media (max-height: 820px) {
@@ -1045,15 +1045,7 @@ const AuthPage = () => {
           <div className="auth-left-overlay" />
 
           <div className="auth-left-content">
-            <div className="auth-left-logo">
-              <BrandLogo className="auth-left-logo-img" />
-            </div>
-            <h2 className="auth-left-heading">Find your perfect home in Hosur.</h2>
-            <p className="auth-left-sub">
-              Browse verified listings, connect with genuine sellers, and manage your property journey with less friction.
-            </p>
-
-            <div className="auth-stats">
+            <div className="auth-stats" style={{ marginTop: 0 }}>
               {[
                 ["2,400+", "Listings"],
                 ["1,200+", "Buyers"],
@@ -1065,6 +1057,9 @@ const AuthPage = () => {
                 </div>
               ))}
             </div>
+            <p className="auth-left-sub" style={{ marginTop: "20px" }}>
+              Browse verified listings, connect with genuine sellers, and manage your property journey with less friction.
+            </p>
           </div>
         </div>
 

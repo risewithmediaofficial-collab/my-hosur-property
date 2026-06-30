@@ -10,7 +10,7 @@ const MarketingCard = ({ children, className = "", hover = true, as: Component =
 );
 
 export const IconCircle = ({ children, className = "" }) => (
-  <div className={`flex h-12 w-12 items-center justify-center rounded-full bg-navy text-white sm:h-14 sm:w-14 ${className}`}>
+  <div className={`flex h-12 w-12 items-center justify-center rounded-full border-2 border-navy bg-transparent text-navy sm:h-14 sm:w-14 ${className}`}>
     {children}
   </div>
 );

@@ -228,7 +228,7 @@ const ServicesPage = () => {
                 <div className="h-1.5 w-full bg-gradient-to-r from-orange via-orange to-navy" />
 
                 <div className="flex items-start gap-4 border-b border-slate-100 p-6">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-navy text-white shadow-[0_10px_24px_rgba(0,66,162,0.18)] transition duration-300 group-hover:bg-orange">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border-2 border-navy bg-transparent text-navy shadow-sm transition duration-300 group-hover:border-orange group-hover:text-orange">
                     <CategoryIcon className="h-6 w-6" />
                   </div>
                   <div className="min-w-0 flex-1">
