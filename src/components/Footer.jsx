@@ -29,27 +29,36 @@ const Footer = () => (
   <footer className="bg-navy text-white">
     <div className="px-5 py-12 sm:px-8 lg:px-10">
       <div className="mx-auto w-full max-w-[1440px]">
-        <div className="grid gap-8 lg:grid-cols-[1.15fr_1fr_1.1fr]">
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr_1.1fr]">
           <div className="space-y-4 lg:col-span-1">
-            <div className="flex items-center gap-3">
-              <div className="inline-flex rounded-xl border border-white/15 bg-white/5 px-3 py-2 shadow-sm backdrop-blur-sm">
-                <BrandLogo className="h-auto w-[240px] max-w-[72vw]" />
-                <p className="mt-2 text-xs font-medium text-white">
-                  Powered by <span className="font-bold text-white">Gyes Construction</span>
-                </p>
-              </div>
+            <div className="flex flex-col items-start gap-1">
+              <BrandLogo className="h-10 w-auto max-w-[180px] sm:h-12" />
+              <span className="text-[11px] font-medium leading-none text-white/60">
+                Powered by <span className="font-bold text-white">Gyes Construction</span>
+              </span>
             </div>
-            <p className="max-w-sm text-sm leading-7 text-white">
+            <p className="max-w-sm text-sm leading-7 text-white/80">
               A refined property platform for verified listings, clearer property discovery, and reliable buyer-owner communication in Hosur.
             </p>
             <p className="text-sm font-semibold text-orange">My Hosur Property - Trusted Real Estate Partner</p>
           </div>
 
-          <div className="space-y-3 lg:col-span-1">
+          <div className="space-y-4 lg:col-span-1">
             <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">Quick links</h4>
-            <nav className="flex flex-row flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-4" aria-label="Footer navigation and services">
-              {[...primaryNavLinks, ...serviceLinks].map((link, idx) => (
-                <NavLink key={`${link.to}-${link.label}-${idx}`} to={link.to} onClick={scrollToTop} className="whitespace-nowrap text-sm text-white transition hover:text-orange">
+            <nav className="grid grid-cols-2 gap-x-4 gap-y-3" aria-label="Footer navigation">
+              {[
+                { label: "Home", to: "/" },
+                { label: "Our Services", to: "/services" },
+                { label: "Bank Loans", to: "/bank-loans" },
+                { label: "Plans", to: "/plans" },
+                { label: "About Us", to: "/about" },
+                { label: "Contact Us", to: "/contact" },
+                { label: "Post Property", to: "/post-property" },
+                { label: "Buy Property", to: "/listings?intent=buy" },
+                { label: "Rent Property", to: "/listings?intent=rent" },
+                { label: "New Projects", to: "/listings?intent=new-project" },
+              ].map((link) => (
+                <NavLink key={link.to + link.label} to={link.to} onClick={scrollToTop} className="text-sm text-white/80 transition hover:text-orange">
                   {link.label}
                 </NavLink>
               ))}
@@ -58,21 +67,17 @@ const Footer = () => (
 
           <div className="space-y-4">
             <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">Contact</h4>
-            <div className="space-y-5 text-sm text-white">
-              <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-start gap-3 transition hover:text-orange">
-                <EnvelopeIcon className="mt-1 h-4 w-4 flex-shrink-0 text-orange" />
+            <div className="space-y-4 text-sm text-white/90">
+              <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center gap-3 transition hover:text-orange">
+                <EnvelopeIcon className="h-4 w-4 flex-shrink-0 text-orange" />
                 <span className="leading-5">{CONTACT_EMAIL}</span>
               </a>
-              <div className="flex items-start gap-3">
-                <PhoneIcon className="mt-1 h-4 w-4 flex-shrink-0 text-orange" />
-                <div className="space-y-1">
-                  {CONTACT_PHONE_NUMBERS.map((phone) => (
-                    <a key={phone.tel} href={`tel:${phone.tel}`} className="block leading-5 transition hover:text-orange">
-                      {phone.display}
-                    </a>
-                  ))}
-                </div>
-              </div>
+              {CONTACT_PHONE_NUMBERS.map((phone) => (
+                <a key={phone.tel} href={`tel:${phone.tel}`} className="flex items-center gap-3 transition hover:text-orange">
+                  <PhoneIcon className="h-4 w-4 flex-shrink-0 text-orange" />
+                  <span className="leading-5">{phone.display}</span>
+                </a>
+              ))}
               <div className="flex items-start gap-3">
                 <MapPinIcon className="mt-1 h-4 w-4 flex-shrink-0 text-orange" />
                 <span className="leading-5">{CONTACT_ADDRESS}</span>
