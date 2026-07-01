@@ -16,14 +16,18 @@ router.get("/applications/posting-access", ctrl.listPostingAccessApplications);
 router.get("/users", ctrl.listUsers);
 router.patch("/users/:id/posting-access", [body("enabled").isBoolean()], validate, ctrl.updatePostingAccess);
 router.patch("/users/:id/status", [body("status").isIn(["active", "deactivated"])], validate, ctrl.toggleUserStatus);
+router.delete("/users/:id", ctrl.deleteUser);
 router.patch("/users/:id/notes", [body("notes").optional().isString()], validate, ctrl.updateUserNotes);
 router.post("/users/email", [
   body("subject").notEmpty().withMessage("Subject is required"),
   body("message").notEmpty().withMessage("Message is required")
 ], validate, ctrl.sendAdminEmail);
 router.get("/leads", ctrl.listAllLeads);
+router.delete("/leads/:id", ctrl.deleteLead);
 router.get("/customer-requests", ctrl.listCustomerRequests);
+router.delete("/customer-requests/:id", ctrl.deleteCustomerRequest);
 router.get("/lead-unlocks", ctrl.listLeadUnlocks);
+router.delete("/lead-unlocks/:id", ctrl.deleteLeadUnlock);
 router.get("/settings/lead-price", ctrl.getLeadPricing);
 router.patch("/settings/lead-price", [body("value").isNumeric()], validate, ctrl.updateLeadPricing);
 router.patch("/leads/:id/assign", [body("brokerId").isMongoId()], validate, ctrl.assignLeadToBroker);

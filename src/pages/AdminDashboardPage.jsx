@@ -15,6 +15,10 @@ import {
   toggleUserStatus,
   updateAdminUserNotes,
   sendAdminEmail,
+  deleteAdminUser,
+  deleteAdminLead,
+  deleteAdminCustomerRequest,
+  deleteAdminLeadUnlock,
 } from "../services/api/adminApi";
 import toast from "react-hot-toast";
 import PropertyPostingForm from "../components/PropertyPostingForm";
@@ -254,6 +258,43 @@ const AdminDashboardPage = () => {
       load();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to change user status");
+    }
+  };
+
+  const onDeleteUser = async (user) => {
+    if (!window.confirm(`Are you sure you want to PERMANENTLY DELETE user "${user.name}"? This will delete all their listings, messages, and associated accounts. This action CANNOT be undone.`)) return;
+    try {
+      await deleteAdminUser(token, user._id);
+      toast.success("User and associated data deleted");
+      setSelectedUser(null);
+      load();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to delete user");
+    }
+  };
+
+  const onDeleteLeadItem = async (type, item) => {
+    const itemName = type === "inquiries" 
+      ? `Inquiry Lead from ${item.userId?.name || item.contactInfo?.name || "N/A"}`
+      : type === "requirements"
+        ? `Property Request from ${item.customerName || "N/A"}`
+        : `Lead Unlock for ${item.customerId?.name || "N/A"}`;
+
+    if (!window.confirm(`Are you sure you want to PERMANENTLY DELETE "${itemName}"? This action CANNOT be undone.`)) return;
+
+    try {
+      if (type === "inquiries") {
+        await deleteAdminLead(token, item._id);
+      } else if (type === "requirements") {
+        await deleteAdminCustomerRequest(token, item._id);
+      } else if (type === "unlocks") {
+        await deleteAdminLeadUnlock(token, item._id);
+      }
+      toast.success("Item deleted successfully");
+      setSelectedLeadItem(null);
+      load();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to delete item");
     }
   };
 
@@ -948,6 +989,12 @@ const AdminDashboardPage = () => {
                 >
                   {selectedUser.status === "deactivated" ? "Reactivate User" : "Deactivate User"}
                 </button>
+                <button
+                  onClick={() => onDeleteUser(selectedUser)}
+                  className="rounded-lg bg-red-800 px-4 py-2 text-sm font-bold text-white shadow transition hover:bg-red-900"
+                >
+                  Delete User
+                </button>
               </div>
             </div>
           </div>
@@ -1142,6 +1189,12 @@ const AdminDashboardPage = () => {
                     Open Property
                   </button>
                 ) : null}
+                <button
+                  onClick={() => onDeleteLeadItem(selectedLeadItem.type, selectedLeadItem.item)}
+                  className="rounded-lg bg-red-600 px-4 py-2 text-sm font-bold text-white hover:bg-red-700 transition"
+                >
+                  Delete Item
+                </button>
                 <button onClick={() => setSelectedLeadItem(null)} className="dashboard-primary px-4 py-2 text-sm">
                   Close
                 </button>

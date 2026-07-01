@@ -623,6 +623,76 @@ const sendAdminEmail = async (req, res) => {
   }
 };
 
+const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (String(user._id) === String(req.user._id)) {
+      return res.status(400).json({ message: "You cannot delete yourself" });
+    }
+
+    // Hard delete user
+    await User.findByIdAndDelete(id);
+    
+    // Clean up user properties
+    await Property.deleteMany({ ownerId: id });
+    
+    // Clean up user leads
+    await Lead.deleteMany({ userId: id });
+
+    return res.json({ message: "User and associated data deleted successfully" });
+  } catch (error) {
+    console.error("[deleteUser] Error:", error.message);
+    return res.status(500).json({ message: "Error deleting user", error: error.message });
+  }
+};
+
+const deleteLead = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const lead = await Lead.findById(id);
+    if (!lead) return res.status(404).json({ message: "Lead not found" });
+
+    await Lead.findByIdAndDelete(id);
+    return res.json({ message: "Inquiry lead deleted successfully" });
+  } catch (error) {
+    console.error("[deleteLead] Error:", error.message);
+    return res.status(500).json({ message: "Error deleting lead", error: error.message });
+  }
+};
+
+const deleteCustomerRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const request = await CustomerRequest.findById(id);
+    if (!request) return res.status(404).json({ message: "Property request not found" });
+
+    await CustomerRequest.findByIdAndDelete(id);
+    await LeadUnlock.deleteMany({ customerRequestId: id });
+
+    return res.json({ message: "Property request deleted successfully" });
+  } catch (error) {
+    console.error("[deleteCustomerRequest] Error:", error.message);
+    return res.status(500).json({ message: "Error deleting property request", error: error.message });
+  }
+};
+
+const deleteLeadUnlock = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const unlock = await LeadUnlock.findById(id);
+    if (!unlock) return res.status(404).json({ message: "Lead unlock record not found" });
+
+    await LeadUnlock.findByIdAndDelete(id);
+    return res.json({ message: "Lead unlock record deleted successfully" });
+  } catch (error) {
+    console.error("[deleteLeadUnlock] Error:", error.message);
+    return res.status(500).json({ message: "Error deleting lead unlock record", error: error.message });
+  }
+};
+
 module.exports = {
   getMetrics,
   getDashboardOverview,
@@ -643,4 +713,8 @@ module.exports = {
   updateLeadPricing,
   getRecentActivity,
   sendAdminEmail,
+  deleteUser,
+  deleteLead,
+  deleteCustomerRequest,
+  deleteLeadUnlock,
 };

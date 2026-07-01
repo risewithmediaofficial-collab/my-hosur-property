@@ -34,3 +34,11 @@ export const fetchAdminLeadPrice = async (token) =>
   (await apiClient.get("/api/admin/settings/lead-price", withAuth(token))).data;
 export const updateAdminLeadPrice = async (token, value) =>
   (await apiClient.patch("/api/admin/settings/lead-price", { value }, withAuth(token))).data;
+export const deleteAdminUser = async (token, userId) =>
+  (await apiClient.delete(`/api/admin/users/${userId}`, withAuth(token))).data;
+export const deleteAdminLead = async (token, leadId) =>
+  (await apiClient.delete(`/api/admin/leads/${leadId}`, withAuth(token))).data;
+export const deleteAdminCustomerRequest = async (token, requestId) =>
+  (await apiClient.delete(`/api/admin/customer-requests/${requestId}`, withAuth(token))).data;
+export const deleteAdminLeadUnlock = async (token, unlockId) =>
+  (await apiClient.delete(`/api/admin/lead-unlocks/${unlockId}`, withAuth(token))).data;
