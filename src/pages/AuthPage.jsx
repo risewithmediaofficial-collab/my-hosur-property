@@ -7,6 +7,7 @@ import BrandLogo from "../components/BrandLogo";
 import { loginUser, resendOtp, signupUser, verifyOtp as verifyOtpApi, verifyWidgetToken, forgotPassword, resetPassword } from "../services/api/authApi";
 import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
+import AnimatedOTPInput from "../components/AnimatedOTPInput";
 
 const MotionDiv = motion.div;
 const AUTH_FORM = {
@@ -126,6 +127,8 @@ const AuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [widgetReady, setWidgetReady] = useState(false);
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
   const onChange = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -244,6 +247,7 @@ const AuthPage = () => {
     setStep("credentials");
     setOtpCode("");
     setNewPassword("");
+    setConfirmNewPassword("");
     setOtpState(null);
     setResendCountdown(0);
     setOtpExpiryCountdown(0);
@@ -251,6 +255,8 @@ const AuthPage = () => {
 
   const switchMode = (nextMode) => {
     setMode(nextMode);
+    setConfirmPassword("");
+    setConfirmNewPassword("");
     resetOtpFlow();
   };
 
@@ -271,6 +277,12 @@ const AuthPage = () => {
       return;
     }
 
+    // Confirm password validation for signup
+    if (mode === "signup" && step === "credentials" && form.password !== confirmPassword) {
+      toast.error("Passwords do not match. Please re-enter your confirm password.");
+      return;
+    }
+
     if (mode === "forgot_password" && !form.email && !form.phone) {
       toast.error("Please enter your email address or mobile number to reset password");
       return;
@@ -287,6 +299,11 @@ const AuthPage = () => {
         }
         if (!newPassword || newPassword.length < 6) {
           toast.error("Password must be at least 6 characters long.");
+          setLoading(false);
+          return;
+        }
+        if (newPassword !== confirmNewPassword) {
+          toast.error("Passwords do not match. Please re-enter confirm password.");
           setLoading(false);
           return;
         }
@@ -1107,24 +1124,31 @@ const AuthPage = () => {
                     <motion.div className="auth-fields" variants={stagger} initial="hidden" animate="show">
                       {step === "forgot_otp" ? (
                         <>
-                          <Field
-                            label="One-Time Password"
-                            icon={ShieldCheckIcon}
-                            inputMode="numeric"
-                            autoComplete="one-time-code"
-                            maxLength={6}
-                            placeholder="Enter 6-digit OTP"
-                            value={otpCode}
-                            onChange={(event) => setOtpCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
-                            required
-                          />
+                           <MotionDiv variants={item} className="auth-field-wrap">
+                             <label className="auth-label">One-Time Password</label>
+                             <div className="flex justify-center py-2">
+                               <AnimatedOTPInput
+                                 value={otpCode}
+                                 onChange={setOtpCode}
+                               />
+                             </div>
+                           </MotionDiv>
 
                           <PasswordField
                             label="New Password"
                             icon={LockClosedIcon}
-                            placeholder="Choose a new password"
+                            placeholder="Choose a new password (min. 6 characters)"
                             value={newPassword}
                             onChange={(event) => setNewPassword(event.target.value)}
+                            required
+                          />
+
+                          <PasswordField
+                            label="Confirm New Password"
+                            icon={LockClosedIcon}
+                            placeholder="Re-enter your new password"
+                            value={confirmNewPassword}
+                            onChange={(event) => setConfirmNewPassword(event.target.value)}
                             required
                           />
 
@@ -1143,17 +1167,15 @@ const AuthPage = () => {
                         </>
                       ) : step === "otp" ? (
                         <>
-                          <Field
-                            label="One-Time Password"
-                            icon={ShieldCheckIcon}
-                            inputMode="numeric"
-                            autoComplete="one-time-code"
-                            maxLength={6}
-                            placeholder="Enter 6-digit OTP"
-                            value={otpCode}
-                            onChange={(event) => setOtpCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
-                            required
-                          />
+                           <MotionDiv variants={item} className="auth-field-wrap">
+                             <label className="auth-label">One-Time Password</label>
+                             <div className="flex justify-center py-2">
+                               <AnimatedOTPInput
+                                 value={otpCode}
+                                 onChange={setOtpCode}
+                               />
+                             </div>
+                           </MotionDiv>
 
                           <motion.div variants={item} className="auth-otp-note">
                             <ShieldCheckIcon className="auth-free-badge-icon" />
@@ -1226,6 +1248,18 @@ const AuthPage = () => {
                               required
                               showForgotPasswordLink={mode === "login"}
                               onForgotPasswordClick={() => switchMode("forgot_password")}
+                            />
+                          )}
+
+                          {isSignup && (
+                            <PasswordField
+                              label="Confirm Password"
+                              icon={LockClosedIcon}
+                              autoComplete="new-password"
+                              placeholder="Re-enter your password"
+                              value={confirmPassword}
+                              onChange={(event) => setConfirmPassword(event.target.value)}
+                              required
                             />
                           )}
 

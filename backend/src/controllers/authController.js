@@ -403,6 +403,13 @@ const findReusableSignupUser = async ({ email }) => {
   return { user: existingByEmail || null };
 };
 
+// Normalize a raw phone string: strips non-digits and prepends "91" for 10-digit numbers
+const normalizePhoneForStorage = (phone) => {
+  if (!phone) return null;
+  const cleaned = String(phone).trim().replace(/\D/g, "");
+  return cleaned.length === 10 ? `91${cleaned}` : cleaned;
+};
+
 const signup = async (req, res) => {
   const { name, email, password, phone, address, role = "buyer" } = req.body;
 
@@ -413,12 +420,15 @@ const signup = async (req, res) => {
 
   let user = lookup.user;
 
+  // Always store phone in normalized form (91XXXXXXXXXX) for consistent login lookups
+  const storedPhone = normalizePhoneForStorage(phone);
+
   if (!user) {
     user = new User({
       name,
       email,
       password,
-      phone: phone ? String(phone).trim() : undefined,
+      phone: storedPhone || undefined,
       address,
       role,
       isPhoneVerified: false,
@@ -429,7 +439,7 @@ const signup = async (req, res) => {
     user.name = name;
     user.email = email;
     user.password = password;
-    if (phone) user.phone = String(phone).trim();
+    if (storedPhone) user.phone = storedPhone;
     user.address = address;
     user.role = role;
     user.canPostProperty = true;
@@ -441,13 +451,8 @@ const signup = async (req, res) => {
   clearOtpState(user);
   await user.save();
 
-  // Normalize phone for MSG91 (10 digits → add country code 91)
-  const normalizedPhone = user.phone
-    ? (() => {
-        const cleaned = String(user.phone).replace(/\D/g, "");
-        return cleaned.length === 10 ? `91${cleaned}` : cleaned;
-      })()
-    : null;
+  // Use the already-normalized phone for MSG91
+  const normalizedPhone = storedPhone;
 
   let challenge;
   try {
@@ -477,15 +482,21 @@ const login = async (req, res) => {
 
   let user = null;
   if (phone) {
-    const normalizedPhone = String(phone).trim().replace(/\D/g, "");
-    const withCountry = normalizedPhone.length === 10 ? `91${normalizedPhone}` : normalizedPhone;
-    user = await User.findOne({ phone: withCountry }) || await User.findOne({ phone: normalizedPhone });
+    const cleaned = String(phone).trim().replace(/\D/g, "");
+    // Try all plausible stored variants: 91XXXXXXXXXX, XXXXXXXXXX, +91XXXXXXXXXX
+    const withCountry = cleaned.length === 10 ? `91${cleaned}` : cleaned;
+    const withPlus = `+${withCountry}`;
+    user =
+      (await User.findOne({ phone: withCountry })) ||
+      (await User.findOne({ phone: cleaned })) ||
+      (await User.findOne({ phone: withPlus })) ||
+      (cleaned.startsWith("91") ? await User.findOne({ phone: cleaned.slice(2) }) : null);
   } else if (email) {
-    user = await User.findOne({ email });
+    user = await User.findOne({ email: String(email).toLowerCase().trim() });
   }
 
   if (!user || !(await user.comparePassword(password))) {
-    return res.status(401).json({ message: "Invalid credentials" });
+    return res.status(401).json({ message: "Invalid credentials. Please check your WhatsApp number and password." });
   }
 
   if (user.status === "deactivated") {

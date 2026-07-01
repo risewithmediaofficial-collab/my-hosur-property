@@ -1,0 +1,292 @@
+"use client";
+
+import { cn } from "../lib/utils";
+import { OTPInput, OTPInputContext } from "input-otp";
+import { MinusIcon } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useContext, useEffect, useState } from "react";
+
+// Animation constants
+const EASE_OUT_QUINT_X1 = 0.22;
+const EASE_OUT_QUINT_Y1 = 1;
+const EASE_OUT_QUINT_X2 = 0.36;
+const EASE_OUT_QUINT_Y2 = 1;
+const EASE_OUT_QUINT = [
+  EASE_OUT_QUINT_X1,
+  EASE_OUT_QUINT_Y1,
+  EASE_OUT_QUINT_X2,
+  EASE_OUT_QUINT_Y2,
+];
+const ANIMATION_DURATION_SHORT = 0.1;
+const ANIMATION_DURATION_MEDIUM = 0.15;
+const ANIMATION_DURATION_STANDARD = 0.2;
+const ANIMATION_DURATION_LONG = 0.3;
+const STAGGER_DELAY = 0.05;
+const SCALE_FILLED = 1.05;
+const SCALE_HOVER = 1.02;
+const SCALE_TAP = 0.98;
+const INITIAL_SCALE = 0.8;
+const INITIAL_Y = 10;
+const SEPARATOR_DELAY = 0.15;
+
+function AnimatedInputOTP({
+  className,
+  containerClassName,
+  value,
+  onChange,
+  onComplete,
+  maxLength = 6,
+  children,
+  ...props
+}) {
+  const handleChange = (newValue) => {
+    // Only allow numeric characters
+    const numericValue = newValue.replace(/[^0-9]/g, "");
+    onChange?.(numericValue);
+  };
+
+  return (
+    <OTPInput
+      aria-describedby={props["aria-describedby"]}
+      aria-label={props["aria-label"] || "One-time password input"}
+      className={cn("disabled:cursor-not-allowed", className)}
+      containerClassName={cn(
+        "flex items-center gap-2 has-disabled:opacity-50",
+        containerClassName
+      )}
+      data-slot="input-otp"
+      maxLength={maxLength}
+      onChange={handleChange}
+      onComplete={onComplete}
+      value={value}
+      {...props}
+    >
+      {children}
+    </OTPInput>
+  );
+}
+
+function AnimatedInputOTPGroup({
+  className,
+  children,
+}) {
+  const shouldReduceMotion = useReducedMotion();
+  return (
+    <motion.div
+      animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+      className={cn("flex items-center gap-2", className)}
+      data-slot="input-otp-group"
+      initial={
+        shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: INITIAL_Y }
+      }
+      transition={
+        shouldReduceMotion
+          ? { duration: 0 }
+          : {
+              duration: ANIMATION_DURATION_LONG,
+              ease: EASE_OUT_QUINT,
+            }
+      }
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function AnimatedInputOTPSlot({ index, className }) {
+  const inputOTPContext = useContext(OTPInputContext);
+  const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {};
+  const [isFilled, setIsFilled] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (char && !isFilled) {
+      setIsFilled(true);
+    } else if (!char && isFilled) {
+      setIsFilled(false);
+    }
+  }, [char, isFilled]);
+
+  return (
+    <motion.div
+      animate={
+        shouldReduceMotion
+          ? { opacity: 1 }
+          : {
+              opacity: 1,
+              y: 0,
+              scale: isFilled ? SCALE_FILLED : 1,
+            }
+      }
+      className={cn(
+        "relative flex h-12 w-12 items-center justify-center rounded-xl border-2 border-slate-200 bg-white text-base font-bold text-navy shadow-sm outline-none transition-all data-[active=true]:z-10 data-[active=true]:border-orange data-[active=true]:ring-4 data-[active=true]:ring-orange/15",
+        className
+      )}
+      data-active={isActive}
+      data-slot="input-otp-slot"
+      initial={
+        shouldReduceMotion
+          ? { opacity: 1 }
+          : { opacity: 0, scale: INITIAL_SCALE, y: INITIAL_Y }
+      }
+      transition={
+        shouldReduceMotion
+          ? { duration: 0 }
+          : {
+              duration: ANIMATION_DURATION_STANDARD,
+              delay: index * STAGGER_DELAY,
+              ease: EASE_OUT_QUINT,
+              scale: {
+                duration: ANIMATION_DURATION_MEDIUM,
+                ease: EASE_OUT_QUINT,
+              },
+            }
+      }
+      whileHover={
+        shouldReduceMotion
+          ? {}
+          : {
+              scale: SCALE_HOVER,
+              transition: {
+                duration: ANIMATION_DURATION_MEDIUM,
+                ease: EASE_OUT_QUINT,
+              },
+            }
+      }
+      whileTap={
+        shouldReduceMotion
+          ? {}
+          : {
+              scale: SCALE_TAP,
+              transition: {
+                duration: ANIMATION_DURATION_SHORT,
+                ease: EASE_OUT_QUINT,
+              },
+            }
+      }
+    >
+      <AnimatePresence mode="wait">
+        {char && (
+          <motion.span
+            animate={
+              shouldReduceMotion
+                ? { opacity: 1, scale: 1 }
+                : { opacity: 1, scale: 1, rotateY: 0 }
+            }
+            className="font-bold text-navy"
+            exit={
+              shouldReduceMotion
+                ? { opacity: 0, transition: { duration: 0 } }
+                : { opacity: 0, scale: 0.5, rotateY: 90 }
+            }
+            initial={
+              shouldReduceMotion
+                ? { opacity: 1, scale: 1 }
+                : { opacity: 0, scale: 0.5, rotateY: -90 }
+            }
+            key={char}
+            transition={
+              shouldReduceMotion
+                ? { duration: 0 }
+                : {
+                    duration: ANIMATION_DURATION_STANDARD,
+                    ease: EASE_OUT_QUINT,
+                  }
+            }
+          >
+            {char}
+          </motion.span>
+        )}
+      </AnimatePresence>
+
+      {hasFakeCaret && !shouldReduceMotion && (
+        <motion.div
+          animate={{ opacity: 1 }}
+          className="pointer-events-none absolute inset-0 flex items-center justify-center"
+          exit={{ opacity: 0 }}
+          initial={{ opacity: 0 }}
+          transition={{ duration: ANIMATION_DURATION_SHORT }}
+        >
+          <motion.div
+            animate={{ opacity: [0, 1, 0] }}
+            className="h-5 w-0.5 bg-orange"
+            transition={{
+              duration: 1,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: [0.645, 0.045, 0.355, 1],
+            }}
+          />
+        </motion.div>
+      )}
+    </motion.div>
+  );
+}
+
+function AnimatedInputOTPSeparator() {
+  const shouldReduceMotion = useReducedMotion();
+  return (
+    <motion.div
+      animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+      data-slot="input-otp-separator"
+      initial={
+        shouldReduceMotion
+          ? { opacity: 1 }
+          : { opacity: 0, scale: INITIAL_SCALE }
+      }
+      transition={
+        shouldReduceMotion
+          ? { duration: 0 }
+          : {
+              duration: ANIMATION_DURATION_LONG,
+              delay: SEPARATOR_DELAY,
+              ease: EASE_OUT_QUINT,
+            }
+      }
+      className="mx-1"
+    >
+      <MinusIcon className="h-5 w-5 text-slate-400" />
+    </motion.div>
+  );
+}
+
+// Main component that combines everything
+export function AnimatedOTPInput({
+  maxLength = 6,
+  className,
+  value,
+  onChange,
+  onComplete,
+  ...props
+}) {
+  return (
+    <AnimatedInputOTP
+      className={className}
+      maxLength={maxLength}
+      onChange={onChange}
+      onComplete={onComplete}
+      value={value}
+      {...props}
+    >
+      <AnimatedInputOTPGroup>
+        <AnimatedInputOTPSlot index={0} />
+        <AnimatedInputOTPSlot index={1} />
+        <AnimatedInputOTPSlot index={2} />
+      </AnimatedInputOTPGroup>
+      <AnimatedInputOTPSeparator />
+      <AnimatedInputOTPGroup>
+        <AnimatedInputOTPSlot index={3} />
+        <AnimatedInputOTPSlot index={4} />
+        <AnimatedInputOTPSlot index={5} />
+      </AnimatedInputOTPGroup>
+    </AnimatedInputOTP>
+  );
+}
+
+export {
+  AnimatedInputOTP,
+  AnimatedInputOTPGroup,
+  AnimatedInputOTPSeparator,
+  AnimatedInputOTPSlot,
+};
+
+export default AnimatedOTPInput;
