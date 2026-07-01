@@ -691,15 +691,15 @@ const HomePage = () => {
                     />
                   )}
                   {/* Dark overlay on hover */}
-                  <div className="absolute inset-0 bg-navy/70 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <div className="absolute inset-0 bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
                   {/* Content sits above image */}
                   <div className="relative z-10 flex flex-col items-center">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-navy text-navy transition-all duration-300 group-hover:border-white group-hover:text-white">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-navy text-navy transition-all duration-300 group-hover:!border-white group-hover:!text-white">
                       <Icon className="h-6 w-6" />
                     </div>
-                    <p className="mt-4 text-base font-bold text-navy transition-colors duration-300 group-hover:text-white">{option.label}</p>
-                    <p className="mt-1 text-xs text-slate-500 transition-colors duration-300 group-hover:text-white/80">Browse listings</p>
+                    <p className="mt-4 text-base font-bold text-navy transition-colors duration-300 group-hover:!text-white">{option.label}</p>
+                    <p className="mt-1 text-xs text-slate-500 transition-colors duration-300 group-hover:!text-white/90">Browse listings</p>
                   </div>
                 </Link>
               );
@@ -740,15 +740,15 @@ const HomePage = () => {
                   />
                 )}
                 {/* Dark overlay */}
-                <div className="absolute inset-0 bg-navy/75 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <div className="absolute inset-0 bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
                 {/* Content */}
                 <div className="relative z-10 flex flex-col items-center">
-                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-navy text-navy transition-all duration-300 group-hover:border-white group-hover:text-white">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-navy text-navy transition-all duration-300 group-hover:!border-white group-hover:!text-white">
                     <Icon className="h-6 w-6" />
                   </div>
-                  <h2 className="mt-5 text-xl font-bold text-navy transition-colors duration-300 group-hover:text-white">{item.title}</h2>
-                  <p className="mt-3 text-sm leading-7 text-slate-600 transition-colors duration-300 group-hover:text-white/90">{item.description}</p>
+                  <h2 className="mt-5 text-xl font-bold text-navy transition-colors duration-300 group-hover:!text-white">{item.title}</h2>
+                  <p className="mt-3 text-sm leading-7 text-slate-600 transition-colors duration-300 group-hover:!text-white/90">{item.description}</p>
                   <Link to="/services" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-orange transition-colors duration-300 hover:text-orange-hover group-hover:text-orange">
                     Learn more
                     <ArrowRightIcon className="h-4 w-4" />
@@ -783,13 +783,13 @@ const HomePage = () => {
               .services-scroll { display: flex; gap: 1.5rem; animation: scroll-services 40s linear infinite; width: max-content; will-change: transform; }
               .service-card { flex-shrink: 0; width: 280px; background: #ffffff; border: 2px solid #dfe6ee; border-radius: 16px; padding: 24px; text-align: center; transition: all 0.3s ease; cursor: pointer; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08); user-select: none; position: relative; overflow: hidden; }
               .service-card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 0.4s ease; }
-              .service-card-overlay { position: absolute; inset: 0; background: rgba(0, 66, 162, 0.75); opacity: 0; transition: opacity 0.4s ease; }
+              .service-card-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.60); opacity: 0; transition: opacity 0.4s ease; }
               .service-card:hover .service-card-bg { opacity: 1; }
               .service-card:hover .service-card-overlay { opacity: 1; }
               .service-card-content { position: relative; z-index: 10; }
               .service-card:hover { border-color: #ff7f0e; transform: translateY(-8px); box-shadow: 0 12px 24px rgba(255, 127, 14, 0.15); }
               .service-icon { width: 60px; height: 60px; margin: 0 auto; border: 2px solid #0042a2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0042a2; transition: all 0.3s ease; }
-              .service-card:hover .service-icon { border-color: #ffffff; color: #ffffff; }
+              .service-card:hover .service-icon { border-color: #ffffff !important; color: #ffffff !important; }
               .gradient-fade-services { pointer-events: none; user-select: none; }
               .gradient-fade-left-services { position: absolute; left: 0; top: 0; bottom: 0; width: 100px; background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }
               .gradient-fade-right-services { position: absolute; right: 0; top: 0; bottom: 0; width: 100px; background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }
@@ -808,8 +808,8 @@ const HomePage = () => {
                         <div className="service-icon">
                           <Icon className="h-6 w-6" />
                         </div>
-                        <h3 className="mt-4 text-lg font-bold text-navy transition group-hover:text-white">{service.title}</h3>
-                        <p className="mt-2 text-sm text-slate-600 transition group-hover:text-white/90">{service.description}</p>
+                        <h3 className="mt-4 text-lg font-bold text-navy transition group-hover:!text-white">{service.title}</h3>
+                        <p className="mt-2 text-sm text-slate-600 transition group-hover:!text-white/90">{service.description}</p>
                       </div>
                     </div>
                   );
