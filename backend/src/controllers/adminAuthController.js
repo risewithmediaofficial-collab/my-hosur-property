@@ -22,10 +22,18 @@ const sanitizeAdmin = (user) => ({
 const adminLogin = async (req, res) => {
   const { username, password } = req.body;
   const key = String(username || "").trim();
+  const cleaned = key.replace(/\D/g, "");
+  const withCountry = cleaned.length === 10 ? `91${cleaned}` : cleaned;
+  const withPlus = `+${withCountry}`;
 
-  const user = await User.findOne({
-    $or: [{ email: key.toLowerCase() }, { name: key }],
-  });
+  const orConditions = [{ email: key.toLowerCase() }, { name: key }];
+  if (cleaned.length > 0) {
+    orConditions.push({ phone: withCountry });
+    orConditions.push({ phone: cleaned });
+    orConditions.push({ phone: withPlus });
+  }
+
+  const user = await User.findOne({ $or: orConditions });
 
   if (!user || !(await user.comparePassword(password))) {
     return res.status(401).json({ message: "Invalid admin credentials" });
