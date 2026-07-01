@@ -6,6 +6,7 @@ import PageHero from "../components/PageHero";
 import PageSection from "../components/PageSection";
 import SeoHead from "../components/SeoHead";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
+import founderImage from "../assets/myhosurproperty vijay kumar founder.jpeg";
 
 const stats = [
   { value: 2500, suffix: "+", label: "Verified listings" },
@@ -242,11 +243,11 @@ const AboutPage = () => {
             </div>
 
             {/* Photo side */}
-            <div className="overflow-hidden rounded-xl border border-slate-200 shadow-card">
+            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-card">
               <img
-                src="/founder.png"
+                src={founderImage}
                 alt="Founder of MyHosurProperty — Mr. Vijay Kumar"
-                className="h-[480px] w-full object-cover object-top"
+                className="h-[520px] w-full object-cover object-center sm:h-[560px]"
                 loading="lazy"
                 decoding="async"
               />
