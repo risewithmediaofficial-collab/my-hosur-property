@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRightIcon, MagnifyingGlassIcon, SparklesIcon } from "../components/AppIcons";
 import ServiceCategoryModal from "../components/ServiceCategoryModal";
 import SeoHead from "../components/SeoHead";
 import { serviceCategories, serviceQuickLinks } from "../constants/serviceCatalog";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
+import useScrollAnimation from "../hooks/useScrollAnimation";
 
 // Import service images
 import buySellImg from "../assets/property buy guideance.jpg";
@@ -13,33 +13,6 @@ import loanImg from "../assets/Home loan.jpg";
 import registrationImg from "../assets/Sale deed registration.jpg";
 import searchImg from "../assets/plot search.jpg";
 import interiorImg from "../assets/interiros.jpg";
-
-const MotionSection = motion.section;
-
-const reveal = {
-  hidden: { opacity: 0, y: 28 },
-  show: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay },
-  }),
-};
-
-const listReveal = {
-  hidden: {},
-  show: {
-    transition: { staggerChildren: 0.06, delayChildren: 0.04 },
-  },
-};
-
-const cardReveal = {
-  hidden: { opacity: 0, y: 18 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
-  },
-};
 
 const serviceHighlights = [
   {
@@ -110,6 +83,7 @@ const serviceHighlights = [
 ];
 
 const ServicesPage = () => {
+  useScrollAnimation();
   const [search, setSearch] = useState("");
   const [activeCategoryKey, setActiveCategoryKey] = useState(null);
 
@@ -141,28 +115,24 @@ const ServicesPage = () => {
         schema={[buildRealEstateAgentSchema(), buildBreadcrumbSchema(breadcrumbs)]}
       />
 
-      <MotionSection
-        initial="hidden"
-        animate="show"
-        variants={reveal}
-        className="marketing-hero px-6 py-10 sm:px-8 lg:px-10 lg:py-14"
-      >
-        <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+      {/* Hero section with load transitions */}
+      <section className="marketing-hero px-6 py-10 sm:px-8 lg:px-10 lg:py-14 gsap-section">
+        <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center gsap-hero-item">
           <div className="max-w-3xl">
-            <motion.div variants={reveal} custom={0.05} className="site-kicker">
+            <div className="site-kicker text-orange-400">
               My Hosur Property - Our Services
-            </motion.div>
-            <motion.h1 variants={reveal} custom={0.1} className="mt-5 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
+            </div>
+            <h1 className="mt-5 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl text-white">
               Complete property solutions for every stage of your real-estate journey.
-            </motion.h1>
-            <motion.p variants={reveal} custom={0.15} className="mt-5 max-w-3xl text-base leading-8">
+            </h1>
+            <p className="mt-5 max-w-3xl text-base leading-8 text-white/80">
               Complete Property Solutions - From Buying & Selling to Loans, Registration, Construction, and Legal Support.
-            </motion.p>
+            </p>
           </div>
 
-          <motion.div variants={reveal} custom={0.2} className="rounded-xl border border-white/15 bg-white/10 p-4 backdrop-blur sm:p-5">
+          <div className="rounded-xl border border-white/15 bg-white/10 p-4 backdrop-blur sm:p-5">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange">Quick service links</p>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {serviceQuickLinks.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -180,105 +150,97 @@ const ServicesPage = () => {
                 );
               })}
             </div>
-          </motion.div>
+          </div>
         </div>
-      </MotionSection>
+      </section>
 
       <ServiceCategoryModal category={activeCategory} onClose={() => setActiveCategoryKey(null)} />
 
-      <MotionSection
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.05 }}
-        variants={listReveal}
-        className="bg-surface px-5 py-10 sm:px-8 lg:px-10"
-      >
+      {/* Services list section */}
+      <section className="bg-surface px-5 py-10 sm:px-8 lg:px-10 gsap-section">
         <div className="mx-auto max-w-[1440px]">
-        <motion.div variants={cardReveal} className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="section-tag">Search services</p>
-            <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl lg:text-4xl">Find the service that matches your property need.</h2>
-          </div>
-          <div className="w-full max-w-md">
-            <div className="flex min-h-[52px] items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-card">
-              <MagnifyingGlassIcon className="h-5 w-5 text-orange" />
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search loan, registration, legal, interior..."
-                className="w-full bg-transparent text-sm font-medium text-slate-700 outline-none placeholder:text-slate-400"
-              />
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="section-tag">Search services</p>
+              <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl lg:text-4xl">Find the service that matches your property need.</h2>
+            </div>
+            <div className="w-full max-w-md">
+              <div className="flex min-h-[52px] items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-card">
+                <MagnifyingGlassIcon className="h-5 w-5 text-orange" />
+                <input
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search loan, registration, legal, interior..."
+                  className="w-full bg-transparent text-sm font-medium text-slate-700 outline-none placeholder:text-slate-400"
+                />
+              </div>
             </div>
           </div>
-        </motion.div>
 
-        <div className="mt-8 grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {filteredServices.map((category, categoryIndex) => {
-            const CategoryIcon = category.icon;
-            return (
-              <motion.article
-                key={category.key}
-                id={`service-${category.key}`}
-                variants={cardReveal}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, amount: 0.01 }}
-                className="group relative flex h-full min-h-[520px] w-full min-w-0 scroll-mt-32 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card transition duration-300 hover:-translate-y-1 hover:border-orange hover:shadow-[0_18px_42px_rgba(0,66,162,0.12)]"
-              >
-                <div className="h-1.5 w-full bg-gradient-to-r from-orange via-orange to-navy" />
+          <div className="mt-8 grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {filteredServices.map((category, categoryIndex) => {
+              const CategoryIcon = category.icon;
+              return (
+                <article
+                  key={category.key}
+                  id={`service-${category.key}`}
+                  className="group relative flex h-full min-h-[520px] w-full min-w-0 scroll-mt-32 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card transition duration-300 hover:-translate-y-1 hover:border-orange hover:shadow-[0_18px_42px_rgba(0,66,162,0.12)] gsap-card"
+                >
+                  <div className="h-1.5 w-full bg-gradient-to-r from-orange via-orange to-navy" />
 
-                <div className="flex items-start gap-4 border-b border-slate-100 p-6">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border-2 border-navy bg-transparent text-navy shadow-sm transition duration-300 group-hover:border-orange group-hover:text-orange">
-                    <CategoryIcon className="h-6 w-6" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-orange">
-                        {String(categoryIndex + 1).padStart(2, "0")}
-                      </span>
-                      <span className="h-px flex-1 bg-slate-200" />
+                  <div className="flex items-start gap-4 border-b border-slate-100 p-6">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border-2 border-navy bg-transparent text-navy shadow-sm transition duration-300 group-hover:border-orange group-hover:text-orange">
+                      <CategoryIcon className="h-6 w-6" />
                     </div>
-                    <h3 className="mt-2 text-xl font-bold leading-tight text-navy">{category.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">{category.description}</p>
-                  </div>
-                </div>
-
-                <div className="flex-1 p-6">
-                  <div className="space-y-1">
-                  {category.services.map((service) => {
-                    const ServiceIcon = service.icon;
-                    return (
-                      <div
-                        key={service.label}
-                        className="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 transition duration-200 hover:bg-surface"
-                      >
-                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-orange/10 text-orange">
-                          <ServiceIcon className="h-4 w-4" />
-                        </div>
-                        <p className="min-w-0 flex-1 text-sm font-semibold leading-snug text-navy">{service.label}</p>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-orange">
+                          {String(categoryIndex + 1).padStart(2, "0")}
+                        </span>
+                        <span className="h-px flex-1 bg-slate-200" />
                       </div>
-                    );
-                  })}
+                      <h3 className="mt-2 text-xl font-bold leading-tight text-navy">{category.title}</h3>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">{category.description}</p>
+                    </div>
                   </div>
-                </div>
 
-                <div className="mt-auto border-t border-slate-100 bg-slate-50/80 px-6 py-4">
-                  <Link
-                    to="/contact"
-                    className="inline-flex w-full items-center justify-between rounded-lg bg-white px-4 py-3 text-sm font-bold text-navy ring-1 ring-slate-200 transition hover:bg-orange hover:text-white hover:ring-orange"
-                  >
-                    <span>Request this service</span>
-                    <ArrowRightIcon className="h-4 w-4" />
-                  </Link>
-                </div>
-              </motion.article>
-            );
-          })}
-        </div>
-        </div>
-      </MotionSection>
+                  <div className="flex-1 p-6">
+                    <div className="space-y-1">
+                      {category.services.map((service) => {
+                        const ServiceIcon = service.icon;
+                        return (
+                          <div
+                            key={service.label}
+                            className="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 transition duration-200 hover:bg-surface"
+                          >
+                            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-orange/10 text-orange">
+                              <ServiceIcon className="h-4 w-4" />
+                            </div>
+                            <p className="min-w-0 flex-1 text-sm font-semibold leading-snug text-navy">{service.label}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
 
-      <div className="space-y-8 bg-white px-5 py-12 sm:px-8 md:space-y-10 lg:px-10">
+                  <div className="mt-auto border-t border-slate-100 bg-slate-50/80 px-6 py-4">
+                    <Link
+                      to="/contact"
+                      className="inline-flex w-full items-center justify-between rounded-lg bg-white px-4 py-3 text-sm font-bold text-navy ring-1 ring-slate-200 transition hover:bg-orange hover:text-white hover:ring-orange"
+                    >
+                      <span>Request this service</span>
+                      <ArrowRightIcon className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Core Expertise section */}
+      <div className="space-y-8 bg-white px-5 py-12 sm:px-8 md:space-y-10 lg:px-10 gsap-section">
         <div className="mx-auto max-w-[1440px] text-center">
           <p className="section-tag">Our Core Expertise</p>
           <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl lg:text-4xl">
@@ -287,78 +249,69 @@ const ServicesPage = () => {
         </div>
 
         <div className="mx-auto flex max-w-[1440px] flex-col gap-8 md:gap-10">
-        {serviceHighlights.map((service) => {
-          const isImageRight = service.imagePosition === "right";
-          return (
-            <motion.div
-              key={service.id}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, amount: 0.05 }}
-              variants={cardReveal}
-              className="marketing-card w-full overflow-hidden p-0 hover:border-orange"
-            >
-              <div className="grid lg:grid-cols-2 lg:items-stretch">
-                <div className={`p-6 sm:p-8 lg:p-10 ${!isImageRight ? "lg:order-2" : ""}`}>
-                  <div>
-                    <p className="section-tag">Service #{service.id}</p>
-                    <h3 className="mt-3 text-2xl font-bold leading-tight text-navy sm:text-3xl">
-                      {service.title}
-                    </h3>
-                    <p className="mt-4 max-w-xl text-base leading-8 text-slate-600">
-                      {service.description}
-                    </p>
-                  </div>
+          {serviceHighlights.map((service) => {
+            const isImageRight = service.imagePosition === "right";
+            return (
+              <div
+                key={service.id}
+                className="marketing-card w-full overflow-hidden p-0 hover:border-orange gsap-card"
+              >
+                <div className="grid grid-cols-1 lg:grid-cols-2 lg:items-stretch">
+                  <div className={`p-6 sm:p-8 lg:p-10 ${!isImageRight ? "lg:order-2" : ""}`}>
+                    <div>
+                      <p className="section-tag">Service #{service.id}</p>
+                      <h3 className="mt-3 text-2xl font-bold leading-tight text-navy sm:text-3xl">
+                        {service.title}
+                      </h3>
+                      <p className="mt-4 max-w-xl text-base leading-8 text-slate-600">
+                        {service.description}
+                      </p>
+                    </div>
 
-                  {/* Highlights with checkmarks */}
-                  <div className="mt-6 grid gap-2 sm:grid-cols-2">
-                    {service.highlights.map((highlight, idx) => (
-                      <div key={idx} className="flex items-center gap-2.5 rounded-lg border border-slate-200 bg-surface px-3 py-2">
-                        <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-orange text-white">
-                          <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
+                    {/* Highlights with checkmarks */}
+                    <div className="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      {service.highlights.map((highlight, idx) => (
+                        <div key={idx} className="flex items-center gap-2.5 rounded-lg border border-slate-200 bg-surface px-3 py-2">
+                          <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-orange text-white">
+                            <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <span className="text-sm font-medium leading-snug text-navy">{highlight}</span>
                         </div>
-                        <span className="text-sm font-medium leading-snug text-navy">{highlight}</span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
+
+                    {/* CTA Button */}
+                    <div className="mt-6">
+                      <Link
+                        to="/contact"
+                        className="site-button-primary inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-bold"
+                      >
+                        Contact Us
+                        <SparklesIcon className="h-4 w-4" />
+                      </Link>
+                    </div>
                   </div>
 
-                  {/* CTA Button */}
-                  <div className="mt-6">
-                    <Link
-                      to="/contact"
-                      className="site-button-primary inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-bold"
-                    >
-                      Contact Us
-                      <SparklesIcon className="h-4 w-4" />
-                    </Link>
+                  <div
+                    className={`relative h-56 overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 sm:h-64 lg:h-auto lg:min-h-[260px] ${!isImageRight ? "lg:order-1" : ""}`}
+                  >
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+                    />
                   </div>
-                </div>
-
-                <div
-                  className={`relative h-56 overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 sm:h-64 lg:h-full lg:min-h-[260px] ${!isImageRight ? "lg:order-1" : ""}`}
-                >
-                  <img
-                    src={service.image}
-                    alt={service.title}
-                    className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
-                  />
                 </div>
               </div>
-            </motion.div>
-          );
-        })}
+            );
+          })}
         </div>
       </div>
 
-      <MotionSection
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={reveal}
-        className="bg-navy px-5 py-12 text-white sm:px-8 lg:px-10"
-      >
+      {/* Support CTA section */}
+      <section className="bg-navy px-5 py-12 text-white sm:px-8 lg:px-10 gsap-section">
         <div className="mx-auto grid max-w-[1440px] gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div className="text-center lg:text-left">
             <p className="section-tag !text-orange">Need support</p>
@@ -372,7 +325,7 @@ const ServicesPage = () => {
             Contact Us
           </Link>
         </div>
-      </MotionSection>
+      </section>
     </main>
   );
 };

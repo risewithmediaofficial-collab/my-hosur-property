@@ -29,13 +29,14 @@ import {
   PROPERTY_MANAGEMENT_SHORTCUTS,
 } from "../constants/serviceCatalog";
 import PropertyCard from "../components/PropertyCard";
+import Hero from "../components/Hero";
 import LocalityDropdown from "../components/LocalityDropdown";
 import SeoHead from "../components/SeoHead";
 import useDebounce from "../hooks/useDebounce";
 import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
-const HERO_BG =
-  "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1920&q=80";
+import darkHeroBg from "../assets/dark-hero-bg.png";
+const HERO_BG = darkHeroBg;
 import { fetchHomeProperties } from "../services/api/propertyApi";
 import { buildRealEstateAgentSchema, buildWebsiteSchema } from "../utils/seo";
 
@@ -227,6 +228,23 @@ const HomePage = () => {
     city: "",
     propertyType: "",
   });
+
+  const [discoverTab, setDiscoverTab] = useState("Ongoing");
+
+  const filteredDiscoverListings = useMemo(() => {
+    let list = [];
+    if (discoverTab === "Completed") {
+      list = featured.filter((item) => item.isSold);
+    } else if (discoverTab === "Upcoming") {
+      list = featured.filter((item) => !item.isSold && (item.possessionStatus?.toLowerCase().includes("under") || item.possessionStatus?.toLowerCase().includes("upc") || item.possessionStatus?.toLowerCase().includes("soon") || item.possessionStatus?.toLowerCase().includes("construct")));
+    } else {
+      list = featured.filter((item) => !item.isSold);
+    }
+    if (list.length === 0) {
+      list = featured.filter((item) => !item.isSold);
+    }
+    return list.slice(0, 4);
+  }, [featured, discoverTab]);
 
   const debouncedSearch = useDebounce(search.search, 300);
 
@@ -436,13 +454,13 @@ const HomePage = () => {
             className="absolute -inset-y-16 inset-x-0 bg-cover bg-center will-change-transform"
             style={{ backgroundImage: `url(${HERO_BG})` }}
           />
-          <div className="absolute inset-0 bg-navy/75" />
+          <div className="absolute inset-0 bg-navy/40" />
         </div>
 
         {/* Shortcut dropdowns need z-index above the hero */}
         <div ref={heroContentRef} className="relative mx-auto flex max-w-[1440px] flex-col items-center px-5 py-12 text-center will-change-transform sm:px-8 sm:py-16 lg:px-10 lg:py-20" style={{ zIndex: 20 }}>
           <p className="home-gsap-hero-item section-tag !text-orange">Verified real estate platform</p>
-          <h1 className="home-gsap-hero-item hero-title mt-4 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
+          <h1 className="home-gsap-hero-item hero-title mt-4 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-white">
             Verified property listings in <span className="text-orange">Hosur</span>
           </h1>
 
@@ -787,8 +805,8 @@ const HomePage = () => {
               .service-card:hover .service-card-bg { opacity: 1; }
               .service-card:hover .service-card-overlay { opacity: 1; }
               .service-card-content { position: relative; z-index: 10; }
-              .service-card:hover { border-color: #ff7f0e; transform: translateY(-8px); box-shadow: 0 12px 24px rgba(255, 127, 14, 0.15); }
-              .service-icon { width: 60px; height: 60px; margin: 0 auto; border: 2px solid #0042a2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0042a2; transition: all 0.3s ease; }
+              .service-card:hover { border-color: #FF9914; transform: translateY(-8px); box-shadow: 0 12px 24px rgba(255, 153, 20, 0.15); }
+              .service-icon { width: 60px; height: 60px; margin: 0 auto; border: 2px solid #274F9A; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #274F9A; transition: all 0.3s ease; }
               .service-card:hover .service-icon { border-color: #ffffff !important; color: #ffffff !important; }
               .gradient-fade-services { pointer-events: none; user-select: none; }
               .gradient-fade-left-services { position: absolute; left: 0; top: 0; bottom: 0; width: 100px; background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }
@@ -825,41 +843,101 @@ const HomePage = () => {
       <MotionSection
         initial="hidden"
         whileInView="show"
-        viewport={{ once: true, amount: 0.18 }}
+        viewport={{ once: true, amount: 0.1 }}
         variants={reveal}
         className="home-gsap-section bg-white px-5 py-16 sm:px-8 lg:px-10"
       >
-        <div className="mx-auto flex max-w-[1440px] flex-col gap-4 text-center sm:items-center">
-          <div>
-            <p className="section-tag">Featured properties</p>
-            <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">Cleanly presented, ready to compare.</h2>
-            <p className="home-gsap-copy mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-              Browse verified homes, plots, and commercial properties arranged in a cleaner, more readable listing flow.
-            </p>
-          </div>
-          <Link to="/listings" className="inline-flex items-center gap-2 text-sm font-bold text-orange transition hover:text-orange-hover">
-            View all listings
-            <ArrowRightIcon className="h-4 w-4" />
-          </Link>
+        {/* Adissia header layout */}
+        <div className="mx-auto flex max-w-[1440px] items-center gap-4 border-b border-slate-100 pb-4 mb-10">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-widest border-r border-slate-300 pr-4">FEATURED PROPERTIES</span>
+          <span className="text-xs font-bold text-orange uppercase tracking-wider">HOSUR'S PREMIUM SELECTION</span>
         </div>
 
-        <div className="mx-auto mt-8 grid max-w-[1440px] gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {featuredListings.map((item) => (
-            <div key={item._id} className="home-gsap-card">
-              <PropertyCard item={item} />
-            </div>
-          ))}
-          {featuredLoading &&
-            Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-card">
-                <div className="h-52 animate-pulse rounded-lg bg-slate-100" />
-                <div className="mt-4 h-5 animate-pulse rounded-full bg-slate-100" />
-                <div className="mt-3 h-4 w-2/3 animate-pulse rounded-full bg-slate-100" />
-                <div className="mt-5 h-10 animate-pulse rounded-full bg-slate-100" />
+        {/* 2-Column Responsive Layout */}
+        <div className="mx-auto grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8 max-w-[1440px]">
+          
+          {/* Left Column: Properties Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 min-h-[400px]">
+            {filteredDiscoverListings.map((item) => (
+              <div key={item._id} className="home-gsap-card">
+                <PropertyCard item={item} />
               </div>
             ))}
+            {featuredLoading &&
+              Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-card">
+                  <div className="h-52 animate-pulse rounded-lg bg-slate-100" />
+                  <div className="mt-4 h-5 animate-pulse rounded-full bg-slate-100" />
+                  <div className="mt-3 h-4 w-2/3 animate-pulse rounded-full bg-slate-100" />
+                  <div className="mt-5 h-10 animate-pulse rounded-full bg-slate-100" />
+                </div>
+              ))}
+          </div>
+
+          {/* Right Column: Discover Properties Sidebar */}
+          <div className="bg-slate-50 rounded-2xl border border-slate-200/60 p-8 flex flex-col justify-between relative overflow-hidden min-h-[460px] shadow-sm">
+            {/* Background design elements */}
+            <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-orange/10 via-transparent to-transparent rounded-bl-full pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-navy/5 via-transparent to-transparent rounded-tr-full pointer-events-none" />
+
+            <div className="relative z-10">
+              <h2 className="text-4xl font-black text-navy font-philosopher leading-tight tracking-tight">
+                Discover Properties
+              </h2>
+
+              {/* Navigation Tabs */}
+              <div className="flex border-b border-slate-200 mt-6 gap-6 text-sm font-semibold">
+                {["Ongoing", "Upcoming", "Completed"].map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setDiscoverTab(tab)}
+                    className={`pb-3 relative transition-colors duration-200 ${
+                      discoverTab === tab ? "text-navy" : "text-slate-400 hover:text-slate-600"
+                    }`}
+                  >
+                    {tab}
+                    {discoverTab === tab && (
+                      <motion.div
+                        layoutId="activeTabUnderline"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {/* Tab Descriptions */}
+              <p className="mt-6 text-sm leading-7 text-slate-600 font-medium">
+                {discoverTab === "Ongoing" && (
+                  "Explore active verified plots, villas, and apartments in Hosur's high-growth corridors."
+                )}
+                {discoverTab === "Upcoming" && (
+                  "Secure early-stage properties coming soon in Hosur's key expansion zones."
+                )}
+                {discoverTab === "Completed" && (
+                  "Recently sold-out premium layouts and successful real estate listings."
+                )}
+              </p>
+            </div>
+
+            {/* CTA button */}
+            <div className="mt-8 border-t border-slate-200/80 pt-6 relative z-10">
+              <Link
+                to="/listings"
+                className="inline-flex items-center justify-between w-full bg-navy text-white hover:bg-orange px-6 py-4 rounded-xl font-bold transition-all duration-300 shadow-md group"
+              >
+                <span>Explore All Listings</span>
+                <ArrowRightIcon className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </div>
         </div>
       </MotionSection>
+
+      {/* Luxury Showcase Hero Section */}
+      <Hero />
 
       {/* ── Partners ── */}
       <MotionSection
@@ -883,7 +961,7 @@ const HomePage = () => {
               @keyframes scroll-partners { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
               .partners-scroll { display: flex; gap: 2rem; animation: scroll-partners 30s linear infinite; width: max-content; will-change: transform; }
               .partner-item { flex-shrink: 0; width: 200px; height: 120px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ffffff 0%, #eef5f4 100%); border: 2px solid #cfdcde; border-radius: 12px; transition: all 0.3s ease; cursor: pointer; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08); user-select: none; }
-              .partner-item:hover { border-color: #f79e26; background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%); transform: translateY(-4px); box-shadow: 0 8px 16px rgba(247, 158, 38, 0.15); }
+              .partner-item:hover { border-color: #FF9914; background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%); transform: translateY(-4px); box-shadow: 0 8px 16px rgba(255, 153, 20, 0.15); }
               .gradient-fade { pointer-events: none; user-select: none; }
               .gradient-fade-left { position: absolute; left: 0; top: 0; bottom: 0; width: 80px; background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }
               .gradient-fade-right { position: absolute; right: 0; top: 0; bottom: 0; width: 80px; background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }

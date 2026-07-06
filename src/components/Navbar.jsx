@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
@@ -38,6 +38,16 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsSticky(window.scrollY > 40);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const dashboardPath = user?.role === "admin" ? "/admin/dashboard" : "/dashboard";
   const canShowSavedShortcut = Boolean(isAuthenticated && user?.role !== "admin");
 
@@ -115,9 +125,18 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50">
-      <div className="hidden bg-navy text-white sm:block">
-        <div className="mx-auto flex max-w-[1440px] items-center px-5 py-2.5 text-xs sm:px-8 lg:px-10">
+    <header className="sticky top-0 z-50 bg-white">
+      <style>{`
+        @keyframes free-blink {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.15; transform: scale(0.9); }
+        }
+        .free-blink-badge {
+          animation: free-blink 1.2s ease-in-out infinite;
+        }
+      `}</style>
+      <div className="bg-navy text-white py-2.5 hidden sm:block">
+        <div className="mx-auto flex max-w-[1440px] items-center px-5 text-xs sm:px-8 lg:px-10">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
             <div className="inline-flex flex-wrap items-center gap-x-4 gap-y-1">
               {CONTACT_PHONE_NUMBERS.map((phone) => (
@@ -135,8 +154,8 @@ const Navbar = () => {
         </div>
       </div>
 
-      <div className="border-b border-slate-200 bg-white shadow-sm">
-        <div className="px-5 py-2 sm:px-8 lg:px-10">
+      <div className={`border-b border-slate-200 bg-white/95 backdrop-blur-md transition-shadow duration-300 ${isSticky ? "shadow-md" : "shadow-sm"}`}>
+        <div className="px-5 sm:px-8 lg:px-10 py-2.5">
           <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4">
             <NavLink
               to="/"
@@ -206,25 +225,17 @@ const Navbar = () => {
                   </NavLink>
                   ) : null}
 
-                  <motion.button
+                  <button
                     type="button"
                     onClick={handlePostFreeProperty}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="group relative inline-flex min-h-[40px] items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange to-orange-600 px-4 py-2 text-sm font-bold text-white shadow-lg transition duration-200 hover:shadow-xl overflow-hidden"
+                    className="header-btn-adissia px-5 py-2 rounded-lg text-sm transition-all duration-300 font-bold flex items-center gap-2 relative"
                   >
-                    <style>{`
-                      @keyframes nav-wave {
-                        0%, 100% { transform: scaleX(1); }
-                        50% { transform: scaleX(1.05); }
-                      }
-                      .nav-wave-icon {
-                        animation: nav-wave 1s ease-in-out infinite;
-                      }
-                    `}</style>
-                    <FlagIcon className="nav-wave-icon h-4 w-4" />
+                    <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white free-blink-badge pointer-events-none uppercase tracking-wider shadow-md">
+                      Free
+                    </span>
+                    <FlagIcon className="h-4 w-4" />
                     <span>Post property</span>
-                  </motion.button>
+                  </button>
                 </>
               ) : (
                 <>
@@ -277,25 +288,17 @@ const Navbar = () => {
                     )}
                   </div>
 
-                  <motion.button
+                  <button
                     type="button"
                     onClick={handlePostFreeProperty}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="group relative inline-flex min-h-[40px] items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange to-orange-600 px-4 py-2 text-sm font-bold text-white shadow-lg transition duration-200 hover:shadow-xl overflow-hidden"
+                    className="header-btn-adissia px-5 py-2 rounded-lg text-sm transition-all duration-300 font-bold flex items-center gap-2 relative"
                   >
-                    <style>{`
-                      @keyframes nav-wave {
-                        0%, 100% { transform: scaleX(1); }
-                        50% { transform: scaleX(1.05); }
-                      }
-                      .nav-wave-icon {
-                        animation: nav-wave 1s ease-in-out infinite;
-                      }
-                    `}</style>
-                    <FlagIcon className="nav-wave-icon h-4 w-4" />
+                    <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white free-blink-badge pointer-events-none uppercase tracking-wider shadow-md">
+                      Free
+                    </span>
+                    <FlagIcon className="h-4 w-4" />
                     <span>Post property</span>
-                  </motion.button>
+                  </button>
                 </>
               )}
             </div>
@@ -366,28 +369,20 @@ const Navbar = () => {
                   Saved Properties
                 </NavLink>
               ) : null}
-              <motion.button
+              <button
                 type="button"
                 onClick={() => {
                   handlePostFreeProperty();
                   closeMenu();
                 }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="group relative flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange to-orange-600 px-4 py-3 text-sm font-bold text-white shadow-lg overflow-hidden"
+                className="header-btn-adissia flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-bold text-white shadow-lg relative"
               >
-                <style>{`
-                  @keyframes nav-wave {
-                    0%, 100% { transform: scaleX(1); }
-                    50% { transform: scaleX(1.05); }
-                  }
-                  .nav-wave-icon {
-                    animation: nav-wave 1s ease-in-out infinite;
-                  }
-                `}</style>
-                <FlagIcon className="nav-wave-icon h-5 w-5" />
-                Post your free property
-              </motion.button>
+                <span className="absolute -top-2.5 right-4 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white free-blink-badge pointer-events-none uppercase tracking-wider shadow-md">
+                  Free
+                </span>
+                <FlagIcon className="h-5 w-5" />
+                <span>Post your free property</span>
+              </button>
               {!isAuthenticated ? (
                 <div className="flex flex-col gap-2">
                   <NavLink

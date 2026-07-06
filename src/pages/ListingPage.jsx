@@ -8,6 +8,7 @@ import PropertySearchFilterPanel from "../components/PropertySearchFilterPanel";
 import SeoHead from "../components/SeoHead";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
 import useAuth from "../hooks/useAuth";
+import useScrollAnimation from "../hooks/useScrollAnimation";
 import { fetchProperties } from "../services/api/propertyApi";
 import { fetchSavedProperties, toggleSavedProperty } from "../services/api/userApi";
 import {
@@ -46,6 +47,8 @@ const ListingPage = () => {
   const [applied, setApplied] = useState(() => parseFiltersFromSearchParams(params));
   const [data, setData] = useState({ items: [], totalPages: 0, page: 1, total: 0 });
   const [savedIds, setSavedIds] = useState([]);
+
+  useScrollAnimation([data.items]);
   const sentinelRef = useRef(null);
   const resultsScrollRef = useRef(null);
 
@@ -222,9 +225,9 @@ const ListingPage = () => {
         </aside>
 
         {/* Right: properties — own scrollbar, independent from filters */}
-        <section className="listing-results flex min-h-0 flex-1 flex-col" aria-label="Property results">
+        <section className="listing-results flex min-h-0 flex-1 flex-col gsap-section" aria-label="Property results">
           <div className="listing-results-header">
-            <div className="listing-results-intro">
+            <div className="listing-results-intro gsap-hero-item">
               <p className="section-tag">Property listings</p>
               <h1 className="mt-2 text-2xl font-bold text-navy sm:text-3xl">Search your property in Hosur</h1>
               <p className="mt-2 text-sm text-slate-600">

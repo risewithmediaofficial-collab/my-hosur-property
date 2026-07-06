@@ -6,8 +6,10 @@ import PageHero from "../components/PageHero";
 import PageSection from "../components/PageSection";
 import LoanCalculator from "../components/LoanCalculator";
 import { bankLoans } from "../constants/bankLoans";
+import useScrollAnimation from "../hooks/useScrollAnimation";
 
 const BankLoansPage = () => {
+  useScrollAnimation();
   const [selectedBank, setSelectedBank] = useState(bankLoans[0]);
 
   const containerVariants = {
@@ -42,10 +44,11 @@ const BankLoansPage = () => {
       <PageHero
         title="Bank Home Loans"
         subtitle="Compare Interest Rates & Calculate Your EMI"
+        className="gsap-section"
       />
 
       {/* Main Content */}
-      <PageSection>
+      <PageSection className="gsap-section">
         <div className="space-y-16">
           {/* Bank Information Cards */}
           <motion.div
@@ -61,7 +64,7 @@ const BankLoansPage = () => {
                 variants={itemVariants}
                 onClick={() => setSelectedBank(bank)}
                 whileHover={{ y: -8 }}
-                className={`group cursor-pointer rounded-2xl p-6 transition-all duration-300 ${
+                className={`group cursor-pointer rounded-2xl p-6 transition-all duration-300 gsap-card ${
                   selectedBank.id === bank.id
                     ? `bg-gradient-to-br ${bank.color} shadow-2xl ring-2 ring-offset-2 ring-white`
                     : "bg-gradient-to-br from-slate-100 to-slate-50 hover:shadow-xl"
@@ -91,6 +94,7 @@ const BankLoansPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
             viewport={{ once: true, amount: 0.2 }}
+            className="gsap-card"
           >
             <LoanCalculator bank={selectedBank} onBankChange={setSelectedBank} />
           </motion.div>
@@ -109,7 +113,7 @@ const BankLoansPage = () => {
               <motion.div
                 key={bank.id}
                 variants={itemVariants}
-                className={`rounded-2xl p-8 transition-all duration-300 ${
+                className={`rounded-2xl p-8 transition-all duration-300 gsap-card ${
                   selectedBank.id === bank.id
                     ? `bg-gradient-to-br ${bank.color} text-white shadow-2xl`
                     : "bg-slate-50 border border-slate-200"

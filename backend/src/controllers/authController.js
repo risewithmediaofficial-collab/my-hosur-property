@@ -99,7 +99,7 @@ const ensureFreeOnboardingValidity = async (user) => {
 
 const signupValidators = [
   body("name").trim().notEmpty(),
-  body("email").isEmail().normalizeEmail(),
+  body("email").optional({ checkFalsy: true }).isEmail().normalizeEmail(),
   body("phone").trim().notEmpty().withMessage("WhatsApp mobile number is required"),
   body("password").isLength({ min: 6 }),
   body("role").optional().isIn(["buyer", "customer", "seller", "agent", "broker", "builder", "admin"]),
@@ -389,18 +389,19 @@ const issueAuthResponse = (user) => ({
   user: sanitizeUser(user),
 });
 
-const findReusableSignupUser = async ({ email }) => {
-  const existingByEmail = await User.findOne({ email });
+const findReusableSignupUserByPhone = async ({ phone }) => {
+  if (!phone) return { user: null };
+  const existingByPhone = await User.findOne({ phone });
 
-  if (existingByEmail && existingByEmail.status === "deactivated") {
-    return { blocked: true, message: "This email belongs to a deactivated account. Please contact support." };
+  if (existingByPhone && existingByPhone.status === "deactivated") {
+    return { blocked: true, message: "This WhatsApp mobile number belongs to a deactivated account. Please contact support." };
   }
 
-  if (existingByEmail && existingByEmail.isEmailVerified) {
-    return { blocked: true, message: "Email already in use" };
+  if (existingByPhone && existingByPhone.isPhoneVerified) {
+    return { blocked: true, message: "WhatsApp mobile number already in use." };
   }
 
-  return { user: existingByEmail || null };
+  return { user: existingByPhone || null };
 };
 
 // Normalize a raw phone string: strips non-digits and prepends "91" for 10-digit numbers
@@ -413,20 +414,20 @@ const normalizePhoneForStorage = (phone) => {
 const signup = async (req, res) => {
   const { name, email, password, phone, address, role = "buyer" } = req.body;
 
-  const lookup = await findReusableSignupUser({ email });
+  // Always store phone in normalized form (91XXXXXXXXXX) for consistent login lookups
+  const storedPhone = normalizePhoneForStorage(phone);
+
+  const lookup = await findReusableSignupUserByPhone({ phone: storedPhone });
   if (lookup.blocked) {
     return res.status(409).json({ message: lookup.message });
   }
 
   let user = lookup.user;
 
-  // Always store phone in normalized form (91XXXXXXXXXX) for consistent login lookups
-  const storedPhone = normalizePhoneForStorage(phone);
-
   if (!user) {
     user = new User({
       name,
-      email,
+      email: email || undefined,
       password,
       phone: storedPhone || undefined,
       address,
@@ -437,7 +438,7 @@ const signup = async (req, res) => {
     });
   } else {
     user.name = name;
-    user.email = email;
+    if (email) user.email = email;
     user.password = password;
     if (storedPhone) user.phone = storedPhone;
     user.address = address;

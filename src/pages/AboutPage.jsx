@@ -7,6 +7,7 @@ import PageSection from "../components/PageSection";
 import SeoHead from "../components/SeoHead";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
 import founderImage from "../assets/myhosurproperty vijay kumar founder.jpeg";
+import useScrollAnimation from "../hooks/useScrollAnimation";
 
 const stats = [
   { value: 2500, suffix: "+", label: "Verified listings" },
@@ -91,6 +92,7 @@ const vmcData = [
 ];
 
 const AboutPage = () => {
+  useScrollAnimation();
   const breadcrumbs = [
     { label: "Home", to: "/" },
     { label: "About", to: "/about" },
@@ -131,13 +133,13 @@ const AboutPage = () => {
       </PageSection>
 
       {/* ── Vision / Mission / Core Values ── */}
-      <section className="bg-white px-5 py-14 sm:px-8 lg:px-10">
+      <section className="bg-white px-5 py-14 sm:px-8 lg:px-10 gsap-section">
         <div className="mx-auto max-w-[1440px]">
           <div className="grid gap-8 md:grid-cols-3">
             {vmcData.map(({ Icon, title, paragraph, bullets }) => (
               <div
                 key={title}
-                className="flex flex-col items-center text-center px-4 py-6"
+                className="flex flex-col items-center text-center px-4 py-6 gsap-card"
               >
                 {/* Icon */}
                 <Icon />
@@ -177,12 +179,12 @@ const AboutPage = () => {
       </section>
 
       {/* ── Our Principles ── */}
-      <PageSection tag="Our principles" title="Built for trust and clarity in Hosur real estate">
+      <PageSection tag="Our principles" title="Built for trust and clarity in Hosur real estate" className="gsap-section">
         <div className="grid gap-6 md:grid-cols-3">
           {principles.map((item) => {
             const Icon = item.icon;
             return (
-              <MarketingCard key={item.title} className="text-center sm:text-left">
+              <MarketingCard key={item.title} className="text-center sm:text-left gsap-card">
                 <IconCircle className="mx-auto sm:mx-0">
                   <Icon className="h-6 w-6" />
                 </IconCircle>
@@ -196,7 +198,7 @@ const AboutPage = () => {
 
       {/* ── Our Founder ── */}
       
-      <section className="bg-white px-5 py-14 sm:px-8 lg:px-10">
+      <section className="bg-white px-5 py-14 sm:px-8 lg:px-10 gsap-section">
         <div className="mx-auto max-w-[1440px]">
           {/* Section label */}
           <div className="flex items-center gap-4 mb-10">
@@ -243,7 +245,7 @@ const AboutPage = () => {
             </div>
 
             {/* Photo side */}
-            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-card">
+            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-card gsap-card">
               <img
                 src={founderImage}
                 alt="Founder of MyHosurProperty — Mr. Vijay Kumar"
@@ -257,7 +259,7 @@ const AboutPage = () => {
       </section>
 
       {/* ── CTA Banner ── */}
-      <PageSection tone="navy" innerClassName="lg:flex lg:items-center lg:justify-between lg:gap-8">
+      <PageSection tone="navy" innerClassName="lg:flex lg:items-center lg:justify-between lg:gap-8" className="gsap-section">
         <div className="text-center lg:text-left">
           <p className="section-tag !text-orange">Built for clarity</p>
           <h2 className="mt-2 text-2xl font-bold text-white sm:text-3xl lg:text-4xl">

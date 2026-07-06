@@ -6,6 +6,7 @@ import { fetchPlans } from "../services/api/planApi";
 import { createPaymentIntent, fetchMyPayments, verifyPayment } from "../services/api/paymentApi";
 import { loadExternalScript } from "../utils/loadExternalScript";
 import { currency } from "../utils/format";
+import useScrollAnimation from "../hooks/useScrollAnimation";
 
 const fallbackPlans = [
   {
@@ -67,6 +68,7 @@ const normalizePlan = (plan) => {
 };
 
 const PlansPage = () => {
+  useScrollAnimation();
   const { token, user, refreshProfile } = useAuth();
   const [plans, setPlans] = useState([]);
   const [buyingPlanId, setBuyingPlanId] = useState("");
@@ -183,7 +185,7 @@ const PlansPage = () => {
     return (
       <article
         key={plan._id || plan.name}
-        className={`relative flex h-full flex-col rounded-xl border p-6 shadow-card md:p-7 ${
+        className={`relative flex h-full flex-col rounded-xl border p-6 shadow-card md:p-7 gsap-card ${
           isRecommended
             ? "border-navy bg-navy text-white shadow-[0_12px_32px_rgba(0,66,162,0.2)]"
             : "border-slate-200 bg-white text-navy"
@@ -277,8 +279,8 @@ const PlansPage = () => {
 
   return (
     <main className="page-shell w-full space-y-10 px-4 py-8 sm:px-5 md:py-12 lg:px-6">
-      <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="marketing-hero rounded-xl p-8 md:p-10">
+      <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] gsap-section">
+        <div className="marketing-hero rounded-xl p-8 md:p-10 gsap-hero-item">
           <p className="section-tag">Pricing and access</p>
           <h1 className="mt-4 text-3xl font-bold md:text-4xl lg:text-5xl">Choose the plan that matches your property activity.</h1>
           <p className="mt-5 max-w-2xl text-base leading-8">
@@ -286,7 +288,7 @@ const PlansPage = () => {
           </p>
         </div>
 
-        <div className="marketing-card p-8 md:p-10">
+        <div className="marketing-card p-8 md:p-10 gsap-card">
           <p className="section-tag">Membership benefits</p>
           <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl">More visibility, stronger lead access, and simpler plan control.</h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -306,13 +308,13 @@ const PlansPage = () => {
         </div>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3 gsap-section">
         {regularPlans.map(renderPlanCard)}
       </section>
 
       {dbPacks.length ? (
-        <section className="space-y-6">
-          <div className="marketing-card p-6 md:p-8">
+        <section className="space-y-6 gsap-section">
+          <div className="marketing-card p-6 md:p-8 gsap-card">
             <p className="section-tag">Add-on packages</p>
             <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl">Database access packages</h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">

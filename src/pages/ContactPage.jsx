@@ -5,6 +5,7 @@ import PageHero from "../components/PageHero";
 import SeoHead from "../components/SeoHead";
 import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE_NUMBERS } from "../constants/contactInfo";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
+import useScrollAnimation from "../hooks/useScrollAnimation";
 
 /* Department / enquiry type rows matching reference table style */
 const enquiryRows = [
@@ -17,6 +18,7 @@ const enquiryRows = [
 ];
 
 const ContactPage = () => {
+  useScrollAnimation();
   const breadcrumbs = [
     { label: "Home", to: "/" },
     { label: "Contact", to: "/contact" },
@@ -56,15 +58,16 @@ const ContactPage = () => {
         tag="Contact us"
         title="Talk to My Hosur Property."
         description="Reach our team for property discovery, buying and selling support, registration help, loans, construction coordination, and local real-estate services."
+        className="gsap-section"
       />
 
       {/* ── Main contact section: form (left) + info (right) ── */}
-      <section className="bg-white px-5 py-14 sm:px-8 lg:px-10">
+      <section className="bg-white px-5 py-14 sm:px-8 lg:px-10 gsap-section">
         <div className="mx-auto max-w-[1440px]">
           <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
 
             {/* LEFT – Contact Form */}
-            <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-card">
+            <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-card gsap-card">
               <h2 className="text-2xl font-bold text-navy mb-6">Send Us A Message</h2>
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 {/* Name */}
@@ -194,7 +197,7 @@ const ContactPage = () => {
               </div>
 
               {/* Address */}
-              <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-5">
+              <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-5 gsap-card">
                 <MapPinIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-orange" />
                 <p className="text-sm leading-7 text-slate-600">{CONTACT_ADDRESS}</p>
               </div>

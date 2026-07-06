@@ -99,3 +99,12 @@ export const resetPassword = async (payload) => {
     return logError("resetPassword", err);
   }
 };
+
+export const updateProfile = async (token, payload) => {
+  try {
+    const res = await apiClient.put("/api/user/profile", payload, withAuth(token));
+    return logResponse("updateProfile", res.data);
+  } catch (err) {
+    return logError("updateProfile", err);
+  }
+};

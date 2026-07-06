@@ -1204,16 +1204,17 @@ const AuthPage = () => {
                             />
                           ) : null}
 
-                          <Field
-                            label={isSignup ? "Email Address" : "Email Address (Optional)"}
-                            icon={EnvelopeIcon}
-                            type="email"
-                            autoComplete="email"
-                            placeholder="you@example.com"
-                            value={form.email}
-                            onChange={(event) => onChange("email", event.target.value)}
-                            required={isSignup}
-                          />
+                          {!isSignup && (
+                            <Field
+                              label="Email Address (Optional)"
+                              icon={EnvelopeIcon}
+                              type="email"
+                              autoComplete="email"
+                              placeholder="you@example.com"
+                              value={form.email}
+                              onChange={(event) => onChange("email", event.target.value)}
+                            />
+                          )}
 
                           <Field
                             label="WhatsApp Mobile Number"
@@ -1226,16 +1227,6 @@ const AuthPage = () => {
                             onChange={(event) => onChange("phone", event.target.value)}
                             required
                           />
-
-                          {isSignup ? (
-                            <Field
-                              label="Address"
-                              icon={MapPinIcon}
-                              placeholder="Hosur, Tamil Nadu"
-                              value={form.address}
-                              onChange={(event) => onChange("address", event.target.value)}
-                            />
-                          ) : null}
 
                           {!isForgot && (
                             <PasswordField
@@ -1262,22 +1253,6 @@ const AuthPage = () => {
                               required
                             />
                           )}
-
-                          {isSignup ? (
-                            <SelectField
-                              label="I Am A"
-                              icon={UserCircleIcon}
-                              value={form.role}
-                              onChange={(event) => onChange("role", event.target.value)}
-                            >
-                              <option value="buyer">Buyer / Tenant</option>
-                              <option value="seller">Property Seller</option>
-                              <option value="agent">Agent</option>
-                              <option value="broker">Broker</option>
-                              <option value="builder">Builder</option>
-                              <option value="customer">Customer</option>
-                            </SelectField>
-                          ) : null}
 
                           {isSignup ? (
                             <motion.div variants={item} className="auth-free-badge">

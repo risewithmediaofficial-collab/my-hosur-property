@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import useAuth from "../hooks/useAuth";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
 import { createProperty, updateProperty, uploadPropertyFiles } from "../services/api/propertyApi";
+import { updateProfile } from "../services/api/authApi";
 
 const propertyTypes = [
   "Plot",
@@ -237,6 +238,25 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   const [uploadedImages, setUploadedImages] = useState(initialData?.images || []);
   const [uploadedDocs, setUploadedDocs] = useState(initialData?.documents || []);
 
+  const [profileForm, setProfileForm] = useState({
+    email: "",
+    address: "",
+    role: "",
+  });
+  const [profileSaving, setProfileSaving] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setProfileForm({
+        email: user.email || "",
+        address: user.address || "",
+        role: user.role === "buyer" ? "" : (user.role || ""),
+      });
+    }
+  }, [user]);
+
+  const isProfileIncomplete = !isAdmin && (!user?.email || !user?.address || user?.role === "buyer");
+
   const config = typeFieldConfig[form.propertyType] || null;
   const formDialogOpen = !isEditMode && modalOpen && Boolean(config);
 
@@ -295,6 +315,28 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   }, [canPostForFree, isAdmin, hasPostingAccess, navigate, initialData]);
 
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
+
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    if (!profileForm.email || !profileForm.address || !profileForm.role) {
+      toast.error("Please fill in all profile details.");
+      return;
+    }
+    setProfileSaving(true);
+    try {
+      const result = await updateProfile(token, profileForm);
+      if (result.success) {
+        toast.success("Profile details saved!");
+        if (refreshProfile) {
+          await refreshProfile();
+        }
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to update profile. Please try again.");
+    } finally {
+      setProfileSaving(false);
+    }
+  };
 
   const preserveContactFields = (prev) => ({
     country: prev.country || defaultForm.country,
@@ -504,9 +546,6 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
               <ReadOnlyField label="Mobile Number" value={accountContact.phone} fallback="Phone not available" />
               <ReadOnlyField label="Email ID" value={accountContact.email} fallback="Email not available" />
             </div>
-            <p className="mt-4 text-xs leading-6 text-slate-500">
-              These details come directly from the logged-in account, so owners and agents do not need to enter them again while posting.
-            </p>
           </div>
         </FormSection>
 
@@ -719,7 +758,60 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         </div>
       )}
 
-      {hasPostingAccess && (isAdmin || canPostForFree || initialData) && (
+      {isProfileIncomplete ? (
+        <div className="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-6 shadow-md mt-6">
+          <h3 className="text-xl font-bold text-navy font-philosopher">Complete Your Profile Details</h3>
+          <p className="mt-2 text-sm text-slate-600">
+            Please fill in these details to post properties.
+          </p>
+          <form onSubmit={handleSaveProfile} className="mt-6 space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">Email Address *</label>
+              <input
+                type="email"
+                required
+                className="site-input w-full"
+                value={profileForm.email}
+                onChange={(e) => setProfileForm(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="you@example.com"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">Address *</label>
+              <input
+                type="text"
+                required
+                className="site-input w-full"
+                value={profileForm.address}
+                onChange={(e) => setProfileForm(prev => ({ ...prev, address: e.target.value }))}
+                placeholder="Hosur, Tamil Nadu"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">I Am A *</label>
+              <select
+                required
+                className="site-input w-full"
+                value={profileForm.role}
+                onChange={(e) => setProfileForm(prev => ({ ...prev, role: e.target.value }))}
+              >
+                <option value="">Select Role</option>
+                <option value="seller">Property Seller / Owner</option>
+                <option value="agent">Agent</option>
+                <option value="broker">Broker</option>
+                <option value="builder">Builder</option>
+              </select>
+            </div>
+            <button
+              type="submit"
+              disabled={profileSaving}
+              className="site-button-primary w-full mt-4 flex justify-center items-center py-2.5 rounded-lg text-sm font-bold text-white animate-pulse hover:animate-none"
+            >
+              {profileSaving ? "Saving..." : "Save and Proceed"}
+            </button>
+          </form>
+        </div>
+      ) : hasPostingAccess && (isAdmin || canPostForFree || initialData) && (
         <>
           {!isEditMode && !modalOpen && (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
