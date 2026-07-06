@@ -52,6 +52,24 @@ body,
   box-sizing: border-box;
 }
 
+/* Remove the default browser square focus outline on all interactive elements */
+*:focus {
+  outline: none !important;
+}
+
+*:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(39, 79, 154, 0.3) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+button:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .MuiSvgIcon-root.h-3 {
   width: 0.75rem !important;
   height: 0.75rem !important;
