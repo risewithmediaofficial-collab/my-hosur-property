@@ -425,7 +425,7 @@ const BankLoansPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
             viewport={{ once: true, amount: 0.2 }}
-            className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl p-8 md:p-12"
+            className="bg-white border border-slate-200 rounded-2xl p-8 md:p-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-8">Frequently Asked Questions</h2>
 
