@@ -1022,7 +1022,7 @@ select:focus-visible {
 
 /* Home Unik inspired theme — navy + orange */
 body {
-  background: #f4f7f9 !important;
+  background: #ffffff !important;
   color: #0042a2;
 }
 
@@ -1036,13 +1036,13 @@ body {
 .site-dashboard-app {
   width: 100%;
   max-width: none;
-  background: #f4f7f9;
+  background: #ffffff;
   box-shadow: none;
 }
 
 :root {
   --site-bg: #ffffff;
-  --site-bg-soft: #f4f7f9;
+  --site-bg-soft: #f9f9f9;
   --site-surface: #ffffff;
   --site-surface-strong: #ffffff;
   --site-border: rgba(0, 66, 162, 0.1);
@@ -1104,7 +1104,7 @@ body {
 
 .site-button-secondary:hover,
 .dashboard-secondary:hover {
-  background: #f4f7f9 !important;
+  background: #f5f5f5 !important;
   box-shadow: none !important;
 }
 
@@ -1223,7 +1223,7 @@ body {
 }
 
 .dashboard-table tbody tr:hover td {
-  background: #f4f7f9 !important;
+  background: #f5f5f5 !important;
 }
 
 .site-app-shell main > section:not(:first-child),
@@ -1286,7 +1286,7 @@ body {
 }
 
 .page-shell-muted {
-  background: #f4f7f9;
+  background: #ffffff;
 }
 
 .stat-card {
