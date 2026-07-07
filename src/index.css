@@ -1377,7 +1377,9 @@ body {
 
 /* Hero title — override global heading color on dark hero */
 .hero-title {
-  color: #ffffff !important;
+  color: #0042a2 !important;
+  position: relative;
+  z-index: 10;
 }
 
 .site-app-shell main {
