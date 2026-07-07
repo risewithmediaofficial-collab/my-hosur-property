@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Outfit:wght@100..900&family=Questrial&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -21,8 +21,8 @@ body,
 :root {
   color: #1c1c1c;
   background: #ffffff;
-  --site-heading: "Josefin Sans", "Outfit", sans-serif;
-  --site-body: "Questrial", "Fredoka", sans-serif;
+  --site-heading: "Philosopher", sans-serif;
+  --site-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --site-bg: #ffffff;
   --site-bg-soft: #f7f7f7;
   --site-surface: rgba(255, 255, 255, 0.98);
@@ -113,6 +113,8 @@ html {
 body {
   margin: 0;
   font-family: var(--site-body);
+  font-size: 16px;
+  line-height: 1.6;
   background: #ffffff;
   color: var(--site-ink);
   letter-spacing: 0;
@@ -145,11 +147,26 @@ h1,
 h2,
 h3,
 h4,
+h5,
+h6,
 .site-heading,
 .dashboard-display {
   font-family: var(--site-heading);
-  letter-spacing: -0.03em;
   color: var(--site-heading-ink);
+  letter-spacing: -0.02em;
+}
+
+h1 { font-size: clamp(40px, 4vw, 64px); font-weight: 700; line-height: 1.2; }
+h2 { font-size: clamp(32px, 4vw, 56px); font-weight: 700; line-height: 1.2; }
+h3 { font-size: clamp(36px, 4vw, 62px); font-weight: 700; line-height: 1.2; }
+h4 { font-size: clamp(34px, 4vw, 46px); font-weight: 700; line-height: 1.2; }
+h5 { font-size: clamp(24px, 4vw, 32px); font-weight: 700; line-height: 1.2; }
+h6 { font-size: clamp(20px, 4vw, 24px); font-weight: 700; line-height: 1.2; }
+
+p {
+  font-family: var(--site-body);
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 ::selection {
@@ -169,7 +186,7 @@ h4,
   border: 0;
   box-shadow: var(--site-shadow);
   backdrop-filter: blur(16px);
-  border-radius: 2rem;
+  border-radius: 12px;
   transition: transform 0.28s ease, box-shadow 0.28s ease, background 0.28s ease;
 }
 
@@ -320,7 +337,7 @@ h4,
 
 .site-input {
   width: 100%;
-  border-radius: 1rem;
+  border-radius: 8px;
   padding: 0.95rem 1rem;
   color: var(--site-ink);
   font-size: 1rem;
@@ -335,7 +352,7 @@ h4,
   justify-content: center;
   gap: 0.5rem;
   border: none;
-  border-radius: 1rem;
+  border-radius: 8px;
   background: linear-gradient(135deg, var(--site-primary) 0%, var(--site-primary-soft) 100%);
   color: #f7fbfb;
   font-weight: 700;
@@ -355,7 +372,7 @@ h4,
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 1rem;
+  border-radius: 8px;
   color: var(--site-heading-ink);
   font-weight: 700;
   box-shadow: inset 0 0 0 1px rgba(0, 66, 162, 0.08);
@@ -1110,22 +1127,7 @@ body {
 
 .site-kicker,
 .section-tag {
-  padding: 0 !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  color: #f79e26 !important;
-  font-size: 0.72rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.18em !important;
-  text-transform: uppercase !important;
-}
-
-.site-kicker::before,
-.section-tag::before {
-  content: "// ";
-  color: #f79e26;
+  display: none !important;
 }
 
 .site-input,
@@ -2263,4 +2265,26 @@ body {
 .header-btn-adissia-secondary:hover {
   background-position: 100%;
   color: #ffffff;
+}
+
+/* ==============================================
+             SVG Animator Styles
+==================================================*/
+@keyframes svgStrokeDraw {
+  0% {
+    stroke-dashoffset: 1000;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.svg-animator path,
+.svg-animator circle,
+.svg-animator line,
+.svg-animator polyline,
+.svg-animator rect {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: svgStrokeDraw 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }

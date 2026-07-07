@@ -881,7 +881,7 @@ const HomePage = () => {
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-navy/5 via-transparent to-transparent rounded-tr-full pointer-events-none" />
 
             <div className="relative z-10">
-              <h2 className="text-4xl font-black text-navy font-philosopher leading-tight tracking-tight">
+              <h2 className="text-5xl sm:text-6xl font-black text-navy leading-tight tracking-tight">
                 Discover Properties
               </h2>
 

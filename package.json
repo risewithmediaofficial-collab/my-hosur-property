@@ -35,7 +35,8 @@
         "react-hot-toast": "^2.6.0",
         "react-router-dom": "^7.13.2",
         "styled-components": "^6.4.0",
-        "tailwind-merge": "^3.6.0"
+        "tailwind-merge": "^3.6.0",
+        "vivus": "^0.4.6"
     },
     "devDependencies": {
         "@eslint/js": "^9.39.4",

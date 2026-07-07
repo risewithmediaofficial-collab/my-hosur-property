@@ -8,6 +8,7 @@ import { loginUser, resendOtp, signupUser, verifyOtp as verifyOtpApi, verifyWidg
 import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
 import AnimatedOTPInput from "../components/AnimatedOTPInput";
+import loginHeroineImage from "../assets/login_heroine_image.png";
 
 const MotionDiv = motion.div;
 const AUTH_FORM = {
@@ -1062,6 +1063,20 @@ const AuthPage = () => {
           <div className="auth-left-overlay" />
 
           <div className="auth-left-content">
+            <img
+              src={loginHeroineImage}
+              alt="MyHosurProperty Dashboard Access"
+              className="login-heroine-image"
+              style={{
+                width: "100%",
+                maxHeight: "360px",
+                objectFit: "cover",
+                borderRadius: "16px",
+                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.08)",
+                marginBottom: "32px",
+                border: "1px solid rgba(226, 232, 240, 0.8)",
+              }}
+            />
             <div className="auth-stats" style={{ marginTop: 0 }}>
               {[
                 ["2,400+", "Listings"],

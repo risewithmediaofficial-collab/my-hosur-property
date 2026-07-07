@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import Vivus from "vivus";
 import { ArrowRightIcon, CheckCircleIcon, ShieldCheckIcon, UsersIcon } from "../components/AppIcons";
 import CountUpNumber from "../components/CountUpNumber";
 import MarketingCard, { IconCircle } from "../components/MarketingCard";
@@ -7,6 +9,7 @@ import PageSection from "../components/PageSection";
 import SeoHead from "../components/SeoHead";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
 import founderImage from "../assets/myhosurproperty vijay kumar founder.jpeg";
+import directorImage from "../assets/director 1.jpeg";
 import useScrollAnimation from "../hooks/useScrollAnimation";
 
 const stats = [
@@ -34,35 +37,98 @@ const principles = [
 ];
 
 /* ── Vision / Mission / Core Values icons as inline SVGs for clean rendering ── */
-const VisionIcon = () => (
-  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto">
-    <circle cx="32" cy="32" r="20" stroke="#0042a2" strokeWidth="3" fill="none"/>
-    <circle cx="32" cy="32" r="8" stroke="#0042a2" strokeWidth="3" fill="none"/>
-    <circle cx="32" cy="32" r="2" fill="#f79e26"/>
-    <line x1="32" y1="8" x2="32" y2="14" stroke="#0042a2" strokeWidth="2.5" strokeLinecap="round"/>
-    <line x1="32" y1="50" x2="32" y2="56" stroke="#0042a2" strokeWidth="2.5" strokeLinecap="round"/>
-    <line x1="8" y1="32" x2="14" y2="32" stroke="#0042a2" strokeWidth="2.5" strokeLinecap="round"/>
-    <line x1="50" y1="32" x2="56" y2="32" stroke="#0042a2" strokeWidth="2.5" strokeLinecap="round"/>
-  </svg>
-);
+const VisionIcon = () => {
+  const svgRef = useRef(null);
 
-const MissionIcon = () => (
-  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto">
-    <circle cx="32" cy="32" r="22" stroke="#0042a2" strokeWidth="3" fill="none"/>
-    <circle cx="32" cy="32" r="14" stroke="#0042a2" strokeWidth="2" fill="none" strokeDasharray="4 3"/>
-    <circle cx="32" cy="32" r="6" stroke="#0042a2" strokeWidth="2" fill="none"/>
-    <path d="M32 10 L36 20 L48 16 L40 26" stroke="#f79e26" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-    <circle cx="32" cy="32" r="2.5" fill="#f79e26"/>
-  </svg>
-);
+  useEffect(() => {
+    if (svgRef.current) {
+      new Vivus(svgRef.current, {
+        duration: 100,
+        type: "delayed",
+        start: "autostart",
+        animTimingFunction: Vivus.EASE_OUT
+      });
+    }
+  }, []);
 
-const CoreValuesIcon = () => (
-  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto">
-    <path d="M32 8 L40 20 L54 22 L44 33 L46 48 L32 41 L18 48 L20 33 L10 22 L24 20 Z" stroke="#0042a2" strokeWidth="2.5" fill="none" strokeLinejoin="round"/>
-    <path d="M32 16 L37 24 L46 26 L40 33 L42 42 L32 37 L22 42 L24 33 L18 26 L27 24 Z" stroke="#f79e26" strokeWidth="1.5" fill="none" strokeLinejoin="round" opacity="0.7"/>
-    <circle cx="32" cy="32" r="3" fill="#f79e26"/>
-  </svg>
-);
+  return (
+    <svg
+      ref={svgRef}
+      viewBox="0 0 64 64"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-16 w-16 mx-auto svg-animator"
+    >
+      <circle cx="32" cy="32" r="20" stroke="#0042a2" strokeWidth="3" fill="none"/>
+      <circle cx="32" cy="32" r="8" stroke="#0042a2" strokeWidth="3" fill="none"/>
+      <circle cx="32" cy="32" r="2" fill="#f79e26"/>
+      <line x1="32" y1="8" x2="32" y2="14" stroke="#0042a2" strokeWidth="2.5" strokeLinecap="round"/>
+      <line x1="32" y1="50" x2="32" y2="56" stroke="#0042a2" strokeWidth="2.5" strokeLinecap="round"/>
+      <line x1="8" y1="32" x2="14" y2="32" stroke="#0042a2" strokeWidth="2.5" strokeLinecap="round"/>
+      <line x1="50" y1="32" x2="56" y2="32" stroke="#0042a2" strokeWidth="2.5" strokeLinecap="round"/>
+    </svg>
+  );
+};
+
+const MissionIcon = () => {
+  const svgRef = useRef(null);
+
+  useEffect(() => {
+    if (svgRef.current) {
+      new Vivus(svgRef.current, {
+        duration: 100,
+        type: "delayed",
+        start: "autostart",
+        animTimingFunction: Vivus.EASE_OUT
+      });
+    }
+  }, []);
+
+  return (
+    <svg
+      ref={svgRef}
+      viewBox="0 0 64 64"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-16 w-16 mx-auto svg-animator"
+    >
+      <circle cx="32" cy="32" r="22" stroke="#0042a2" strokeWidth="3" fill="none"/>
+      <circle cx="32" cy="32" r="14" stroke="#0042a2" strokeWidth="2" fill="none" strokeDasharray="4 3"/>
+      <circle cx="32" cy="32" r="6" stroke="#0042a2" strokeWidth="2" fill="none"/>
+      <path d="M32 10 L36 20 L48 16 L40 26" stroke="#f79e26" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+      <circle cx="32" cy="32" r="2.5" fill="#f79e26"/>
+    </svg>
+  );
+};
+
+const CoreValuesIcon = () => {
+  const svgRef = useRef(null);
+
+  useEffect(() => {
+    if (svgRef.current) {
+      new Vivus(svgRef.current, {
+        duration: 100,
+        type: "delayed",
+        start: "autostart",
+        animTimingFunction: Vivus.EASE_OUT
+      });
+    }
+  }, []);
+
+  return (
+    <svg
+      ref={svgRef}
+      viewBox="0 0 64 64"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-16 w-16 mx-auto svg-animator"
+    >
+      <path d="M32 8 L40 20 L54 22 L44 33 L46 48 L32 41 L18 48 L20 33 L10 22 L24 20 Z" stroke="#0042a2" strokeWidth="2.5" fill="none" strokeLinejoin="round"/>
+      <path d="M32 16 L37 24 L46 26 L40 33 L42 42 L32 37 L22 42 L24 33 L18 26 L27 24 Z" stroke="#f79e26" strokeWidth="1.5" fill="none" strokeLinejoin="round" opacity="0.7"/>
+      <circle cx="32" cy="32" r="3" fill="#f79e26"/>
+    </svg>
+  );
+};
 
 const vmcData = [
   {
@@ -253,6 +319,59 @@ const AboutPage = () => {
                 loading="lazy"
                 decoding="async"
               />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-slate-50 px-5 py-14 sm:px-8 lg:px-10 gsap-section border-t border-b border-slate-100">
+        <div className="mx-auto max-w-[1440px]">
+          {/* Section label */}
+          <div className="flex items-center gap-4 mb-10">
+            <span className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">
+              OUR DIRECTOR
+            </span>
+            <div className="flex-1 border-t border-slate-200" />
+          </div>
+
+          {/* Director content */}
+          <div className="grid gap-10 lg:grid-cols-[420px_1fr] lg:items-center">
+            {/* Photo side */}
+            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-card gsap-card">
+              <img
+                src={directorImage}
+                alt="Director of MyHosurProperty — Raja"
+                className="h-[520px] w-full object-cover object-center sm:h-[560px]"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+
+            {/* Text side */}
+            <div>
+              <h2 className="text-2xl font-bold text-navy sm:text-3xl">
+                Raja
+              </h2>
+              <p className="mt-1 text-base font-semibold text-slate-500">
+                Director, MyHosurProperty
+              </p>
+
+              <p className="mt-6 text-sm leading-8 text-slate-600">
+                Raja is a dynamic leader and key strategist at MyHosurProperty, playing an active role in driving our vision of a trusted property ecosystem. With broad experience in property valuation, client coordination, and local operations, he ensures the integrity and reliability of our real-estate offerings.
+              </p>
+              <p className="mt-4 text-sm leading-8 text-slate-600">
+                Focused on delivering high-value opportunities to buyers and investors, Raja coordinates closely with verified partners to maintain the highest quality standards on the platform. He is deeply committed to client satisfaction, direct communications, and building long-term relationships based on honesty and professional excellence.
+              </p>
+
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  to="/contact"
+                  className="site-button-primary inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-bold"
+                >
+                  Contact Office
+                  <ArrowRightIcon className="h-4 w-4" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>

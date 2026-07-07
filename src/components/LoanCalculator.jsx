@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { ChevronDownIcon } from "./AppIcons";
 import { bankLoans } from "../constants/bankLoans";
 
-const LoanCalculator = ({ bank, onBankChange }) => {
+const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
   const [loanAmount, setLoanAmount] = useState(25); // in lakhs
   const [interestRate, setInterestRate] = useState((bank.minRate + bank.maxRate) / 2);
   const [tenure, setTenure] = useState(180); // 15 years in months
@@ -130,32 +130,34 @@ const LoanCalculator = ({ bank, onBankChange }) => {
         className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200"
       >
         {/* Bank Selection */}
-        <div className="p-4 sm:p-6 md:p-8 bg-gradient-to-r from-blue-50 to-blue-100 border-b border-slate-200">
-          <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-4 sm:mb-6">Loan Calculator</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {bankLoans.map((bankOption) => (
-              <motion.button
-                key={bankOption.id}
-                onClick={() => {
-                  onBankChange(bankOption);
-                  setInterestRate((bankOption.minRate + bankOption.maxRate) / 2);
-                }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
-                className={`p-3 sm:p-4 rounded-xl font-semibold transition-all duration-300 min-w-0 ${
-                  selectedBank.id === bankOption.id
-                    ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg ring-2 ring-blue-300"
-                    : "bg-white text-slate-700 border border-slate-200 hover:border-slate-300 hover:bg-slate-50"
-                }`}
-              >
-                <div className="text-sm mb-1">{bankOption.shortName}</div>
-                <div className="text-[11px] sm:text-xs opacity-75">
-                  {bankOption.minRate}%-{bankOption.maxRate}%
-                </div>
-              </motion.button>
-            ))}
+        {showBankSelector && (
+          <div className="p-4 sm:p-6 md:p-8 bg-gradient-to-r from-blue-50 to-blue-100 border-b border-slate-200">
+            <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-4 sm:mb-6">Loan Calculator</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {bankLoans.map((bankOption) => (
+                <motion.button
+                  key={bankOption.id}
+                  onClick={() => {
+                    onBankChange(bankOption);
+                    setInterestRate((bankOption.minRate + bankOption.maxRate) / 2);
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`p-3 sm:p-4 rounded-xl font-semibold transition-all duration-300 min-w-0 ${
+                    selectedBank.id === bankOption.id
+                      ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg ring-2 ring-blue-300"
+                      : "bg-white text-slate-700 border border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                  }`}
+                >
+                  <div className="text-sm mb-1">{bankOption.shortName}</div>
+                  <div className="text-[11px] sm:text-xs opacity-75">
+                    {bankOption.minRate}%-{bankOption.maxRate}%
+                  </div>
+                </motion.button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Calculator Body */}
         <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 bg-white">

@@ -108,7 +108,6 @@ const ServicesPage = () => {
   return (
     <main className="page-shell w-full">
       <SeoHead
-        title="My Hosur Property - Our Services"
         description="Complete property solutions from My Hosur Property, including buying, selling, loans, registration, construction, and legal support."
         keywords="Hosur property services, home loan Hosur, registration services Hosur, construction services Hosur, property legal services Hosur"
         canonicalPath="/services"
@@ -120,7 +119,6 @@ const ServicesPage = () => {
         <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center gsap-hero-item">
           <div className="max-w-3xl">
             <div className="site-kicker text-orange-400">
-              My Hosur Property - Our Services
             </div>
             <h1 className="mt-5 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl text-white">
               Complete property solutions for every stage of your real-estate journey.
