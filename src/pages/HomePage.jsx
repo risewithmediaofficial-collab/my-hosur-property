@@ -30,6 +30,7 @@ import {
 } from "../constants/serviceCatalog";
 import PropertyCard from "../components/PropertyCard";
 import Hero from "../components/Hero";
+import DotField from "../components/DotField";
 import LocalityDropdown from "../components/LocalityDropdown";
 import SeoHead from "../components/SeoHead";
 import useDebounce from "../hooks/useDebounce";
@@ -447,8 +448,20 @@ const HomePage = () => {
         className="relative min-h-[380px] sm:min-h-[460px] lg:min-h-[500px]"
         style={{ zIndex: 1 }}
       >
-        {/* Background set to solid white with bottom border */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none bg-white border-b border-slate-200/60" />
+        {/* Background: white base with animated DotField pattern */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none bg-white border-b border-slate-200/60">
+          <DotField
+            dotRadius={1.5}
+            dotSpacing={18}
+            bulgeStrength={60}
+            glowRadius={180}
+            sparkle={false}
+            waveAmplitude={0}
+            gradientFrom="rgba(0, 66, 162, 0.18)"
+            gradientTo="rgba(39, 79, 154, 0.10)"
+            glowColor="rgba(0, 66, 162, 0.15)"
+          />
+        </div>
 
         {/* Shortcut dropdowns need z-index above the hero */}
         <div ref={heroContentRef} className="relative mx-auto flex max-w-[1440px] flex-col items-center px-5 py-12 text-center will-change-transform sm:px-8 sm:py-16 lg:px-10 lg:py-20" style={{ zIndex: 20 }}>
@@ -694,23 +707,16 @@ const HomePage = () => {
                   to={`/listings?intent=buy&propertyType=${encodeURIComponent(option.value)}`}
                   className="home-gsap-card group relative flex flex-col items-center overflow-hidden rounded-xl border border-slate-200 bg-white p-6 text-center shadow-card transition-all duration-300"
                 >
-                  {/* Hover background image */}
-                  {bgImg && (
-                    <div
-                      className="absolute inset-0 bg-cover bg-center opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                      style={{ backgroundImage: `url(${bgImg})` }}
-                    />
-                  )}
-                  {/* Dark overlay on hover */}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  {/* Subtle hover tint — no image */}
+                  <div className="absolute inset-0 bg-navy/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-xl" />
 
-                  {/* Content sits above image */}
+                  {/* Content sits above */}
                   <div className="relative z-10 flex flex-col items-center">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-navy text-navy transition-all duration-300 group-hover:!border-white group-hover:!text-white">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-navy text-navy transition-all duration-300 group-hover:border-orange group-hover:text-orange">
                       <Icon className="h-6 w-6" />
                     </div>
-                    <p className="mt-4 text-base font-bold text-navy transition-colors duration-300 group-hover:!text-white">{option.label}</p>
-                    <p className="mt-1 text-xs text-slate-500 transition-colors duration-300 group-hover:!text-white/90">Browse listings</p>
+                    <p className="mt-4 text-base font-bold text-navy">{option.label}</p>
+                    <p className="mt-1 text-xs text-slate-500">Browse listings</p>
                   </div>
                 </Link>
               );
@@ -743,24 +749,17 @@ const HomePage = () => {
                 viewport={{ once: true, amount: 0.01 }}
                 className="home-gsap-card home-parallax-soft group relative overflow-hidden rounded-xl border border-slate-200 bg-white p-8 text-center shadow-card transition-all duration-300"
               >
-                {/* Hover background image */}
-                {bgImg && (
-                  <div
-                    className="absolute inset-0 bg-cover bg-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                    style={{ backgroundImage: `url(${bgImg})` }}
-                  />
-                )}
-                {/* Dark overlay */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                {/* Subtle hover color overlay — no image */}
+                <div className="absolute inset-0 bg-navy/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-xl" />
 
                 {/* Content */}
                 <div className="relative z-10 flex flex-col items-center">
-                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-navy text-navy transition-all duration-300 group-hover:!border-white group-hover:!text-white">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-navy text-navy transition-all duration-300 group-hover:border-orange group-hover:text-orange">
                     <Icon className="h-6 w-6" />
                   </div>
-                  <h2 className="mt-5 text-xl font-bold text-navy transition-colors duration-300 group-hover:!text-white">{item.title}</h2>
-                  <p className="mt-3 text-sm leading-7 text-slate-600 transition-colors duration-300 group-hover:!text-white/90">{item.description}</p>
-                  <Link to="/services" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-orange transition-colors duration-300 hover:text-orange-hover group-hover:text-orange">
+                  <h2 className="mt-5 text-xl font-bold text-navy">{item.title}</h2>
+                  <p className="mt-3 text-sm leading-7 text-slate-600">{item.description}</p>
+                  <Link to="/services" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-orange transition-colors duration-300 hover:text-orange-hover">
                     Learn more
                     <ArrowRightIcon className="h-4 w-4" />
                   </Link>
@@ -793,14 +792,10 @@ const HomePage = () => {
               @keyframes scroll-services { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
               .services-scroll { display: flex; gap: 1.5rem; animation: scroll-services 40s linear infinite; width: max-content; will-change: transform; }
               .service-card { flex-shrink: 0; width: 280px; background: #ffffff; border: 2px solid #dfe6ee; border-radius: 16px; padding: 24px; text-align: center; transition: all 0.3s ease; cursor: pointer; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08); user-select: none; position: relative; overflow: hidden; }
-              .service-card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 0.4s ease; }
-              .service-card-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.60); opacity: 0; transition: opacity 0.4s ease; }
-              .service-card:hover .service-card-bg { opacity: 1; }
-              .service-card:hover .service-card-overlay { opacity: 1; }
               .service-card-content { position: relative; z-index: 10; }
               .service-card:hover { border-color: #FF9914; transform: translateY(-8px); box-shadow: 0 12px 24px rgba(255, 153, 20, 0.15); }
               .service-icon { width: 60px; height: 60px; margin: 0 auto; border: 2px solid #274F9A; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #274F9A; transition: all 0.3s ease; }
-              .service-card:hover .service-icon { border-color: #ffffff !important; color: #ffffff !important; }
+              .service-card:hover .service-icon { border-color: #FF9914 !important; color: #FF9914 !important; }
               .gradient-fade-services { pointer-events: none; user-select: none; }
               .gradient-fade-left-services { position: absolute; left: 0; top: 0; bottom: 0; width: 100px; background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }
               .gradient-fade-right-services { position: absolute; right: 0; top: 0; bottom: 0; width: 100px; background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }
@@ -813,14 +808,12 @@ const HomePage = () => {
                   const Icon = service.icon;
                   return (
                     <div key={`${service.title}-${index}`} className="service-card group">
-                      <div className="service-card-bg" style={{ backgroundImage: `url(${propertyTypeImages[service.title] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80"})` }} />
-                      <div className="service-card-overlay" />
                       <div className="service-card-content">
                         <div className="service-icon">
                           <Icon className="h-6 w-6" />
                         </div>
-                        <h3 className="mt-4 text-lg font-bold text-navy transition group-hover:!text-white">{service.title}</h3>
-                        <p className="mt-2 text-sm text-slate-600 transition group-hover:!text-white/90">{service.description}</p>
+                        <h3 className="mt-4 text-lg font-bold text-navy">{service.title}</h3>
+                        <p className="mt-2 text-sm text-slate-600">{service.description}</p>
                       </div>
                     </div>
                   );
