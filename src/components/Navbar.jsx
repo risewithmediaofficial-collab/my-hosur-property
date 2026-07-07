@@ -135,7 +135,7 @@ const Navbar = () => {
           animation: free-blink 1.2s ease-in-out infinite;
         }
       `}</style>
-      <div className="bg-navy text-white py-2.5 hidden sm:block">
+      <div className="bg-navy text-white py-1 hidden sm:block">
         <div className="mx-auto flex max-w-[1440px] items-center px-5 text-xs sm:px-8 lg:px-10">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
             <div className="inline-flex flex-wrap items-center gap-x-4 gap-y-1">
