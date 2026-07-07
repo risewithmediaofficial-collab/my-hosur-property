@@ -360,7 +360,7 @@ const AboutPage = () => {
               </p>
 
               <p className="mt-6 text-sm leading-8 text-slate-600">
-                Raja is a dynamic leader and key strategist at MyHosurProperty, playing an active role in driving our vision of a trusted property ecosystem. With broad experience in property valuation, client coordination, and local operations, he ensures the integrity and reliability of our real-estate offerings.
+                Raja is a dynamic leader and key strategist at MyHosurProperty, 7+ years Experience in Marketing, playing an active role in driving our vision of a trusted property ecosystem. With broad experience in property valuation, client coordination, and local operations, he ensures the integrity and reliability of our real-estate offerings.
               </p>
               <p className="mt-4 text-sm leading-8 text-slate-600">
                 Focused on delivering high-value opportunities to buyers and investors, Raja coordinates closely with verified partners to maintain the highest quality standards on the platform. He is deeply committed to client satisfaction, direct communications, and building long-term relationships based on honesty and professional excellence.
