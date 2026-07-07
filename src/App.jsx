@@ -81,6 +81,13 @@ if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
   window.history.scrollRestoration = "manual";
 }
 
+// Force scroll to top immediately on page load (before React mounts)
+if (typeof window !== "undefined") {
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+}
+
 const idleCallback = (callback, timeout = 1200) => {
   if (typeof window === "undefined") return () => {};
   if ("requestIdleCallback" in window) {
@@ -152,34 +159,52 @@ const AppShell = () => {
     };
   }, [isListingsRoute]);
 
-  // Scroll to top on initial load/refresh AND on every route change
+  // Scroll to top on initial load/refresh AND on every route change.
   // (skip listings — it scrolls inside its own results panel)
   useEffect(() => {
     if (isListingsRoute) return;
 
+    // Signal to useBodyScrollLock that a navigation occurred — it must NOT
+    // call window.scrollTo(0, savedScrollY) in its cleanup when this flag is set.
+    document.body.dataset.routeChanged = "1";
+
     const htmlElement = document.documentElement;
-    const originalScroll = htmlElement.style.scrollBehavior;
+    // Override CSS `scroll-behavior: smooth` so scrollTo jumps instantly
     htmlElement.style.scrollBehavior = "auto";
+    document.body.style.scrollBehavior = "auto";
 
-    // Scroll immediately (handles most cases)
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-
-    // Also fire on the next animation frame in case the browser tries to
-    // restore scroll position asynchronously after initial paint
-    const raf = requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    const forceScrollTop = () => {
+      window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
+    };
+
+    // Fire immediately — before any paint
+    forceScrollTop();
+
+    // Double RAF: covers browser async scroll-restoration and AnimatePresence exit delay
+    let raf2;
+    const raf1 = requestAnimationFrame(() => {
+      forceScrollTop();
+      raf2 = requestAnimationFrame(forceScrollTop);
     });
 
-    setTimeout(() => {
-      htmlElement.style.scrollBehavior = originalScroll;
-    }, 50);
+    // 150ms safety net for lazy-loaded content layout shifts
+    const timer = setTimeout(() => {
+      forceScrollTop();
+      htmlElement.style.scrollBehavior = "";
+      document.body.style.scrollBehavior = "";
+      // Clear the routeChanged flag — lock cleanup can restore scroll after this
+      delete document.body.dataset.routeChanged;
+    }, 150);
 
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf1);
+      if (raf2) cancelAnimationFrame(raf2);
+      clearTimeout(timer);
+    };
   }, [location.pathname, isListingsRoute]);
+
 
   const hideNavbar = ["/admin/login"].some((p) =>
     location.pathname.startsWith(p),

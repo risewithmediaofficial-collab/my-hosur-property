@@ -9,12 +9,12 @@ import useScrollAnimation from "../hooks/useScrollAnimation";
 
 /* Department / enquiry type rows matching reference table style */
 const enquiryRows = [
-  { label: "To Buy or Enquire", phone: CONTACT_PHONE_NUMBERS[0]?.display },
-  { label: "For Property Listings", phone: CONTACT_PHONE_NUMBERS[1]?.display },
-  { label: "To Reach Our Team", phone: CONTACT_PHONE_NUMBERS[0]?.display },
-  { label: "For Business Enquiries", phone: CONTACT_PHONE_NUMBERS[1]?.display },
-  { label: "To Sell Your Property", phone: CONTACT_PHONE_NUMBERS[0]?.display },
-  { label: "For Service Assistance", phone: CONTACT_PHONE_NUMBERS[1]?.display },
+  { label: "To Buy or Business Enquire", phone: "+91 99940 05086" },
+  { label: "To Sell", phone: "+91 91501 00499" },
+  { label: "For Property Listing", phone: "+91 91501 00499" },
+  { label: "For Rental Enquire", phone: "+91 91501 00477" },
+  { label: "For Office & Home Service Enquire", phone: "+91 91501 00477" },
+  { label: "To Reach our Team", phone: "+91 82489 18906" },
 ];
 
 const ContactPage = () => {

@@ -269,6 +269,8 @@ const HomePage = () => {
   const leaveTimeoutRef = useRef(null);
   const showcaseTrackRef = useRef(null);
   const [showcaseIndex, setShowcaseIndex] = useState(0);
+  // Tracks whether the user has actually interacted with the showcase carousel
+  const showcaseInteractedRef = useRef(false);
 
 
   const [search, setSearch] = useState({
@@ -327,16 +329,14 @@ const HomePage = () => {
     };
   }, []);
 
+  // GSAP animations — run ONCE on mount only.
+  // Do NOT include featured.length here; that would revert + rebuild all
+  // ScrollTriggers whenever the API response arrives, causing a scroll-position jump.
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduceMotion) return undefined;
 
     const ctx = gsap.context(() => {
-      // Ensure the page starts at the very top before any scroll-triggered animation
-      ScrollTrigger.clearScrollMemory();
-      window.history.scrollRestoration = "manual";
-      window.scrollTo(0, 0);
-
       gsap.from(".home-gsap-hero-item", {
         autoAlpha: 0,
         y: 28,
@@ -434,6 +434,19 @@ const HomePage = () => {
     }, homeRootRef);
 
     return () => ctx.revert();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // When featured properties load, recalculate ScrollTrigger positions
+  // WITHOUT reverting/rebuilding the entire GSAP context (which would jump scroll)
+  useEffect(() => {
+    if (featured.length > 0) {
+      // Small delay to let React render the new property cards first
+      const timer = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
   }, [featured.length]);
 
   const queryString = useMemo(() => {
@@ -484,6 +497,7 @@ const HomePage = () => {
   const maxShowcaseIndex = Math.max(0, showcaseItems.length - 1);
 
   const scrollShowcase = (direction) => {
+    showcaseInteractedRef.current = true;
     setShowcaseIndex((current) => {
       const next = direction === "next"
         ? Math.min(current + 1, maxShowcaseIndex)
@@ -493,6 +507,9 @@ const HomePage = () => {
   };
 
   useEffect(() => {
+    // Only run scrollIntoView after the user has interacted with the carousel,
+    // never on initial mount — prevents scroll jump on page load/refresh.
+    if (!showcaseInteractedRef.current) return;
     const track = showcaseTrackRef.current;
     if (!track) return;
     const card = track.children[showcaseIndex];
@@ -1082,18 +1099,16 @@ const HomePage = () => {
             <div className="overflow-hidden pointer-events-none">
               <div className="home-scroll-track partners-scroll pointer-events-auto">
                 {[
-                  { name: "Partner 1", logo: "P1" },
-                  { name: "Partner 2", logo: "P2" },
-                  { name: "Partner 3", logo: "P3" },
-                  { name: "Partner 4", logo: "P4" },
-                  { name: "Partner 5", logo: "P5" },
-                  { name: "Partner 6", logo: "P6" },
-                  { name: "Partner 1", logo: "P1" },
-                  { name: "Partner 2", logo: "P2" },
-                  { name: "Partner 3", logo: "P3" },
-                  { name: "Partner 4", logo: "P4" },
-                  { name: "Partner 5", logo: "P5" },
-                  { name: "Partner 6", logo: "P6" },
+                  { name: "Gyes property & construction", logo: "Gyes P&C" },
+                  { name: "Gyes traders", logo: "Gyes Traders" },
+                  { name: "Onedice office & Home service", logo: "Onedice" },
+                  { name: "Alluring Realty", logo: "Alluring" },
+                  { name: "Hareesh Enterprises (Document writer)", logo: "Hareesh" },
+                  { name: "Gyes property & construction", logo: "Gyes P&C" },
+                  { name: "Gyes traders", logo: "Gyes Traders" },
+                  { name: "Onedice office & Home service", logo: "Onedice" },
+                  { name: "Alluring Realty", logo: "Alluring" },
+                  { name: "Hareesh Enterprises (Document writer)", logo: "Hareesh" },
                 ].map((partner, index) => (
                   <div key={index} className="partner-item group">
                     <div className="text-center">

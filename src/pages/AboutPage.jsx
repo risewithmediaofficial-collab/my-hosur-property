@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRightIcon, CheckCircleIcon, ShieldCheckIcon, UsersIcon } from "../components/AppIcons";
+import { ArrowRightIcon, CheckCircleIcon, ShieldCheckIcon, UsersIcon, CheckBadgeIcon, ChartBarIcon, HomeModernIcon, GardenIcon } from "../components/AppIcons";
 import CountUpNumber from "../components/CountUpNumber";
 import MarketingCard, { IconCircle } from "../components/MarketingCard";
 import PageHero from "../components/PageHero";
@@ -9,12 +9,6 @@ import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo"
 import founderImage from "../assets/myhosurproperty vijay kumar founder.jpeg";
 import directorImage from "../assets/director 1.jpeg";
 import useScrollAnimation from "../hooks/useScrollAnimation";
-
-const stats = [
-  { value: 2500, suffix: "+", label: "Verified listings" },
-  { value: 12000, suffix: "+", label: "Leads managed" },
-  { value: 25, suffix: "+", label: "Service categories" },
-];
 
 const principles = [
   {
@@ -108,27 +102,101 @@ const AboutPage = () => {
         canonicalPath="/about"
         schema={[buildRealEstateAgentSchema(), buildBreadcrumbSchema(breadcrumbs)]}
       />
-      {/* Stats + Image */}
-      <PageSection tone="surface" className="!pt-24 sm:!pt-28 !pb-10">
-        <div className="grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-start">
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card">
+      {/* Our Story */}
+      <PageSection tag="Our Story" title="Built on Trust. Driven by Purpose." tone="surface" className="!pt-6 sm:!pt-8 !pb-14">
+        <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+          {/* Left Column: Story Content */}
+          <div className="flex flex-col gap-6">
+            <div className="border-l-4 border-orange pl-4">
+              <p className="text-base leading-7 text-slate-700 font-semibold">
+                What began as a small vision to create honest and quality real estate experiences has grown into a trusted platform for thousands of families and investors in Hosur.
+              </p>
+            </div>
+            <p className="text-sm leading-7 text-slate-600">
+              We believe every property holds potential – not just in value, but in the life it helps build. That's why we combine local expertise with modern technology to help you find spaces that truly fit your dreams and future.
+            </p>
+            
+            {/* Story Metrics */}
+            <div className="grid grid-cols-3 gap-4 mt-4 border-t border-slate-100 pt-6">
+              {[
+                { value: 2500, suffix: "+", label: "Verified Listings" },
+                { value: 12000, suffix: "+", label: "Happy Clients" },
+                { value: 8, suffix: "+", label: "Years of Trust" }
+              ].map((item) => (
+                <div key={item.label} className="text-left">
+                  <p className="text-2xl font-bold text-navy sm:text-3xl">
+                    <CountUpNumber value={item.value} suffix={item.suffix} />
+                  </p>
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">{item.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Column: Image with Overlay */}
+          <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card gsap-card">
             <img
-              src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1400&q=80"
-              alt="Modern home exterior representing the MyHosurProperty platform"
-              className="h-[280px] w-full object-cover sm:h-[320px]"
+              src="https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=1200&q=80"
+              alt="Premium villa representing Gyes Construction"
+              className="h-[320px] w-full object-cover sm:h-[380px]"
               loading="lazy"
               decoding="async"
             />
-          </div>
-          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
-            {stats.map((item) => (
-              <div key={item.label} className="stat-card text-center lg:text-left">
-                <p className="stat-value">
-                  <CountUpNumber value={item.value} suffix={item.suffix} />
-                </p>
-                <p className="stat-label">{item.label}</p>
+            {/* Overlay card */}
+            <div className="absolute bottom-6 left-6 right-6 sm:right-auto bg-navy text-white rounded-xl p-4 shadow-lg flex items-center gap-3 max-w-[280px]">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-white/10">
+                <CheckCircleIcon className="h-6 w-6 text-orange" />
               </div>
-            ))}
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-orange">My Hosur Property</p>
+                <p className="text-xs leading-relaxed text-white/90 font-medium mt-0.5">
+                  Building more than properties, we build trust.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Timeline Section */}
+        <div className="mt-20 border-t border-slate-100 pt-16">
+          <div className="relative grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+            {/* Connecting line for desktop */}
+            <div className="absolute left-10 right-10 top-6 hidden h-0.5 bg-slate-200 lg:block" />
+
+            {[
+              { year: "2018", title: "The Beginning", desc: "Started with a simple goal to make real estate transparent and reliable in our community.", icon: GardenIcon },
+              { year: "2020", title: "Growing Together", desc: "Expanded our team and services, helping more clients find the right spaces.", icon: UsersIcon },
+              { year: "2022", title: "Building Trust", desc: "Earned thousands of happy clients and became a trusted real estate partner.", icon: CheckBadgeIcon },
+              { year: "2024", title: "Expanding Horizons", desc: "Introduced advanced technology and new services to create better experiences.", icon: ChartBarIcon },
+              { year: "Future", title: "Continuing Journey", desc: "We continue to innovate, serve, and build a better future for our clients.", icon: HomeModernIcon }
+            ].map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <div key={index} className="relative z-10 flex flex-col items-center text-center px-4">
+                  {/* Circle container */}
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white border-2 border-[#0042a2] text-[#0042a2] shadow-sm transition hover:scale-105">
+                    <Icon className="h-5 w-5 text-orange" />
+                  </div>
+                  <div className="mt-3 text-sm font-bold text-orange">{item.year}</div>
+                  <h4 className="mt-1 text-sm font-bold text-navy">{item.title}</h4>
+                  <p className="mt-2 text-xs leading-5 text-slate-500 max-w-[190px]">{item.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Bottom Quote Box */}
+        <div className="mt-16 bg-white border border-slate-200/60 rounded-xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-start gap-4">
+            <span className="text-4xl text-orange font-serif leading-none select-none">“</span>
+            <p className="text-sm sm:text-base font-medium text-navy leading-relaxed italic">
+              Our story is not just about buildings. It's about people, dreams, and the future we build together.
+            </p>
+          </div>
+          <div className="flex-shrink-0 text-center md:text-right border-t md:border-t-0 md:border-l border-slate-200 pt-4 md:pt-0 md:pl-6">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">With Gratitude</p>
+            <p className="text-sm font-bold text-navy mt-1 font-philosopher italic">Thank you for being part of our journey.</p>
           </div>
         </div>
       </PageSection>

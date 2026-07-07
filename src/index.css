@@ -109,7 +109,11 @@ button:focus {
 }
 
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior is intentionally NOT set to "smooth" here.
+     Setting scroll-behavior: smooth on html causes window.scrollTo(0, 0)
+     to ANIMATE instead of jump — the browser's async scroll-restoration
+     can then race against the animation and land the page mid-scroll.
+     Apply smooth scrolling at the element level only where needed. */
 }
 
 body {

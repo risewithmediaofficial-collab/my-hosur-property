@@ -9,7 +9,7 @@ import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
 import AnimatedOTPInput from "../components/AnimatedOTPInput";
 import { AnimatedCharactersLoginPage } from "../components/ui/animated-characters-login-page";
-import loginHeroineImage from "../assets/login_heroine_image.png";
+import loginIllustration from "../assets/Wavy_Gen-01_Single-07.jpg";
 
 const MotionDiv = motion.div;
 const AUTH_FORM = {
@@ -265,7 +265,7 @@ const AuthPage = () => {
   const submit = async (event) => {
     event.preventDefault();
 
-    // ── Hard guard: login mode NEVER shows OTP. If step is somehow "otp" from
+    // ΓöÇΓöÇ Hard guard: login mode NEVER shows OTP. If step is somehow "otp" from
     //    a stale signup session, reset it and re-submit as a normal login.
     if (mode === "login" && (step === "otp" || step === "forgot_otp")) {
       resetOtpFlow();
@@ -326,9 +326,9 @@ const AuthPage = () => {
         return;
       }
 
-      // ── Signup OTP verify step ────────────────────────────────────────────
+      // ΓöÇΓöÇ Signup OTP verify step ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
       if (step === "otp" && mode === "signup") {
-        // ── MSG91 Widget OTP verify path ─────────────────────────────────────────
+        // ΓöÇΓöÇ MSG91 Widget OTP verify path ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
         if (otpState?.provider === "msg91_widget" && typeof window.verifyOtp === "function") {
           console.log("[OTP] Using MSG91 widget verifyOtp for code:", otpCode.trim());
           window.verifyOtp(
@@ -368,7 +368,7 @@ const AuthPage = () => {
           return;
         }
 
-        // ── Backend OTP verify path (challenge-based) ─────────────────────────
+        // ΓöÇΓöÇ Backend OTP verify path (challenge-based) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
         if (!otpState?.challengeId) {
           toast.error("OTP session expired or invalid. Please start again.");
           setLoading(false);
@@ -397,8 +397,8 @@ const AuthPage = () => {
               };
 
         if (mode === "signup") {
-          // ── Always use backend WhatsApp OTP for signup ─────────────────────
-          // The MSG91 widget sends SMS/Voice — NOT WhatsApp.
+          // ΓöÇΓöÇ Always use backend WhatsApp OTP for signup ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+          // The MSG91 widget sends SMS/Voice ΓÇö NOT WhatsApp.
           // Our backend calls MSG91's WhatsApp outbound API directly.
           console.log("[signup] Sending OTP via backend WhatsApp API...");
           try {
@@ -418,7 +418,7 @@ const AuthPage = () => {
             setLoading(false);
           }
         } else if (mode === "forgot_password") {
-          // ── Forgot password path ───────────────────────────────────────────
+          // ΓöÇΓöÇ Forgot password path ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
           console.log("[OTP] Sending forgot password request to backend...");
           try {
             const res = await forgotPassword({
@@ -439,7 +439,7 @@ const AuthPage = () => {
             setLoading(false);
           }
         } else {
-          // ── Login path — ALWAYS direct, NO OTP ────────────────────────────
+          // ΓöÇΓöÇ Login path ΓÇö ALWAYS direct, NO OTP ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
           console.log("[login] Sending login request to backend...");
           const data = await loginUser(payload);
           console.log("[login] loginUser response:", data);
@@ -556,57 +556,39 @@ const AuthPage = () => {
             overflow: visible;
             padding: 0;
           }
-          .auth-left {
-            display: none !important;
-          }
+          .auth-left { display: none !important; }
         }
-
         .auth-left {
           grid-area: hero;
           height: 100%;
           overflow: hidden;
-          background: #f8fafc;
+          background: #ffffff;
           border-right: 1px solid #e5e7eb;
           display: flex;
           flex-direction: column;
-          justify-content: flex-start;
-          align-items: flex-start;
-          padding: clamp(28px, 4vh, 48px) 0 32px;
-          min-width: 0;
+          justify-content: flex-end;
+          align-items: center;
+          padding: 40px clamp(24px, 4vw, 48px) 48px;
         }
-        .auth-left-img {
-          position: absolute;
-          inset: 0;
-          object-fit: cover;
+        .auth-left-illustration-container {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           width: 100%;
-          height: 100%;
-          opacity: 0.06;
+          margin-bottom: 32px;
         }
-        .auth-left-overlay {
-          position: absolute;
-          inset: 0;
-          background: rgba(255, 255, 255, 0.9);
+        .auth-left-illustration {
+          width: 100%;
+          max-width: 440px;
+          height: auto;
+          max-height: 420px;
+          object-fit: contain;
         }
         .auth-left-content {
-          position: relative;
-          z-index: 1;
-          max-width: 520px;
-          margin: 0;
+          width: 100%;
+          max-width: 460px;
           text-align: left;
-        }
-        .auth-left-logo {
-          display: inline-flex;
-          align-items: center;
-          padding: 10px 14px;
-          border: 1px solid #e5e7eb;
-          border-radius: 18px;
-          background: #ffffff;
-          box-shadow: 0 12px 30px rgba(0, 66, 162, 0.08);
-          margin-bottom: 22px;
-        }
-        .auth-left-logo-img {
-          width: 280px;
-          max-width: 100%;
         }
         .auth-left-heading {
           margin: 0 0 14px;
@@ -615,57 +597,21 @@ const AuthPage = () => {
           color: #111111;
           line-height: 1.08;
           letter-spacing: -1.2px;
-          max-width: 440px;
         }
         .auth-left-sub {
-          margin: 0;
-          max-width: 390px;
+          margin: 0 0 32px;
           font-size: 15px;
           line-height: 1.65;
           color: #555555;
         }
-        .auth-stats {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 12px;
-          margin-top: 0;
-          max-width: 460px;
-        }
-        @media (max-height: 820px) {
-          .auth-left {
-            padding-top: 40px;
-          }
-          .auth-left-content {
-            margin-top: 0;
-          }
-        }
-        .auth-stat-item {
-          padding: 14px 0;
-          border-top: 1px solid #e5e7eb;
-        }
-        .auth-stat-num {
-          font-size: 26px;
-          line-height: 1;
-          font-weight: 700;
-          color: #111111;
-        }
-        .auth-stat-label {
-          margin-top: 8px;
-          font-size: 11px;
-          font-weight: 600;
-          color: #6b7280;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-        }
-
         .auth-right {
           grid-area: form;
           position: relative;
           z-index: 3;
           display: flex;
           align-items: flex-start;
-          justify-content: flex-end;
-          padding: clamp(28px, 4vh, 48px) 0 32px;
+          justify-content: flex-start;
+          padding: clamp(28px, 4vh, 48px) clamp(16px, 3vw, 48px) 32px;
           overflow: visible;
           background: #ffffff;
           height: 100%;
@@ -1056,14 +1002,18 @@ const AuthPage = () => {
 
       <div className="auth-page">
         <div className="auth-left">
-          <img
-            className="auth-left-img"
-            src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=1200&q=80"
-            alt="Modern buildings in Hosur"
-          />
-          <div className="auth-left-overlay" />
+          <div className="auth-left-illustration-container">
+            <img
+              className="auth-left-illustration"
+              src={loginIllustration}
+              alt="Hosur Property Marketplace Illustration"
+            />
+          </div>
 
           <div className="auth-left-content">
+            <p className="auth-left-sub" style={{ margin: "0 0 24px" }}>
+              Browse verified listings, connect with genuine sellers, and manage your property journey with less friction.
+            </p>
             <div className="auth-stats" style={{ marginTop: 0 }}>
               {[
                 ["2,400+", "Listings"],
@@ -1076,9 +1026,6 @@ const AuthPage = () => {
                 </div>
               ))}
             </div>
-            <p className="auth-left-sub" style={{ marginTop: "20px" }}>
-              Browse verified listings, connect with genuine sellers, and manage your property journey with less friction.
-            </p>
           </div>
         </div>
 
@@ -1183,7 +1130,7 @@ const AuthPage = () => {
                             <ShieldCheckIcon className="auth-free-badge-icon" />
                             <span>
                               OTP expires in <strong>{Math.max(0, otpExpiryCountdown)} seconds</strong>.
-                              {!isSignup ? " This keeps your account sign-in protected." : (otpState?.channel === "whatsapp" ? " We’ll activate your account right after WhatsApp verification." : " We’ll activate your account right after email verification.")}
+                              {!isSignup ? " This keeps your account sign-in protected." : (otpState?.channel === "whatsapp" ? " WeΓÇÖll activate your account right after WhatsApp verification." : " WeΓÇÖll activate your account right after email verification.")}
                               {otpState?.developmentOtp ? (
                                 <>
                                   {" "}
