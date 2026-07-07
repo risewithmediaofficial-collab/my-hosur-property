@@ -312,14 +312,13 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* ── CTA Banner ── */}
-      <PageSection tone="navy" innerClassName="lg:flex lg:items-center lg:justify-between lg:gap-8" className="gsap-section">
+      <PageSection tone="white" innerClassName="lg:flex lg:items-center lg:justify-between lg:gap-8 border border-slate-200/60 rounded-2xl bg-white p-8 sm:p-10 shadow-soft" className="gsap-section">
         <div className="text-center lg:text-left">
           <p className="section-tag !text-orange">Built for clarity</p>
-          <h2 className="mt-2 text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
+          <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl lg:text-4xl">
             A local real-estate platform that feels simple, premium, and trustworthy.
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-8 text-white sm:text-base lg:mx-0">
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-8 text-slate-600 sm:text-base lg:mx-0">
             We combine property discovery, documentation support, service assistance, and local market knowledge into one structured platform for Hosur.
           </p>
         </div>

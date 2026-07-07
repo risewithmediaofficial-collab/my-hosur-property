@@ -1299,19 +1299,18 @@ body {
 }
 
 .marketing-hero {
-  background: linear-gradient(135deg, #0042a2 0%, #1b5fc0 100%);
-  color: #ffffff;
+  background: #ffffff;
+  color: #274F9A;
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 66, 162, 0.15);
 }
 
 .marketing-hero h1,
 .marketing-hero h2 {
-  color: #ffffff;
+  color: #0042a2;
 }
 
 .marketing-hero p {
-  color: rgba(255, 255, 255, 0.78);
+  color: #274F9A;
 }
 
 .marketing-card {
@@ -2345,11 +2344,11 @@ body {
 .marketing-hero h4,
 .marketing-hero h5,
 .marketing-hero h6 {
-  color: #0042a2;
+  color: #0042a2 !important;
 }
 
 .marketing-hero p {
-  color: #274F9A;
+  color: #274F9A !important;
 }
 
 .marketing-hero .text-white {
