@@ -75,7 +75,7 @@ const Label = styled.p`
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.55);
-  font-family: "Inter", "Outfit", sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 500;
   text-align: center;
 `;

@@ -9,16 +9,21 @@ import {
   BanknotesIcon,
   BuildingOffice2Icon,
   BuildingOfficeIcon,
+  CheckBadgeIcon,
   CheckIcon,
   ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   DocumentTextIcon,
   FlagIcon,
+  HandshakeIcon,
+  HomeIcon,
   LandIcon,
   HomeModernIcon,
-  MagnifyingGlassIcon,
   PaintBrushIcon,
   RentIcon,
   ScaleIcon,
+  UserGroupIcon,
   VillaIcon,
   WrenchScrewdriverIcon,
 } from "../components/AppIcons";
@@ -29,15 +34,13 @@ import {
   PROPERTY_MANAGEMENT_SHORTCUTS,
 } from "../constants/serviceCatalog";
 import PropertyCard from "../components/PropertyCard";
-import Hero from "../components/Hero";
 import DotField from "../components/DotField";
 import LocalityDropdown from "../components/LocalityDropdown";
 import SeoHead from "../components/SeoHead";
 import useDebounce from "../hooks/useDebounce";
 import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
-import darkHeroBg from "../assets/dark-hero-bg.png";
-const HERO_BG = darkHeroBg;
+import servicesHeroImage from "../assets/house.png";
 import { fetchHomeProperties } from "../services/api/propertyApi";
 import { buildRealEstateAgentSchema, buildWebsiteSchema } from "../utils/seo";
 
@@ -81,6 +84,15 @@ const propertyTypeIcons = {
   Flat: BuildingOfficeIcon,
   "Commercial Land": BuildingOffice2Icon,
   "Agricultural Land": LandIcon,
+};
+
+const propertyTypeDescriptions = {
+  Plot: ["Residential & commercial", "plots across Hosur"],
+  Villa: ["Premium gated", "villa communities"],
+  "Independent House": ["Spacious standalone", "homes with privacy"],
+  Flat: ["Apartments in prime", "Hosur localities"],
+  "Commercial Land": ["Office & retail", "commercial spaces"],
+  "Agricultural Land": ["Farm & agricultural", "land listings"],
 };
 
 /* Background images for each property type card hover */
@@ -188,14 +200,48 @@ const servicePreview = [
 ];
 
 const showcaseItems = [
-  { title: "Buy Property", description: "Find your dream home", icon: HomeModernIcon },
-  { title: "Sell Property", description: "Quick and verified sales", icon: BanknotesIcon },
-  { title: "Rent Property", description: "Lease verified homes", icon: RentIcon },
-  { title: "Commercial", description: "Office & retail spaces", icon: BuildingOffice2Icon },
-  { title: "Land Sale", description: "Agricultural & residential land", icon: LandIcon },
-  { title: "Interior Design", description: "Customized interiors", icon: PaintBrushIcon },
-  { title: "Construction", description: "Build your project", icon: WrenchScrewdriverIcon },
-  { title: "Legal Support", description: "Documentation assistance", icon: DocumentTextIcon },
+  {
+    title: "Sell Property",
+    description: "Quick and verified sales",
+    icon: BanknotesIcon,
+    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80",
+    to: "/post-property",
+  },
+  {
+    title: "Rent Property",
+    description: "Lease verified homes",
+    icon: RentIcon,
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+    to: "/listings?intent=rent",
+  },
+  {
+    title: "Commercial",
+    description: "Office & retail spaces",
+    icon: BuildingOffice2Icon,
+    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+    to: "/listings?intent=buy&propertyType=Commercial%20Land",
+  },
+  {
+    title: "Land Sale",
+    description: "Agricultural & residential land",
+    icon: LandIcon,
+    image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
+    to: "/listings?intent=buy&propertyType=Plot",
+  },
+  {
+    title: "Interior Design",
+    description: "Customized interiors",
+    icon: PaintBrushIcon,
+    image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80",
+    to: "/request-service?category=interior",
+  },
+];
+
+const trustStats = [
+  { value: 500, suffix: "+", label: "Happy Clients", icon: UserGroupIcon },
+  { value: 150, suffix: "+", label: "Properties Sold", icon: HomeIcon },
+  { value: 15, suffix: "+", label: "Years Experience", icon: CheckBadgeIcon },
+  { value: 100, suffix: "%", label: "Satisfaction Rate", icon: HandshakeIcon },
 ];
 
 /* Testimonial placeholder data */
@@ -221,6 +267,8 @@ const HomePage = () => {
   const shortcutBarRef = useRef(null);
   const propertyTypeMenuRef = useRef(null);
   const leaveTimeoutRef = useRef(null);
+  const showcaseTrackRef = useRef(null);
+  const [showcaseIndex, setShowcaseIndex] = useState(0);
 
 
   const [search, setSearch] = useState({
@@ -427,6 +475,26 @@ const HomePage = () => {
       }, 300); // 300ms closing delay
     }
   };
+
+  const maxShowcaseIndex = Math.max(0, showcaseItems.length - 1);
+
+  const scrollShowcase = (direction) => {
+    setShowcaseIndex((current) => {
+      const next = direction === "next"
+        ? Math.min(current + 1, maxShowcaseIndex)
+        : Math.max(current - 1, 0);
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    const track = showcaseTrackRef.current;
+    if (!track) return;
+    const card = track.children[showcaseIndex];
+    if (card) {
+      card.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+    }
+  }, [showcaseIndex]);
 
   return (
     <main ref={homeRootRef} className="page-shell w-full overflow-hidden">
@@ -689,38 +757,44 @@ const HomePage = () => {
         whileInView="show"
         viewport={{ once: true, amount: 0.18 }}
         variants={reveal}
-        className="home-gsap-section bg-white px-5 py-16 sm:px-8 lg:px-10"
+        className="home-property-types-section home-modern-section home-gsap-section px-5 py-14 sm:px-8 sm:py-20 lg:px-10"
       >
-        <div className="mx-auto max-w-[1440px] text-center">
-          <p className="section-tag">Property types</p>
-          <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">Explore property categories in Hosur</h2>
-        </div>
-        <div className="mx-auto mt-8 grid max-w-[1440px] grid-cols-2 gap-4 sm:mt-10 md:grid-cols-3 lg:grid-cols-6">
-          {propertyTypeOptions
-            .filter((option) => option.value)
-            .map((option) => {
-              const Icon = propertyTypeIcons[option.value] || BuildingOffice2Icon;
-              const bgImg = propertyTypeImages[option.value];
-              return (
-                <Link
-                  key={option.value}
-                  to={`/listings?intent=buy&propertyType=${encodeURIComponent(option.value)}`}
-                  className="home-gsap-card group relative flex flex-col items-center overflow-hidden rounded-xl border border-slate-200 bg-white p-6 text-center shadow-card transition-all duration-300"
-                >
-                  {/* Subtle hover tint — no image */}
-                  <div className="absolute inset-0 bg-navy/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-xl" />
+        <div className="mx-auto max-w-[1440px]">
+          <div className="home-property-types-intro">
+            <p className="section-tag">Property types</p>
+            <h2 className="mt-3">Explore property categories in Hosur</h2>
+            <p>Browse verified listings across plots, villas, flats, and commercial properties.</p>
+          </div>
 
-                  {/* Content sits above */}
-                  <div className="relative z-10 flex flex-col items-center">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-navy text-navy transition-all duration-300 group-hover:border-orange group-hover:text-orange">
-                      <Icon className="h-6 w-6" />
+          <div className="home-property-types-grid">
+            {propertyTypeOptions
+              .filter((option) => option.value)
+              .map((option) => {
+                const Icon = propertyTypeIcons[option.value] || BuildingOffice2Icon;
+                const desc = propertyTypeDescriptions[option.value] || ["Browse verified", "listings in Hosur"];
+                return (
+                  <Link
+                    key={option.value}
+                    to={`/listings?intent=buy&propertyType=${encodeURIComponent(option.value)}`}
+                    className="home-gsap-card home-property-type-card group"
+                  >
+                    <div className="home-type-icon">
+                      <Icon className="h-7 w-7" />
                     </div>
-                    <p className="mt-4 text-base font-bold text-navy">{option.label}</p>
-                    <p className="mt-1 text-xs text-slate-500">Browse listings</p>
-                  </div>
-                </Link>
-              );
-            })}
+                    <h3 className="home-type-title">{option.label}</h3>
+                    <p className="home-type-desc">
+                      {desc[0]}
+                      <br />
+                      {desc[1]}
+                    </p>
+                    <span className="home-type-link">
+                      Browse listings
+                      <ArrowRightIcon className="h-4 w-4" />
+                    </span>
+                  </Link>
+                );
+              })}
+          </div>
         </div>
       </MotionSection>
 
@@ -730,98 +804,147 @@ const HomePage = () => {
         whileInView="show"
         viewport={{ once: true, amount: 0.05 }}
         variants={reveal}
-        className="home-gsap-section bg-surface px-5 py-16 sm:px-8 lg:px-10"
+        className="home-modern-section home-gsap-section bg-white px-5 py-16 sm:px-8 lg:px-10"
       >
-        <div className="mx-auto max-w-[1440px] text-center">
-          <p className="section-tag">Our services</p>
-          <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">Complete property support for Hosur</h2>
-        </div>
-        <div className="mx-auto mt-10 grid max-w-[1440px] gap-6 md:grid-cols-3">
-          {servicePreview.map((item) => {
-            const Icon = item.icon;
-            const bgImg = serviceImages[item.title];
-            return (
-              <motion.article
-                key={item.title}
-                variants={cardReveal}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, amount: 0.01 }}
-                className="home-gsap-card home-parallax-soft group relative overflow-hidden rounded-xl border border-slate-200 bg-white p-8 text-center shadow-card transition-all duration-300"
-              >
-                {/* Subtle hover color overlay — no image */}
-                <div className="absolute inset-0 bg-navy/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-xl" />
+        <div className="mx-auto max-w-[1440px] home-services-grid">
+          <div className="text-left">
+            <p className="section-tag">Our services</p>
+            <h2 className="home-section-heading mt-3">Complete property support for Hosur</h2>
+            <p className="mt-4 max-w-sm text-slate-600">
+              From buying and selling to legal registration and construction — we provide end-to-end property support tailored for Hosur.
+            </p>
+            <Link
+              to="/services"
+              className="site-button-primary mt-6 inline-flex min-h-[44px] items-center justify-center rounded-xl px-6 py-2.5 text-sm font-bold"
+            >
+              Explore all services
+            </Link>
+          </div>
 
-                {/* Content */}
-                <div className="relative z-10 flex flex-col items-center">
-                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-navy text-navy transition-all duration-300 group-hover:border-orange group-hover:text-orange">
-                    <Icon className="h-6 w-6" />
+          <div className="space-y-7">
+            {servicePreview.map((item) => {
+              const Icon = item.icon;
+              return (
+                <motion.article
+                  key={item.title}
+                  variants={cardReveal}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true, amount: 0.01 }}
+                  className="home-gsap-card home-service-row"
+                >
+                  <div className="home-service-icon">
+                    <Icon className="h-5 w-5" />
                   </div>
-                  <h2 className="mt-5 text-xl font-bold text-navy">{item.title}</h2>
-                  <p className="mt-3 text-sm leading-7 text-slate-600">{item.description}</p>
-                  <Link to="/services" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-orange transition-colors duration-300 hover:text-orange-hover">
-                    Learn more
-                    <ArrowRightIcon className="h-4 w-4" />
-                  </Link>
-                </div>
-              </motion.article>
-            );
-          })}
+                  <div>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                    <Link to="/services" className="home-service-link">
+                      Learn more
+                      <ArrowRightIcon className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+                </motion.article>
+              );
+            })}
+          </div>
+
+          <div className="home-services-image-wrap home-gsap-card">
+            <img src={servicesHeroImage} alt="Modern villa property in Hosur" loading="lazy" />
+          </div>
         </div>
       </MotionSection>
 
-      {/* ── Property Showcase scrolling strip ── */}
+      {/* ── Property Showcase carousel ── */}
       <MotionSection
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, amount: 0.2 }}
         variants={reveal}
-        className="home-gsap-section bg-gradient-to-b from-surface to-white px-5 py-16 sm:px-8 lg:px-10"
+        className="home-modern-section home-gsap-section bg-white px-5 py-16 sm:px-8 lg:px-10"
       >
-        <div className="mx-auto max-w-[1440px] text-center">
-          <p className="section-tag">Property Showcase</p>
-          <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">Services &amp; Property Types</h2>
-          <p className="home-gsap-copy mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-            Explore the diverse range of properties and services we provide in Hosur
-          </p>
-        </div>
+        <div className="mx-auto max-w-[1440px]">
+          <div className="home-showcase-header">
+            <div>
+              <p className="section-tag">Property Showcase</p>
+              <h2 className="home-section-heading mt-3">Services &amp; Property Types</h2>
+              <p className="home-gsap-copy mt-3 max-w-xl text-slate-600">
+                Explore the diverse range of properties and services we provide in Hosur
+              </p>
+            </div>
+            <div className="home-showcase-nav">
+              <button
+                type="button"
+                className="home-showcase-nav-btn"
+                onClick={() => scrollShowcase("prev")}
+                disabled={showcaseIndex === 0}
+                aria-label="Previous showcase item"
+              >
+                <ChevronLeftIcon className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                className="home-showcase-nav-btn"
+                onClick={() => scrollShowcase("next")}
+                disabled={showcaseIndex >= maxShowcaseIndex}
+                aria-label="Next showcase item"
+              >
+                <ChevronRightIcon className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
 
-        <div className="mx-auto mt-12 max-w-[1440px]">
-          <div className="relative overflow-hidden">
-            <style>{`
-              @keyframes scroll-services { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-              .services-scroll { display: flex; gap: 1.5rem; animation: scroll-services 40s linear infinite; width: max-content; will-change: transform; }
-              .service-card { flex-shrink: 0; width: 280px; background: #ffffff; border: 2px solid #dfe6ee; border-radius: 16px; padding: 24px; text-align: center; transition: all 0.3s ease; cursor: pointer; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08); user-select: none; position: relative; overflow: hidden; }
-              .service-card-content { position: relative; z-index: 10; }
-              .service-card:hover { border-color: #FF9914; transform: translateY(-8px); box-shadow: 0 12px 24px rgba(255, 153, 20, 0.15); }
-              .service-icon { width: 60px; height: 60px; margin: 0 auto; border: 2px solid #274F9A; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #274F9A; transition: all 0.3s ease; }
-              .service-card:hover .service-icon { border-color: #FF9914 !important; color: #FF9914 !important; }
-              .gradient-fade-services { pointer-events: none; user-select: none; }
-              .gradient-fade-left-services { position: absolute; left: 0; top: 0; bottom: 0; width: 100px; background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }
-              .gradient-fade-right-services { position: absolute; right: 0; top: 0; bottom: 0; width: 100px; background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }
-            `}</style>
-
-            <div className="gradient-fade-services gradient-fade-left-services"></div>
-            <div className="overflow-hidden pointer-events-none">
-              <div className="home-scroll-track services-scroll pointer-events-auto">
-                {[...showcaseItems, ...showcaseItems].map((service, index) => {
-                  const Icon = service.icon;
-                  return (
-                    <div key={`${service.title}-${index}`} className="service-card group">
-                      <div className="service-card-content">
-                        <div className="service-icon">
-                          <Icon className="h-6 w-6" />
-                        </div>
-                        <h3 className="mt-4 text-lg font-bold text-navy">{service.title}</h3>
-                        <p className="mt-2 text-sm text-slate-600">{service.description}</p>
+          <div className="mt-10 overflow-hidden">
+            <div ref={showcaseTrackRef} className="home-showcase-track">
+              {showcaseItems.map((service) => {
+                const Icon = service.icon;
+                return (
+                  <Link
+                    key={service.title}
+                    to={service.to}
+                    className="home-showcase-card home-gsap-card"
+                    style={{ backgroundImage: `url(${service.image})` }}
+                  >
+                    <div className="home-showcase-card-content">
+                      <div className="home-showcase-card-icon">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h3>{service.title}</h3>
+                        <p>{service.description}</p>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                  </Link>
+                );
+              })}
             </div>
-            <div className="gradient-fade-services gradient-fade-right-services"></div>
           </div>
+        </div>
+      </MotionSection>
+
+      {/* ── Trust stats bar ── */}
+      <MotionSection
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={reveal}
+        className="home-modern-section home-gsap-section bg-white px-5 pb-16 sm:px-8 lg:px-10"
+      >
+        <div className="mx-auto max-w-[1440px] home-trust-stats">
+          {trustStats.map((item) => {
+            const Icon = item.icon;
+            return (
+              <div key={item.label} className="home-trust-stat home-gsap-card">
+                <div className="home-trust-icon">
+                  <Icon className="h-6 w-6" />
+                </div>
+                <p className="home-trust-value">
+                  <CountUpNumber value={item.value} suffix={item.suffix} />
+                </p>
+                <p className="home-trust-label">{item.label}</p>
+              </div>
+            );
+          })}
         </div>
       </MotionSection>
 
@@ -921,9 +1044,6 @@ const HomePage = () => {
           </div>
         </div>
       </MotionSection>
-
-      {/* Luxury Showcase Hero Section */}
-      <Hero />
 
       {/* ── Partners ── */}
       <MotionSection

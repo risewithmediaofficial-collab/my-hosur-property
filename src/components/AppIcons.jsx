@@ -20,6 +20,7 @@ export { default as CheckBadgeIcon } from "@mui/icons-material/VerifiedOutlined"
 export { default as CheckCircleIcon } from "@mui/icons-material/CheckCircleOutlineOutlined";
 export { default as CheckIcon } from "@mui/icons-material/CheckOutlined";
 export { default as ChevronDownIcon } from "@mui/icons-material/ExpandMoreOutlined";
+export { default as ChevronLeftIcon } from "@mui/icons-material/ChevronLeftOutlined";
 export { default as ChevronRightIcon } from "@mui/icons-material/ChevronRightOutlined";
 export { default as ClipboardDocumentCheckIcon } from "@mui/icons-material/FactCheckOutlined";
 export { default as ClipboardDocumentListIcon } from "@mui/icons-material/AssignmentOutlined";
