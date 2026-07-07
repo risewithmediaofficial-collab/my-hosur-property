@@ -118,13 +118,16 @@ const ServicesPage = () => {
       <section className="marketing-hero px-6 py-10 sm:px-8 lg:px-10 lg:py-14 gsap-section">
         <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center gsap-hero-item">
           <div className="max-w-3xl">
-            <div className="site-kicker text-orange-400">
-            </div>
-            <h1 className="mt-5 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl text-navy">
-              Complete property solutions for every stage of your real-estate journey.
+            <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-orange">
+              <span className="h-0.5 w-6 bg-orange rounded-full inline-block" />
+              My Hosur Property · Services
+            </p>
+            <h1 className="mt-4 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl" style={{ color: '#0042a2' }}>
+              Complete property solutions for every stage of your{" "}
+              <span style={{ color: '#FF9914' }}>real-estate journey.</span>
             </h1>
-            <p className="mt-5 max-w-3xl text-base leading-8 text-slate-600">
-              Complete Property Solutions - From Buying & Selling to Loans, Registration, Construction, and Legal Support.
+            <p className="mt-5 max-w-2xl text-base leading-8" style={{ color: '#274F9A' }}>
+              From Buying &amp; Selling to Loans, Registration, Construction, and Legal Support — we cover it all in Hosur.
             </p>
           </div>
 

@@ -2337,8 +2337,6 @@ body {
 .marketing-hero {
   background: #ffffff !important;
   color: var(--site-ink) !important;
-  border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04) !important;
 }
 
 .marketing-hero h1,
@@ -2347,11 +2345,11 @@ body {
 .marketing-hero h4,
 .marketing-hero h5,
 .marketing-hero h6 {
-  color: var(--navy) !important;
+  color: #0042a2;
 }
 
 .marketing-hero p {
-  color: var(--site-ink) !important;
+  color: #274F9A;
 }
 
 .marketing-hero .text-white {
