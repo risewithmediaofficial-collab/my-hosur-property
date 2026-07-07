@@ -120,15 +120,15 @@ const ServicesPage = () => {
           <div className="max-w-3xl">
             <div className="site-kicker text-orange-400">
             </div>
-            <h1 className="mt-5 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl text-white">
+            <h1 className="mt-5 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl text-navy">
               Complete property solutions for every stage of your real-estate journey.
             </h1>
-            <p className="mt-5 max-w-3xl text-base leading-8 text-white/80">
+            <p className="mt-5 max-w-3xl text-base leading-8 text-slate-600">
               Complete Property Solutions - From Buying & Selling to Loans, Registration, Construction, and Legal Support.
             </p>
           </div>
 
-          <div className="rounded-xl border border-white/15 bg-white/10 p-4 backdrop-blur sm:p-5">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange">Quick service links</p>
             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {serviceQuickLinks.map((item) => {
@@ -138,7 +138,7 @@ const ServicesPage = () => {
                     key={item.key}
                     type="button"
                     onClick={() => setActiveCategoryKey(item.key)}
-                    className="group inline-flex min-h-[52px] w-full items-center gap-3 rounded-lg border border-white/15 bg-white px-4 py-3 text-left text-sm font-bold text-navy shadow-sm transition hover:-translate-y-0.5 hover:border-orange hover:text-orange"
+                    className="group inline-flex min-h-[52px] w-full items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-bold text-navy shadow-sm transition hover:-translate-y-0.5 hover:border-orange hover:text-orange"
                   >
                     <span className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-orange/10 text-orange transition group-hover:bg-orange group-hover:text-white">
                       <Icon className="h-4 w-4" />
@@ -298,7 +298,7 @@ const ServicesPage = () => {
                     <img
                       src={service.image}
                       alt={service.title}
-                      className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+                      className="h-full w-full object-cover transition-transform duration-700"
                     />
                   </div>
                 </div>

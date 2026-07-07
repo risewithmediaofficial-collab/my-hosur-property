@@ -46,7 +46,7 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
         <img
           src={item.images?.[0] || PROPERTY_PLACEHOLDER_IMAGE}
           alt={getPropertyImageAlt(item)}
-          className={`h-full w-full object-cover transition duration-500 ${isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'}`}
+          className={`h-full w-full object-cover transition duration-500 ${isSold ? 'grayscale opacity-60' : ''}`}
           loading="lazy"
           decoding="async"
           onError={(event) => {
