@@ -465,7 +465,7 @@ const HomePage = () => {
 
         {/* Shortcut dropdowns need z-index above the hero */}
         <div ref={heroContentRef} className="relative mx-auto flex max-w-[1440px] flex-col items-center px-5 py-12 text-center will-change-transform sm:px-8 sm:py-16 lg:px-10 lg:py-20" style={{ zIndex: 20 }}>
-          <p className="home-gsap-hero-item section-tag !text-orange">Verified real estate platform</p>
+          <p className="home-gsap-hero-item section-tag !text-navy">Verified real estate platform</p>
           <h1 className="home-gsap-hero-item hero-title mt-4 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-navy">
             Verified property listings in <span className="text-orange">Hosur</span>
           </h1>

@@ -391,6 +391,57 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
     return "";
   };
 
+  const MAX_FILE_SIZE_MB = 10;
+  const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
+  const handleImageFileChange = (e) => {
+    const selected = Array.from(e.target.files || []);
+    const oversized = selected.filter((f) => f.size > MAX_FILE_SIZE_BYTES);
+    const valid = selected.filter((f) => f.size <= MAX_FILE_SIZE_BYTES);
+
+    if (oversized.length > 0) {
+      oversized.forEach((f) => {
+        const sizeMb = (f.size / (1024 * 1024)).toFixed(1);
+        toast.error(`⚠️ Image "${f.name}" is ${sizeMb} MB — maximum allowed size is ${MAX_FILE_SIZE_MB} MB. Please compress or resize the image before uploading.`);
+      });
+    }
+
+    if (valid.length > 5) {
+      toast.error(`You can upload a maximum of 5 images at a time. Only the first 5 images were selected.`);
+    }
+
+    const finalFiles = valid.slice(0, 5);
+    if (finalFiles.length > 0) {
+      setFiles(finalFiles);
+    } else {
+      e.target.value = "";
+    }
+  };
+
+  const handleDocFileChange = (e) => {
+    const selected = Array.from(e.target.files || []);
+    const oversized = selected.filter((f) => f.size > MAX_FILE_SIZE_BYTES);
+    const valid = selected.filter((f) => f.size <= MAX_FILE_SIZE_BYTES);
+
+    if (oversized.length > 0) {
+      oversized.forEach((f) => {
+        const sizeMb = (f.size / (1024 * 1024)).toFixed(1);
+        toast.error(`⚠️ File "${f.name}" is ${sizeMb} MB — maximum allowed file size is ${MAX_FILE_SIZE_MB} MB. Please compress the PDF before uploading.`);
+      });
+    }
+
+    if (valid.length > 5) {
+      toast.error(`You can upload a maximum of 5 documents at a time. Only the first 5 were selected.`);
+    }
+
+    const finalFiles = valid.slice(0, 5);
+    if (finalFiles.length > 0) {
+      setFiles(finalFiles);
+    } else {
+      e.target.value = "";
+    }
+  };
+
   const uploadAssets = async () => {
     if (!files.length) return;
 
@@ -645,8 +696,14 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
           <div className="grid gap-5 lg:grid-cols-2">
             <div className="rounded-xl bg-surface p-4">
               <h4 className="text-sm font-bold text-navy">Property Images</h4>
-              <p className="mt-1 text-xs text-slate-500">Upload clear property images. Maximum 5 files per upload.</p>
-              <input className="mt-3 w-full text-sm" type="file" multiple accept="image/*" onChange={(e) => setFiles(Array.from(e.target.files || []).slice(0, 5))} />
+              <p className="mt-1 text-xs text-slate-500">Upload clear property images. Max 5 files per upload. Each image must be under 10 MB.</p>
+              <input
+                className="mt-3 w-full text-sm"
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageFileChange}
+              />
               <button type="button" onClick={uploadAssets} disabled={uploading || !files.length} className="site-button-secondary mt-3 px-4 py-2 text-sm disabled:opacity-50">
                 {uploading ? "Uploading..." : "Upload selected images"}
               </button>
@@ -663,8 +720,14 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
             <div className="rounded-xl bg-surface p-4">
               <h4 className="text-sm font-bold text-navy">Brochure / Layout Plan</h4>
-              <p className="mt-1 text-xs text-slate-500">Attach PDF layout, approval, or brochure files.</p>
-              <input className="mt-3 w-full text-sm" type="file" multiple accept="application/pdf" onChange={(e) => setFiles(Array.from(e.target.files || []).slice(0, 5))} />
+              <p className="mt-1 text-xs text-slate-500">Attach PDF layout, approval, or brochure files. Max 5 files. Each file must be under 10 MB.</p>
+              <input
+                className="mt-3 w-full text-sm"
+                type="file"
+                multiple
+                accept="application/pdf"
+                onChange={handleDocFileChange}
+              />
               <button type="button" onClick={uploadAssets} disabled={uploading || !files.length} className="site-button-secondary mt-3 px-4 py-2 text-sm disabled:opacity-50">
                 {uploading ? "Uploading..." : "Upload PDF brochure"}
               </button>
