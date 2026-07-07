@@ -447,29 +447,22 @@ const HomePage = () => {
         className="relative min-h-[380px] sm:min-h-[460px] lg:min-h-[500px]"
         style={{ zIndex: 1 }}
       >
-        {/* Background clipped inside its own div */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div
-            ref={heroBgRef}
-            className="absolute -inset-y-16 inset-x-0 bg-cover bg-center will-change-transform"
-            style={{ backgroundImage: `url(${HERO_BG})` }}
-          />
-          <div className="absolute inset-0 bg-navy/40" />
-        </div>
+        {/* Background set to solid white with bottom border */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none bg-white border-b border-slate-200/60" />
 
         {/* Shortcut dropdowns need z-index above the hero */}
         <div ref={heroContentRef} className="relative mx-auto flex max-w-[1440px] flex-col items-center px-5 py-12 text-center will-change-transform sm:px-8 sm:py-16 lg:px-10 lg:py-20" style={{ zIndex: 20 }}>
           <p className="home-gsap-hero-item section-tag !text-orange">Verified real estate platform</p>
-          <h1 className="home-gsap-hero-item hero-title mt-4 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-white">
+          <h1 className="home-gsap-hero-item hero-title mt-4 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-navy">
             Verified property listings in <span className="text-orange">Hosur</span>
           </h1>
 
           <div className="home-gsap-hero-item mt-8 flex flex-col gap-6 w-full sm:mt-10">
-            <p className="mx-auto text-sm leading-7 text-white/85 sm:text-base">
+            <p className="mx-auto text-sm leading-7 text-slate-600 sm:text-base">
               Find verified properties for sale and rent across Hosur. Search apartments, villas, plots, and houses with clearer tools and local support.
             </p>
 
-            {/* ── Shortcut bar — now outside overflow-hidden, uses z-index ── */}
+            {/* ── Shortcut bar ── */}
             <div ref={shortcutBarRef} className="relative flex flex-wrap justify-center gap-2 sm:gap-2.5 lg:gap-3">
               {shortcutGroups.map((group) => (
                 <div
@@ -484,8 +477,8 @@ const HomePage = () => {
                     onClick={() => setOpenShortcutMenu((current) => (current === group.label ? "" : group.label))}
                     className={`inline-flex min-h-[40px] items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition duration-200 ${
                       openShortcutMenu === group.label
-                        ? "bg-white text-navy shadow-lg"
-                        : "bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 hover:shadow-md border border-white/30"
+                        ? "bg-navy text-white shadow-lg"
+                        : "bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300"
                     }`}
                   >
                     <span>{group.label}</span>
@@ -576,7 +569,7 @@ const HomePage = () => {
                   scrollToTop();
                   navigate(`/listings?${queryString || "intent=buy"}`);
                 }}
-                className="inline-flex items-center justify-center rounded-lg border-2 border-white px-8 py-2.5 text-sm font-bold text-white transition hover:bg-white/10 w-full sm:w-auto"
+                className="inline-flex items-center justify-center rounded-lg border-2 border-navy px-8 py-2.5 text-sm font-bold text-navy transition hover:bg-navy/5 w-full sm:w-auto"
               >
                 Find Your Property
               </button>
@@ -586,10 +579,10 @@ const HomePage = () => {
           <div className="home-gsap-hero-item mt-8 grid w-full max-w-3xl grid-cols-3 gap-3 text-center sm:mt-10 sm:gap-6">
             {homeStats.map((item) => (
               <div key={item.label}>
-                <p className="text-xl font-bold text-white sm:text-2xl lg:text-3xl">
+                <p className="text-xl font-bold text-navy sm:text-2xl lg:text-3xl">
                   <CountUpNumber value={item.value} suffix={item.suffix} />
                 </p>
-                <p className="mt-1 text-[11px] text-white sm:text-sm">{item.label}</p>
+                <p className="mt-1 text-[11px] text-slate-500 sm:text-sm">{item.label}</p>
               </div>
             ))}
           </div>
