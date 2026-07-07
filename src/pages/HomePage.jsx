@@ -332,6 +332,11 @@ const HomePage = () => {
     if (reduceMotion) return undefined;
 
     const ctx = gsap.context(() => {
+      // Ensure the page starts at the very top before any scroll-triggered animation
+      ScrollTrigger.clearScrollMemory();
+      window.history.scrollRestoration = "manual";
+      window.scrollTo(0, 0);
+
       gsap.from(".home-gsap-hero-item", {
         autoAlpha: 0,
         y: 28,
@@ -518,16 +523,16 @@ const HomePage = () => {
       >
         {/* Background: white base with animated DotField pattern */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none bg-white border-b border-slate-200/60">
-          <DotField
+        <DotField
             dotRadius={2}
             dotSpacing={16}
             bulgeStrength={80}
             glowRadius={200}
             sparkle={false}
             waveAmplitude={0}
-            gradientFrom="rgba(0, 66, 162, 0.55)"
-            gradientTo="rgba(39, 79, 154, 0.38)"
-            glowColor="rgba(0, 66, 162, 0.35)"
+            gradientFrom="rgba(0, 66, 162, 0.22)"
+            gradientTo="rgba(39, 79, 154, 0.12)"
+            glowColor="rgba(0, 66, 162, 0.12)"
           />
         </div>
 
