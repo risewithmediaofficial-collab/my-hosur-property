@@ -519,15 +519,15 @@ const HomePage = () => {
         {/* Background: white base with animated DotField pattern */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none bg-white border-b border-slate-200/60">
           <DotField
-            dotRadius={1.5}
-            dotSpacing={18}
-            bulgeStrength={60}
-            glowRadius={180}
+            dotRadius={2}
+            dotSpacing={16}
+            bulgeStrength={80}
+            glowRadius={200}
             sparkle={false}
             waveAmplitude={0}
-            gradientFrom="rgba(0, 66, 162, 0.18)"
-            gradientTo="rgba(39, 79, 154, 0.10)"
-            glowColor="rgba(0, 66, 162, 0.15)"
+            gradientFrom="rgba(0, 66, 162, 0.55)"
+            gradientTo="rgba(39, 79, 154, 0.38)"
+            glowColor="rgba(0, 66, 162, 0.35)"
           />
         </div>
 
