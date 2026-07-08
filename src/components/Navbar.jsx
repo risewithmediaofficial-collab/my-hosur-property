@@ -329,11 +329,16 @@ const Navbar = () => {
               ) : null}
               <button
                 type="button"
-                className="inline-flex rounded-lg border border-slate-200 p-1.5 text-navy transition hover:bg-surface"
+                className="inline-flex items-center justify-center rounded-lg border border-slate-200 p-1.5 text-navy hover:bg-surface focus:outline-none transition-all duration-300"
                 onClick={() => setMobileMenuOpen((value) => !value)}
+                style={{ width: "32px", height: "32px" }}
                 aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               >
-                {mobileMenuOpen ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
+                <div className="relative w-5 h-4 flex flex-col justify-between items-center">
+                  <span className={`block h-[2px] w-full bg-navy rounded-full transform transition-all duration-300 ${mobileMenuOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
+                  <span className={`block h-[2px] w-full bg-navy rounded-full transition-all duration-300 ${mobileMenuOpen ? "opacity-0" : ""}`} />
+                  <span className={`block h-[2px] w-full bg-navy rounded-full transform transition-all duration-300 ${mobileMenuOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
+                </div>
               </button>
             </div>
           </div>
