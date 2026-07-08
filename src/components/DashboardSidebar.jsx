@@ -62,51 +62,53 @@ const DashboardSidebar = ({
       </aside>
 
       {/* ── Mobile Top Bar ── */}
-      <div className="sticky top-[52px] z-20 w-full shrink-0 bg-white/95 backdrop-blur-md shadow-sm md:hidden">
-        {/* Profile + Logout row */}
-        <div className="flex items-center justify-between gap-2 border-b border-slate-100 px-3 py-1.5">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-navy text-white text-xs font-bold">
-              {title?.charAt(0)?.toUpperCase() || "U"}
+      <div className="md:hidden w-full shrink-0">
+        <div className="sticky top-[44px] z-20 w-full bg-white/95 backdrop-blur-md shadow-sm">
+          {/* Profile + Logout row */}
+          <div className="flex items-center justify-between gap-2 border-b border-slate-100 px-3 py-1">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-navy text-white text-[11px] font-bold">
+                {title?.charAt(0)?.toUpperCase() || "U"}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-slate-800 truncate">{title}</p>
+                <p className="text-[9px] text-slate-400 leading-none">{subtitle}</p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-slate-800 truncate">{title}</p>
-              <p className="text-[10px] text-slate-400 leading-none">{subtitle}</p>
-            </div>
-          </div>
-          {onLogout && (
-            <button
-              type="button"
-              onClick={onLogout}
-              className="shrink-0 rounded-lg border border-slate-200 px-2.5 py-1 text-[11px] font-semibold text-red-600 transition hover:bg-red-50"
-            >
-              Logout
-            </button>
-          )}
-        </div>
-
-        {/* Horizontal scrollable tab row */}
-        <div className="overflow-x-auto scrollbar-none">
-          <nav className="flex min-w-max items-center gap-1 px-3 py-2">
-            {navItems.map((item) => (
+            {onLogout && (
               <button
-                key={item.key}
                 type="button"
-                onClick={() => item.onClick?.(item.key)}
-                className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap ${
-                  item.active
-                    ? "bg-slate-900 text-white shadow-sm"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900"
-                }`}
+                onClick={onLogout}
+                className="shrink-0 rounded-lg border border-slate-200 px-2 py-0.5 text-[10px] font-semibold text-red-600 transition hover:bg-red-50"
               >
-                {item.icon ? <span className="flex-shrink-0">{item.icon}</span> : null}
-                <span>{item.label}</span>
-                {item.badge ? (
-                  <span className="rounded-full bg-black/15 px-1.5 py-0.5 text-[9px] font-bold">{item.badge}</span>
-                ) : null}
+                Logout
               </button>
-            ))}
-          </nav>
+            )}
+          </div>
+
+          {/* Horizontal scrollable tab row */}
+          <div className="overflow-x-auto scrollbar-none">
+            <nav className="flex min-w-max items-center gap-1 px-3 py-1.5">
+              {navItems.map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => item.onClick?.(item.key)}
+                  className={`flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition whitespace-nowrap ${
+                    item.active
+                      ? "bg-slate-900 text-white shadow-sm"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900"
+                  }`}
+                >
+                  {item.icon ? <span className="flex-shrink-0">{item.icon}</span> : null}
+                  <span>{item.label}</span>
+                  {item.badge ? (
+                    <span className="rounded-full bg-black/15 px-1.5 py-0.5 text-[9px] font-bold">{item.badge}</span>
+                  ) : null}
+                </button>
+              ))}
+            </nav>
+          </div>
         </div>
       </div>
 

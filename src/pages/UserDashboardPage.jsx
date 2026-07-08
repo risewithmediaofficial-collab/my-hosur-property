@@ -222,10 +222,6 @@ const UserDashboardPage = () => {
                   Your dashboard gives you quick access to listings, buyer leads, payments, and saved homes.
                 </p>
               </div>
-              <button onClick={logout} className="dashboard-danger px-6 py-3 text-sm">
-                <ArrowLeftOnRectangleIcon className="h-4 w-4" />
-                Sign Out
-              </button>
             </div>
           </section>
 
