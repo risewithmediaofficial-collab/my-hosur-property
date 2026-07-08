@@ -11,9 +11,11 @@ const DashboardSidebar = ({
   asideClassName = "",
   mainClassName = "",
   contentClassName = "",
+  onLogout,
 }) => {
   return (
     <div className={`flex min-h-[calc(100vh-4rem)] flex-col overflow-x-hidden bg-transparent md:min-h-0 md:flex-row ${rootClassName}`}>
+      {/* ── Desktop Sidebar ── */}
       <aside className={`sticky top-20 z-10 hidden h-[calc(100vh-5rem)] w-[21rem] shrink-0 overflow-y-auto px-4 pb-6 pt-4 md:flex md:min-h-0 md:flex-col ${asideClassName}`}>
         <div className="dashboard-shell flex h-full min-h-0 flex-col gap-6 p-6">
           <div>
@@ -59,34 +61,56 @@ const DashboardSidebar = ({
         </div>
       </aside>
 
-      <div className="relative z-10 w-full shrink-0 overflow-x-hidden bg-white px-3 py-3 md:hidden">
-        <div className="mb-3 rounded-[24px] bg-white px-4 py-4 shadow-[inset_0_0_0_1px_rgba(0,66,162,0.07),0_8px_20px_rgba(0,66,162,0.06)]">
-          <p className="dashboard-kicker">{subtitle}</p>
-          <h1 className="dashboard-display mt-2 break-words text-[1.9rem] font-semibold leading-tight text-slate-900">{title}</h1>
-          {description ? <p className="dashboard-muted mt-2 text-sm leading-6">{description}</p> : null}
-        </div>
-        <div className="flex flex-wrap gap-2 px-0.5 pb-2">
-          {navItems.map((item) => (
+      {/* ── Mobile Top Bar ── */}
+      <div className="sticky top-[52px] z-20 w-full shrink-0 bg-white/95 backdrop-blur-md shadow-sm md:hidden">
+        {/* Profile + Logout row */}
+        <div className="flex items-center justify-between gap-2 border-b border-slate-100 px-3 py-1.5">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-navy text-white text-xs font-bold">
+              {title?.charAt(0)?.toUpperCase() || "U"}
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-slate-800 truncate">{title}</p>
+              <p className="text-[10px] text-slate-400 leading-none">{subtitle}</p>
+            </div>
+          </div>
+          {onLogout && (
             <button
-              key={item.key}
               type="button"
-              onClick={() => item.onClick?.(item.key)}
-              className={`min-w-0 rounded-full px-4 py-2 text-xs font-semibold transition ${
-                item.active
-                  ? "bg-slate-900 text-white shadow-sm"
-                  : "bg-white text-slate-600 shadow-[inset_0_0_0_1px_rgba(0,66,162,0.08)] hover:bg-slate-50 hover:text-slate-900"
-              }`}
+              onClick={onLogout}
+              className="shrink-0 rounded-lg border border-slate-200 px-2.5 py-1 text-[11px] font-semibold text-red-600 transition hover:bg-red-50"
             >
-              <span className="flex items-center gap-1.5 whitespace-nowrap">
+              Logout
+            </button>
+          )}
+        </div>
+
+        {/* Horizontal scrollable tab row */}
+        <div className="overflow-x-auto scrollbar-none">
+          <nav className="flex min-w-max items-center gap-1 px-3 py-2">
+            {navItems.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => item.onClick?.(item.key)}
+                className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap ${
+                  item.active
+                    ? "bg-slate-900 text-white shadow-sm"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900"
+                }`}
+              >
                 {item.icon ? <span className="flex-shrink-0">{item.icon}</span> : null}
                 <span>{item.label}</span>
-                {item.badge ? <span className="rounded-full bg-black/10 px-1.5 py-0.5 text-[9px] font-bold">{item.badge}</span> : null}
-              </span>
-            </button>
-          ))}
+                {item.badge ? (
+                  <span className="rounded-full bg-black/15 px-1.5 py-0.5 text-[9px] font-bold">{item.badge}</span>
+                ) : null}
+              </button>
+            ))}
+          </nav>
         </div>
       </div>
 
+      {/* ── Main Content ── */}
       <main className={`min-w-0 flex-1 overflow-x-hidden overflow-y-visible md:h-full md:min-h-0 md:overflow-y-auto ${mainClassName}`}>
         <div className="mx-auto min-h-full max-w-6xl px-3 py-4 md:px-6 md:py-8 xl:px-8">
           <section className={`space-y-6 ${contentClassName}`}>{children}</section>

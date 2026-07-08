@@ -152,6 +152,8 @@ const UserDashboardPage = () => {
     }
   };
 
+  const VALID_TABS = ["overview", "listings", "leads", "inquiries", "payments", "saved"];
+
   const pendingLeads = incomingLeads.filter((lead) => lead.status === "pending");
   const inquiryHistory = useMemo(() => getInquiryHistory(user?._id), [user?._id, myProperties.length, incomingLeads.length]);
   const sidebarStats = [
@@ -172,19 +174,23 @@ const UserDashboardPage = () => {
     onClick: setTab,
   }));
 
+  // Sync URL -> tab state (only when URL param changes externally)
   useEffect(() => {
     const nextTab = searchParams.get("tab");
-    if (nextTab && navItems.some((item) => item.key === nextTab) && nextTab !== tab) {
+    if (nextTab && VALID_TABS.includes(nextTab) && nextTab !== tab) {
       setTab(nextTab);
     }
-  }, [navItems, searchParams, tab]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
+  // Sync tab state -> URL
   useEffect(() => {
     const current = searchParams.get("tab") || "overview";
     if (tab !== current) {
       setSearchParams(tab === "overview" ? {} : { tab }, { replace: true });
     }
-  }, [searchParams, setSearchParams, tab]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
 
   if (loading) {
     return (
@@ -203,6 +209,7 @@ const UserDashboardPage = () => {
       description="View all your property activity, leads, payments, and saved listings from one clear workspace."
       stats={sidebarStats}
       navItems={navItems}
+      onLogout={logout}
     >
       {tab === "overview" && (
         <div className="space-y-6">
