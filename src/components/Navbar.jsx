@@ -165,7 +165,7 @@ const Navbar = () => {
               }}
               className="inline-flex min-w-0 flex-col items-start gap-0.5"
             >
-              <BrandLogo className="h-8 w-auto max-w-[110px] sm:h-15 sm:max-w-[200px] lg:h-18 lg:max-w-[240px]" />
+              <BrandLogo className="h-7 w-auto max-w-[95px] sm:h-15 sm:max-w-[200px] lg:h-18 lg:max-w-[240px]" />
               <span className="hidden sm:inline-block text-[10px] font-medium leading-none text-slate-500 sm:text-[11px]">
                 Powered by <span className="font-bold text-navy">Gyes Construction</span>
               </span>
@@ -311,7 +311,7 @@ const Navbar = () => {
                     scrollToTop();
                     closeMenu();
                   }}
-                  className="inline-flex rounded-lg border border-slate-200 p-1 text-navy transition hover:border-orange hover:text-orange"
+                  className="inline-flex rounded-lg border border-slate-200 p-1.5 text-navy transition hover:border-orange hover:text-orange"
                   aria-label="Saved properties"
                   title="Saved properties"
                 >
@@ -322,14 +322,14 @@ const Navbar = () => {
                 <NavLink
                   to="/auth"
                   onClick={scrollToTop}
-                  className="hidden items-center rounded-lg px-2 py-1 text-xs font-semibold text-navy transition hover:text-orange xs:inline-flex sm:text-sm"
+                  className="hidden items-center rounded-lg px-2.5 py-1.5 text-xs font-semibold text-navy transition hover:text-orange xs:inline-flex sm:text-sm"
                 >
                   Login
                 </NavLink>
               ) : null}
               <button
                 type="button"
-                className="inline-flex rounded-lg border border-slate-200 p-1 text-navy transition hover:bg-surface"
+                className="inline-flex rounded-lg border border-slate-200 p-1.5 text-navy transition hover:bg-surface"
                 onClick={() => setMobileMenuOpen((value) => !value)}
                 aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               >
