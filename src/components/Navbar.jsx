@@ -155,7 +155,7 @@ const Navbar = () => {
       </div>
 
       <div className={`border-b border-slate-200 bg-white/95 backdrop-blur-md transition-shadow duration-300 ${isSticky ? "shadow-md" : "shadow-sm"}`}>
-        <div className="px-5 sm:px-8 lg:px-10 py-1.5 sm:py-3 lg:py-4">
+        <div className="px-5 sm:px-8 lg:px-10 py-1.5 sm:py-2 lg:py-2.5">
           <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4">
             <NavLink
               to="/"
@@ -165,7 +165,7 @@ const Navbar = () => {
               }}
               className="inline-flex min-w-0 flex-col items-start gap-0.5"
             >
-              <BrandLogo className="h-8 w-auto max-w-[110px] sm:h-16 sm:max-w-[220px] lg:h-20 lg:max-w-[260px]" />
+              <BrandLogo className="h-8 w-auto max-w-[110px] sm:h-12 sm:max-w-[160px] lg:h-16 lg:max-w-[200px]" />
               <span className="hidden sm:inline-block text-[10px] font-medium leading-none text-slate-500 sm:text-[11px]">
                 Powered by <span className="font-bold text-navy">Gyes Construction</span>
               </span>
