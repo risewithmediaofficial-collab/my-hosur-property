@@ -317,7 +317,8 @@ const Navbar = () => {
                     scrollToTop();
                     closeMenu();
                   }}
-                  className="inline-flex rounded-lg border border-slate-200 p-1.5 text-navy transition hover:border-orange hover:text-orange"
+                  className="inline-flex items-center justify-center rounded-lg border border-slate-200 p-1.5 text-navy transition hover:border-orange hover:text-orange"
+                  style={{ width: "32px", height: "32px" }}
                   aria-label="Saved properties"
                   title="Saved properties"
                 >

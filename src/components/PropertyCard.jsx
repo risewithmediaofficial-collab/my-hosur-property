@@ -8,6 +8,8 @@ import {
   MapPinIcon,
   RectangleStackIcon,
   UserIcon,
+  HeartIcon,
+  HeartSolidIcon,
 } from "./AppIcons";
 import { currency, formatArea } from "../utils/format";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
@@ -114,13 +116,14 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
             <button
               type="button"
               onClick={() => onSave?.(item._id)}
-              className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition duration-200 ${
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
                 isSaved
-                  ? "bg-navy text-white border-navy"
-                  : "border-slate-200 bg-white text-navy hover:border-orange hover:text-orange"
+                  ? "bg-red-50 border-red-200 text-red-500 shadow-sm"
+                  : "border-slate-200 bg-white text-slate-400 hover:border-red-200 hover:text-red-500 hover:bg-red-50/30"
               }`}
+              title={isSaved ? "Remove from saved" : "Save property"}
             >
-              {isSaved ? "Saved" : "Save"}
+              {isSaved ? <HeartSolidIcon className="h-5 w-5" /> : <HeartIcon className="h-5 w-5" />}
             </button>
           )}
         </div>
