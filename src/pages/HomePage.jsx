@@ -41,6 +41,7 @@ import useDebounce from "../hooks/useDebounce";
 import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
 import servicesHeroImage from "../assets/house.png";
+import alluringRealityImg from "../assets/alluring reality.jpeg";
 import { fetchHomeProperties } from "../services/api/propertyApi";
 import { buildRealEstateAgentSchema, buildWebsiteSchema } from "../utils/seo";
 
@@ -1093,19 +1094,30 @@ const HomePage = () => {
                   { name: "Gyes property & construction", logo: "Gyes P&C" },
                   { name: "Gyes traders", logo: "Gyes Traders" },
                   { name: "OneClick office & Home service", logo: "One Click" },
-                  { name: "Alluring Realty", logo: "Alluring" },
+                  { name: "Alluring Realty", logo: "Alluring", image: alluringRealityImg },
                   { name: "Hareesh Enterprises (Document writer)", logo: "Hareesh" },
                   { name: "Gyes property & construction", logo: "Gyes P&C" },
                   { name: "Gyes traders", logo: "Gyes Traders" },
                   { name: "OneClick office & Home service", logo: "One Click" },
-                  { name: "Alluring Realty", logo: "Alluring" },
+                  { name: "Alluring Realty", logo: "Alluring", image: alluringRealityImg },
                   { name: "Hareesh Enterprises (Document writer)", logo: "Hareesh" },
                 ].map((partner, index) => (
                   <div key={index} className="partner-item group">
-                    <div className="text-center">
-                      <p className="text-lg font-bold text-navy">{partner.logo}</p>
-                      <p className="mt-1 text-xs text-slate-600 group-hover:text-orange transition">{partner.name}</p>
-                    </div>
+                    {partner.image ? (
+                      <div className="flex flex-col items-center justify-center p-2">
+                        <img 
+                          src={partner.image} 
+                          alt={partner.name} 
+                          className="max-h-[70px] max-w-[170px] object-contain group-hover:scale-105 transition-transform duration-300 rounded"
+                        />
+                        <p className="mt-1 text-[10px] font-bold text-slate-500 group-hover:text-orange transition text-center">{partner.name}</p>
+                      </div>
+                    ) : (
+                      <div className="text-center">
+                        <p className="text-lg font-bold text-navy">{partner.logo}</p>
+                        <p className="mt-1 text-xs text-slate-600 group-hover:text-orange transition">{partner.name}</p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
