@@ -442,6 +442,67 @@ footer .mx-auto {
   }
 }
 
+/* Mobile typography and spacing improvements
+   Improve readability and alignment on small screens by reducing
+   large heading sizes, increasing line-height, and adjusting card text. */
+@media (max-width: 640px) {
+  body {
+    font-size: 15px; /* ensure readable base */
+    line-height: 1.7;
+  }
+
+  p {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  h1 { font-size: 1.75rem; line-height: 1.12; }
+  h2 { font-size: 1.4rem; line-height: 1.15; }
+  h3 { font-size: 1.05rem; line-height: 1.2; }
+  h4 { font-size: 1rem; }
+  h5 { font-size: 0.95rem; }
+  h6 { font-size: 0.9rem; }
+
+  /* Reduce heavy decorative spacing inside cards */
+  .home-property-type-card,
+  .home-service-row,
+  .home-showcase-card,
+  .marketing-card,
+  .content-card {
+    padding: 1rem !important;
+    font-size: 0.95rem;
+  }
+
+  /* Make card headings and descriptions compact */
+  .home-type-title { font-size: 1rem; margin-top: 0.25rem; }
+  .home-type-desc { font-size: 0.9rem; }
+
+  /* Buttons slightly smaller but still tappable */
+  .site-button-primary,
+  .site-button-secondary,
+  .header-btn-adissia {
+    font-size: 0.95rem;
+    padding-left: 0.9rem;
+    padding-right: 0.9rem;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+  }
+
+  /* Navbar: ensure links wrap and don't overflow */
+  header .mx-auto {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  footer .mx-auto {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Reduce image/gap sizes in list/grid cards */
+  .home-showcase-track .home-showcase-card { min-width: 200px; }
+}
+
 .site-button-primary,
 .dashboard-primary {
   display: inline-flex;
