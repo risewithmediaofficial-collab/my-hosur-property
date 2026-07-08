@@ -136,6 +136,16 @@ const shortcutGroups = [
     ],
   },
   {
+    label: "Construction",
+    items: [
+      { label: "House Construction", to: "/request-service?category=construction&type=House Construction" },
+      { label: "Office Construction", to: "/request-service?category=construction&type=Office Construction" },
+      { label: "Commercial Building", to: "/request-service?category=construction&type=Commercial Building" },
+      { label: "Apartment", to: "/request-service?category=construction&type=Apartment" },
+      { label: "Industry & Warehouse", to: "/request-service?category=construction&type=Industry & Warehouse" },
+    ],
+  },
+  {
     label: "Interior",
     items: [
       { label: "Home Interior", to: "/request-service?category=interior&type=Home Interior" },
@@ -166,17 +176,17 @@ const homeStats = [
 
 const servicePreview = [
   {
-    title: "Property Transactions",
+    title: "Property Transactions Support",
     description: "Buying, selling, rental guidance, and documentation support tailored for Hosur buyers and owners.",
     icon: BuildingOffice2Icon,
   },
   {
-    title: "Legal & Registration",
+    title: "Legal & Registration Support",
     description: "Agreement support, sale deed registration, patta transfer, and property legal coordination in one place.",
     icon: ScaleIcon,
   },
   {
-    title: "Construction & Support",
+    title: "Construction & Interior Support",
     description: "Interior planning, construction services, electrical, plumbing, and trusted contractor support.",
     icon: WrenchScrewdriverIcon,
   },
@@ -500,7 +510,7 @@ const HomePage = () => {
   }, [showcaseIndex]);
 
   return (
-    <main ref={homeRootRef} className="page-shell w-full overflow-hidden">
+    <main ref={homeRootRef} className="min-w-min page-shell w-full overflow-hidden">
       <SeoHead
         title="Verified Property Listings in Hosur"
         description="Explore verified property listings, real-estate services, and professional local property support through My Hosur Property."
@@ -1082,12 +1092,12 @@ const HomePage = () => {
                 {[
                   { name: "Gyes property & construction", logo: "Gyes P&C" },
                   { name: "Gyes traders", logo: "Gyes Traders" },
-                  { name: "Onedice office & Home service", logo: "Onedice" },
+                  { name: "OneClick office & Home service", logo: "One Click" },
                   { name: "Alluring Realty", logo: "Alluring" },
                   { name: "Hareesh Enterprises (Document writer)", logo: "Hareesh" },
                   { name: "Gyes property & construction", logo: "Gyes P&C" },
                   { name: "Gyes traders", logo: "Gyes Traders" },
-                  { name: "Onedice office & Home service", logo: "Onedice" },
+                  { name: "OneClick office & Home service", logo: "One Click" },
                   { name: "Alluring Realty", logo: "Alluring" },
                   { name: "Hareesh Enterprises (Document writer)", logo: "Hareesh" },
                 ].map((partner, index) => (

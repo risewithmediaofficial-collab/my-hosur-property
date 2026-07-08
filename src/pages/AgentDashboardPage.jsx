@@ -261,7 +261,7 @@ const AgentDashboardPage = () => {
   return (
     <DashboardSidebar
       title={user?.name || "Agent"}
-      subtitle="Agent / Broker Panel"
+      subtitle="Agent / Developer Panel"
       description="Manage your listings, leads, and customer requirements from a cleaner, easier-to-access workspace."
       stats={sidebarStats}
       navItems={tabs.map((item) => ({

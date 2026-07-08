@@ -1153,17 +1153,16 @@ const AuthPage = () => {
                             />
                           ) : null}
 
-                          {!isSignup && (
-                            <Field
-                              label="Email Address (Optional)"
-                              icon={EnvelopeIcon}
-                              type="email"
-                              autoComplete="email"
-                              placeholder="you@example.com"
-                              value={form.email}
-                              onChange={(event) => onChange("email", event.target.value)}
-                            />
-                          )}
+                          {/* Email shown for both signup (optional) and login */}
+                          <Field
+                            label="Email Address (Optional)"
+                            icon={EnvelopeIcon}
+                            type="email"
+                            autoComplete="email"
+                            placeholder={isSignup ? "you@example.com (optional)" : "you@example.com"}
+                            value={form.email}
+                            onChange={(event) => onChange("email", event.target.value)}
+                          />
 
                           <Field
                             label="WhatsApp Mobile Number"

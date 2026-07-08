@@ -469,8 +469,8 @@ const AdminDashboardPage = () => {
                       <option value="all">All Roles</option>
                       <option value="customer">Customer</option>
                       <option value="seller">Seller</option>
-                      <option value="agent">Agent</option>
-                      <option value="broker">Broker</option>
+                      <option value="agent">Agent / Media</option>
+                      <option value="broker">Developer</option>
                       <option value="builder">Builder</option>
                       <option value="admin">Admin</option>
                     </select>

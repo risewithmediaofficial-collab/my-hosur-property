@@ -1,33 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url>
-  <loc>https://myhosurproperty.com/</loc>
-  <lastmod>2026-07-07T14:56:36.834Z</lastmod>
-  <changefreq>daily</changefreq>
-  <priority>1.0</priority>
-</url>
-<url>
-  <loc>https://myhosurproperty.com/about</loc>
-  <lastmod>2026-07-07T14:56:36.834Z</lastmod>
-  <changefreq>weekly</changefreq>
-  <priority>0.8</priority>
-</url>
-<url>
-  <loc>https://myhosurproperty.com/listings</loc>
-  <lastmod>2026-07-07T14:56:36.834Z</lastmod>
-  <changefreq>weekly</changefreq>
-  <priority>0.8</priority>
-</url>
-<url>
-  <loc>https://myhosurproperty.com/property/6a0177093bce3462f5da9465/2-bhk-apartment-for-sale-tank-street-hosur-2bhk</loc>
-  <lastmod>2026-06-05T05:12:38.057Z</lastmod>
-  <changefreq>daily</changefreq>
-  <priority>0.8</priority>
-</url>
-<url>
-  <loc>https://myhosurproperty.com/property/6a016f2765129b099ef466b6/2-bhk-independent-house-for-sale-near-municipality-water-tank-hosur-2bhk-home</loc>
-  <lastmod>2026-05-19T09:43:58.396Z</lastmod>
-  <changefreq>daily</changefreq>
-  <priority>0.8</priority>
-</url>
+  <url>
+    <loc>https://myhosurproperty.com/</loc>
+  </url>
+  <url>
+    <loc>https://myhosurproperty.com/about</loc>
+  </url>
+  <url>
+    <loc>https://myhosurproperty.com/listings</loc>
+  </url>
 </urlset>

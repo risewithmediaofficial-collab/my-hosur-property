@@ -503,6 +503,50 @@ footer .mx-auto {
   .home-showcase-track .home-showcase-card { min-width: 200px; }
 }
 
+/* Further conservative mobile fixes for typography and layout */
+@media (max-width: 640px) {
+  /* Ensure hero titles don't overflow on very small screens */
+  .hero-title {
+    font-size: 1.9rem !important;
+    line-height: 1.12 !important;
+  }
+
+  .marketing-hero h1, .marketing-hero h2 {
+    font-size: 1.35rem !important;
+    line-height: 1.18 !important;
+  }
+
+  /* Make sure all images scale correctly */
+  img, .site-image, .home-services-image-wrap img, .home-services-image-wrap {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block !important;
+  }
+
+  /* Prevent nav items from overflowing horizontally */
+  header nav, header .mx-auto nav, header nav a, header nav button {
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+
+  /* Cards: tighten vertical spacing and reduce text size a touch */
+  .PropertyCard, .property-card, .home-property-type-card, .marketing-card {
+    padding: 0.9rem !important;
+    font-size: 0.95rem !important;
+  }
+
+  /* Reduce large hero paddings on mobile to keep content visible above the fold */
+  .hero-title + .home-gsap-hero-item, .home-gsap-hero-item.hero-subcopy {
+    margin-top: 0.5rem !important;
+  }
+
+  /* Footers: compact the link lists to avoid long wrapping lines */
+  footer nav.grid {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+}
+
 .site-button-primary,
 .dashboard-primary {
   display: inline-flex;

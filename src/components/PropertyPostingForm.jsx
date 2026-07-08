@@ -210,8 +210,8 @@ const roleLabels = {
   buyer: "Buyer",
   customer: "Customer",
   seller: "Owner / Seller",
-  agent: "Agent",
-  broker: "Broker",
+  agent: "Agent / Media",
+  broker: "Developer",
   builder: "Builder",
   admin: "Admin",
 };
@@ -860,8 +860,8 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
               >
                 <option value="">Select Role</option>
                 <option value="seller">Property Seller / Owner</option>
-                <option value="agent">Agent</option>
-                <option value="broker">Broker</option>
+                <option value="agent">Agent / Media</option>
+                <option value="broker">Developer</option>
                 <option value="builder">Builder</option>
               </select>
             </div>

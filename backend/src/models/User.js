@@ -4,8 +4,8 @@ const bcrypt = require("bcryptjs");
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
-    email: { type: String, required: false, unique: true, sparse: true, lowercase: true, trim: true },
-    phone: { type: String, unique: true, sparse: true, trim: true },
+    email: { type: String, required: false, lowercase: true, trim: true, default: undefined },
+    phone: { type: String, trim: true, default: undefined },
     address: { type: String, trim: true },
     adminNotes: { type: String, trim: true },
     password: { type: String, required: true, minlength: 6 },
@@ -69,6 +69,18 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre("save", async function () {
+  // --- Guard: never persist null or empty email/phone ---
+  // If the field is falsy (null, "", undefined), remove it from the document
+  // so it never reaches the unique index as `null`.
+  if (this.email !== undefined && (this.email === null || String(this.email).trim() === '')) {
+    delete this._doc.email;
+    this.email = undefined;
+  }
+  if (this.phone !== undefined && (this.phone === null || String(this.phone).trim() === '')) {
+    delete this._doc.phone;
+    this.phone = undefined;
+  }
+
   if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, 10);
 });
@@ -76,5 +88,11 @@ userSchema.pre("save", async function () {
 userSchema.methods.comparePassword = async function (candidate) {
   return bcrypt.compare(candidate, this.password);
 };
+
+// Create partial unique indexes so documents without an email/phone
+// (or where the field is not a string) are not considered for uniqueness.
+// This avoids duplicate-key errors when code writes `null` or omits the field.
+userSchema.index({ email: 1 }, { unique: true, partialFilterExpression: { email: { $type: 'string' } } });
+userSchema.index({ phone: 1 }, { unique: true, partialFilterExpression: { phone: { $type: 'string' } } });
 
 module.exports = mongoose.model("User", userSchema);

@@ -7,7 +7,7 @@ const sendEmail = require("../utils/sendEmail");
 const generateHtmlEmail = require("../utils/emailFormatter");
 const { sendWelcomeTemplateEmail } = require("../utils/sendEmailJs");
 const { sendEmailOtp, hasMsg91EmailConfig } = require("../utils/sendEmailOtp");
-const { sendWhatsAppOtp, hasMsg91WhatsAppConfig } = require("../utils/sendWhatsAppOtp");
+const { sendWhatsAppOtp } = require("../utils/sendWhatsAppOtp");
 
 const FREE_POST_VALIDITY_DAYS = 90;
 const OTP_EXPIRY_MINUTES = Math.max(Number(process.env.OTP_EXPIRY_MINUTES) || 5, 1);
@@ -424,10 +424,27 @@ const signup = async (req, res) => {
 
   let user = lookup.user;
 
+  const normalizedEmail = email && String(email).trim().length > 0 ? String(email).toLowerCase().trim() : undefined;
+
+  // --- Pre-save email duplicate check ---
+  // If caller supplied an email, verify no OTHER verified user already owns it.
+  if (normalizedEmail) {
+    const existingEmailUser = await User.findOne({ email: normalizedEmail });
+    if (existingEmailUser) {
+      // It's OK if it's the same unverified user we're about to re-use (lookup.user).
+      // Block only if it's a completely different document.
+      const isSameUser = user && String(existingEmailUser._id) === String(user._id);
+      if (!isSameUser) {
+        return res.status(409).json({
+          message: "An account with this email already exists. Please sign in or use a different email address.",
+        });
+      }
+    }
+  }
+
   if (!user) {
-    user = new User({
+    const newUserData = {
       name,
-      email: email || undefined,
       password,
       phone: storedPhone || undefined,
       address,
@@ -435,10 +452,18 @@ const signup = async (req, res) => {
       isPhoneVerified: false,
       isEmailVerified: false,
       ...buildFreeOnboardingPack(),
-    });
+    };
+    if (normalizedEmail) newUserData.email = normalizedEmail;
+    user = new User(newUserData);
   } else {
     user.name = name;
-    if (email) user.email = email;
+    if (normalizedEmail) {
+      user.email = normalizedEmail;
+    } else {
+      // Explicitly remove the email field so MongoDB never stores/indexes it as null
+      user.email = undefined;
+      user.$ignore && user.$ignore('email');
+    }
     user.password = password;
     if (storedPhone) user.phone = storedPhone;
     user.address = address;
@@ -450,7 +475,46 @@ const signup = async (req, res) => {
   }
 
   clearOtpState(user);
-  await user.save();
+
+  // --- Defensive guard: never let a null/empty email reach the unique index ---
+  // If email was not provided, delete the field from the Mongoose document entirely
+  // so that MongoDB does not store it as `null` and trigger the unique index.
+  if (!user.email || String(user.email).trim().length === 0) {
+    user.email = undefined;
+    // Use Mongoose's unset mechanism so the field is truly removed from the document
+    if (user.isNew) {
+      delete user._doc.email;
+    } else {
+      // For existing users that are being updated, mark field for $unset
+      user.markModified('email');
+      delete user._doc.email;
+    }
+  }
+
+  console.log(`[signup] About to save user -> email: ${user.email ?? '(undefined)'}, phone: ${user.phone ?? '(undefined)'}, name: ${user.name}`);
+  try {
+    await user.save();
+  } catch (saveErr) {
+    // Friendly duplicate-key error messages
+    if (saveErr.code === 11000) {
+      const keyPattern = saveErr.keyPattern || {};
+      if (keyPattern.email) {
+        return res.status(409).json({ message: "An account with this email address already exists. Please sign in or use a different email." });
+      }
+      if (keyPattern.phone) {
+        return res.status(409).json({ message: "An account with this WhatsApp number already exists. Please sign in instead." });
+      }
+      return res.status(409).json({ message: "An account with these details already exists. Please sign in." });
+    }
+    try {
+      const snapshot = user.toObject ? user.toObject() : user;
+      console.error('[signup] user.save failed. user snapshot:', JSON.stringify(snapshot, null, 2));
+    } catch (snapErr) {
+      console.error('[signup] Failed to serialize user snapshot:', snapErr.message || snapErr);
+    }
+    console.error('[signup] user.save error:', saveErr);
+    throw saveErr;
+  }
 
   // Use the already-normalized phone for MSG91
   const normalizedPhone = storedPhone;
@@ -754,8 +818,9 @@ const verifyWidgetToken = async (req, res) => {
     }
 
     let user = null;
-    if (email) {
-      user = await User.findOne({ email });
+    const widgetEmail = email && String(email).trim().length > 0 ? String(email).toLowerCase().trim() : undefined;
+    if (widgetEmail) {
+      user = await User.findOne({ email: widgetEmail });
     }
 
     if (!user && phone) {
@@ -769,9 +834,8 @@ const verifyWidgetToken = async (req, res) => {
         return res.status(409).json({ message: "Account already exists with this email/phone number." });
       }
 
-      user = new User({
+      const widgetUserData = {
         name,
-        email,
         password,
         phone: phone ? String(phone).trim() : undefined,
         address,
@@ -779,7 +843,9 @@ const verifyWidgetToken = async (req, res) => {
         isPhoneVerified: true,
         isEmailVerified: true,
         ...buildFreeOnboardingPack(),
-      });
+      };
+      if (widgetEmail) widgetUserData.email = widgetEmail;
+      user = new User(widgetUserData);
 
       clearOtpState(user);
       await user.save();

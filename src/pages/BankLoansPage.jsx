@@ -12,18 +12,37 @@ const BankLoansPage = () => {
   return (
     <>
       <SeoHead
-        title="Bank Home Loans - Compare Rates & Calculate EMI"
-        description="Compare home loan rates from SBI, PNB, HDFC, LIC, IDBI, Can Fin Homes, and Aditya Birla Capital. Use our EMI calculator to review monthly payments and total interest."
+        title="Bank Loans - Compare Rates & Calculate EMI"
+        description="Compare bank loan rates from SBI, PNB, HDFC, LIC, IDBI, Can Fin Homes, and Aditya Birla Capital. Use our EMI calculator to review monthly payments and total interest."
         keywords="home loans, bank loans, EMI calculator, loan rates, SBI, PNB, HDFC, LIC, IDBI, Can Fin Homes, Aditya Birla Capital"
       />
 
       {/* Static Hero Section */}
       <section className="px-5 py-8 sm:px-8 lg:px-10 bg-white border-b border-slate-200/80">
-        <div className="mx-auto max-w-[1440px]">
-          <h1 className="text-3xl font-black leading-tight sm:text-4xl lg:text-5xl text-navy">Bank Home Loans</h1>
-          <p className="mt-2 max-w-3xl text-sm sm:text-base text-slate-500 font-medium">
-            Compare Interest Rates & Calculate Your EMI
-          </p>
+        <div className="mx-auto max-w-[1440px] flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div>
+            <h1 className="text-3xl font-black leading-tight sm:text-4xl lg:text-5xl text-navy">Bank Loans</h1>
+            <p className="mt-2 max-w-3xl text-sm sm:text-base text-slate-500 font-medium">
+              Compare Interest Rates & Calculate Your EMI
+            </p>
+          </div>
+          {/* Bank pills on top right */}
+          <div className="flex flex-wrap gap-2 md:justify-end max-w-xl">
+            {bankLoans.map((bank) => (
+              <button
+                key={bank.id}
+                type="button"
+                onClick={() => setSelectedBank(bank)}
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all duration-200 hover:-translate-y-0.5 ${
+                  selectedBank.id === bank.id
+                    ? "bg-navy text-white border-navy shadow-sm"
+                    : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-slate-900"
+                }`}
+              >
+                {bank.shortName || bank.name}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
