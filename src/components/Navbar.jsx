@@ -6,7 +6,7 @@ import useAuth from "../hooks/useAuth";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
 import { CONTACT_EMAIL, CONTACT_PHONE_NUMBERS } from "../constants/contactInfo";
 import { primaryNavLinks } from "../constants/navigation";
-import BrandLogo from "./BrandLogo";
+import BrandLogo, { logoSrc } from "./BrandLogo";
 import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
@@ -155,17 +155,23 @@ const Navbar = () => {
       </div>
 
       <div className={`border-b border-slate-200 bg-white/95 backdrop-blur-md transition-shadow duration-300 ${isSticky ? "shadow-md" : "shadow-sm"}`}>
-        <div className="px-5 sm:px-8 lg:px-10 py-1 sm:py-1.5 lg:py-2">
-          <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4">
+        <div className="px-3 sm:px-8 lg:px-10 py-0.5 sm:py-1.5 lg:py-2">
+          <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-2">
             <NavLink
               to="/"
               onClick={() => {
                 scrollToTop();
                 closeMenu();
               }}
-              className="inline-flex min-w-0 flex-col items-start gap-0.5"
+              className="inline-flex min-w-0 shrink-0 flex-col items-start gap-0"
+              style={{ maxWidth: "clamp(60px, 20vw, 160px)" }}
             >
-              <BrandLogo className="h-5 w-auto max-w-[60px] sm:h-10 sm:max-w-[140px] lg:h-12 lg:max-w-[160px]" />
+              <img
+                src={logoSrc}
+                alt="MyHosurProperty"
+                className="block object-contain sm:!h-10 sm:!max-w-[140px] lg:!h-12 lg:!max-w-[160px]"
+                style={{ height: "36px", width: "auto", maxWidth: "100px" }}
+              />
               <span className="hidden sm:inline-block text-[10px] font-medium leading-none text-slate-500 sm:text-[11px]">
                 Powered by <span className="font-bold text-navy">Gyes Construction</span>
               </span>
