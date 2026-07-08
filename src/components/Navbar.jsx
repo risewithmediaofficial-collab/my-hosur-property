@@ -155,7 +155,7 @@ const Navbar = () => {
       </div>
 
       <div className={`border-b border-slate-200 bg-white/95 backdrop-blur-md transition-shadow duration-300 ${isSticky ? "shadow-md" : "shadow-sm"}`}>
-        <div className="px-5 sm:px-8 lg:px-10 py-2.5">
+        <div className="px-5 sm:px-8 lg:px-10 py-1.5 sm:py-2.5">
           <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4">
             <NavLink
               to="/"
@@ -165,8 +165,8 @@ const Navbar = () => {
               }}
               className="inline-flex min-w-0 flex-col items-start gap-0.5"
             >
-              <BrandLogo className="h-12 w-auto max-w-[160px] sm:h-15 sm:max-w-[200px]" />
-              <span className="text-[10px] font-medium leading-none text-slate-500 sm:text-[11px]">
+              <BrandLogo className="h-9 w-auto max-w-[130px] sm:h-15 sm:max-w-[200px]" />
+              <span className="hidden sm:inline-block text-[10px] font-medium leading-none text-slate-500 sm:text-[11px]">
                 Powered by <span className="font-bold text-navy">Gyes Construction</span>
               </span>
             </NavLink>
@@ -303,7 +303,7 @@ const Navbar = () => {
               )}
             </div>
 
-            <div className="flex items-center gap-2 lg:hidden">
+            <div className="flex items-center gap-1.5 lg:hidden">
               {canShowSavedShortcut ? (
                 <NavLink
                   to="/dashboard?tab=saved"
@@ -311,29 +311,29 @@ const Navbar = () => {
                     scrollToTop();
                     closeMenu();
                   }}
-                  className="inline-flex rounded-lg border border-slate-200 p-2 text-navy transition hover:border-orange hover:text-orange"
+                  className="inline-flex rounded-lg border border-slate-200 p-1.5 text-navy transition hover:border-orange hover:text-orange"
                   aria-label="Saved properties"
                   title="Saved properties"
                 >
-                  <BookmarkIcon className="h-5 w-5" />
+                  <BookmarkIcon className="h-4 w-4" />
                 </NavLink>
               ) : null}
               {!isAuthenticated ? (
                 <NavLink
                   to="/auth"
                   onClick={scrollToTop}
-                  className="hidden items-center rounded-lg px-3 py-2 text-xs font-semibold text-navy transition hover:text-orange xs:inline-flex sm:text-sm"
+                  className="hidden items-center rounded-lg px-2.5 py-1.5 text-xs font-semibold text-navy transition hover:text-orange xs:inline-flex sm:text-sm"
                 >
                   Login
                 </NavLink>
               ) : null}
               <button
                 type="button"
-                className="inline-flex rounded-lg border border-slate-200 p-2 text-navy transition hover:bg-surface"
+                className="inline-flex rounded-lg border border-slate-200 p-1.5 text-navy transition hover:bg-surface"
                 onClick={() => setMobileMenuOpen((value) => !value)}
                 aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               >
-                {mobileMenuOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
+                {mobileMenuOpen ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
               </button>
             </div>
           </div>
