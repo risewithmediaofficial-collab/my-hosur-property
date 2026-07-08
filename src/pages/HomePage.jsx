@@ -511,7 +511,7 @@ const HomePage = () => {
   }, [showcaseIndex]);
 
   return (
-    <main ref={homeRootRef} className="min-w-min page-shell w-full overflow-hidden">
+    <main ref={homeRootRef} className="min-w-0 page-shell w-full overflow-hidden">
       <SeoHead
         title="Verified Property Listings in Hosur"
         description="Explore verified property listings, real-estate services, and professional local property support through My Hosur Property."
