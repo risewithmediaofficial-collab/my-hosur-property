@@ -225,11 +225,17 @@ const buildOtpResponse = (user, meta = {}) => {
 };
 
 const sendWelcomeEmail = async (user, providerLabel = "signing up") => {
+  // No email on the account — skip silently
+  if (!user.email) {
+    console.warn(`[sendWelcomeEmail] Skipped — user ${user._id} has no email.`);
+    return null;
+  }
   const emailJsResult = await sendWelcomeTemplateEmail(user, providerLabel);
   if (emailJsResult) {
     return emailJsResult;
   }
-  throw new Error("Welcome email send failed via EmailJS");
+  // Return null instead of throwing so the caller's try/catch doesn't suppress other errors
+  return null;
 };
 
 const sendLoginAlert = async (user) => {
@@ -696,11 +702,15 @@ const verifyOtp = async (req, res) => {
   await user.save();
 
   if (purpose === "signup" || purpose === "email_signup") {
-    try {
-      await sendWelcomeEmail(user, "signing up");
-      console.log(`[signup] Welcome email sent to ${user.email}`);
-    } catch (error) {
-      console.error("[signup] Welcome email failed:", error.message);
+    if (user.email && String(user.email).trim().length > 0) {
+      try {
+        await sendWelcomeEmail(user, "signing up");
+        console.log(`[signup] Welcome email dispatched to ${user.email}`);
+      } catch (error) {
+        console.error("[signup] Welcome email failed:", error.message);
+      }
+    } else {
+      console.warn(`[signup] No email on account — skipping welcome email for user ${user._id}`);
     }
   }
 
