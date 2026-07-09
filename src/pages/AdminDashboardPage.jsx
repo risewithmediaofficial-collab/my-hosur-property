@@ -371,6 +371,7 @@ const AdminDashboardPage = () => {
       asideClassName="md:top-0 md:h-full md:overflow-hidden"
       mainClassName="md:h-full md:overflow-y-auto"
       contentClassName="md:space-y-0 md:flex md:h-full md:min-h-0 md:flex-col md:gap-6 md:overflow-hidden"
+      hideLogo={true}
       stats={[
         { label: "Users", value: metrics.users || users.length || 0, icon: <UsersIcon className="h-4 w-4" /> },
         { label: "Posted Properties", value: propertyListings.length || metrics.properties || 0, icon: <HomeModernIcon className="h-4 w-4" /> },
