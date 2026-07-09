@@ -36,39 +36,83 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] } },
 };
 
-const Field = ({ label, icon: Icon, ...props }) => (
-  <MotionDiv variants={item} className="auth-field-wrap">
-    <label className="auth-label">{label}</label>
-    <div className="auth-input-shell">
-      {Icon ? <Icon className="auth-input-icon" /> : null}
-      <input className={`auth-input ${Icon ? "auth-input-with-icon" : ""}`} {...props} />
-    </div>
-  </MotionDiv>
-);
-
-const SelectField = ({ label, icon: Icon, children, ...props }) => (
-  <MotionDiv variants={item} className="auth-field-wrap">
-    <label className="auth-label">{label}</label>
-    <div className="auth-input-shell">
-      {Icon ? <Icon className="auth-input-icon" /> : null}
-      <select className={`auth-input auth-select ${Icon ? "auth-input-with-icon" : ""}`} {...props}>
-        {children}
-      </select>
-    </div>
-  </MotionDiv>
-);
-
-const PasswordField = ({ label, icon: Icon, showForgotPasswordLink, onForgotPasswordClick, ...props }) => {
-  const [showPassword, setShowPassword] = useState(false);
+const Field = ({ label, icon: Icon, id, ...props }) => {
+  const defaultId = React.useId();
+  const inputId = id || defaultId;
   return (
-    <MotionDiv variants={item} className="auth-field-wrap">
+    <MotionDiv variants={item} className="auth-field-wrap group relative pt-2">
+      <label
+        htmlFor={inputId}
+        className={`origin-start absolute top-[34px] block -translate-y-1/2 cursor-text px-1 text-xs font-semibold text-slate-400 transition-all pointer-events-none z-10
+          group-focus-within:top-2 group-focus-within:text-[10px] group-focus-within:text-navy group-focus-within:font-bold
+          has-[+div>input:not(:placeholder-shown)]:top-2 has-[+div>input:not(:placeholder-shown)]:text-[10px] has-[+div>input:not(:placeholder-shown)]:font-bold has-[+div>input:not(:placeholder-shown)]:text-navy
+          ${Icon ? "left-12" : "left-4"}`}
+      >
+        <span className="inline-flex bg-white px-1.5">{label}</span>
+      </label>
+      <div className="auth-input-shell">
+        {Icon ? <Icon className="auth-input-icon" /> : null}
+        <input
+          id={inputId}
+          placeholder=" "
+          className={`auth-input ${Icon ? "auth-input-with-icon" : ""}`}
+          {...props}
+        />
+      </div>
+    </MotionDiv>
+  );
+};
+
+const SelectField = ({ label, icon: Icon, id, children, ...props }) => {
+  const defaultId = React.useId();
+  const inputId = id || defaultId;
+  return (
+    <MotionDiv variants={item} className="auth-field-wrap group relative pt-2">
+      <label
+        htmlFor={inputId}
+        className={`origin-start absolute top-[34px] block -translate-y-1/2 cursor-text px-1 text-xs font-semibold text-slate-400 transition-all pointer-events-none z-10
+          group-focus-within:top-2 group-focus-within:text-[10px] group-focus-within:text-navy group-focus-within:font-bold
+          has-[+div>select:not([value=""]):not(:disabled)]:top-2 has-[+div>select:not([value=""]):not(:disabled)]:text-[10px] has-[+div>select:not([value=""]):not(:disabled)]:font-bold has-[+div>select:not([value=""]):not(:disabled)]:text-navy
+          has-[+div>select]:top-2 has-[+div>select]:text-[10px] has-[+div>select]:font-bold has-[+div>select]:text-navy
+          ${Icon ? "left-12" : "left-4"}`}
+      >
+        <span className="inline-flex bg-white px-1.5">{label}</span>
+      </label>
+      <div className="auth-input-shell">
+        {Icon ? <Icon className="auth-input-icon" /> : null}
+        <select
+          id={inputId}
+          className={`auth-input auth-select ${Icon ? "auth-input-with-icon" : ""}`}
+          {...props}
+        >
+          {children}
+        </select>
+      </div>
+    </MotionDiv>
+  );
+};
+
+const PasswordField = ({ label, icon: Icon, showForgotPasswordLink, onForgotPasswordClick, id, ...props }) => {
+  const [showPassword, setShowPassword] = useState(false);
+  const defaultId = React.useId();
+  const inputId = id || defaultId;
+  return (
+    <MotionDiv variants={item} className="auth-field-wrap group relative pt-2">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <label className="auth-label">{label}</label>
+        <label
+          htmlFor={inputId}
+          className={`origin-start absolute top-[34px] block -translate-y-1/2 cursor-text px-1 text-xs font-semibold text-slate-400 transition-all pointer-events-none z-10
+            group-focus-within:top-2 group-focus-within:text-[10px] group-focus-within:text-navy group-focus-within:font-bold
+            has-[+div>input:not(:placeholder-shown)]:top-2 has-[+div>input:not(:placeholder-shown)]:text-[10px] has-[+div>input:not(:placeholder-shown)]:font-bold has-[+div>input:not(:placeholder-shown)]:text-navy
+            ${Icon ? "left-12" : "left-4"}`}
+        >
+          <span className="inline-flex bg-white px-1.5">{label}</span>
+        </label>
         {showForgotPasswordLink && (
           <button
             type="button"
-            className="auth-toggle-btn"
-            style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.5px" }}
+            className="auth-toggle-btn absolute right-2 top-0"
+            style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.5px", zIndex: 12 }}
             onClick={onForgotPasswordClick}
           >
             Forgot Password?
@@ -78,6 +122,8 @@ const PasswordField = ({ label, icon: Icon, showForgotPasswordLink, onForgotPass
       <div className="auth-input-shell" style={{ position: "relative" }}>
         {Icon ? <Icon className="auth-input-icon" /> : null}
         <input
+          id={inputId}
+          placeholder=" "
           type={showPassword ? "text" : "password"}
           className={`auth-input ${Icon ? "auth-input-with-icon" : ""}`}
           style={{ paddingRight: "48px" }}

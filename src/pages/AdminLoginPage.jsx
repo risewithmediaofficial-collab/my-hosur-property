@@ -5,6 +5,7 @@ import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
 import { adminLoginUser } from "../services/api/adminAuthApi";
 import { ShieldCheckIcon } from "../components/AppIcons";
+import { FloatingInput } from "../components/ui/input";
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();
@@ -41,18 +42,18 @@ const AdminLoginPage = () => {
         <h1 className="mt-3 text-3xl font-extrabold text-navy">Admin Login</h1>
         <p className="mt-1 text-sm text-slate-600">Use admin username/email and password.</p>
 
-        <div className="mt-5 space-y-3">
-          <input
-            className="site-input w-full"
-            placeholder="Username or Email"
+        <div className="mt-5 space-y-4">
+          <FloatingInput
+            label="Username or Email"
+            placeholder=" "
             value={form.username}
             onChange={(e) => onChange("username", e.target.value)}
             required
           />
-          <input
-            className="site-input w-full"
-            placeholder="Password"
+          <FloatingInput
+            label="Password"
             type="password"
+            placeholder=" "
             value={form.password}
             onChange={(e) => onChange("password", e.target.value)}
             required

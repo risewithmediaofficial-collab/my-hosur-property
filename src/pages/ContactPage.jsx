@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { EnvelopeIcon, MapPinIcon, PhoneIcon } from "../components/AppIcons";
 import PageHero from "../components/PageHero";
 import SeoHead from "../components/SeoHead";
+import { FloatingInput } from "../components/ui/input";
 import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE_NUMBERS } from "../constants/contactInfo";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
 import useScrollAnimation from "../hooks/useScrollAnimation";
@@ -71,68 +72,68 @@ const ContactPage = () => {
               <h2 className="text-2xl font-bold text-navy mb-6">Send Us A Message</h2>
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 {/* Name */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Name <span className="text-orange">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    placeholder="Your name"
-                    required
-                    className="border-0 border-b-2 border-slate-300 bg-transparent py-2.5 text-sm text-navy placeholder-slate-400 outline-none transition focus:border-navy"
-                  />
-                </div>
+                <FloatingInput
+                  label="Name *"
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  placeholder=" "
+                  required
+                />
 
                 {/* Email */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    E-Mail <span className="text-orange">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    placeholder="your@email.com"
-                    required
-                    className="border-0 border-b-2 border-slate-300 bg-transparent py-2.5 text-sm text-navy placeholder-slate-400 outline-none transition focus:border-navy"
-                  />
-                </div>
+                <FloatingInput
+                  label="E-Mail *"
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder=" "
+                  required
+                />
 
                 {/* Phone */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Phone <span className="text-orange">*</span>
+                <div className="group relative w-full pt-2">
+                  <label
+                    htmlFor="contact-phone"
+                    className="origin-start absolute top-2 block cursor-default text-[10px] font-bold text-navy px-1 pointer-events-none z-10 left-16"
+                  >
+                    <span className="inline-flex bg-white px-1.5">Phone *</span>
                   </label>
-                  <div className="flex items-center border-b-2 border-slate-300 transition focus-within:border-navy">
-                    <span className="py-2.5 pr-2 text-sm text-slate-500">🇮🇳 +91 •</span>
+                  <div className="flex items-center rounded-lg border border-input bg-background px-3 py-2 shadow-sm shadow-black/5 transition-shadow focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/20">
+                    <span className="text-sm text-slate-500 mr-2">🇮🇳 +91 •</span>
                     <input
+                      id="contact-phone"
                       type="tel"
                       name="phone"
                       value={form.phone}
                       onChange={handleChange}
                       placeholder="XXXXX XXXXX"
                       required
-                      className="flex-1 border-0 bg-transparent py-2.5 text-sm text-navy placeholder-slate-400 outline-none"
+                      className="flex-1 border-0 bg-transparent py-1.5 text-sm text-navy placeholder-slate-400 outline-none"
                     />
                   </div>
                 </div>
 
                 {/* Message */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Message
+                <div className="group relative w-full pt-2">
+                  <label
+                    htmlFor="contact-message"
+                    className="origin-start absolute top-1/2 block -translate-y-1/2 cursor-text px-1 text-xs font-semibold text-slate-400 transition-all pointer-events-none z-10 left-4
+                      group-focus-within:top-2 group-focus-within:text-[10px] group-focus-within:text-navy group-focus-within:font-bold
+                      has-[+textarea:not(:placeholder-shown)]:top-2 has-[+textarea:not(:placeholder-shown)]:text-[10px] has-[+textarea:not(:placeholder-shown)]:font-bold has-[+textarea:not(:placeholder-shown)]:text-navy"
+                  >
+                    <span className="inline-flex bg-white px-1.5">Message</span>
                   </label>
                   <textarea
+                    id="contact-message"
                     name="message"
                     value={form.message}
                     onChange={handleChange}
                     rows={3}
-                    placeholder="How can we help you?"
-                    className="border-0 border-b-2 border-slate-300 bg-transparent py-2.5 text-sm text-navy placeholder-slate-400 outline-none transition focus:border-navy resize-none"
+                    placeholder=" "
+                    className="flex w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm shadow-black/5 transition-shadow placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/20 resize-none"
                   />
                 </div>
 
