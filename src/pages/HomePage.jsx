@@ -1079,43 +1079,43 @@ const HomePage = () => {
           <div className="relative overflow-hidden">
             <style>{`
               @keyframes scroll-partners { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-              .partners-scroll { display: flex; gap: 2rem; animation: scroll-partners 30s linear infinite; width: max-content; will-change: transform; }
-              .partner-item { flex-shrink: 0; width: 200px; height: 120px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ffffff 0%, #eef5f4 100%); border: 2px solid #cfdcde; border-radius: 12px; transition: all 0.3s ease; cursor: pointer; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08); user-select: none; }
-              .partner-item:hover { border-color: #FF9914; background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%); transform: translateY(-4px); box-shadow: 0 8px 16px rgba(255, 153, 20, 0.15); }
+              .partners-scroll { display: flex; gap: 3rem; animation: scroll-partners 30s linear infinite; width: max-content; will-change: transform; align-items: center; }
+              .partner-item { flex-shrink: 0; width: 105px; height: 105px; display: flex; align-items: center; justify-content: center; background: #ffffff; border: 2px solid #e2e8f0; border-radius: 50%; transition: all 0.3s ease; cursor: pointer; user-select: none; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04); }
+              .partner-item:hover { border-color: #FF9914; transform: scale(1.08); box-shadow: 0 6px 15px rgba(255, 153, 20, 0.15); }
               .gradient-fade { pointer-events: none; user-select: none; }
               .gradient-fade-left { position: absolute; left: 0; top: 0; bottom: 0; width: 80px; background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }
               .gradient-fade-right { position: absolute; right: 0; top: 0; bottom: 0; width: 80px; background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }
             `}</style>
 
             <div className="gradient-fade gradient-fade-left"></div>
-            <div className="overflow-hidden pointer-events-none">
+            <div className="overflow-hidden pointer-events-none py-4">
               <div className="home-scroll-track partners-scroll pointer-events-auto">
                 {[
-                  { name: "Gyes property & construction", logo: "Gyes P&C" },
-                  { name: "Gyes traders", logo: "Gyes Traders" },
-                  { name: "OneClick office & Home service", logo: "One Click" },
+                  { name: "Gyes property & construction", logo: "Gyes\nP&C" },
+                  { name: "Gyes traders", logo: "Gyes\nTraders" },
+                  { name: "OneClick office & Home service", logo: "One\nClick" },
                   { name: "Alluring Realty", logo: "Alluring", image: alluringRealityImg },
                   { name: "Hareesh Enterprises (Document writer)", logo: "Hareesh" },
-                  { name: "Gyes property & construction", logo: "Gyes P&C" },
-                  { name: "Gyes traders", logo: "Gyes Traders" },
-                  { name: "OneClick office & Home service", logo: "One Click" },
+                  { name: "Gyes property & construction", logo: "Gyes\nP&C" },
+                  { name: "Gyes traders", logo: "Gyes\nTraders" },
+                  { name: "OneClick office & Home service", logo: "One\nClick" },
                   { name: "Alluring Realty", logo: "Alluring", image: alluringRealityImg },
                   { name: "Hareesh Enterprises (Document writer)", logo: "Hareesh" },
                 ].map((partner, index) => (
-                  <div key={index} className="partner-item group">
+                  <div key={index} className="partner-item group" title={partner.name}>
                     {partner.image ? (
-                      <div className="flex flex-col items-center justify-center p-2">
+                      <div className="flex items-center justify-center p-3 w-full h-full">
                         <img 
                           src={partner.image} 
                           alt={partner.name} 
-                          className="max-h-[70px] max-w-[170px] object-contain group-hover:scale-105 transition-transform duration-300 rounded"
+                          className="max-h-[65px] max-w-[65px] object-contain group-hover:scale-105 transition-transform duration-300"
                         />
-                        <p className="mt-1 text-[10px] font-bold text-slate-500 group-hover:text-orange transition text-center">{partner.name}</p>
                       </div>
                     ) : (
-                      <div className="text-center">
-                        <p className="text-lg font-bold text-navy">{partner.logo}</p>
-                        <p className="mt-1 text-xs text-slate-600 group-hover:text-orange transition">{partner.name}</p>
+                      <div className="text-center px-2 flex flex-col justify-center items-center w-full h-full">
+                        <span className="text-[11px] font-extrabold text-navy leading-tight whitespace-pre-line group-hover:text-orange transition-colors duration-300">
+                          {partner.logo}
+                        </span>
                       </div>
                     )}
                   </div>
