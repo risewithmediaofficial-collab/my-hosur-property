@@ -40,6 +40,7 @@ import SeoHead from "../components/SeoHead";
 import useDebounce from "../hooks/useDebounce";
 import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
+import { AnimatedTooltip } from "../components/ui/animated-tooltip";
 import servicesHeroImage from "../assets/house.png";
 import alluringRealityImg from "../assets/alluring reality.jpeg";
 import { fetchHomeProperties } from "../services/api/propertyApi";
@@ -1075,55 +1076,41 @@ const HomePage = () => {
           </p>
         </div>
 
-        <div className="mx-auto mt-12 max-w-[1440px]">
-          <div className="relative overflow-hidden">
-            <style>{`
-              @keyframes scroll-partners { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-              .partners-scroll { display: flex; gap: 3rem; animation: scroll-partners 30s linear infinite; width: max-content; will-change: transform; align-items: center; }
-              .partner-item { flex-shrink: 0; width: 105px; height: 105px; display: flex; align-items: center; justify-content: center; background: #ffffff; border: 2px solid #e2e8f0; border-radius: 50%; transition: all 0.3s ease; cursor: pointer; user-select: none; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04); }
-              .partner-item:hover { border-color: #FF9914; transform: scale(1.08); box-shadow: 0 6px 15px rgba(255, 153, 20, 0.15); }
-              .gradient-fade { pointer-events: none; user-select: none; }
-              .gradient-fade-left { position: absolute; left: 0; top: 0; bottom: 0; width: 80px; background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }
-              .gradient-fade-right { position: absolute; right: 0; top: 0; bottom: 0; width: 80px; background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); z-index: 10; pointer-events: none; }
-            `}</style>
-
-            <div className="gradient-fade gradient-fade-left"></div>
-            <div className="overflow-hidden pointer-events-none py-4">
-              <div className="home-scroll-track partners-scroll pointer-events-auto">
-                {[
-                  { name: "Gyes property & construction", logo: "Gyes\nP&C" },
-                  { name: "Gyes traders", logo: "Gyes\nTraders" },
-                  { name: "OneClick office & Home service", logo: "One\nClick" },
-                  { name: "Alluring Realty", logo: "Alluring", image: alluringRealityImg },
-                  { name: "Hareesh Enterprises (Document writer)", logo: "Hareesh" },
-                  { name: "Gyes property & construction", logo: "Gyes\nP&C" },
-                  { name: "Gyes traders", logo: "Gyes\nTraders" },
-                  { name: "OneClick office & Home service", logo: "One\nClick" },
-                  { name: "Alluring Realty", logo: "Alluring", image: alluringRealityImg },
-                  { name: "Hareesh Enterprises (Document writer)", logo: "Hareesh" },
-                ].map((partner, index) => (
-                  <div key={index} className="partner-item group" title={partner.name}>
-                    {partner.image ? (
-                      <div className="flex items-center justify-center p-3 w-full h-full">
-                        <img 
-                          src={partner.image} 
-                          alt={partner.name} 
-                          className="max-h-[65px] max-w-[65px] object-contain group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    ) : (
-                      <div className="text-center px-2 flex flex-col justify-center items-center w-full h-full">
-                        <span className="text-[11px] font-extrabold text-navy leading-tight whitespace-pre-line group-hover:text-orange transition-colors duration-300">
-                          {partner.logo}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="gradient-fade gradient-fade-right"></div>
-          </div>
+        <div className="mx-auto mt-12 flex justify-center max-w-[1440px] px-4">
+          <AnimatedTooltip
+            items={[
+              {
+                id: 1,
+                name: "Gyes Property & Construction",
+                designation: "Property & construction solutions",
+                image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=200&auto=format&fit=crop",
+              },
+              {
+                id: 2,
+                name: "Gyes Traders",
+                designation: "General trading services",
+                image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=200&auto=format&fit=crop",
+              },
+              {
+                id: 3,
+                name: "OneClick Office & Home Service",
+                designation: "Office & home solutions",
+                image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=200&auto=format&fit=crop",
+              },
+              {
+                id: 4,
+                name: "Alluring Realty",
+                designation: "Real estate & consulting",
+                image: alluringRealityImg,
+              },
+              {
+                id: 5,
+                name: "Hareesh Enterprises",
+                designation: "Document writing & legal services",
+                image: "https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=200&auto=format&fit=crop",
+              },
+            ]}
+          />
         </div>
       </MotionSection>
 
