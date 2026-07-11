@@ -190,7 +190,7 @@ export function AnimatedCharactersLoginPage() {
               <Label htmlFor="preview-email" className="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">Email</Label>
               <Input
                 id="preview-email"
-                placeholder="hello@myhosurproperty.com"
+                placeholder=" "
                 className="h-10 border-white/10 bg-slate-900/80 text-slate-100 placeholder:text-slate-500"
                 onFocus={() => setIsTyping(true)}
                 onBlur={() => setIsTyping(false)}
@@ -202,7 +202,7 @@ export function AnimatedCharactersLoginPage() {
                 <Input
                   id="preview-password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder=" "
                   className="h-10 border-white/10 bg-slate-900/80 pr-10 text-slate-100 placeholder:text-slate-500"
                   onFocus={() => setIsTyping(true)}
                   onBlur={() => setIsTyping(false)}

@@ -38,7 +38,7 @@ const LocalitySearch = () => {
                 type="text"
                 value={manualSearch}
                 onChange={(e) => setManualSearch(e.target.value)}
-                placeholder="Search locality or area..."
+                placeholder=" "
                 className="w-full bg-transparent text-sm font-medium text-navy outline-none placeholder:text-slate-400"
               />
               <button

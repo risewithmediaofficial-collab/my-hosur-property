@@ -556,10 +556,10 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
   const renderInput = (field) => {
     if (field === "landArea") {
-      return <DataInput field={field} value={form[field]} options={landAreaOptions} onChange={update} placeholder="Select or type land area" />;
+      return <DataInput field={field} value={form[field]} options={landAreaOptions} onChange={update} placeholder=" " />;
     }
     if (["price", "minPrice", "maxPrice", "monthlyRent", "deposit"].includes(field)) {
-      return <DataInput field={field} value={form[field]} options={priceOptions} onChange={update} placeholder="Select or type amount" />;
+      return <DataInput field={field} value={form[field]} options={priceOptions} onChange={update} placeholder=" " />;
     }
     if (field === "facing") {
       return <Select field={field} value={form[field]} options={["", ...facingOptions]} onChange={update} />;
@@ -608,7 +608,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
               </Field>
             ))}
             <Field label="Full Address / Survey Details" required className="md:col-span-3">
-              <textarea className="site-input min-h-[88px] resize-none" rows="2" value={form.houseAddress} onChange={(e) => update("houseAddress", e.target.value)} placeholder="Street, survey number, landmark" />
+              <textarea className="site-input min-h-[88px] resize-none" rows="2" value={form.houseAddress} onChange={(e) => update("houseAddress", e.target.value)} placeholder=" " />
             </Field>
           </div>
         </FormSection>
@@ -653,7 +653,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
           {form.rera === "Yes" ? (
             <div className="mt-4 max-w-md">
               <Field label="RERA ID">
-                <input className="site-input" value={form.reraId} onChange={(e) => update("reraId", e.target.value)} placeholder="RERA number" />
+                <input className="site-input" value={form.reraId} onChange={(e) => update("reraId", e.target.value)} placeholder=" " />
               </Field>
             </div>
           ) : null}
@@ -668,7 +668,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
               <Select field="postedBy" value={form.postedBy} options={["owner", "agent", "builder"]} onChange={update} />
             </Field>
             <Field label="Property Description" required className="md:col-span-2">
-              <textarea className="site-input min-h-[120px] resize-none" rows="4" minLength={10} value={form.description} onChange={(e) => update("description", e.target.value)} placeholder="Explain locality, road access, nearby schools, condition, approvals, and buyer/renter notes." />
+              <textarea className="site-input min-h-[120px] resize-none" rows="4" minLength={10} value={form.description} onChange={(e) => update("description", e.target.value)} placeholder=" " />
             </Field>
           </div>
         </FormSection>
@@ -836,7 +836,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
                 className="site-input w-full"
                 value={profileForm.email}
                 onChange={(e) => setProfileForm(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="you@example.com"
+                placeholder=" "
               />
             </div>
             <div>
@@ -847,7 +847,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
                 className="site-input w-full"
                 value={profileForm.address}
                 onChange={(e) => setProfileForm(prev => ({ ...prev, address: e.target.value }))}
-                placeholder="Hosur, Tamil Nadu"
+                placeholder=" "
               />
             </div>
             <div>

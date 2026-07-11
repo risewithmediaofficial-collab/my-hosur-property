@@ -122,7 +122,7 @@ const LocalityDropdown = ({ value, onChange, onSelect, onOpenChange }) => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search localities..."
+                  placeholder=" "
                   className="w-full rounded-lg border-2 border-slate-200 bg-slate-50 py-2.5 pl-9 pr-4 text-sm font-medium text-navy outline-none transition duration-200 placeholder:text-slate-400 focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/20"
                   autoFocus
                 />

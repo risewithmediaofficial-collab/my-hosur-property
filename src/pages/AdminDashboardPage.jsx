@@ -444,7 +444,7 @@ const AdminDashboardPage = () => {
               <div className="flex w-full flex-col gap-2 sm:flex-row">
                 <input 
                   type="text" 
-                  placeholder="Filter users by name, email or phone..." 
+                  placeholder=" " 
                   className="dashboard-control flex-1 text-sm"
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
@@ -941,7 +941,7 @@ const AdminDashboardPage = () => {
                     rows={3}
                     value={tempNotes}
                     onChange={(e) => setTempNotes(e.target.value)}
-                    placeholder="Add details about this member here..."
+                    placeholder=" "
                   />
                 )}
               </div>
@@ -1224,7 +1224,7 @@ const AdminDashboardPage = () => {
                   value={emailSubject}
                   onChange={(e) => setEmailSubject(e.target.value)}
                   className="dashboard-control"
-                  placeholder="Enter email subject"
+                  placeholder=" "
                 />
               </div>
               <div>
@@ -1235,7 +1235,7 @@ const AdminDashboardPage = () => {
                   value={emailMessage}
                   onChange={(e) => setEmailMessage(e.target.value)}
                   className="dashboard-control min-h-[170px]"
-                  placeholder="Type your message here... (HTML tags like <br/> or <b> are supported internally)"
+                  placeholder=" "
                 />
               </div>
               <div className="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

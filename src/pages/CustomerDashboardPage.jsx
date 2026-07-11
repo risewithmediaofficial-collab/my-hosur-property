@@ -324,13 +324,13 @@ const CustomerDashboardPage = () => {
               <div className="grid gap-4 sm:grid-cols-2">
                 <input
                   className="dashboard-control"
-                  placeholder="City *"
+                  placeholder=" "
                   value={form.city}
                   onChange={(event) => setForm((previous) => ({ ...previous, city: event.target.value }))}
                 />
                 <input
                   className="dashboard-control"
-                  placeholder="Area *"
+                  placeholder=" "
                   value={form.area}
                   onChange={(event) => setForm((previous) => ({ ...previous, area: event.target.value }))}
                 />
@@ -338,7 +338,7 @@ const CustomerDashboardPage = () => {
                   className="dashboard-control"
                   type="number"
                   min="0"
-                  placeholder="Budget Min"
+                  placeholder=" "
                   value={form.budgetMin}
                   onChange={(event) => setForm((previous) => ({ ...previous, budgetMin: event.target.value }))}
                 />
@@ -346,7 +346,7 @@ const CustomerDashboardPage = () => {
                   className="dashboard-control"
                   type="number"
                   min="0"
-                  placeholder="Budget Max *"
+                  placeholder=" "
                   value={form.budgetMax}
                   onChange={(event) => setForm((previous) => ({ ...previous, budgetMax: event.target.value }))}
                 />
@@ -364,7 +364,7 @@ const CustomerDashboardPage = () => {
               </div>
               <textarea
                 className="dashboard-control min-h-[110px]"
-                placeholder="Additional requirements (optional)"
+                placeholder=" "
                 value={form.additionalRequirements}
                 onChange={(event) => setForm((previous) => ({ ...previous, additionalRequirements: event.target.value }))}
               />

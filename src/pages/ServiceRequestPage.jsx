@@ -155,7 +155,7 @@ const ServiceRequestPage = () => {
                 className="site-input"
                 value={form.city}
                 onChange={(event) => setForm((prev) => ({ ...prev, city: event.target.value }))}
-                placeholder="Hosur"
+                placeholder=" "
               />
             </label>
 
@@ -165,7 +165,7 @@ const ServiceRequestPage = () => {
                 className="site-input"
                 value={form.area}
                 onChange={(event) => setForm((prev) => ({ ...prev, area: event.target.value }))}
-                placeholder="Bagalur Road, Hosur"
+                placeholder=" "
               />
             </label>
 
@@ -205,7 +205,7 @@ const ServiceRequestPage = () => {
                   min="0"
                   value={form.budgetMin}
                   onChange={(event) => setForm((prev) => ({ ...prev, budgetMin: event.target.value }))}
-                  placeholder="Optional"
+                  placeholder=" "
                 />
               </div>
             </label>
@@ -220,7 +220,7 @@ const ServiceRequestPage = () => {
                   min="0"
                   value={form.budgetMax}
                   onChange={(event) => setForm((prev) => ({ ...prev, budgetMax: event.target.value }))}
-                  placeholder="Optional"
+                  placeholder=" "
                 />
               </div>
             </label>

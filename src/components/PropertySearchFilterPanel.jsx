@@ -81,7 +81,7 @@ const FieldControl = ({ field, values, update }) => {
           type="search"
           list={listId}
           className="property-filter-input property-filter-input-search"
-          placeholder="Search locality..."
+          placeholder=" "
           value={getFieldValue(values, field.key)}
           onChange={(e) => update(field.key, e.target.value)}
         />

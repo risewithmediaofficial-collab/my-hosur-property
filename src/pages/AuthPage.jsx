@@ -97,8 +97,8 @@ const PasswordField = ({ label, icon: Icon, showForgotPasswordLink, onForgotPass
   const defaultId = React.useId();
   const inputId = id || defaultId;
   return (
-    <MotionDiv variants={item} className="auth-field-wrap group relative pt-2">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <div>
+      <MotionDiv variants={item} className="auth-field-wrap group relative pt-2">
         <label
           htmlFor={inputId}
           className={`origin-start absolute top-[34px] block -translate-y-1/2 cursor-text px-1 text-xs font-semibold text-slate-400 transition-all pointer-events-none z-10
@@ -108,53 +108,53 @@ const PasswordField = ({ label, icon: Icon, showForgotPasswordLink, onForgotPass
         >
           <span className="inline-flex bg-white px-1.5">{label}</span>
         </label>
-        {showForgotPasswordLink && (
+        <div className="auth-input-shell" style={{ position: "relative" }}>
+          {Icon ? <Icon className="auth-input-icon" /> : null}
+          <input
+            id={inputId}
+            placeholder=" "
+            type={showPassword ? "text" : "password"}
+            className={`auth-input ${Icon ? "auth-input-with-icon" : ""}`}
+            style={{ paddingRight: "48px" }}
+            {...props}
+          />
           <button
             type="button"
-            className="auth-toggle-btn absolute right-2 top-0"
-            style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.5px", zIndex: 12 }}
-            onClick={onForgotPasswordClick}
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: "absolute",
+              right: "12px",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "100%",
+              color: "#94a3b8",
+              padding: "0 8px",
+              zIndex: 5,
+            }}
           >
-            Forgot Password?
+            {showPassword ? (
+              <EyeSlashIcon style={{ width: "20px", height: "20px" }} />
+            ) : (
+              <EyeIcon style={{ width: "20px", height: "20px" }} />
+            )}
           </button>
-        )}
-      </div>
-      <div className="auth-input-shell" style={{ position: "relative" }}>
-        {Icon ? <Icon className="auth-input-icon" /> : null}
-        <input
-          id={inputId}
-          placeholder=" "
-          type={showPassword ? "text" : "password"}
-          className={`auth-input ${Icon ? "auth-input-with-icon" : ""}`}
-          style={{ paddingRight: "48px" }}
-          {...props}
-        />
+        </div>
+      </MotionDiv>
+      {showForgotPasswordLink && (
         <button
           type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          style={{
-            position: "absolute",
-            right: "12px",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "100%",
-            color: "#94a3b8",
-            padding: "0 8px",
-            zIndex: 5,
-          }}
+          className="auth-toggle-btn mt-2 text-right w-full"
+          style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.5px", color: "#0f172a" }}
+          onClick={onForgotPasswordClick}
         >
-          {showPassword ? (
-            <EyeSlashIcon style={{ width: "20px", height: "20px" }} />
-          ) : (
-            <EyeIcon style={{ width: "20px", height: "20px" }} />
-          )}
+          Forgot Password?
         </button>
-      </div>
-    </MotionDiv>
+      )}
+    </div>
   );
 };
 
@@ -1132,7 +1132,7 @@ const AuthPage = () => {
                           <PasswordField
                             label="New Password"
                             icon={LockClosedIcon}
-                            placeholder="Choose a new password (min. 6 characters)"
+                            placeholder=" "
                             value={newPassword}
                             onChange={(event) => setNewPassword(event.target.value)}
                             required
@@ -1141,7 +1141,7 @@ const AuthPage = () => {
                           <PasswordField
                             label="Confirm New Password"
                             icon={LockClosedIcon}
-                            placeholder="Re-enter your new password"
+                            placeholder=" "
                             value={confirmNewPassword}
                             onChange={(event) => setConfirmNewPassword(event.target.value)}
                             required
@@ -1192,7 +1192,7 @@ const AuthPage = () => {
                             <Field
                               label="Full Name"
                               icon={UserIcon}
-                              placeholder="Ravi Kumar"
+                              placeholder=" "
                               value={form.name}
                               onChange={(event) => onChange("name", event.target.value)}
                               required
@@ -1205,7 +1205,7 @@ const AuthPage = () => {
                             icon={EnvelopeIcon}
                             type="email"
                             autoComplete="email"
-                            placeholder={isSignup ? "you@example.com (optional)" : "you@example.com"}
+                            placeholder=" "
                             value={form.email}
                             onChange={(event) => onChange("email", event.target.value)}
                           />
@@ -1216,7 +1216,7 @@ const AuthPage = () => {
                             type="tel"
                             inputMode="tel"
                             autoComplete="tel"
-                            placeholder="e.g. 9994005086"
+                            placeholder=" "
                             value={form.phone}
                             onChange={(event) => onChange("phone", event.target.value)}
                             required
@@ -1227,7 +1227,7 @@ const AuthPage = () => {
                               label="Password"
                               icon={LockClosedIcon}
                               autoComplete={isSignup ? "new-password" : "current-password"}
-                              placeholder="Enter your password"
+                              placeholder=" "
                               value={form.password}
                               onChange={(event) => onChange("password", event.target.value)}
                               required
@@ -1241,7 +1241,7 @@ const AuthPage = () => {
                               label="Confirm Password"
                               icon={LockClosedIcon}
                               autoComplete="new-password"
-                              placeholder="Re-enter your password"
+                              placeholder=" "
                               value={confirmPassword}
                               onChange={(event) => setConfirmPassword(event.target.value)}
                               required

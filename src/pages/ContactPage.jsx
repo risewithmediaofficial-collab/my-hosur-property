@@ -109,7 +109,7 @@ const ContactPage = () => {
                       name="phone"
                       value={form.phone}
                       onChange={handleChange}
-                      placeholder="XXXXX XXXXX"
+                      placeholder=" "
                       required
                       className="flex-1 border-0 bg-transparent py-1.5 text-sm text-navy placeholder-slate-400 outline-none"
                     />

@@ -68,7 +68,7 @@ const LocationPicker = ({ location, setLocation }) => {
       <input
         ref={inputRef}
         className="w-full rounded-lg border border-clay px-3 py-2 text-sm"
-        placeholder="Search location / locality"
+        placeholder=" "
         disabled={mapsFailed}
       />
 
@@ -81,36 +81,36 @@ const LocationPicker = ({ location, setLocation }) => {
       <div className="grid gap-3 md:grid-cols-3">
         <input
           className="rounded-lg border border-clay px-3 py-2"
-          placeholder="City"
+          placeholder=" "
           value={location.city}
           onChange={(e) => setLocation((p) => ({ ...p, city: e.target.value }))}
           required
         />
         <input
           className="rounded-lg border border-clay px-3 py-2"
-          placeholder="Area"
+          placeholder=" "
           value={location.area}
           onChange={(e) => setLocation((p) => ({ ...p, area: e.target.value }))}
           required
         />
         <input
           className="rounded-lg border border-clay px-3 py-2"
-          placeholder="Address"
+          placeholder=" "
           value={location.address}
-          onChange={(e) => setLocation((p) => ({ ...p, address: e.target.value }))}
+          onChange={(e) => setLocation((p) => ({ ...p, address: e.target.value }))}  
         />
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
         <input
           className="rounded-lg border border-clay px-3 py-2"
-          placeholder="Latitude"
+          placeholder=" "
           value={location.lat || ""}
           onChange={(e) => setLocation((p) => ({ ...p, lat: e.target.value }))}
         />
         <input
           className="rounded-lg border border-clay px-3 py-2"
-          placeholder="Longitude"
+          placeholder=" "
           value={location.lng || ""}
           onChange={(e) => setLocation((p) => ({ ...p, lng: e.target.value }))}
         />

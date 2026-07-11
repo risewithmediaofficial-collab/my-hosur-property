@@ -171,7 +171,7 @@ const ServicesPage = () => {
                 <input
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Search loan, registration, legal, interior..."
+                  placeholder=" "
                   className="w-full bg-transparent text-sm font-medium text-slate-700 outline-none placeholder:text-slate-400"
                 />
               </div>
