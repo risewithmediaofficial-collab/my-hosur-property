@@ -596,7 +596,7 @@ const HomePage = () => {
                           <Link
                             key={`${group.label}-${item.label}`}
                             to={item.to}
-                            className="block rounded-lg px-4 py-2.5 text-sm font-medium text-navy transition duration-150 hover:bg-orange/5 hover:text-orange"
+                            className="block rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-800 transition duration-150 hover:bg-orange hover:text-white"
                             onClick={() => setOpenShortcutMenu("")}
                           >
                             {item.label}
@@ -622,7 +622,7 @@ const HomePage = () => {
                       <Link
                         key={`${openShortcutGroup.label}-${item.label}`}
                         to={item.to}
-                        className="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 text-navy transition duration-150 hover:bg-orange/5 hover:text-orange"
+                        className="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 text-slate-800 transition duration-150 hover:bg-orange hover:text-white"
                         onClick={() => setOpenShortcutMenu("")}
                       >
                         {item.label}
