@@ -590,6 +590,8 @@ const HomePage = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.15 }}
+                      onMouseEnter={() => handleShortcutHover(group.label)}
+                      onMouseLeave={handleShortcutLeave}
                     >
                       <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl max-h-[60vh] overflow-y-auto">
                         {group.items.map((item) => (
