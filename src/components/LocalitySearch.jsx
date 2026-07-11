@@ -83,7 +83,7 @@ const LocalitySearch = () => {
                   key={location}
                   type="button"
                   onClick={() => handleLocalitySearch(location)}
-                  className="relative flex w-full items-center justify-between rounded-lg border-2 border-slate-200 bg-white px-4 py-3 text-left font-semibold text-navy transition duration-200 hover:border-orange hover:bg-orange/10 hover:text-orange active:scale-95"
+                  className="relative flex w-full items-center justify-between rounded-lg border-2 border-slate-200 bg-white px-4 py-3 text-left font-semibold text-slate-800 transition duration-200 hover:border-orange hover:bg-orange hover:text-white active:scale-95"
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
                 >

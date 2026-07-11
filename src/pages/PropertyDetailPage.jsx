@@ -415,7 +415,7 @@ const PropertyDetailPage = () => {
                 className={`flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold transition ${
                   isSaved
                     ? "bg-navy text-white"
-                    : "border border-slate-200 bg-white text-navy hover:border-orange hover:text-orange"
+                    : "border border-slate-200 bg-white text-slate-800 hover:border-orange hover:bg-orange hover:text-white"
                 }`}
               >
                 <BookmarkIcon className="h-4 w-4" />

@@ -1029,7 +1029,7 @@ const MinPriceRangeGroup = ({ value, onChange }) => (
         className={`rounded-lg border px-4 py-2.5 text-sm font-bold transition ${
           value === range
             ? "border-orange bg-orange text-white shadow-sm"
-            : "border-slate-200 bg-white text-navy hover:border-orange hover:bg-orange/5"
+            : "border-slate-200 bg-white text-slate-800 hover:border-orange hover:bg-orange hover:text-white"
         }`}
       >
         {range}

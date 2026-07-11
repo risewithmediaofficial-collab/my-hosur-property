@@ -140,7 +140,7 @@ const ServiceRequestPage = () => {
                 className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
                   requestCategory === item.requestCategory
                     ? "bg-orange text-white"
-                    : "border border-slate-200 bg-white text-navy hover:border-orange hover:text-orange"
+                    : "border border-slate-200 bg-white text-slate-800 hover:border-orange hover:bg-orange hover:text-white"
                 }`}
               >
                 {item.label}
