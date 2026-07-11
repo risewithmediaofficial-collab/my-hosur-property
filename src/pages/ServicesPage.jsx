@@ -141,7 +141,7 @@ const ServicesPage = () => {
                     key={item.key}
                     type="button"
                     onClick={() => setActiveCategoryKey(item.key)}
-                    className="group inline-flex min-h-[52px] w-full items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-bold text-navy shadow-sm transition hover:-translate-y-0.5 hover:border-orange hover:text-orange"
+                    className="group inline-flex min-h-[52px] w-full items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-bold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-orange hover:bg-orange hover:text-white"
                   >
                     <span className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-orange/10 text-orange transition group-hover:bg-orange group-hover:text-white">
                       <Icon className="h-4 w-4" />
