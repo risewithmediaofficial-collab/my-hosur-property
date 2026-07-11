@@ -102,7 +102,7 @@ export const resetPassword = async (payload) => {
 
 export const updateProfile = async (token, payload) => {
   try {
-    const res = await apiClient.put("/api/user/profile", payload, withAuth(token));
+    const res = await apiClient.put("/api/users/profile", payload, withAuth(token));
     return logResponse("updateProfile", res.data);
   } catch (err) {
     return logError("updateProfile", err);
