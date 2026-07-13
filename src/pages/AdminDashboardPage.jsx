@@ -19,6 +19,9 @@ import {
   deleteAdminLead,
   deleteAdminCustomerRequest,
   deleteAdminLeadUnlock,
+  fetchAdminPaymentRequests,
+  approveAdminPaymentRequest,
+  rejectAdminPaymentRequest,
 } from "../services/api/adminApi";
 import toast from "react-hot-toast";
 import PropertyPostingForm from "../components/PropertyPostingForm";
@@ -71,11 +74,21 @@ const AdminDashboardPage = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [paymentPlanFilter, setPaymentPlanFilter] = useState("all");
   const [paymentPlanOptions, setPaymentPlanOptions] = useState([]);
+  const [paymentRequests, setPaymentRequests] = useState([]);
+  const [moderatingPaymentRequest, setModeratingPaymentRequest] = useState(null);
+  const [showApproveModal, setShowApproveModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [approvedPlan, setApprovedPlan] = useState("Starter");
+  const [durationDays, setDurationDays] = useState("30");
+  const [customExpiryDate, setCustomExpiryDate] = useState("");
+  const [adminNotes, setAdminNotes] = useState("");
+  const [rejectionReason, setRejectionReason] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
   const [leadView, setLeadView] = useState("inquiries");
   const [selectedLeadItem, setSelectedLeadItem] = useState(null);
   const [editingNotes, setEditingNotes] = useState(false);
   const [tempNotes, setTempNotes] = useState("");
+
   
   // Email state
   const [emailModalOpen, setEmailModalOpen] = useState(false);
@@ -124,7 +137,7 @@ const AdminDashboardPage = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [metricsRes, usersRes, paymentsRes, propertyRes, leadsRes, customerRequestsRes, leadUnlocksRes, leadPriceRes] = await Promise.allSettled([
+      const [metricsRes, usersRes, paymentsRes, propertyRes, leadsRes, customerRequestsRes, leadUnlocksRes, leadPriceRes, manualPayRes] = await Promise.allSettled([
         fetchAdminMetrics(token),
         fetchAdminUsers(token),
         fetchAdminPayments(token, {
@@ -136,6 +149,7 @@ const AdminDashboardPage = () => {
         fetchAdminCustomerRequests(token, { limit: 50 }),
         fetchAdminLeadUnlocks(token, { limit: 50 }),
         fetchAdminLeadPrice(token),
+        fetchAdminPaymentRequests(token),
       ]);
 
       if (metricsRes.status === "fulfilled") setMetrics(metricsRes.value);
@@ -149,6 +163,7 @@ const AdminDashboardPage = () => {
       if (customerRequestsRes.status === "fulfilled") setCustomerRequests(customerRequestsRes.value.items || []);
       if (leadUnlocksRes.status === "fulfilled") setLeadUnlocks(leadUnlocksRes.value.items || []);
       if (leadPriceRes.status === "fulfilled") setLeadPrice(Number(leadPriceRes.value.value || 200));
+      if (manualPayRes.status === "fulfilled") setPaymentRequests(manualPayRes.value.items || []);
     } finally {
       setLoading(false);
     }
@@ -190,10 +205,11 @@ const AdminDashboardPage = () => {
       { id: "users", label: "Users", icon: UsersIcon, badge: metrics.users || users.length || 0 },
       { id: "properties", label: "Properties", icon: HomeModernIcon, badge: propertyListings.length || metrics.properties || 0 },
       { id: "leads", label: "Requests & Leads", icon: ChatBubbleLeftRightIcon, badge: leadQueueCount || leads.length + customerRequests.length + leadUnlocks.length },
+      { id: "payment-requests", label: "Payment Requests", icon: TicketIcon, badge: paymentRequests.filter(r => r.status === "pending").length },
       { id: "payments", label: "Payments", icon: BanknotesIcon, badge: payments.length },
       { id: "settings", label: "Settings", icon: Cog6ToothIcon },
     ],
-    [customerRequests.length, leadQueueCount, leadUnlocks.length, leads.length, metrics.properties, metrics.users, payments.length, propertyListings.length, users.length]
+    [customerRequests.length, leadQueueCount, leadUnlocks.length, leads.length, metrics.properties, metrics.users, payments.length, propertyListings.length, users.length, paymentRequests.length]
   );
 
   const leadViews = useMemo(
@@ -348,6 +364,47 @@ const AdminDashboardPage = () => {
       setSendingEmail(false);
     }
   };
+
+  const handleApprovePayment = async (requestId) => {
+    try {
+      await approveAdminPaymentRequest(token, requestId, {
+        approvedPlan,
+        durationDays: Number(durationDays),
+        expiryDate: customExpiryDate || undefined,
+        adminNotes,
+      });
+      toast.success("Payment request approved successfully!");
+      setShowApproveModal(false);
+      setModeratingPaymentRequest(null);
+      setAdminNotes("");
+      setCustomExpiryDate("");
+      setDurationDays("30");
+      load();
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message || "Approval failed");
+    }
+  };
+
+  const handleRejectPayment = async (requestId) => {
+    if (!rejectionReason.trim()) {
+      return toast.error("Rejection reason is required");
+    }
+    try {
+      await rejectAdminPaymentRequest(token, requestId, {
+        reason: rejectionReason,
+        adminNotes,
+      });
+      toast.success("Payment request rejected successfully!");
+      setShowRejectModal(false);
+      setModeratingPaymentRequest(null);
+      setRejectionReason("");
+      setAdminNotes("");
+      load();
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message || "Rejection failed");
+    }
+  };
+
 
   const activeLeadView = leadViews.find((item) => item.id === leadView) || leadViews[0];
 
@@ -527,6 +584,133 @@ const AdminDashboardPage = () => {
                       </td>
                     </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
+          </article>
+        )}
+
+        {activeTab === "payment-requests" && (
+          <article className="dashboard-shell flex min-h-0 flex-1 flex-col p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">Payment Verification Requests</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  Moderating manual QR-based payment requests and subscription updates.
+                </p>
+              </div>
+              <div className="dashboard-chip">
+                {paymentRequests.filter((r) => r.status === "pending").length} pending approval
+              </div>
+            </div>
+            <div className="mt-4 min-h-0 overflow-y-auto rounded-[1.5rem] border border-slate-200/70 text-sm">
+              <table className="dashboard-table min-w-full text-left">
+                <thead className="whitespace-nowrap">
+                  <tr className="border-b border-clay">
+                    <th className="py-2.5 px-3">User Info</th>
+                    <th className="py-2.5 px-3">Requested Plan</th>
+                    <th className="py-2.5 px-3">Amount</th>
+                    <th className="py-2.5 px-3">Transaction ID / Method</th>
+                    <th className="py-2.5 px-3">Payment Date</th>
+                    <th className="py-2.5 px-3">Screenshot</th>
+                    <th className="py-2.5 px-3">Status</th>
+                    <th className="py-2.5 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paymentRequests.map((req) => (
+                    <tr key={req._id} className="border-b border-clay/60 align-top">
+                      <td className="py-3 px-3">
+                        <p className="font-semibold text-slate-900">{req.name}</p>
+                        <p className="text-xs text-slate-500">{req.email}</p>
+                        <p className="text-xs text-slate-500">{req.phone}</p>
+                      </td>
+                      <td className="py-3 px-3">
+                        <p className="font-semibold text-slate-900">{req.selectedPlan}</p>
+                        {req.status === "approved" && req.approvedPlan && req.approvedPlan !== req.selectedPlan && (
+                          <p className="text-[10px] text-emerald-600">Approved as: {req.approvedPlan}</p>
+                        )}
+                      </td>
+                      <td className="py-3 px-3 font-mono font-medium">Rs. {req.amountPaid}</td>
+                      <td className="py-3 px-3">
+                        <p className="font-mono text-xs text-slate-800">{req.transactionId}</p>
+                        <p className="text-[10px] uppercase font-bold text-slate-400">{req.paymentMethod}</p>
+                      </td>
+                      <td className="py-3 px-3 text-xs text-slate-600">
+                        {new Date(req.paymentDate).toLocaleDateString("en-IN")}
+                      </td>
+                      <td className="py-3 px-3">
+                        {req.screenshot ? (
+                          <a
+                            href={req.screenshot}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline font-semibold"
+                          >
+                            <ArrowDownTrayIcon className="h-3 w-3" /> View Proof
+                          </a>
+                        ) : (
+                          <span className="text-xs text-slate-400 italic">No proof</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-3">
+                        {req.status === "pending" && (
+                          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
+                            Pending
+                          </span>
+                        )}
+                        {req.status === "approved" && (
+                          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+                            Approved
+                          </span>
+                        )}
+                        {req.status === "rejected" && (
+                          <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">
+                            Rejected
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-3 text-right">
+                        {req.status === "pending" ? (
+                          <div className="flex justify-end gap-2">
+                            <button
+                              onClick={() => {
+                                setModeratingPaymentRequest(req);
+                                setApprovedPlan(req.selectedPlan);
+                                setDurationDays("30");
+                                setCustomExpiryDate("");
+                                setAdminNotes("");
+                                setShowApproveModal(true);
+                              }}
+                              className="rounded bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-emerald-700"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => {
+                                setModeratingPaymentRequest(req);
+                                setRejectionReason("");
+                                setAdminNotes("");
+                                setShowRejectModal(true);
+                              }}
+                              className="rounded bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-700"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-slate-400 italic">Moderated</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                  {paymentRequests.length === 0 && (
+                    <tr>
+                      <td colSpan="8" className="py-12 text-center text-slate-400 text-sm">
+                        No manual payment requests found.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -1250,7 +1434,160 @@ const AdminDashboardPage = () => {
           </div>
         </div>
       )}
+
+      {/* Approve Payment Modal Overlay */}
+      {showApproveModal && moderatingPaymentRequest && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-slate-950/50 p-0 sm:items-center sm:p-4">
+          <div className="modal-panel-white dashboard-modal flex max-h-[90dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-[2rem] sm:max-h-[calc(100dvh-2rem)] sm:rounded-[2rem]" style={{ background: "#ffffff" }}>
+            <div className="flex items-center justify-between border-b border-slate-200/80 px-6 pb-4 pt-6">
+              <h2 className="dashboard-display text-xl font-bold text-slate-900">Approve Payment Request</h2>
+              <button onClick={() => { setShowApproveModal(false); setModeratingPaymentRequest(null); }} className="text-slate-400 transition hover:text-slate-900">
+                <XMarkIcon className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 space-y-2">
+                <p className="text-xs text-slate-500">USER: <span className="font-bold text-slate-900">{moderatingPaymentRequest.name}</span> ({moderatingPaymentRequest.email})</p>
+                <p className="text-xs text-slate-500">REQUESTED PLAN: <span className="font-bold text-slate-900">{moderatingPaymentRequest.selectedPlan}</span></p>
+                <p className="text-xs text-slate-500">AMOUNT PAID: <span className="font-bold text-slate-900">Rs. {moderatingPaymentRequest.amountPaid}</span></p>
+                <p className="text-xs text-slate-500">TRANSACTION ID: <span className="font-bold text-slate-900">{moderatingPaymentRequest.transactionId}</span></p>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-bold text-slate-700 uppercase tracking-wide">Approved Plan <span className="text-red-500">*</span></label>
+                <select
+                  value={approvedPlan}
+                  onChange={(e) => setApprovedPlan(e.target.value)}
+                  className="dashboard-control"
+                >
+                  <option value="Starter">Starter (Seller/Listing)</option>
+                  <option value="Premium">Premium (Seller/Listing)</option>
+                  <option value="Elite">Elite (Seller/Listing)</option>
+                  <option value="Pro Starter">Pro Starter (Agent Leads)</option>
+                  <option value="Pro Plus">Pro Plus (Agent Leads)</option>
+                  <option value="Pro Premium">Pro Premium (Agent Leads)</option>
+                  <option value="DB Pack 1: Exclusive">DB Pack 1: Exclusive (Database Contacts)</option>
+                  <option value="DB Pack 2: Volume">DB Pack 2: Volume (Database Contacts)</option>
+                </select>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold text-slate-700 uppercase tracking-wide">Duration (Days)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={durationDays}
+                    onChange={(e) => setDurationDays(e.target.value)}
+                    className="dashboard-control"
+                    placeholder="Plan default duration"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold text-slate-700 uppercase tracking-wide">Custom Expiry Date</label>
+                  <input
+                    type="date"
+                    value={customExpiryDate}
+                    onChange={(e) => setCustomExpiryDate(e.target.value)}
+                    className="dashboard-control"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-bold text-slate-700 uppercase tracking-wide">Admin Notes</label>
+                <textarea
+                  rows={3}
+                  value={adminNotes}
+                  onChange={(e) => setAdminNotes(e.target.value)}
+                  className="dashboard-control min-h-[90px] resize-none"
+                  placeholder="Enter remarks or approval notes"
+                />
+              </div>
+
+              <div className="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => { setShowApproveModal(false); setModeratingPaymentRequest(null); }}
+                  className="dashboard-secondary px-4 py-2 text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleApprovePayment(moderatingPaymentRequest._id)}
+                  className="rounded-lg bg-emerald-600 px-6 py-2 text-sm font-bold text-white hover:bg-emerald-700 transition shadow"
+                >
+                  Confirm Approval
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reject Payment Modal Overlay */}
+      {showRejectModal && moderatingPaymentRequest && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-slate-950/50 p-0 sm:items-center sm:p-4">
+          <div className="modal-panel-white dashboard-modal flex max-h-[90dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-[2rem] sm:max-h-[calc(100dvh-2rem)] sm:rounded-[2rem]" style={{ background: "#ffffff" }}>
+            <div className="flex items-center justify-between border-b border-slate-200/80 px-6 pb-4 pt-6">
+              <h2 className="dashboard-display text-xl font-bold text-slate-900">Reject Payment Request</h2>
+              <button onClick={() => { setShowRejectModal(false); setModeratingPaymentRequest(null); }} className="text-slate-400 transition hover:text-slate-900">
+                <XMarkIcon className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 space-y-2">
+                <p className="text-xs text-slate-500">USER: <span className="font-bold text-slate-900">{moderatingPaymentRequest.name}</span></p>
+                <p className="text-xs text-slate-500">PLAN: <span className="font-bold text-slate-900">{moderatingPaymentRequest.selectedPlan}</span></p>
+                <p className="text-xs text-slate-500">AMOUNT PAID: <span className="font-bold text-slate-900">Rs. {moderatingPaymentRequest.amountPaid}</span></p>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-bold text-slate-700 uppercase tracking-wide">Rejection Reason <span className="text-red-500">*</span></label>
+                <textarea
+                  required
+                  rows={3}
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  className="dashboard-control min-h-[90px] resize-none"
+                  placeholder="Reason for rejecting this request"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-bold text-slate-700 uppercase tracking-wide">Admin Notes</label>
+                <textarea
+                  rows={3}
+                  value={adminNotes}
+                  onChange={(e) => setAdminNotes(e.target.value)}
+                  className="dashboard-control min-h-[90px] resize-none"
+                  placeholder="Private admin notes or remarks"
+                />
+              </div>
+
+              <div className="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => { setShowRejectModal(false); setModeratingPaymentRequest(null); }}
+                  className="dashboard-secondary px-4 py-2 text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleRejectPayment(moderatingPaymentRequest._id)}
+                  className="rounded-lg bg-red-600 px-6 py-2 text-sm font-bold text-white hover:bg-red-700 transition shadow"
+                >
+                  Confirm Rejection
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
+
   );
 };
 

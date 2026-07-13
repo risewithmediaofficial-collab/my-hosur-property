@@ -42,3 +42,11 @@ export const deleteAdminCustomerRequest = async (token, requestId) =>
   (await apiClient.delete(`/api/admin/customer-requests/${requestId}`, withAuth(token))).data;
 export const deleteAdminLeadUnlock = async (token, unlockId) =>
   (await apiClient.delete(`/api/admin/lead-unlocks/${unlockId}`, withAuth(token))).data;
+
+export const fetchAdminPaymentRequests = async (token) =>
+  (await apiClient.get("/api/admin/payment-requests", withAuth(token))).data;
+export const approveAdminPaymentRequest = async (token, requestId, payload) =>
+  (await apiClient.put(`/api/admin/payment-request/${requestId}/approve`, payload, withAuth(token))).data;
+export const rejectAdminPaymentRequest = async (token, requestId, payload) =>
+  (await apiClient.put(`/api/admin/payment-request/${requestId}/reject`, payload, withAuth(token))).data;
+

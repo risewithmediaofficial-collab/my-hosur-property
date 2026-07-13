@@ -18,9 +18,11 @@ import Loader from "../components/Loader";
 import useAuth from "../hooks/useAuth";
 import { fetchMyProperties } from "../services/api/propertyApi";
 import { fetchMyLeads, unlockInboxLead, updateLeadApproval } from "../services/api/leadApi";
-import { fetchMyPayments } from "../services/api/paymentApi";
+import { fetchMyPayments, fetchUserPaymentRequests } from "../services/api/paymentApi";
 import { fetchSavedProperties, toggleSavedProperty } from "../services/api/userApi";
 import { buyLeadPackIntent, verifyLeadPackPayment } from "../services/api/customerRequestApi";
+import QrPaymentModal from "../components/QrPaymentModal";
+
 import { loadExternalScript } from "../utils/loadExternalScript";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
 import { getPropertyImageAlt } from "../utils/seo";
@@ -37,8 +39,12 @@ const UserDashboardPage = () => {
   const [customerLeadCredits, setCustomerLeadCredits] = useState(0);
   const [saved, setSaved] = useState([]);
   const [payments, setPayments] = useState([]);
+  const [paymentRequests, setPaymentRequests] = useState([]);
+  const [selectedPlanForPayment, setSelectedPlanForPayment] = useState(null);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [tab, setTab] = useState(searchParams.get("tab") || "overview");
   const [loading, setLoading] = useState(true);
+
 
   const canPostProperty = useMemo(
     () => SELLER_ROLES.includes(user?.role) || Boolean(user?.canPostProperty),
@@ -50,11 +56,12 @@ const UserDashboardPage = () => {
 
     setLoading(true);
     try {
-      const [props, leadsRes, pay, savedProps] = await Promise.all([
+      const [props, leadsRes, pay, savedProps, reqsRes] = await Promise.all([
         canPostProperty ? fetchMyProperties(token) : Promise.resolve({ items: [] }),
         fetchMyLeads(token),
         fetchMyPayments(token),
         fetchSavedProperties(token),
+        fetchUserPaymentRequests(token),
       ]);
 
       setMyProperties(props.items || []);
@@ -62,12 +69,14 @@ const UserDashboardPage = () => {
       setCustomerLeadCredits(leadsRes.customerLeadCredits || 0);
       setPayments(pay.items || []);
       setSaved(savedProps.items || []);
+      setPaymentRequests(reqsRes.items || []);
     } catch {
       toast.error("Failed to load dashboard data");
     } finally {
       setLoading(false);
     }
   }, [canPostProperty, token]);
+
 
   useEffect(() => {
     loadDashboard();
@@ -97,6 +106,7 @@ const UserDashboardPage = () => {
     }
   };
 
+  /*
   const openRazorpayCheckout = async (intent, planName) => {
     const loaded = await loadExternalScript("https://checkout.razorpay.com/v1/checkout.js");
     if (!loaded || !window.Razorpay) throw new Error("Unable to load Razorpay checkout");
@@ -124,22 +134,13 @@ const UserDashboardPage = () => {
       razorpay.open();
     });
   };
+  */
 
   const onBuyPack = async () => {
-    try {
-      const intent = await buyLeadPackIntent(token);
-      const paymentResponse = await openRazorpayCheckout(intent, "Lead Pack (5 Credits)");
-      await verifyLeadPackPayment(token, {
-        razorpayOrderId: paymentResponse.razorpay_order_id,
-        razorpayPaymentId: paymentResponse.razorpay_payment_id,
-        razorpaySignature: paymentResponse.razorpay_signature,
-      });
-      toast.success("5 lead credits added to your account!");
-      loadDashboard();
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message || "Purchase failed");
-    }
+    setSelectedPlanForPayment({ name: "Lead Pack (5 Credits)", price: 300 });
+    setIsPaymentModalOpen(true);
   };
+
 
   const onToggleSaved = async (propertyId) => {
     try {
@@ -439,38 +440,86 @@ const UserDashboardPage = () => {
 
       {tab === "payments" && (
         <section className="dashboard-shell p-6">
-          <h2 className="dashboard-display mb-4 text-2xl font-semibold text-slate-900">Payment History</h2>
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="dashboard-display text-2xl font-semibold text-slate-900">Payment History</h2>
+              <p className="dashboard-muted text-sm">
+                Track your manual payment requests and subscription verification status.
+              </p>
+            </div>
+          </div>
           <div className="overflow-x-auto">
             <table className="dashboard-table min-w-full text-left text-sm">
               <thead>
                 <tr>
-                  <th>Plan</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                  <th>Date</th>
+                  <th className="pb-3 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Plan details</th>
+                  <th className="pb-3 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Amount</th>
+                  <th className="pb-3 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Payment Date</th>
+                  <th className="pb-3 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Status</th>
+                  <th className="pb-3 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Validity</th>
+                  <th className="pb-3 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Notes / Remarks</th>
                 </tr>
               </thead>
               <tbody>
-                {payments.map((payment) => (
-                  <tr key={payment._id}>
-                    <td className="text-slate-900">{payment.planId?.name || "Lead Pack Credits"}</td>
-                    <td>Rs. {payment.amount}</td>
-                    <td>
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                          payment.status === "paid" ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"
-                        }`}
-                      >
-                        {payment.status}
-                      </span>
+                {paymentRequests.map((req) => (
+                  <tr key={req._id} className="border-t border-slate-100">
+                    <td className="py-4 text-slate-950 font-semibold">
+                      <div>
+                        <p>{req.selectedPlan}</p>
+                        {req.status === "approved" && req.approvedPlan && req.approvedPlan !== req.selectedPlan && (
+                          <p className="text-[10px] text-emerald-600 font-normal">
+                            Approved as: {req.approvedPlan}
+                          </p>
+                        )}
+                      </div>
                     </td>
-                    <td>{new Date(payment.createdAt).toLocaleDateString("en-IN")}</td>
+                    <td className="py-4 text-slate-700 font-medium font-mono">Rs. {req.amountPaid}</td>
+                    <td className="py-4 text-slate-500 text-xs">
+                      {new Date(req.paymentDate).toLocaleDateString("en-IN")}
+                    </td>
+                    <td className="py-4">
+                      {req.status === "pending" && (
+                        <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+                          Pending
+                        </span>
+                      )}
+                      {req.status === "approved" && (
+                        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                          Approved
+                        </span>
+                      )}
+                      {req.status === "rejected" && (
+                        <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+                          Rejected
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-4 text-slate-500 text-xs">
+                      {req.status === "approved" && req.approvedAt ? (
+                        <div>
+                          <p className="text-[10px] text-slate-400">Active: {new Date(req.approvedAt).toLocaleDateString("en-IN")}</p>
+                          <p className="font-semibold text-slate-700">Expires: {new Date(req.expiryDate).toLocaleDateString("en-IN")}</p>
+                        </div>
+                      ) : (
+                        <span className="text-slate-400">-</span>
+                      )}
+                    </td>
+                    <td className="py-4 max-w-[200px] truncate text-slate-500 text-xs">
+                      {req.status === "rejected" && req.rejectionReason && (
+                        <p className="text-red-600 font-medium italic">Reason: {req.rejectionReason}</p>
+                      )}
+                      {req.adminNotes ? (
+                        <p className="text-slate-600">{req.adminNotes}</p>
+                      ) : req.status !== "rejected" ? (
+                        <span className="text-slate-400">-</span>
+                      ) : null}
+                    </td>
                   </tr>
                 ))}
-                {payments.length === 0 && (
+                {paymentRequests.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="py-10 text-center text-slate-500">
-                      No payments yet.
+                    <td colSpan={6} className="py-12 text-center text-slate-400 text-sm">
+                      No payment requests submitted yet.
                     </td>
                   </tr>
                 )}
@@ -479,6 +528,7 @@ const UserDashboardPage = () => {
           </div>
         </section>
       )}
+
 
       {tab === "saved" && (
         <section className="space-y-4">
@@ -503,8 +553,18 @@ const UserDashboardPage = () => {
           )}
         </section>
       )}
+
+      <QrPaymentModal
+        open={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        selectedPlan={selectedPlanForPayment}
+        user={user}
+        token={token}
+        onSuccess={loadDashboard}
+      />
     </DashboardSidebar>
   );
+
 };
 
 export default UserDashboardPage;

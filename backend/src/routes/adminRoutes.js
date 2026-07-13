@@ -40,4 +40,10 @@ router.patch(
 router.get("/payments", ctrl.listAllPayments);
 router.patch("/properties/:id/status", [body("status").isIn(["approved", "rejected", "pending"])], validate, ctrl.moderateProperty);
 
+const paymentCtrl = require("../controllers/paymentController");
+router.get("/payment-requests", paymentCtrl.getAdminPaymentRequests);
+router.put("/payment-request/:id/approve", paymentCtrl.approvePaymentRequest);
+router.put("/payment-request/:id/reject", paymentCtrl.rejectPaymentRequest);
+
 module.exports = router;
+

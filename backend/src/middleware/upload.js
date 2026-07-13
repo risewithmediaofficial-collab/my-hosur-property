@@ -37,6 +37,14 @@ const uploadPropertyAssets = multer({
   limits: { fileSize: 8 * 1024 * 1024, files: 5 },
 });
 
+const uploadPaymentScreenshot = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+});
+
 module.exports = {
   uploadPropertyAssets,
+  uploadPaymentScreenshot,
 };
+

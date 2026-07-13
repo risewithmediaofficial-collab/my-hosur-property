@@ -77,3 +77,5 @@ export { default as WrenchScrewdriverIcon } from "@mui/icons-material/Constructi
 export { default as XMarkIcon } from "@mui/icons-material/CloseOutlined";
 export { default as EyeIcon } from "@mui/icons-material/VisibilityOutlined";
 export { default as EyeSlashIcon } from "@mui/icons-material/VisibilityOffOutlined";
+export { default as PhotoIcon } from "@mui/icons-material/ImageOutlined";
+

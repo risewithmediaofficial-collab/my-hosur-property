@@ -9,10 +9,14 @@ import {
   Squares2X2Icon,
   TicketIcon,
   UserGroupIcon,
+  CreditCardIcon,
 } from "../components/AppIcons";
 import useAuth from "../hooks/useAuth";
 import { fetchMyProperties, promoteProperty } from "../services/api/propertyApi";
 import { fetchMyLeads, unlockInboxLead, updateLeadApproval, updateLeadStatus } from "../services/api/leadApi";
+import { fetchUserPaymentRequests } from "../services/api/paymentApi";
+import QrPaymentModal from "../components/QrPaymentModal";
+
 import {
   buyLeadPackIntent,
   fetchCustomerRequestsForAgents,
@@ -58,6 +62,9 @@ const AgentDashboardPage = () => {
   const [customerRequests, setCustomerRequests] = useState([]);
   const [customerLeadCredits, setCustomerLeadCredits] = useState(0);
   const [saved, setSaved] = useState([]);
+  const [paymentRequests, setPaymentRequests] = useState([]);
+  const [selectedPlanForPayment, setSelectedPlanForPayment] = useState(null);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [leadUnlockPrice] = useState(200);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState(searchParams.get("tab") || "overview");
@@ -69,6 +76,8 @@ const AgentDashboardPage = () => {
         fetchMyLeads(token),
         fetchSavedProperties(token),
         isBroker ? fetchCustomerRequestsForAgents(token) : Promise.resolve({ items: [], customerLeadCredits: 0 }),
+        fetchUserPaymentRequests(token),
+
       ]);
 
       if (results[0].status === "fulfilled") setProperties(results[0].value.items || []);
@@ -83,6 +92,8 @@ const AgentDashboardPage = () => {
           setCustomerLeadCredits(results[3].value.customerLeadCredits);
         }
       }
+      if (results[4].status === "fulfilled") setPaymentRequests(results[4].value.items || []);
+
     } finally {
       setLoading(false);
     }
@@ -126,6 +137,7 @@ const AgentDashboardPage = () => {
     }
   };
 
+  /*
   const openRazorpayCheckout = async (intent, planName) => {
     const loaded = await loadExternalScript("https://checkout.razorpay.com/v1/checkout.js");
     if (!loaded || !window.Razorpay) throw new Error("Unable to load Razorpay checkout");
@@ -153,6 +165,7 @@ const AgentDashboardPage = () => {
       razorpay.open();
     });
   };
+  */
 
   const onUnlockCustomerRequest = async (id) => {
     try {
@@ -162,7 +175,9 @@ const AgentDashboardPage = () => {
         loadAll();
         return;
       }
+      toast.error("No lead credits available. Please purchase a credit pack or upgrade your plan.");
 
+      /*
       if (response.razorpay?.orderId) {
         const paymentResponse = await openRazorpayCheckout(response, "Unlock Lead");
         await verifyCustomerLeadUnlock(token, {
@@ -174,6 +189,7 @@ const AgentDashboardPage = () => {
         toast.success("Lead unlocked successfully");
         loadAll();
       }
+      */
     } catch (error) {
       toast.error(error.response?.data?.message || error.message || "Lead unlock failed");
     }
@@ -194,6 +210,9 @@ const AgentDashboardPage = () => {
   };
 
   const onBuyPack = async () => {
+    setSelectedPlanForPayment({ name: "Lead Pack (5 Credits)", price: 300 });
+    setIsPaymentModalOpen(true);
+    /*
     try {
       const intent = await buyLeadPackIntent(token);
       const paymentResponse = await openRazorpayCheckout(intent, "Lead Pack (5 Credits)");
@@ -207,7 +226,9 @@ const AgentDashboardPage = () => {
     } catch (error) {
       toast.error(error.response?.data?.message || error.message || "Purchase failed");
     }
+    */
   };
+
 
   const onToggleSaved = async (propertyId) => {
     try {
@@ -225,6 +246,7 @@ const AgentDashboardPage = () => {
     { key: "listings", label: "Listings", icon: <HomeModernIcon className="h-4 w-4" /> },
     { key: "leads", label: "Leads", icon: <UserGroupIcon className="h-4 w-4" /> },
     { key: "saved", label: "Saved", icon: <BookmarkIcon className="h-4 w-4" /> },
+    { key: "payments", label: "Payment History", icon: <CreditCardIcon className="h-4 w-4" /> },
     ...(isBroker ? [{ key: "requests", label: "Requests", icon: <ClipboardDocumentListIcon className="h-4 w-4" /> }] : []),
   ];
   const sidebarStats = [
@@ -467,6 +489,97 @@ const AgentDashboardPage = () => {
         </section>
       )}
 
+      {tab === "payments" && (
+        <section className="dashboard-shell p-6">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="dashboard-display text-2xl font-semibold text-slate-900">Payment History</h2>
+              <p className="dashboard-muted text-sm">
+                Track your manual payment requests and subscription verification status.
+              </p>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="dashboard-table min-w-full text-left text-sm">
+              <thead>
+                <tr>
+                  <th className="pb-3 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Plan details</th>
+                  <th className="pb-3 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Amount</th>
+                  <th className="pb-3 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Payment Date</th>
+                  <th className="pb-3 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Status</th>
+                  <th className="pb-3 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Validity</th>
+                  <th className="pb-3 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Notes / Remarks</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paymentRequests.map((req) => (
+                  <tr key={req._id} className="border-t border-slate-100">
+                    <td className="py-4 text-slate-950 font-semibold">
+                      <div>
+                        <p>{req.selectedPlan}</p>
+                        {req.status === "approved" && req.approvedPlan && req.approvedPlan !== req.selectedPlan && (
+                          <p className="text-[10px] text-emerald-600 font-normal">
+                            Approved as: {req.approvedPlan}
+                          </p>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-4 text-slate-700 font-medium font-mono">Rs. {req.amountPaid}</td>
+                    <td className="py-4 text-slate-500 text-xs">
+                      {new Date(req.paymentDate).toLocaleDateString("en-IN")}
+                    </td>
+                    <td className="py-4">
+                      {req.status === "pending" && (
+                        <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+                          Pending
+                        </span>
+                      )}
+                      {req.status === "approved" && (
+                        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                          Approved
+                        </span>
+                      )}
+                      {req.status === "rejected" && (
+                        <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+                          Rejected
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-4 text-slate-500 text-xs">
+                      {req.status === "approved" && req.approvedAt ? (
+                        <div>
+                          <p className="text-[10px] text-slate-400">Active: {new Date(req.approvedAt).toLocaleDateString("en-IN")}</p>
+                          <p className="font-semibold text-slate-700">Expires: {new Date(req.expiryDate).toLocaleDateString("en-IN")}</p>
+                        </div>
+                      ) : (
+                        <span className="text-slate-400">-</span>
+                      )}
+                    </td>
+                    <td className="py-4 max-w-[200px] truncate text-slate-500 text-xs">
+                      {req.status === "rejected" && req.rejectionReason && (
+                        <p className="text-red-600 font-medium italic">Reason: {req.rejectionReason}</p>
+                      )}
+                      {req.adminNotes ? (
+                        <p className="text-slate-600">{req.adminNotes}</p>
+                      ) : req.status !== "rejected" ? (
+                        <span className="text-slate-400">-</span>
+                      ) : null}
+                    </td>
+                  </tr>
+                ))}
+                {paymentRequests.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center text-slate-400 text-sm">
+                      No payment requests submitted yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
       {tab === "saved" && (
         <section className="dashboard-shell p-6">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
@@ -524,8 +637,18 @@ const AgentDashboardPage = () => {
           {customerRequests.length === 0 && <div className="dashboard-empty p-10 text-center">No customer requirements found.</div>}
         </section>
       )}
+
+      <QrPaymentModal
+        open={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        selectedPlan={selectedPlanForPayment}
+        user={user}
+        token={token}
+        onSuccess={loadAll}
+      />
     </DashboardSidebar>
   );
 };
 
 export default AgentDashboardPage;
+

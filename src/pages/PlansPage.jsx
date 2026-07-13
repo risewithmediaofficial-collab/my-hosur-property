@@ -3,10 +3,12 @@ import toast from "react-hot-toast";
 import { CheckCircleIcon, ShieldCheckIcon } from "../components/AppIcons";
 import useAuth from "../hooks/useAuth";
 import { fetchPlans } from "../services/api/planApi";
-import { createPaymentIntent, fetchMyPayments, verifyPayment } from "../services/api/paymentApi";
+import { fetchMyPayments } from "../services/api/paymentApi";
 import { loadExternalScript } from "../utils/loadExternalScript";
 import { currency } from "../utils/format";
 import useScrollAnimation from "../hooks/useScrollAnimation";
+import QrPaymentModal from "../components/QrPaymentModal";
+
 
 const fallbackPlans = [
   {
@@ -73,6 +75,9 @@ const PlansPage = () => {
   const [plans, setPlans] = useState([]);
   const [buyingPlanId, setBuyingPlanId] = useState("");
   const [payments, setPayments] = useState([]);
+  const [selectedPlanForPayment, setSelectedPlanForPayment] = useState(null);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+
 
   useEffect(() => {
     fetchPlans({ targetRole: user?.role })
@@ -109,6 +114,7 @@ const PlansPage = () => {
     [payments]
   );
 
+  /*
   const openRazorpayCheckout = async (intent, planName) => {
     const loaded = await loadExternalScript("https://checkout.razorpay.com/v1/checkout.js");
     if (!loaded || !window.Razorpay) throw new Error("Unable to load Razorpay checkout");
@@ -136,6 +142,7 @@ const PlansPage = () => {
       rz.open();
     });
   };
+  */
 
   const onBuy = async (plan) => {
     if (!plan?._id) {
@@ -143,6 +150,10 @@ const PlansPage = () => {
       return;
     }
 
+    setSelectedPlanForPayment(plan);
+    setIsPaymentModalOpen(true);
+
+    /*
     try {
       setBuyingPlanId(plan._id);
       const intent = await createPaymentIntent(token, { planId: plan._id });
@@ -168,7 +179,9 @@ const PlansPage = () => {
     } finally {
       setBuyingPlanId("");
     }
+    */
   };
+
 
   const regularPlans = plans.filter((plan) => plan.category !== "database_access");
   const dbPacks = plans.filter((plan) => plan.category === "database_access");
@@ -327,7 +340,21 @@ const PlansPage = () => {
           </div>
         </section>
       ) : null}
+
+      <QrPaymentModal
+        open={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        selectedPlan={selectedPlanForPayment}
+        user={user}
+        token={token}
+        onSuccess={async () => {
+          await refreshProfile();
+          // We can also trigger reload or tab switch in UserDashboard if we want,
+          // but from PlansPage simply updating payments is good.
+        }}
+      />
     </main>
+
   );
 };
 
