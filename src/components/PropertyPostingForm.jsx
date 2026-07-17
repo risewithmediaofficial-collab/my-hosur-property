@@ -234,7 +234,8 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   const [modalOpen, setModalOpen] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [files, setFiles] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [docFiles, setDocFiles] = useState([]);
   const [uploadedImages, setUploadedImages] = useState(initialData?.images || []);
   const [uploadedDocs, setUploadedDocs] = useState(initialData?.documents || []);
 
@@ -355,7 +356,8 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
       propertyType: type,
       listingType: getListingType(type),
     });
-    setFiles([]);
+    setImageFiles([]);
+    setDocFiles([]);
     setUploadedImages([]);
     setUploadedDocs([]);
     setModalOpen(true);
@@ -363,6 +365,8 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
   const closeFormModal = () => {
     setModalOpen(false);
+    setImageFiles([]);
+    setDocFiles([]);
     setForm((prev) => ({ ...defaultForm, ...preserveContactFields(prev) }));
   };
 
@@ -412,9 +416,10 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
     const finalFiles = valid.slice(0, 5);
     if (finalFiles.length > 0) {
-      setFiles(finalFiles);
+      setImageFiles(finalFiles);
     } else {
       e.target.value = "";
+      setImageFiles([]);
     }
   };
 
@@ -436,22 +441,24 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
     const finalFiles = valid.slice(0, 5);
     if (finalFiles.length > 0) {
-      setFiles(finalFiles);
+      setDocFiles(finalFiles);
     } else {
       e.target.value = "";
+      setDocFiles([]);
     }
   };
 
-  const uploadAssets = async () => {
-    if (!files.length) return;
+  const uploadImageAssets = async () => {
+    if (!imageFiles.length) return;
 
     try {
       setUploading(true);
-      const res = await uploadPropertyFiles(token, files);
+      const res = await uploadPropertyFiles(token, imageFiles);
       setUploadedImages((prev) => [...prev, ...(res.images || [])]);
-      setUploadedDocs((prev) => [...prev, ...(res.documents || [])]);
-      setFiles([]);
-      toast.success("Files uploaded");
+      setImageFiles([]);
+      const inputEl = document.getElementById("property-image-input");
+      if (inputEl) inputEl.value = "";
+      toast.success("Images uploaded successfully");
     } catch (error) {
       toast.error(error.response?.data?.message || "Upload failed");
     } finally {
@@ -459,7 +466,41 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
     }
   };
 
+  const uploadDocAssets = async () => {
+    if (!docFiles.length) return;
+
+    try {
+      setUploading(true);
+      const res = await uploadPropertyFiles(token, docFiles);
+      setUploadedDocs((prev) => [...prev, ...(res.documents || [])]);
+      setDocFiles([]);
+      const inputEl = document.getElementById("property-doc-input");
+      if (inputEl) inputEl.value = "";
+      toast.success("Documents uploaded successfully");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeUploadedImage = (indexToRemove) => {
+    setUploadedImages((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const removeUploadedDoc = (indexToRemove) => {
+    setUploadedDocs((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
   const submitProperty = async (e) => {
+    if (imageFiles.length > 0) {
+      toast.error("Please click 'Upload selected images' before publishing/saving.");
+      return;
+    }
+    if (docFiles.length > 0) {
+      toast.error("Please click 'Upload PDF brochure' before publishing/saving.");
+      return;
+    }
     e.preventDefault();
 
     const validationError = validateForm();
@@ -698,20 +739,29 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
               <h4 className="text-sm font-bold text-navy">Property Images</h4>
               <p className="mt-1 text-xs text-slate-500">Upload clear property images. Max 5 files per upload. Each image must be under 10 MB.</p>
               <input
+                id="property-image-input"
                 className="mt-3 w-full text-sm"
                 type="file"
                 multiple
                 accept="image/*"
                 onChange={handleImageFileChange}
               />
-              <button type="button" onClick={uploadAssets} disabled={uploading || !files.length} className="site-button-secondary mt-3 px-4 py-2 text-sm disabled:opacity-50">
+              <button type="button" onClick={uploadImageAssets} disabled={uploading || !imageFiles.length} className="site-button-secondary mt-3 px-4 py-2 text-sm disabled:opacity-50">
                 {uploading ? "Uploading..." : "Upload selected images"}
               </button>
               {!!uploadedImages.length && (
                 <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-5">
                   {uploadedImages.map((src, idx) => (
-                    <div key={idx} className="aspect-square overflow-hidden rounded-lg bg-white">
+                    <div key={idx} className="group relative aspect-square overflow-hidden rounded-lg bg-white border border-slate-100">
                       <img src={src} alt="Uploaded property" className="h-full w-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removeUploadedImage(idx)}
+                        className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white shadow-md opacity-80 hover:opacity-100 transition-opacity"
+                        title="Remove image"
+                      >
+                        <XMarkIcon className="h-3.5 w-3.5" />
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -722,16 +772,36 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
               <h4 className="text-sm font-bold text-navy">Brochure / Layout Plan</h4>
               <p className="mt-1 text-xs text-slate-500">Attach PDF layout, approval, or brochure files. Max 5 files. Each file must be under 10 MB.</p>
               <input
+                id="property-doc-input"
                 className="mt-3 w-full text-sm"
                 type="file"
                 multiple
                 accept="application/pdf"
                 onChange={handleDocFileChange}
               />
-              <button type="button" onClick={uploadAssets} disabled={uploading || !files.length} className="site-button-secondary mt-3 px-4 py-2 text-sm disabled:opacity-50">
+              <button type="button" onClick={uploadDocAssets} disabled={uploading || !docFiles.length} className="site-button-secondary mt-3 px-4 py-2 text-sm disabled:opacity-50">
                 {uploading ? "Uploading..." : "Upload PDF brochure"}
               </button>
-              {!!uploadedDocs.length && <p className="mt-3 text-xs font-semibold text-slate-600">Uploaded {uploadedDocs.length} documents.</p>}
+              {!!uploadedDocs.length && (
+                <div className="mt-3 space-y-1.5">
+                  {uploadedDocs.map((url, idx) => {
+                    const filename = url.split("/").pop() || `document-${idx + 1}.pdf`;
+                    return (
+                      <div key={idx} className="flex items-center justify-between rounded-lg bg-white p-2 text-xs border border-slate-100">
+                        <span className="truncate text-slate-700 font-semibold">{filename}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeUploadedDoc(idx)}
+                          className="text-red-500 hover:text-red-700 p-1"
+                          title="Remove document"
+                        >
+                          <XMarkIcon className="h-4 w-4" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </FormSection>
