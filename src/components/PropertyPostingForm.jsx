@@ -238,6 +238,22 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   const [docFiles, setDocFiles] = useState([]);
   const [uploadedImages, setUploadedImages] = useState(initialData?.images || []);
   const [uploadedDocs, setUploadedDocs] = useState(initialData?.documents || []);
+  const [imagePreviews, setImagePreviews] = useState([]);
+
+  useEffect(() => {
+    if (!imageFiles.length) {
+      setImagePreviews([]);
+      return;
+    }
+    const urls = imageFiles.map((file) => ({
+      name: file.name,
+      url: URL.createObjectURL(file),
+    }));
+    setImagePreviews(urls);
+    return () => {
+      urls.forEach((item) => URL.revokeObjectURL(item.url));
+    };
+  }, [imageFiles]);
 
   const [profileForm, setProfileForm] = useState({
     email: "",
@@ -490,6 +506,18 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
   const removeUploadedDoc = (indexToRemove) => {
     setUploadedDocs((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const removeSelectedImage = (indexToRemove) => {
+    setImageFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+    const inputEl = document.getElementById("property-image-input");
+    if (inputEl) inputEl.value = "";
+  };
+
+  const removeSelectedDoc = (indexToRemove) => {
+    setDocFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+    const inputEl = document.getElementById("property-doc-input");
+    if (inputEl) inputEl.value = "";
   };
 
   const submitProperty = async (e) => {
@@ -746,6 +774,29 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
                 accept="image/*"
                 onChange={handleImageFileChange}
               />
+              {!!imagePreviews.length && (
+                <div className="mt-3">
+                  <p className="text-xs font-semibold text-slate-600 mb-2">Selected for upload:</p>
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+                    {imagePreviews.map((preview, idx) => (
+                      <div key={idx} className="group relative aspect-square overflow-hidden rounded-lg bg-white border border-dashed border-slate-300">
+                        <img src={preview.url} alt="Selected preview" className="h-full w-full object-cover opacity-85 group-hover:opacity-100 transition-opacity" />
+                        <button
+                          type="button"
+                          onClick={() => removeSelectedImage(idx)}
+                          className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white shadow-md hover:bg-red-700 transition-colors"
+                          title="Remove image"
+                        >
+                          <XMarkIcon className="h-3 w-3" />
+                        </button>
+                        <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-1 py-0.5 text-[9px] text-white truncate text-center">
+                          {preview.name}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <button type="button" onClick={uploadImageAssets} disabled={uploading || !imageFiles.length} className="site-button-secondary mt-3 px-4 py-2 text-sm disabled:opacity-50">
                 {uploading ? "Uploading..." : "Upload selected images"}
               </button>
@@ -779,6 +830,26 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
                 accept="application/pdf"
                 onChange={handleDocFileChange}
               />
+              {!!docFiles.length && (
+                <div className="mt-3">
+                  <p className="text-xs font-semibold text-slate-600 mb-1.5">Selected documents for upload:</p>
+                  <div className="space-y-1.5">
+                    {docFiles.map((file, idx) => (
+                      <div key={idx} className="flex items-center justify-between rounded-lg bg-white p-2 text-xs border border-dashed border-slate-300">
+                        <span className="truncate text-slate-700 font-medium">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeSelectedDoc(idx)}
+                          className="text-red-500 hover:text-red-700 p-1"
+                          title="Remove document"
+                        >
+                          <XMarkIcon className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <button type="button" onClick={uploadDocAssets} disabled={uploading || !docFiles.length} className="site-button-secondary mt-3 px-4 py-2 text-sm disabled:opacity-50">
                 {uploading ? "Uploading..." : "Upload PDF brochure"}
               </button>
