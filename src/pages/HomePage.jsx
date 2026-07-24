@@ -516,7 +516,7 @@ const HomePage = () => {
       <SeoHead
         title="Verified Property Listings in Hosur"
         description="Explore verified property listings, real-estate services, and professional local property support through My Hosur Property."
-        keywords="Hosur property listings, verified property in Hosur, buy property Hosur, rent property Hosur, real estate services Hosur"
+        keywords="Hosur property listings, verified property in Hosur, buy property Hosur, rent property Hosur, real estate services Hosur, Hosur Land, Land Hosur, Hosur Plots, Plot for Sale in Hosur, Hosur Plots for Sale, Land for Sale in Hosur, Property Listing Site in Hosur, Property Buying Platform in Hosur, Property Selling Platform in Hosur, Budget Friendly Lands in Hosur, Hosur Rental Property, Hosur Land Media, Hosur Duplex Villas, Hosur Commercial Property, Hosur Resale Plots, Hosur Resale House, Hosur Commercial Land"
         canonicalPath="/"
         schema={[buildWebsiteSchema(), buildRealEstateAgentSchema()]}
       />
