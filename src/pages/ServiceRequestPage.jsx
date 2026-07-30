@@ -5,11 +5,12 @@ import { BuildingOffice2Icon, ClipboardDocumentCheckIcon, CurrencyRupeeIcon, Wre
 import SeoHead from "../components/SeoHead";
 import useAuth from "../hooks/useAuth";
 import { createCustomerRequest } from "../services/api/customerRequestApi";
-import { SERVICE_REQUEST_CATEGORY_LIST, SERVICE_REQUEST_OPTIONS } from "../constants/serviceRequests";
+import { BANK_OPTIONS, SERVICE_REQUEST_CATEGORY_LIST, SERVICE_REQUEST_OPTIONS } from "../constants/serviceRequests";
 
 const initialForm = {
   city: "Hosur",
   area: "",
+  selectedBank: BANK_OPTIONS[0],
   budgetMin: "",
   budgetMax: "",
   additionalRequirements: "",
@@ -35,12 +36,17 @@ const ServiceRequestPage = () => {
   const [serviceType, setServiceType] = useState(defaultServiceType);
   const [submitting, setSubmitting] = useState(false);
 
+  const bankFromQuery = searchParams.get("bank") || "";
+
   useEffect(() => {
     const nextOption = SERVICE_REQUEST_OPTIONS[categoryFromQuery] || SERVICE_REQUEST_OPTIONS.loan;
     setRequestCategory(nextOption.requestCategory);
     setPropertyType(nextOption.propertyTypes?.[0] || "");
     setServiceType(nextOption.serviceTypes?.includes(typeFromQuery) ? typeFromQuery : nextOption.serviceTypes?.[0] || "");
-  }, [categoryFromQuery, typeFromQuery]);
+    if (bankFromQuery && BANK_OPTIONS.includes(bankFromQuery)) {
+      setForm((prev) => ({ ...prev, selectedBank: bankFromQuery }));
+    }
+  }, [categoryFromQuery, typeFromQuery, bankFromQuery]);
 
   const currentOption = useMemo(
     () => SERVICE_REQUEST_OPTIONS[requestCategory] || SERVICE_REQUEST_OPTIONS.loan,
@@ -71,6 +77,11 @@ const ServiceRequestPage = () => {
 
     try {
       setSubmitting(true);
+      const reqNotes = [
+        currentOption.showBankDropdown ? `Preferred Bank: ${form.selectedBank}` : "",
+        form.additionalRequirements.trim(),
+      ].filter(Boolean).join("\n");
+
       await createCustomerRequest(token, {
         requestCategory,
         propertyType: showPropertyType ? propertyType : undefined,
@@ -79,9 +90,9 @@ const ServiceRequestPage = () => {
           city: form.city.trim(),
           area: form.area.trim(),
         },
-        budgetMin: Number(form.budgetMin || 0),
-        budgetMax: Number(form.budgetMax || 0),
-        additionalRequirements: form.additionalRequirements.trim(),
+        budgetMin: currentOption.showBudget !== false ? Number(form.budgetMin || 0) : 0,
+        budgetMax: currentOption.showBudget !== false ? Number(form.budgetMax || 0) : 0,
+        additionalRequirements: reqNotes,
       });
       toast.success("Request sent to admin successfully");
       navigate("/dashboard");
@@ -169,6 +180,23 @@ const ServiceRequestPage = () => {
               />
             </label>
 
+            {currentOption.showBankDropdown ? (
+              <label className="block sm:col-span-2">
+                <span className="mb-2 block text-sm font-semibold text-slate-700">Select Bank (Bank Preference)</span>
+                <select
+                  className="site-input font-bold text-navy"
+                  value={form.selectedBank}
+                  onChange={(event) => setForm((prev) => ({ ...prev, selectedBank: event.target.value }))}
+                >
+                  {BANK_OPTIONS.map((bank) => (
+                    <option key={bank} value={bank}>
+                      {bank}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
+
             {showPropertyType ? (
               <label className="block">
                 <span className="mb-2 block text-sm font-semibold text-slate-700">Property type</span>
@@ -195,35 +223,39 @@ const ServiceRequestPage = () => {
               </label>
             ) : null}
 
-            <label className="block">
-              <span className="mb-2 block text-sm font-semibold text-slate-700">{currentOption.budgetLabel} min</span>
-              <div className="relative">
-                <CurrencyRupeeIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <input
-                  className="site-input pl-10"
-                  type="number"
-                  min="0"
-                  value={form.budgetMin}
-                  onChange={(event) => setForm((prev) => ({ ...prev, budgetMin: event.target.value }))}
-                  placeholder=" "
-                />
-              </div>
-            </label>
+            {currentOption.showBudget !== false ? (
+              <>
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold text-slate-700">{currentOption.budgetLabel} min</span>
+                  <div className="relative">
+                    <CurrencyRupeeIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      className="site-input pl-10"
+                      type="number"
+                      min="0"
+                      value={form.budgetMin}
+                      onChange={(event) => setForm((prev) => ({ ...prev, budgetMin: event.target.value }))}
+                      placeholder=" "
+                    />
+                  </div>
+                </label>
 
-            <label className="block">
-              <span className="mb-2 block text-sm font-semibold text-slate-700">{currentOption.budgetLabel} max</span>
-              <div className="relative">
-                <CurrencyRupeeIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <input
-                  className="site-input pl-10"
-                  type="number"
-                  min="0"
-                  value={form.budgetMax}
-                  onChange={(event) => setForm((prev) => ({ ...prev, budgetMax: event.target.value }))}
-                  placeholder=" "
-                />
-              </div>
-            </label>
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold text-slate-700">{currentOption.budgetLabel} max</span>
+                  <div className="relative">
+                    <CurrencyRupeeIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      className="site-input pl-10"
+                      type="number"
+                      min="0"
+                      value={form.budgetMax}
+                      onChange={(event) => setForm((prev) => ({ ...prev, budgetMax: event.target.value }))}
+                      placeholder=" "
+                    />
+                  </div>
+                </label>
+              </>
+            ) : null}
           </div>
 
           <label className="mt-4 block">

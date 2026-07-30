@@ -1,10 +1,12 @@
+import { useState } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { Link } from "react-router-dom";
-import { ArrowRightIcon, XMarkIcon } from "./AppIcons";
+import { ArrowRightIcon, ChevronDownIcon, XMarkIcon } from "./AppIcons";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
 
 const ServiceCategoryModal = ({ category, onClose }) => {
   useBodyScrollLock(Boolean(category));
+  const [expandedService, setExpandedService] = useState(null);
 
   if (!category) return null;
 
@@ -45,6 +47,53 @@ const ServiceCategoryModal = ({ category, onClose }) => {
             <ul className="space-y-2">
               {category.services.map((service) => {
                 const ServiceIcon = service.icon;
+                const isExpanded = expandedService === service.label;
+
+                if (service.subItems?.length) {
+                  return (
+                    <li key={service.label} className="rounded-xl border border-orange/30 bg-orange/5 p-2 transition">
+                      <button
+                        type="button"
+                        onClick={() => setExpandedService(isExpanded ? null : service.label)}
+                        className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition hover:bg-orange/10"
+                      >
+                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-orange/20 text-orange">
+                          <ServiceIcon className="h-4 w-4" />
+                        </div>
+                        <span className="min-w-0 flex-1 text-sm font-extrabold leading-snug text-navy">
+                          {service.label} <span className="text-xs font-bold text-orange">(Click to view plans)</span>
+                        </span>
+                        <ChevronDownIcon className={`h-4 w-4 text-orange transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+                      </button>
+
+                      {/* Expanded Sub-items List */}
+                      {isExpanded ? (
+                        <div className="mt-2 space-y-1.5 pl-3 border-l-2 border-orange/40 ml-4 pb-1">
+                          {service.subItems.map((subItem) => {
+                            const SubIcon = subItem.icon || ServiceIcon;
+                            return (
+                              <Link
+                                key={subItem.label}
+                                to={subItem.requestPath}
+                                onClick={onClose}
+                                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-navy shadow-xs transition hover:border-orange hover:bg-orange/10 hover:text-orange"
+                              >
+                                <span className="flex items-center gap-2">
+                                  <div className="flex h-6 w-6 items-center justify-center rounded bg-orange/10 text-orange">
+                                    <SubIcon className="h-3.5 w-3.5" />
+                                  </div>
+                                  <span>{subItem.label}</span>
+                                </span>
+                                <ArrowRightIcon className="h-3.5 w-3.5 text-slate-400" />
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      ) : null}
+                    </li>
+                  );
+                }
+
                 const content = (
                   <>
                     <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-orange/10 text-orange">

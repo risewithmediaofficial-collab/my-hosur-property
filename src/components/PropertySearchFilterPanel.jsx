@@ -15,6 +15,7 @@ const PropertySearchFilterPanel = ({
   onCategoryChange,
   onFieldChange,
   showCategoryPicker = true,
+  extraLocations = [],
 }) => {
   const fields = propertyFilterConfig[category] || [];
 
@@ -63,7 +64,7 @@ const PropertySearchFilterPanel = ({
                 <span className="property-filter-section-count">{selectedCount}</span>
               ) : null}
             </div>
-            <FieldControl field={field} values={values} update={update} />
+            <FieldControl field={field} values={values} update={update} extraLocations={extraLocations} />
           </div>
         );
       })}
@@ -71,9 +72,13 @@ const PropertySearchFilterPanel = ({
   );
 };
 
-const FieldControl = ({ field, values, update }) => {
+const FieldControl = ({ field, values, update, extraLocations = [] }) => {
   if (field.type === "search") {
     const listId = `location-${field.key}`;
+    const allSuggestions = Array.from(
+      new Set([...(field.suggestions || []), ...extraLocations.filter(Boolean)])
+    );
+
     return (
       <div className="property-filter-search-wrap">
         <MagnifyingGlassIcon className="property-filter-search-icon" />
@@ -81,12 +86,12 @@ const FieldControl = ({ field, values, update }) => {
           type="search"
           list={listId}
           className="property-filter-input property-filter-input-search"
-          placeholder=" "
+          placeholder="Search location..."
           value={getFieldValue(values, field.key)}
           onChange={(e) => update(field.key, e.target.value)}
         />
         <datalist id={listId}>
-          {(field.suggestions || []).map((item) => (
+          {allSuggestions.map((item) => (
             <option key={item} value={item} />
           ))}
         </datalist>

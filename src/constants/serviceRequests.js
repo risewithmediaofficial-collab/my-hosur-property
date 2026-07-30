@@ -13,42 +13,63 @@ export const PROPERTY_REQUEST_TYPES = [
 
 export const RENT_REQUEST_TYPES = ["House", "Office", "Commercial", "Warehouse", "Land", "Industrial Shed"];
 
+export const BANK_OPTIONS = [
+  "SBI (State Bank of India)",
+  "HDFC Bank",
+  "ICICI Bank",
+  "Axis Bank",
+  "Canara Bank",
+  "Bank of Baroda",
+  "LIC Housing Finance",
+  "Indian Bank",
+  "Union Bank of India",
+  "IDFC FIRST Bank",
+  "Other / Partner Bank",
+];
+
 export const SERVICE_REQUEST_OPTIONS = {
   property_buy: {
     label: "Buy Property",
     requestCategory: "property_buy",
     propertyTypes: PROPERTY_REQUEST_TYPES,
     budgetLabel: "Budget",
+    showBudget: true,
   },
   property_sell: {
     label: "Sell Property",
     requestCategory: "property_sell",
     propertyTypes: PROPERTY_REQUEST_TYPES,
     budgetLabel: "Expected Price",
+    showBudget: true,
   },
   property_rent: {
     label: "Rent Property",
     requestCategory: "property_rent",
     propertyTypes: RENT_REQUEST_TYPES,
     budgetLabel: "Monthly Rent Budget",
+    showBudget: true,
   },
   loan: {
     label: "Loan",
     requestCategory: "loan",
     serviceTypes: ["Home Loan", "Plot Loan", "Mortgage Loan", "Private Finance"],
     budgetLabel: "Loan Amount",
+    showBankDropdown: true,
+    showBudget: true,
   },
   interior: {
     label: "Interior",
     requestCategory: "interior",
     serviceTypes: ["Home Interior", "Office Interior"],
     budgetLabel: "Project Budget",
+    showBudget: false,
   },
   construction: {
     label: "Construction",
     requestCategory: "construction",
     serviceTypes: ["House Construction", "Office Construction", "Commercial Building", "Apartment", "Industry & Warehouse"],
     budgetLabel: "Project Budget",
+    showBudget: true,
   },
   property_management: {
     label: "Property Management",
@@ -56,10 +77,12 @@ export const SERVICE_REQUEST_OPTIONS = {
     serviceTypes: [
       "Home & Apartment Facility AMC Service",
       "Industry & Warehouse Facility AMC Service",
-      "Land Scraping & Garden Maintenance Property Management Service",
+      "Land Scaping & Garden Maintenance Property Management Service",
       "NRI Property Management Service",
+      "Property Management Service",
     ],
     budgetLabel: "Annual Budget",
+    showBudget: false,
   },
   home_office_services: {
     label: "Home & Office Services",
@@ -76,6 +99,7 @@ export const SERVICE_REQUEST_OPTIONS = {
       "Sofa & Carpet Cleaning",
     ],
     budgetLabel: "Service Budget",
+    showBudget: false,
   },
 };
 

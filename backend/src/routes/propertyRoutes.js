@@ -9,6 +9,7 @@ const router = express.Router();
 
 router.get("/", authOptional, ctrl.listProperties);
 router.get("/featured", ctrl.featured);
+router.get("/locations", ctrl.getLocations);
 router.get("/seo-listings", ctrl.seoListings);
 router.get("/mine", auth, ctrl.myProperties);
 router.post("/upload", auth, uploadPropertyAssets.array("files", 5), ctrl.uploadAssets);

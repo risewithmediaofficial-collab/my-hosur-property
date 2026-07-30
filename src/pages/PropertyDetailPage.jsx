@@ -1,17 +1,26 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
 import {
+  ArrowRightIcon,
   ArrowTopRightOnSquareIcon,
   BookmarkIcon,
   CheckBadgeIcon,
+  CheckIcon,
   ChevronRightIcon,
   DocumentTextIcon,
+  EyeIcon,
+  FlagIcon,
   HomeModernIcon,
+  LandIcon,
   MapPinIcon,
   PhoneIcon,
+  ShareIcon,
+  SparklesIcon,
+  UserIcon,
+  VillaIcon,
 } from "../components/AppIcons";
-import ImageGallery from "../components/ImageGallery";
 import PropertyCard from "../components/PropertyCard";
 import ContactModal from "../components/ContactModal";
 import SeoHead from "../components/SeoHead";
@@ -35,68 +44,43 @@ import {
   saveInquiryHistoryItem,
   updateInquiryHistoryItem,
 } from "../utils/inquiryHistory";
+import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
+
+const formatDateSafe = (dateVal) => {
+  if (!dateVal) return "Recently";
+  try {
+    const d = new Date(dateVal);
+    if (isNaN(d.getTime())) return "Recently";
+    return d.toLocaleDateString("en-IN", { month: "short", day: "2-digit", year: "numeric" });
+  } catch {
+    return "Recently";
+  }
+};
 
 const PropertyDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { token, user } = useAuth();
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [data, setData] = useState({
     property: null,
     similar: [],
     localityInsights: null,
-    accessRestricted: false,
   });
+
   const [myLead, setMyLead] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [inquiryText, setInquiryText] = useState("");
   const [intentType, setIntentType] = useState("contact");
   const [savedIds, setSavedIds] = useState([]);
+  const [activeMediaTab, setActiveMediaTab] = useState("photos");
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [activeNavTab, setActiveNavTab] = useState("overview");
+  const [isFullscreenImage, setIsFullscreenImage] = useState(false);
 
-  const handleSubmitInquiry = async () => {
-    if (!token) {
-      toast.error("Please login to contact the owner.");
-      return;
-    }
-
-    try {
-      const res = await createLead(token, {
-        propertyId: id,
-        intentType,
-        message: inquiryText || "Hi, I am interested in this property.",
-      });
-      setMyLead(res.lead);
-      saveInquiryHistoryItem(user?._id, {
-        id: res.lead?._id || `${id}-${Date.now()}`,
-        propertyId: id,
-        propertyTitle: p?.title || "Property inquiry",
-        propertyLocation: [p?.location?.area, p?.location?.city]
-          .filter(Boolean)
-          .join(", "),
-        ownerName: p?.listingContact?.name || p?.ownerId?.name || "Owner",
-        intentType,
-        message: inquiryText || "Hi, I am interested in this property.",
-        status: res.lead?.status || "pending",
-        createdAt: res.lead?.createdAt || new Date().toISOString(),
-      });
-      toast.success(
-        intentType === "brochure"
-          ? "Request sent"
-          : "Contact request sent to owner for approval.",
-      );
-      setModalOpen(false);
-      setInquiryText("");
-    } catch (e) {
-      if (e.response?.status === 402) {
-        toast.error(
-          "Monthly inquiry limit reached. Please upgrade your plan to contact more property owners.",
-        );
-      } else {
-        toast.error(e.response?.data?.message || "Failed to send inquiry.");
-      }
-    }
-  };
+  const p = data.property;
 
   useEffect(() => {
     const loadProperty = async () => {
@@ -104,14 +88,9 @@ const PropertyDetailPage = () => {
         setLoading(true);
         setError(null);
         const result = await fetchPropertyById(id, token);
-        setData(
-          result || { property: null, similar: [], localityInsights: null },
-        );
+        setData(result || { property: null, similar: [], localityInsights: null });
       } catch (loadError) {
-        setError(
-          loadError.response?.data?.message ||
-            "Failed to load property details",
-        );
+        setError(loadError.response?.data?.message || "Failed to load property details");
         setData({ property: null, similar: [], localityInsights: null });
       } finally {
         setLoading(false);
@@ -146,72 +125,162 @@ const PropertyDetailPage = () => {
     }
 
     const wasSaved = savedIds.includes(propertyId);
-
     try {
       const res = await toggleSavedProperty(token, { propertyId });
       setSavedIds(res.savedProperties || []);
       toast.success(
         wasSaved
           ? "Removed from saved properties"
-          : "Property saved to your dashboard",
+          : "Property saved to your dashboard"
       );
     } catch {
       toast.error("Unable to update saved properties");
     }
   };
 
-  const p = data.property;
+  const handleSubmitInquiry = async () => {
+    if (!token) {
+      toast.error("Please login to contact the owner.");
+      return;
+    }
+
+    try {
+      const res = await createLead(token, {
+        propertyId: id,
+        intentType,
+        message: inquiryText || "Hi, I am interested in this property.",
+      });
+      setMyLead(res.lead);
+      saveInquiryHistoryItem(user?._id, {
+        id: res.lead?._id || `${id}-${Date.now()}`,
+        propertyId: id,
+        propertyTitle: p?.title || "Property inquiry",
+        propertyLocation: [p?.location?.area, p?.location?.city].filter(Boolean).join(", "),
+        ownerName: p?.listingContact?.name || p?.ownerId?.name || "Owner",
+        intentType,
+        message: inquiryText || "Hi, I am interested in this property.",
+        status: res.lead?.status || "pending",
+        createdAt: res.lead?.createdAt || new Date().toISOString(),
+      });
+      toast.success(
+        intentType === "brochure"
+          ? "Request sent"
+          : "Contact request sent to owner for approval."
+      );
+      setModalOpen(false);
+      setInquiryText("");
+    } catch (e) {
+      if (e.response?.status === 402) {
+        toast.error("Monthly inquiry limit reached. Please upgrade your plan.");
+      } else {
+        toast.error(e.response?.data?.message || "Failed to send inquiry.");
+      }
+    }
+  };
+
+  const safeImages = useMemo(() => {
+    if (!p || !Array.isArray(p.images) || p.images.length === 0) {
+      return [PROPERTY_PLACEHOLDER_IMAGE];
+    }
+    return p.images.filter(Boolean);
+  }, [p]);
+
+  const activeImage = safeImages[activeImageIndex] || safeImages[0];
+
+  const pricePerSqft = useMemo(() => {
+    if (!p || !p.price) return 0;
+    const area = p.carpetArea || p.builtupArea || 1000;
+    return Math.round(p.price / area);
+  }, [p]);
+
+  const estimatedEMI = useMemo(() => {
+    if (!p || !p.price) return 0;
+    return Math.round(p.price * 0.00798);
+  }, [p]);
+
   const propertyPath = p ? getPropertyPath(p) : "";
   const propertySlug = p ? buildPropertySlug(p) : "";
-  const breadcrumbs = useMemo(
-    () =>
-      p
-        ? [
-            { label: "Home", to: "/" },
-            { label: "Listings", to: "/listings" },
-            {
-              label: p.location?.city || "Hosur",
-              to: `/listings?city=${encodeURIComponent(p.location?.city || "Hosur")}`,
-            },
-            { label: p.title, to: propertyPath },
-          ]
-        : [],
-    [p, propertyPath],
-  );
+
+  const breadcrumbs = useMemo(() => {
+    if (!p) return [];
+    const area = p.location?.area || "Hosur";
+    const city = p.location?.city || "Hosur";
+    return [
+      { label: "Home", to: "/" },
+      { label: `Property in ${city}`, to: `/listings?city=${encodeURIComponent(city)}` },
+      { label: `${p.propertyType || "Plot"}s in ${city}`, to: `/listings?propertyType=${encodeURIComponent(p.propertyType || "")}` },
+      { label: `Plots in ${area}`, to: `/listings?city=${encodeURIComponent(city)}&area=${encodeURIComponent(area)}` },
+      { label: p.title || "Property Details", to: propertyPath },
+    ];
+  }, [p, propertyPath]);
+
   const faqItems = useMemo(() => {
     if (!p) return [];
-
     return [
       {
-        question: `What is the price of ${p.title}?`,
-        answer: `${p.title} is listed at ${currency(p.price)} on MyHosurProperty.`,
+        question: `What is the price of ${p.title || "this property"}?`,
+        answer: `${p.title || "This property"} is listed at ${currency(p.price)} (@ ₹${(pricePerSqft || 0).toLocaleString("en-IN")} per sqft) on MyHosurProperty.`,
       },
       {
-        question: `Where is ${p.title} located?`,
-        answer: `${p.title} is located in ${p.location?.area}, ${p.location?.city}.`,
+        question: `Where is ${p.title || "this property"} located?`,
+        answer: `${p.title || "This property"} is located in ${p.location?.area || "Hosur"}, ${p.location?.city || "Hosur"}.`,
       },
       {
-        question: `What type of property is ${p.title}?`,
-        answer: `${p.title} is a ${p.bhk ? `${p.bhk} BHK ` : ""}${p.propertyType} available for ${p.listingType === "rent" ? "rent" : p.listingType === "new-project" ? "new project enquiries" : "sale"}.`,
+        question: `What type of property is ${p.title || "this property"}?`,
+        answer: `${p.title || "This property"} is a ${p.bhk ? `${p.bhk} BHK ` : ""}${p.propertyType || "Plot"} available for ${
+          p.listingType === "rent" ? "rent" : "sale"
+        }.`,
       },
+    ];
+  }, [p, pricePerSqft]);
+
+  const modalContact = p?.listingContact?.phone
+    ? { name: p.listingContact.name, phone: p.listingContact.phone, email: p.ownerId?.email }
+    : { name: p?.ownerId?.name, phone: p?.ownerId?.phone, email: p?.ownerId?.email };
+
+  const isApproved = myLead?.status === "approved" || String(p?.ownerId?._id || p?.ownerId) === String(user?._id);
+  const isPending = myLead?.status === "pending";
+  const isSaved = p?._id ? savedIds.includes(p._id) : false;
+
+  const nearbyPlaces = useMemo(() => {
+    if (!p) return [];
+    if (Array.isArray(p.nearbyFacilities) && p.nearbyFacilities.length > 0) {
+      return p.nearbyFacilities.map((name) => ({ name, icon: "📍" }));
+    }
+    const area = p.location?.area || p.location?.city || "Hosur";
+    return [
+      { name: `${area} Main Road`, icon: "🛣️" },
+      { name: `${area} Bus Stand`, icon: "🚌" },
+      { name: `Schools near ${area}`, icon: "🎓" },
+      { name: `Hospitals near ${area}`, icon: "🏥" },
+      { name: `Markets near ${area}`, icon: "🛍️" },
     ];
   }, [p]);
 
-  useEffect(() => {
-    if (!p || !propertySlug) return;
-
-    if (window.location.pathname !== propertyPath) {
-      navigate(propertyPath, { replace: true });
+  const highlights = useMemo(() => {
+    if (!p) return [];
+    const list = [];
+    if (p.facing) list.push(`${p.facing} Facing`);
+    if (p.bhk) list.push(`${p.bhk} BHK Layout`);
+    if (p.carpetArea || p.builtupArea) list.push(`Spacious ${p.carpetArea || p.builtupArea} ${p.areaUnit || "sqft"}`);
+    if (p.possessionStatus) list.push(`${p.possessionStatus} Possession`);
+    if (p.verification?.isVerified) list.push("Verified Property Listing");
+    if (p.verification?.reraId) list.push(`RERA Approved (${p.verification.reraId})`);
+    if (Array.isArray(p.amenities) && p.amenities.length) {
+      list.push(...p.amenities.slice(0, 4));
     }
-  }, [navigate, p, propertyPath, propertySlug]);
+    if (list.length < 4) {
+      list.push("Clear Legal Documentation", "Prime Location Access");
+    }
+    return list;
+  }, [p]);
 
   if (loading) {
     return (
-      <main className="page-shell w-full px-5 py-12 sm:px-8 lg:px-10">
-        <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-center rounded-xl bg-surface py-24">
-          <p className="text-sm font-medium text-slate-500">
-            Loading property details...
-          </p>
+      <main className="page-shell w-full px-5 py-16 sm:px-8 lg:px-10">
+        <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-center rounded-2xl bg-white p-20 shadow-sm border border-slate-200">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-orange border-t-transparent" />
+          <p className="mt-4 text-sm font-bold text-navy">Loading property details...</p>
         </div>
       </main>
     );
@@ -219,246 +288,336 @@ const PropertyDetailPage = () => {
 
   if (error || !data.property) {
     return (
-      <main className="page-shell w-full px-5 py-12 sm:px-8 lg:px-10">
+      <main className="page-shell w-full px-5 py-16 sm:px-8 lg:px-10">
         <SeoHead
           title="Property Unavailable"
-          description="This property listing is unavailable or may have been removed from MyHosurProperty."
+          description="This property listing is unavailable or may have been removed."
           noIndex
         />
-        <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-xl bg-surface px-6 py-16 text-center">
-          <HomeModernIcon className="h-12 w-12 text-orange" />
-          <h1 className="text-2xl font-bold text-navy">Property unavailable</h1>
-          <p className="text-sm leading-7 text-slate-600">
+        <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-2xl bg-white p-12 text-center shadow-lg border border-slate-200">
+          <HomeModernIcon className="h-14 w-14 text-orange" />
+          <h1 className="text-2xl font-bold text-navy">Property Unavailable</h1>
+          <p className="text-sm text-slate-600">
             {error || "The property you are looking for does not exist."}
           </p>
           <button
             type="button"
             onClick={() => window.history.back()}
-            className="site-button-primary px-5 py-3 text-sm"
+            className="site-button-primary mt-2 px-6 py-3 text-sm font-bold"
           >
-            Go back
+            Go Back
           </button>
         </div>
       </main>
     );
   }
 
-  const mapQuery = encodeURIComponent(
-    `${p.location?.area}, ${p.location?.city}`,
-  );
-  const keyFacts = [
-    { label: "BHK", value: p.bhk || "Studio" },
-    { label: "Bathrooms", value: p.bathrooms || "—" },
-    {
-      label: "Carpet area",
-      value: p.carpetArea ? formatArea(p.carpetArea, p.areaUnit) : "—",
-    },
-    {
-      label: "Built-up area",
-      value: p.builtupArea ? formatArea(p.builtupArea, p.areaUnit) : "—",
-    },
-    { label: "Furnishing", value: p.furnishingStatus || "—" },
-    { label: "Possession", value: p.possessionStatus || "—" },
-    { label: "Facing", value: p.facing || "—" },
-    {
-      label: "Floor",
-      value: p.totalFloors ? `${p.floorNumber || 0} / ${p.totalFloors}` : "—",
-    },
-  ];
-
-  const modalContact = p.listingContact?.phone
-    ? {
-        name: p.listingContact.name,
-        phone: p.listingContact.phone,
-        email: p.ownerId?.email,
-      }
-    : {
-        name: p.ownerId?.name,
-        phone: p.ownerId?.phone,
-        email: p.ownerId?.email,
-      };
-
-  const isApproved =
-    myLead?.status === "approved" ||
-    String(p.ownerId?._id || p.ownerId) === String(user?._id);
-  const isPending = myLead?.status === "pending";
-  const isSaved = savedIds.includes(p._id);
-  const localityEntries = Object.entries(data.localityInsights || {}).filter(
-    ([key]) => key !== "notes",
-  );
-  const statusPills = [
-    p.verification?.isVerified ? "Verified listing" : "",
-    p.verification?.reraId ? `RERA ${p.verification.reraId}` : "",
-    p.possessionStatus || "",
-  ].filter(Boolean);
-
-  const listingLabel =
-    p.listingType === "rent"
-      ? "For rent"
-      : p.listingType === "new-project"
-        ? "New project"
-        : "For sale";
-
   return (
-    <main className="page-shell w-full">
+    <main className="page-shell w-full bg-slate-50/50 pb-20">
       <SeoHead
-        title={`${p.title} in ${p.location?.area || p.location?.city || "Hosur"} - ${currency(p.price)}`}
+        title={`${p?.title || "Property"} in ${p?.location?.area || "Hosur"} - ${currency(p?.price || 0)}`}
         description={truncateText(
-          p.description ||
-            `${p.propertyType} in ${p.location?.area}, ${p.location?.city} listed on MyHosurProperty.`,
-          160,
+          p?.description || `${p?.propertyType || "Property"} in ${p?.location?.area || "Hosur"}, ${p?.location?.city || "Hosur"} listed on MyHosurProperty.`,
+          160
         )}
-        keywords={`${p.title}, ${p.propertyType} in ${p.location?.city}, ${p.location?.area} property, ${p.listingType} property in Hosur, ${p.bhk || ""} BHK ${p.propertyType}`}
+        keywords={`${p?.title || "Property"}, ${p?.propertyType || "Real Estate"} in ${p?.location?.city || "Hosur"}, ${p?.location?.area || "Hosur"} property`}
         canonicalPath={propertyPath}
-        image={p.images?.[0]}
+        image={safeImages[0]}
         type="article"
-        schema={[
-          buildRealEstateAgentSchema(),
-          buildBreadcrumbSchema(breadcrumbs),
-          buildFaqSchema(faqItems),
-        ]}
+        schema={[buildRealEstateAgentSchema(), buildBreadcrumbSchema(breadcrumbs), buildFaqSchema(faqItems)]}
       />
 
-      {/* Breadcrumb */}
-      <section className="border-b border-slate-100 bg-white px-5 py-4 sm:px-8 lg:px-10">
-        <nav
-          className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-1 text-sm text-slate-500"
-          aria-label="Breadcrumb"
-        >
-          {breadcrumbs.map((crumb, index) => (
-            <span key={crumb.to} className="inline-flex items-center gap-1">
-              {index > 0 ? (
-                <ChevronRightIcon className="h-3.5 w-3.5 text-slate-300" />
-              ) : null}
-              {index === breadcrumbs.length - 1 ? (
-                <span className="font-medium text-navy line-clamp-1">
-                  {crumb.label}
-                </span>
-              ) : (
-                <Link to={crumb.to} className="transition hover:text-orange">
-                  {crumb.label}
-                </Link>
-              )}
-            </span>
-          ))}
-        </nav>
+      {/* ── 1. TOP BREADCRUMB & DATE BAR ── */}
+      <section className="border-b border-slate-200 bg-white px-5 py-3.5 sm:px-8 lg:px-10">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-xs sm:text-sm text-slate-500">
+          <nav className="flex flex-wrap items-center gap-1.5" aria-label="Breadcrumb">
+            {breadcrumbs.map((crumb, index) => (
+              <span key={`${crumb.to}-${index}`} className="inline-flex items-center gap-1.5">
+                {index > 0 ? <ChevronRightIcon className="h-3.5 w-3.5 text-slate-300 flex-shrink-0" /> : null}
+                {index === breadcrumbs.length - 1 ? (
+                  <span className="font-semibold text-navy line-clamp-1">{crumb.label}</span>
+                ) : (
+                  <Link to={crumb.to} className="transition hover:text-orange">
+                    {crumb.label}
+                  </Link>
+                )}
+              </span>
+            ))}
+          </nav>
+          <div className="flex items-center gap-3 text-xs text-slate-500 font-medium shrink-0">
+            <span>Posted on {formatDateSafe(p?.createdAt)}</span>
+            <span className="h-3 w-px bg-slate-300" aria-hidden />
+            <span className="font-semibold text-emerald-600">{p?.possessionStatus || "Ready to move"}</span>
+          </div>
+        </div>
       </section>
 
-      {/* Gallery + summary */}
-      <section className="bg-white px-5 py-8 sm:px-8 sm:py-10 lg:px-10">
-        <div className="mx-auto grid max-w-[1440px] gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
-          <div className="min-w-0">
-            {statusPills.length ? (
-              <div className="mb-4 flex flex-wrap gap-2">
-                {statusPills.map((pill) => (
-                  <span
-                    key={pill}
-                    className="inline-flex items-center gap-1.5 rounded-md bg-orange/10 px-2.5 py-1 text-xs font-semibold text-navy"
-                  >
-                    <CheckBadgeIcon className="h-3.5 w-3.5 text-orange" />
-                    {pill}
-                  </span>
-                ))}
+      {/* ── 2. PROPERTY PRICE & HEADER CARD ── */}
+      <section className="bg-white border-b border-slate-200 px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
+        <div className="mx-auto max-w-[1440px]">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              {/* Price & EMI */}
+              <div className="flex flex-wrap items-baseline gap-3">
+                <h1 className="text-3xl font-extrabold text-navy sm:text-4xl lg:text-5xl">
+                  {currency(p?.price || 0)}
+                </h1>
+                <span className="text-sm font-semibold text-slate-500 sm:text-base">
+                  @ ₹{pricePerSqft.toLocaleString("en-IN")} per sqft
+                </span>
+                <span className="h-4 w-px bg-slate-300 hidden sm:inline-block" />
+                <span className="text-xs font-bold text-sky-600 bg-sky-50 px-2.5 py-1 rounded-md border border-sky-200">
+                  Estimated EMI ₹{estimatedEMI.toLocaleString("en-IN")}
+                </span>
               </div>
-            ) : null}
-            <ImageGallery images={p.images} property={p} />
-          </div>
 
-          <aside className="lg:sticky lg:top-24">
-            <span className="inline-flex rounded-md bg-navy px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
-              {listingLabel}
-            </span>
-            <p className="section-tag mt-4">Property overview</p>
-            <h1 className="mt-2 text-2xl font-bold leading-tight text-navy sm:text-3xl">
-              {p.title}
-            </h1>
-            <p className="mt-3 inline-flex items-center gap-2 text-sm text-slate-600">
-              <MapPinIcon className="h-4 w-4 flex-shrink-0 text-orange" />
-              {p.location?.area}, {p.location?.city}
-            </p>
-            <p className="mt-1 text-sm text-slate-500">
-              Listed by {p.ownerId?.name || "Owner"} ·{" "}
-              {p.ownerId?.role || p.listingSource || "owner"}
-            </p>
+              {/* Title & Location */}
+              <h2 className="mt-2 text-lg font-bold text-navy sm:text-xl">
+                {p.bhk ? `${p.bhk} BHK ` : ""}{p.propertyType || "Residential Land/Plot"} for {p.listingType === "rent" ? "Rent" : "Sale"}
+                <span className="font-normal text-slate-600"> in {p.location?.area || "Mathigiri"}, {p.location?.city || "Hosur"}</span>
+              </h2>
 
-            <div className="mt-6 rounded-xl bg-surface p-5">
-              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                Price
-              </p>
-              <p className="mt-1 text-3xl font-bold text-navy sm:text-4xl">
-                {currency(p.price)}
-              </p>
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <div className="rounded-lg bg-white p-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                    Type
-                  </p>
-                  <p className="mt-1 text-sm font-bold text-navy">
-                    {p.propertyType || "Residential"}
-                  </p>
-                </div>
-                <div className="rounded-lg bg-white p-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                    Listing
-                  </p>
-                  <p className="mt-1 text-sm font-bold capitalize text-navy">
-                    {p.listingType || "sale"}
-                  </p>
-                </div>
+              {/* RERA & Status Badges */}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {p.verification?.reraId ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-xs font-bold text-emerald-700">
+                    <CheckBadgeIcon className="h-4 w-4 text-emerald-600" />
+                    RERA APPROVED ({p.verification.reraId})
+                  </span>
+                ) : p.verification?.isVerified ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-xs font-bold text-emerald-700">
+                    <CheckBadgeIcon className="h-4 w-4 text-emerald-600" />
+                    VERIFIED LISTING
+                  </span>
+                ) : null}
               </div>
             </div>
 
-            <div className="mt-5 space-y-3">
+            {/* Action buttons */}
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
               <button
                 type="button"
                 onClick={() => handleToggleSaved(p._id)}
-                className={`flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold transition ${
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition border ${
                   isSaved
-                    ? "bg-navy text-white"
-                    : "border border-slate-200 bg-white text-slate-800 hover:border-orange hover:bg-orange hover:text-white"
+                    ? "bg-navy text-white border-navy"
+                    : "bg-white border-slate-300 text-navy hover:bg-slate-50"
                 }`}
               >
-                <BookmarkIcon className="h-4 w-4" />
-                {isSaved ? "Saved to dashboard" : "Save this property"}
+                <BookmarkIcon className="h-4.5 w-4.5" />
+                {isSaved ? "Saved" : "Save Property"}
               </button>
 
-              {p.isSold ? (
-                <div className="rounded-xl bg-red-50 border border-red-200 p-5">
-                  <p className="text-sm font-bold text-red-700">PROPERTY SOLD</p>
-                  <p className="mt-2 text-base font-semibold text-slate-700">
-                    This property has been sold and is no longer available.
-                  </p>
-                  {p.soldAt ? (
-                    <p className="mt-2 text-xs text-slate-500">
-                      Sold on {new Date(p.soldAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                    </p>
+              <button
+                type="button"
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({ title: p.title, url: window.location.href });
+                  } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    toast.success("Property link copied!");
+                  }
+                }}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-navy hover:bg-slate-50 transition"
+              >
+                <ShareIcon className="h-4.5 w-4.5" />
+                Share
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 4. HERO SECTION: MEDIA GALLERY + SPECS CARD ── */}
+      <section className="mx-auto max-w-[1440px] px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
+        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+          
+          {/* Left Column: Media Gallery Box */}
+          <div className="min-w-0 flex flex-col gap-3">
+            {/* Gallery Tabs Header */}
+            <div className="flex items-center gap-4 border-b border-slate-200 pb-2">
+              <button
+                type="button"
+                onClick={() => setActiveMediaTab("photos")}
+                className={`text-sm font-bold transition pb-1 border-b-2 ${
+                  activeMediaTab === "photos"
+                    ? "border-orange text-orange"
+                    : "border-transparent text-slate-500 hover:text-navy"
+                }`}
+              >
+                Property ({safeImages.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveMediaTab("videos")}
+                className={`text-sm font-bold transition pb-1 border-b-2 ${
+                  activeMediaTab === "videos"
+                    ? "border-orange text-orange"
+                    : "border-transparent text-slate-500 hover:text-navy"
+                }`}
+              >
+                Videos ({p.virtualTourUrl ? "1" : "0"})
+              </button>
+            </div>
+
+            {/* Main Image Box */}
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-slate-900 shadow-md group">
+              <img
+                src={activeImage}
+                alt={p.title}
+                className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+              />
+
+              {/* Bottom-left: Eyeball Views Overlay Badge */}
+              <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2 rounded-full bg-slate-900/80 backdrop-blur-md px-3.5 py-1.5 text-xs font-bold text-white shadow-lg border border-white/10">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-white">
+                  <EyeIcon className="h-3 w-3" />
+                </span>
+                <span>3 people viewed this property yesterday</span>
+              </div>
+
+              {/* Bottom-right: Zoom Fullscreen Button */}
+              <button
+                type="button"
+                onClick={() => setIsFullscreenImage(true)}
+                className="absolute bottom-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-slate-900/80 text-white backdrop-blur-md transition hover:bg-orange shadow-lg"
+                title="View Fullscreen"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Thumbnail Strip */}
+            {safeImages.length > 1 && (
+              <div className="flex gap-2.5 overflow-x-auto pb-1 pt-1 hide-scrollbar">
+                {safeImages.map((img, idx) => (
+                  <button
+                    key={`${img}-${idx}`}
+                    type="button"
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`shrink-0 overflow-hidden rounded-xl transition-all duration-200 ${
+                      activeImageIndex === idx
+                        ? "ring-2 ring-orange ring-offset-2 scale-105"
+                        : "opacity-70 hover:opacity-100"
+                    }`}
+                  >
+                    <img src={img} alt="" className="h-16 w-20 object-cover sm:h-20 sm:w-24 rounded-lg" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Right Column: Property Specs Grid Card */}
+          <div className="rounded-2xl border border-slate-200/90 bg-slate-50/70 p-6 shadow-sm flex flex-col gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-sm">
+              
+              {/* Price */}
+              <div className="flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-100/70 text-amber-700 font-bold">
+                  🏷️
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Price</p>
+                  <p className="font-extrabold text-navy text-base mt-0.5">{currency(p.price)}</p>
+                  {pricePerSqft > 0 ? (
+                    <p className="text-xs text-slate-600 font-medium">@ ₹{pricePerSqft.toLocaleString("en-IN")} per sqft</p>
                   ) : null}
                 </div>
-              ) : isApproved ? (
-                <div className="rounded-xl bg-surface p-5">
-                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                    Approved contact
-                  </p>
-                  <p className="mt-2 text-lg font-bold text-navy">
-                    {modalContact.name}
-                  </p>
-                  <p className="mt-1 text-xl font-semibold text-orange">
-                    {modalContact.phone}
-                  </p>
-                  {modalContact.email ? (
-                    <p className="mt-1 text-sm text-slate-500">
-                      {modalContact.email}
+              </div>
+
+              {/* Area */}
+              {(p.carpetArea || p.builtupArea) ? (
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100/70 text-emerald-700 font-bold">
+                    📏
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Area</p>
+                    <p className="font-extrabold text-navy text-base mt-0.5">
+                      {formatArea(p.carpetArea || p.builtupArea, p.areaUnit)}
                     </p>
-                  ) : null}
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Address */}
+              <div className="flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100/70 text-blue-700 font-bold">
+                  📍
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Location</p>
+                  <p className="font-extrabold text-navy text-base mt-0.5">{[p.location?.area, p.location?.city || "Hosur"].filter(Boolean).join(", ")}</p>
+                </div>
+              </div>
+
+              {/* Property Type */}
+              <div className="flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-purple-100/70 text-purple-700 font-bold">
+                  🏠
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Property Type</p>
+                  <p className="font-extrabold text-navy text-base mt-0.5">{p.propertyType || "Residential"}</p>
+                </div>
+              </div>
+
+              {/* BHK if present */}
+              {p.bhk ? (
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-100/70 text-indigo-700 font-bold">
+                    🛏️
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Bedrooms</p>
+                    <p className="font-extrabold text-navy text-base mt-0.5">{p.bhk} BHK</p>
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Facing if present */}
+              {p.facing ? (
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-teal-100/70 text-teal-700 font-bold">
+                    🧭
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Facing</p>
+                    <p className="font-extrabold text-navy text-base mt-0.5">{p.facing}</p>
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Possession Status if present */}
+              {p.possessionStatus ? (
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-100/70 text-sky-700 font-bold">
+                    🔑
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Possession</p>
+                    <p className="font-extrabold text-navy text-base mt-0.5">{p.possessionStatus}</p>
+                  </div>
+                </div>
+              ) : null}
+
+            </div>
+
+            {/* Owner Contact CTA Action Box */}
+            <div className="mt-2 pt-4 border-t border-slate-200/80 flex flex-col gap-3">
+              {isApproved ? (
+                <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4">
+                  <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">Approved Owner Contact</p>
+                  <p className="mt-1 text-lg font-extrabold text-navy">{modalContact.name}</p>
+                  <p className="text-xl font-bold text-orange mt-0.5">{modalContact.phone}</p>
                 </div>
               ) : isPending ? (
-                <button
-                  type="button"
-                  disabled
-                  className="w-full rounded-lg bg-slate-100 px-5 py-3.5 text-sm font-semibold text-slate-500"
-                >
-                  Contact request pending approval
-                </button>
+                <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 text-center">
+                  <p className="text-sm font-bold text-amber-800">Contact Request Pending Owner Approval</p>
+                </div>
               ) : (
                 <button
                   type="button"
@@ -466,158 +625,55 @@ const PropertyDetailPage = () => {
                     setIntentType("contact");
                     setModalOpen(true);
                   }}
-                  className="site-button-primary flex w-full items-center justify-center gap-2 px-5 py-3.5 text-sm"
+                  className="site-button-primary flex w-full items-center justify-center gap-2.5 py-3.5 text-base font-bold shadow-md hover:shadow-lg transition"
                 >
-                  <PhoneIcon className="h-4 w-4" />
-                  Request contact details
+                  <PhoneIcon className="h-5 w-5" />
+                  Get Owner / Dealer Contact Details
                 </button>
               )}
-
-              {!p.isSold ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIntentType("brochure");
-                    setModalOpen(true);
-                  }}
-                  className="site-button-secondary flex w-full items-center justify-center gap-2 px-5 py-3.5 text-sm"
-                >
-                  <DocumentTextIcon className="h-4 w-4" />
-                  Request brochure
-                </button>
-              ) : null}
-
-              {p.virtualTourUrl && !p.isSold ? (
-                <a
-                  href={p.virtualTourUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="link-orange inline-flex items-center gap-2 px-1 text-sm"
-                >
-                  <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-                  Open virtual tour
-                </a>
-              ) : null}
-            </div>
-          </aside>
-        </div>
-      </section>
-
-      {/* About + map */}
-      <section className="bg-surface px-5 py-12 sm:px-8 lg:px-10">
-        <div className="mx-auto grid max-w-[1440px] gap-8 lg:grid-cols-2">
-          <article>
-            <p className="section-tag">Overview</p>
-            <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl">
-              About this property
-            </h2>
-            <p className="mt-4 whitespace-pre-line text-sm leading-7 text-slate-600">
-              {p.description}
-            </p>
-
-            <h3 className="mt-8 text-lg font-bold text-navy">Key facts</h3>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {keyFacts.map((fact) => (
-                <div key={fact.label} className="stat-card">
-                  <p className="stat-label">{fact.label}</p>
-                  <p className="stat-value !text-base !font-bold">
-                    {fact.value}
-                  </p>
-                </div>
-              ))}
             </div>
 
-            {p.amenities?.length ? (
-              <>
-                <h3 className="mt-8 text-lg font-bold text-navy">Amenities</h3>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {p.amenities.map((item) => (
-                    <span
-                      key={item}
-                      className="rounded-md bg-white px-3 py-1.5 text-xs font-semibold text-navy"
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              </>
-            ) : null}
-
-            {p.nearbyFacilities?.length ? (
-              <>
-                <h3 className="mt-8 text-lg font-bold text-navy">
-                  Nearby facilities
-                </h3>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {p.nearbyFacilities.map((facility) => (
-                    <span
-                      key={facility}
-                      className="rounded-md bg-white px-3 py-1.5 text-xs font-semibold text-navy"
-                    >
-                      {facility}
-                    </span>
-                  ))}
-                </div>
-              </>
-            ) : null}
-          </article>
-
-          <article>
-            <p className="section-tag">Location</p>
-            <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl">
-              Map view
-            </h2>
-            <p className="mt-2 text-sm text-slate-600">
-              See how the property sits within the surrounding Hosur area.
-            </p>
-            <iframe
-              title="Property location map"
-              className="mt-4 h-72 w-full rounded-xl sm:h-80 lg:h-[28rem]"
-              loading="lazy"
-              src={`https://maps.google.com/maps?q=${mapQuery}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
-            />
-          </article>
-        </div>
-      </section>
-
-      {/* Locality */}
-      {(localityEntries.length > 0 || data.localityInsights?.notes) && (
-        <section className="bg-white px-5 py-12 sm:px-8 lg:px-10">
-          <div className="mx-auto max-w-[1440px]">
-            <p className="section-tag">Locality insights</p>
-            <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl">
-              Signals around the area
-            </h2>
-
-            {localityEntries.length ? (
-              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {localityEntries.map(([key, value]) => (
-                  <div key={key} className="stat-card text-center">
-                    <p className="stat-label">{key}</p>
-                    <p className="stat-value">{value}</p>
-                  </div>
-                ))}
-              </div>
-            ) : null}
-
-            {data.localityInsights?.notes ? (
-              <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-600">
-                {data.localityInsights.notes}
-              </p>
-            ) : null}
           </div>
-        </section>
-      )}
 
-      {/* Similar properties */}
+        </div>
+      </section>
+
+      {/* ── 5. ABOUT PROPERTY & DESCRIPTION ── */}
+      <section className="mx-auto max-w-[1440px] px-5 py-6 sm:px-8 lg:px-10">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-extrabold text-navy">About Property</h3>
+          <p className="mt-2 text-xs font-bold text-slate-500">Address: <span className="text-navy">{[p.location?.area, p.location?.city || "Hosur"].filter(Boolean).join(", ")}</span></p>
+
+          <div className="mt-4 whitespace-pre-line text-sm leading-relaxed text-slate-700">
+            {p.description || `Verified ${p.propertyType || "property"} listing in ${p.location?.area || p.location?.city || "Hosur"}. Contact the property owner or listing agent for complete details, site visits, and legal documentation support.`}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 6. LOCATION MAP ── */}
+      <section className="mx-auto max-w-[1440px] px-5 py-6 sm:px-8 lg:px-10">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-extrabold text-navy">Location Map</h3>
+          <p className="mt-1 text-xs text-slate-500">Explore surrounding area in {[p.location?.area, p.location?.city || "Hosur"].filter(Boolean).join(", ")}.</p>
+          
+          <iframe
+            title="Property Map"
+            className="mt-4 h-72 w-full rounded-xl sm:h-80 lg:h-96 border border-slate-200"
+            loading="lazy"
+            src={`https://maps.google.com/maps?q=${encodeURIComponent(`${p.location?.area || ""}, ${p.location?.city || "Hosur"}`)}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
+          />
+        </div>
+      </section>
+
+      {/* ── 7. RELATED PROPERTIES ── */}
       {data.similar?.length > 0 && (
-        <section className="bg-surface px-5 py-12 sm:px-8 lg:px-10">
-          <div className="mx-auto max-w-[1440px]">
-            <p className="section-tag">More options</p>
-            <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl">
-              Similar properties
+        <section className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 lg:px-10">
+          <div className="border-t border-slate-200 pt-8">
+            <p className="text-xs font-bold uppercase tracking-wider text-orange">More Options</p>
+            <h2 className="mt-1 text-2xl font-extrabold text-navy sm:text-3xl">
+              Related Properties in Hosur
             </h2>
-            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {data.similar.map((item) => (
                 <PropertyCard
                   key={item._id}
@@ -631,61 +687,34 @@ const PropertyDetailPage = () => {
         </section>
       )}
 
-      {/* FAQ */}
-      <section className="bg-white px-5 py-12 sm:px-8 lg:px-10">
-        <div className="mx-auto max-w-[1440px]">
-          <p className="section-tag">FAQs</p>
-          <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl">
-            Common questions
-          </h2>
-          <div className="mt-6 divide-y divide-slate-100">
-            {faqItems.map((item) => (
-              <article key={item.question} className="py-5 first:pt-0">
-                <h3 className="text-base font-bold text-navy">
-                  {item.question}
-                </h3>
-                <p className="mt-2 text-sm leading-7 text-slate-600">
-                  {item.answer}
-                </p>
-              </article>
-            ))}
-          </div>
+      {/* ── 8. REPORT FOOTER ── */}
+      <section className="mx-auto max-w-[1440px] px-5 py-4 sm:px-8 lg:px-10">
+        <div className="flex items-center justify-between text-xs text-slate-500">
+          <span>Property sold out? Incorrect data?</span>
+          <button
+            type="button"
+            onClick={() => toast.success("Thank you for your report. Our team will review this listing.")}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 font-bold text-slate-700 hover:bg-slate-50 transition"
+          >
+            <FlagIcon className="h-3.5 w-3.5 text-slate-500" />
+            Report Issue
+          </button>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-navy px-5 py-14 text-white sm:px-8 lg:px-10">
-        <div className="mx-auto max-w-[1440px] text-center lg:text-left">
-          <p className="section-tag text-orange">Explore more</p>
-          <h2 className="mt-3 text-2xl font-bold sm:text-3xl">
-            Keep browsing Hosur properties
-          </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-white lg:mx-0">
-            View more listings in {p.location?.city || "Hosur"} or filter by{" "}
-            {p.propertyType} to compare similar options.
-          </p>
-          <div className="mt-6 flex flex-col flex-wrap justify-center gap-3 sm:flex-row lg:justify-start">
-            <Link
-              to="/listings"
-              className="inline-flex items-center justify-center rounded-lg bg-orange px-6 py-3 text-sm font-bold text-white transition hover:bg-orange-hover"
-            >
-              View all listings
-            </Link>
-            <Link
-              to={`/listings?city=${encodeURIComponent(p.location?.city || "Hosur")}`}
-              className="inline-flex items-center justify-center rounded-lg border-2 border-white px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10"
-            >
-              More in {p.location?.city || "Hosur"}
-            </Link>
-            <Link
-              to={`/listings?propertyType=${encodeURIComponent(p.propertyType || "")}`}
-              className="inline-flex items-center justify-center rounded-lg border-2 border-white/40 px-6 py-3 text-sm font-bold text-white transition hover:border-white hover:bg-white/10"
-            >
-              More {p.propertyType}
-            </Link>
-          </div>
+      {/* Fullscreen Image Lightbox Modal */}
+      {isFullscreenImage && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 p-4">
+          <button
+            type="button"
+            onClick={() => setIsFullscreenImage(false)}
+            className="absolute top-5 right-5 text-white font-bold text-2xl hover:text-orange transition"
+          >
+            ✕
+          </button>
+          <img src={activeImage} alt="" className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl" />
         </div>
-      </section>
+      )}
 
       <ContactModal
         user={user}

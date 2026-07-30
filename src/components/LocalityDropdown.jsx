@@ -2,14 +2,36 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckIcon, ChevronDownIcon } from "./AppIcons";
 import { LOCALITY_SECTIONS } from "../constants/localities";
+import { fetchPropertyLocations } from "../services/api/propertyApi";
 
 const LocalityDropdown = ({ value, onChange, onSelect, onOpenChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [dynamicLocations, setDynamicLocations] = useState([]);
   const dropdownRef = useRef(null);
   const triggerRef = useRef(null);
 
-  const filteredSections = LOCALITY_SECTIONS.map((section) => ({
+  useEffect(() => {
+    fetchPropertyLocations()
+      .then((locs) => setDynamicLocations(locs || []))
+      .catch(() => setDynamicLocations([]));
+  }, []);
+
+  const sectionsToUse = [...LOCALITY_SECTIONS];
+  if (dynamicLocations.length > 0) {
+    const extraLocs = dynamicLocations.filter(
+      (loc) => !LOCALITY_SECTIONS.some((sec) => sec.items.includes(loc))
+    );
+    if (extraLocs.length > 0) {
+      sectionsToUse.unshift({
+        key: "posted-locations",
+        label: "Posted Locations",
+        items: extraLocs,
+      });
+    }
+  }
+
+  const filteredSections = sectionsToUse.map((section) => ({
     ...section,
     items: section.items.filter((item) =>
       item.toLowerCase().includes(searchQuery.toLowerCase())
@@ -60,7 +82,7 @@ const LocalityDropdown = ({ value, onChange, onSelect, onOpenChange }) => {
   };
 
   return (
-    <div ref={dropdownRef} className={`relative w-full ${isOpen ? "z-30" : "z-10"}`}>
+    <div ref={dropdownRef} className={`relative w-full ${isOpen ? "z-[9999]" : "z-10"}`}>
       <button
         ref={triggerRef}
         type="button"
@@ -99,11 +121,11 @@ const LocalityDropdown = ({ value, onChange, onSelect, onOpenChange }) => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -12, scale: 0.95 }}
+            initial={{ opacity: 0, y: -8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -12, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="absolute left-0 right-0 top-full mt-3 w-full rounded-xl border border-slate-200 bg-white shadow-2xl"
+            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            transition={{ duration: 0.18 }}
+            className="absolute left-0 right-0 top-full z-[99999] mt-2 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl"
           >
             <div className="sticky top-0 z-10 rounded-t-xl border-b border-slate-100 bg-white/95 p-4 backdrop-blur-sm">
               <div className="relative">

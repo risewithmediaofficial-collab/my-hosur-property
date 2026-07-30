@@ -88,9 +88,9 @@ export const PROPERTY_MANAGEMENT_SHORTCUTS = [
     type: "Industry & Warehouse Facility AMC Service",
   },
   {
-    label: "Land Scraping & Garden Maintenance Property Management Service",
+    label: "Land Scaping & Garden Maintenance Property Management Service",
     category: "property_management",
-    type: "Land Scraping & Garden Maintenance Property Management Service",
+    type: "Land Scaping & Garden Maintenance Property Management Service",
   },
   {
     label: "NRI Property Management Service",
@@ -112,10 +112,26 @@ export const serviceCategories = [
     description: "We help customers buy, sell, and rent properties with complete assistance.",
     icon: BrokerIcon,
     services: [
-      { label: "Property legal service", icon: ScaleIcon },
-      { label: "Sale agreement support", icon: HandshakeIcon },
-      { label: "Property buying guidance", icon: HomeModernIcon },
-      { label: "Property selling guidance", icon: BrokerIcon },
+      {
+        label: "Find your property",
+        icon: HomeModernIcon,
+        requestPath: "/request-service?category=property_buy&type=Find your property",
+      },
+      {
+        label: "Sell your property",
+        icon: BrokerIcon,
+        requestPath: "/request-service?category=property_sell&type=Sell your property",
+      },
+      {
+        label: "Rent your property",
+        icon: HandshakeIcon,
+        requestPath: "/request-service?category=property_rent&type=Rent your property",
+      },
+      {
+        label: "Property guidance for buy sell and rent",
+        icon: ScaleIcon,
+        requestPath: "/request-service?category=property_buy&type=Property guidance for buy sell and rent",
+      },
     ],
   },
   {
@@ -124,11 +140,36 @@ export const serviceCategories = [
     description: "Fast and reliable loan assistance for various property requirements.",
     icon: LoanIcon,
     services: [
-      { label: "Home loan", icon: HomeModernIcon },
-      { label: "Plot loan", icon: LandIcon },
-      { label: "Commercial loan", icon: BuildingOffice2Icon },
-      { label: "Agriculture loan", icon: GardenIcon },
-      { label: "Home loan balance transfer", icon: CreditCardIcon },
+      {
+        label: "Home loan",
+        icon: HomeModernIcon,
+        requestPath: "/request-service?category=loan&type=Home Loan",
+      },
+      {
+        label: "Plot loan",
+        icon: LandIcon,
+        requestPath: "/request-service?category=loan&type=Plot Loan",
+      },
+      {
+        label: "Mortgage loan",
+        icon: CreditCardIcon,
+        requestPath: "/request-service?category=loan&type=Mortgage Loan",
+      },
+      {
+        label: "Commercial loan",
+        icon: BuildingOffice2Icon,
+        requestPath: "/request-service?category=loan&type=Commercial Loan",
+      },
+      {
+        label: "Agriculture loan",
+        icon: GardenIcon,
+        requestPath: "/request-service?category=loan&type=Agriculture Loan",
+      },
+      {
+        label: "Home loan balance transfer",
+        icon: CreditCardIcon,
+        requestPath: "/request-service?category=loan&type=Home Loan Balance Transfer",
+      },
     ],
   },
   {
@@ -137,9 +178,31 @@ export const serviceCategories = [
     description: "End-to-end documentation and registration assistance.",
     icon: RegistrationIcon,
     services: [
-      { label: "Sale deed registration", icon: DocumentTextIcon },
-      { label: "Patta transfer", icon: RegistrationIcon },
-      { label: "Land survey", icon: MapIcon },
+      {
+        label: "Sale agreement support",
+        icon: HandshakeIcon,
+        requestPath: "/request-service?category=property_buy&type=Sale agreement support",
+      },
+      {
+        label: "Legal verification support",
+        icon: ScaleIcon,
+        requestPath: "/request-service?category=property_buy&type=Legal verification support",
+      },
+      {
+        label: "Patta transfer",
+        icon: RegistrationIcon,
+        requestPath: "/request-service?category=property_buy&type=Patta transfer",
+      },
+      {
+        label: "Land survey",
+        icon: MapIcon,
+        requestPath: "/request-service?category=property_buy&type=Land survey",
+      },
+      {
+        label: "Sale deed registration",
+        icon: DocumentTextIcon,
+        requestPath: "/request-service?category=property_buy&type=Sale deed registration",
+      },
     ],
   },
   {
@@ -148,9 +211,36 @@ export const serviceCategories = [
     description: "Find suitable properties based on your requirements.",
     icon: PropertySearchIcon,
     services: [
-      { label: "Plot search", icon: LandIcon },
-      { label: "Commercial property search", icon: BuildingOffice2Icon },
-      { label: "Agriculture land search", icon: GardenIcon },
+      {
+        label: "Plot",
+        icon: LandIcon,
+        requestPath: "/listings?intent=buy&propertyType=Plot",
+      },
+      {
+        label: "Villa / Flat",
+        icon: HomeModernIcon,
+        requestPath: "/listings?intent=buy&propertyType=Villa,Flat",
+      },
+      {
+        label: "Independent House",
+        icon: HomeModernIcon,
+        requestPath: "/listings?intent=buy&propertyType=Independent House",
+      },
+      {
+        label: "Commercial Land / Building",
+        icon: BuildingOffice2Icon,
+        requestPath: "/listings?intent=buy&propertyType=Commercial Land,Commercial Building",
+      },
+      {
+        label: "Farm Land",
+        icon: GardenIcon,
+        requestPath: "/listings?intent=buy&propertyType=Farm Land",
+      },
+      {
+        label: "Agricultural Land",
+        icon: GardenIcon,
+        requestPath: "/listings?intent=buy&propertyType=Agricultural Land",
+      },
     ],
   },
   {
@@ -159,10 +249,73 @@ export const serviceCategories = [
     description: "Premium interior and construction solutions.",
     icon: InteriorIcon,
     services: [
-      { label: "Home interiors", icon: InteriorIcon },
-      { label: "Office interiors", icon: PaintBrushIcon },
-      { label: "Construction services", icon: EngineeringIcon },
-      { label: "Approval plans", icon: DocumentMagnifyingGlassIcon },
+      {
+        label: "Home interiors",
+        icon: InteriorIcon,
+        requestPath: "/request-service?category=interior&type=Home Interior",
+      },
+      {
+        label: "Office interiors",
+        icon: PaintBrushIcon,
+        requestPath: "/request-service?category=interior&type=Office Interior",
+      },
+      {
+        label: "House construction",
+        icon: EngineeringIcon,
+        requestPath: "/request-service?category=construction&type=House Construction",
+      },
+      {
+        label: "Office construction",
+        icon: BuildingOffice2Icon,
+        requestPath: "/request-service?category=construction&type=Office Construction",
+      },
+      {
+        label: "Commercial building construction",
+        icon: BuildingOffice2Icon,
+        requestPath: "/request-service?category=construction&type=Commercial Building",
+      },
+      {
+        label: "Apartment construction",
+        icon: EngineeringIcon,
+        requestPath: "/request-service?category=construction&type=Apartment",
+      },
+      {
+        label: "Industry & warehouse construction",
+        icon: EngineeringIcon,
+        requestPath: "/request-service?category=construction&type=Industry %26 Warehouse",
+      },
+      {
+        label: "Approval plans & blueprints",
+        icon: DocumentMagnifyingGlassIcon,
+        requestPath: "/request-service?category=construction&type=Approval plans",
+        subItems: [
+          {
+            label: "2D Plan",
+            icon: DocumentMagnifyingGlassIcon,
+            requestPath: "/request-service?category=construction&type=2D Plan",
+          },
+          {
+            label: "3D Plan",
+            icon: HomeModernIcon,
+            requestPath: "/request-service?category=construction&type=3D Plan",
+          },
+          {
+            label: "HNTDA Approval",
+            icon: ShieldCheckIcon,
+            requestPath: "/request-service?category=construction&type=HNTDA Approval",
+          },
+          {
+            label: "RERA Approval",
+            icon: ShieldCheckIcon,
+            requestPath: "/request-service?category=construction&type=RERA Approval",
+          },
+          {
+            label: "Building Plan & Approval",
+            icon: DocumentTextIcon,
+            requestPath: "/request-service?category=construction&type=Building Plan %26 Approval",
+          },
+        ],
+      },
     ],
   },
   {

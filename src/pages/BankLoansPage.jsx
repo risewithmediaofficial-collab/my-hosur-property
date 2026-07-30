@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRightIcon, CheckCircleIcon, ChevronDownIcon } from "../components/AppIcons";
 import SeoHead from "../components/SeoHead";
@@ -152,6 +153,16 @@ const BankLoansPage = () => {
                       </li>
                     ))}
                   </ul>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100">
+                  <Link
+                    to={`/request-service?category=loan&bank=${encodeURIComponent(selectedBank.name)}`}
+                    className="site-button-primary flex w-full items-center justify-center gap-2 py-3.5 text-sm font-bold shadow-md hover:shadow-lg transition"
+                  >
+                    <span>Apply Loan with {selectedBank.shortName || selectedBank.name}</span>
+                    <ArrowRightIcon className="w-4 h-4" />
+                  </Link>
                 </div>
               </div>
             </div>

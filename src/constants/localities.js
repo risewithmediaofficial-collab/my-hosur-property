@@ -1,3 +1,18 @@
+/** Major Hosur Roads */
+export const ROAD_AREAS = [
+  "Bagalur Road",
+  "Nallur Road",
+  "Avalapalli Road",
+  "Alasanatham Road",
+  "Kelamangalam Road",
+  "Thally Road",
+  "Attibele Road",
+  "Denkanikottai Road",
+  "TVS Road",
+  "Athimugam Road",
+  "Rayakottai Road",
+];
+
 /** Main Hosur localities */
 export const MAIN_AREAS = [
   "Hosur City",
@@ -29,6 +44,7 @@ export const NEARBY_AREAS = [
 ];
 
 export const LOCALITY_SECTIONS = [
+  { key: "road-areas", label: "Major Roads", items: ROAD_AREAS },
   { key: "main-areas", label: "Main Areas", items: MAIN_AREAS },
   { key: "nearby-areas", label: "Nearby Areas", items: NEARBY_AREAS },
 ];

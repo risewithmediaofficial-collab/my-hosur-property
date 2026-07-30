@@ -21,6 +21,7 @@ const PROPERTY_TYPES = [
   "Commercial Land",
   "Agricultural Land",
   "Agri Land",
+  "Farmland",
   "Home",
   "Office",
   "Apartment",
@@ -86,8 +87,20 @@ const buildQuery = (q) => {
     query.propertyType = { $in: ["Apartment", "Flat"] };
   }
 
-  if (q.city) query["location.city"] = new RegExp(q.city, "i");
-  if (q.area) query["location.area"] = new RegExp(q.area, "i");
+  if (q.location || (q.city && q.city === q.area)) {
+    const loc = q.location || q.city;
+    const locRegex = new RegExp(loc, "i");
+    query.$or = [
+      { "location.city": locRegex },
+      { "location.area": locRegex },
+      { "location.address": locRegex },
+      { title: locRegex },
+      { description: locRegex },
+    ];
+  } else {
+    if (q.city) query["location.city"] = new RegExp(q.city, "i");
+    if (q.area) query["location.area"] = new RegExp(q.area, "i");
+  }
 
   if (q.propertyType) {
     const types = String(q.propertyType)
@@ -593,6 +606,23 @@ const seoListings = async (_req, res) => {
   return res.json({ items });
 };
 
+const getLocations = async (_req, res) => {
+  const cacheKey = "property_locations_list";
+  const cached = cache.get(cacheKey);
+  if (cached) return res.json(cached);
+
+  const properties = await Property.find({ status: "approved" }).select("location");
+  const locSet = new Set();
+  properties.forEach((p) => {
+    if (p.location?.city) locSet.add(p.location.city.trim());
+    if (p.location?.area) locSet.add(p.location.area.trim());
+  });
+
+  const result = { locations: Array.from(locSet).filter(Boolean) };
+  cache.set(cacheKey, result, 300);
+  return res.json(result);
+};
+
 module.exports = {
   propertyValidators,
   listProperties,
@@ -605,4 +635,5 @@ module.exports = {
   promoteProperty,
   uploadAssets,
   seoListings,
+  getLocations,
 };

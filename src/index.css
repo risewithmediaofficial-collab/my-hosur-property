@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 /* Hide scrollbar while keeping scroll functionality */
 .scrollbar-none {
@@ -117,13 +117,11 @@ button:focus {
   font-size: 3rem !important;
 }
 
-html {
-  /* scroll-behavior is intentionally NOT set to "smooth" here.
-     Setting scroll-behavior: smooth on html causes window.scrollTo(0, 0)
-     to ANIMATE instead of jump — the browser's async scroll-restoration
-     can then race against the animation and land the page mid-scroll.
-     Apply smooth scrolling at the element level only where needed. */
-}
+/* scroll-behavior is intentionally NOT set to "smooth" on html.
+   Setting scroll-behavior: smooth on html causes window.scrollTo(0, 0)
+   to ANIMATE instead of jump — the browser's async scroll-restoration
+   can then race against the animation and land the page mid-scroll.
+   Apply smooth scrolling at the element level only where needed. */
 
 body {
   margin: 0;
@@ -399,12 +397,51 @@ p {
 
 .site-input {
   width: 100%;
-  border-radius: 8px;
-  padding: 0.95rem 1rem;
+  border-radius: 10px;
+  padding: 0.65rem 0.875rem;
   color: var(--site-ink);
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 500;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
   transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+/* Custom styled dropdown select elements — removes browser default look */
+select,
+.site-input select,
+select.site-input {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.2' stroke='%230042a2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.85rem center !important;
+  background-size: 1.15rem 1.15rem !important;
+  padding-right: 2.6rem !important;
+  cursor: pointer;
+}
+
+select:hover,
+select.site-input:hover {
+  border-color: #0042a2 !important;
+  background-color: #f8fafc !important;
+}
+
+select:focus,
+select.site-input:focus {
+  border-color: #f79e26 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(247, 158, 38, 0.2) !important;
+  background-color: #ffffff !important;
+}
+
+select option {
+  padding: 12px 16px;
+  background-color: #ffffff;
+  color: #002255;
+  font-weight: 500;
+  font-size: 0.875rem;
 }
 
 /* Layout helpers: prevent unwanted horizontal gap and ensure consistent side padding */
@@ -2671,15 +2708,15 @@ body {
   justify-content: center;
   width: 4.5rem;
   height: 4.5rem;
-  border-radius: 9999px;
-  background: linear-gradient(145deg, rgba(39, 79, 154, 0.14) 0%, rgba(39, 79, 154, 0.06) 100%);
-  color: #274f9a;
-  transition: transform 0.28s ease, background 0.28s ease;
+  border-radius: 1.25rem;
+  background: rgba(39, 79, 154, 0.05);
+  transition: transform 0.28s ease, background 0.28s ease, box-shadow 0.28s ease;
 }
 
 .home-property-type-card:hover .home-type-icon {
-  transform: scale(1.06);
-  background: linear-gradient(145deg, rgba(39, 79, 154, 0.2) 0%, rgba(255, 153, 20, 0.12) 100%);
+  transform: scale(1.08);
+  background: rgba(255, 153, 20, 0.1);
+  box-shadow: 0 8px 20px rgba(39, 79, 154, 0.12);
 }
 
 .home-property-type-card .home-type-title {
@@ -2732,7 +2769,7 @@ body {
 
 .home-service-row {
   display: flex;
-  gap: 1rem;
+  gap: 1.25rem;
   align-items: flex-start;
   text-align: left;
 }
@@ -2742,11 +2779,17 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 9999px;
-  background: rgba(39, 79, 154, 0.08);
-  color: #274f9a;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 1rem;
+  background: rgba(39, 79, 154, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.home-service-row:hover .home-service-icon {
+  transform: scale(1.08);
+  background: rgba(255, 153, 20, 0.1);
 }
 
 .home-service-row h3 {

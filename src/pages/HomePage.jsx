@@ -46,6 +46,25 @@ import alluringRealityImg from "../assets/alluring reality.jpeg";
 import { fetchHomeProperties } from "../services/api/propertyApi";
 import { buildRealEstateAgentSchema, buildWebsiteSchema } from "../utils/seo";
 
+import {
+  PlotMulticolorIcon,
+  VillaMulticolorIcon,
+  VillaFlatMulticolorIcon,
+  HouseMulticolorIcon,
+  FlatMulticolorIcon,
+  CommercialMulticolorIcon,
+  FarmLandMulticolorIcon,
+  AgricultureLandMulticolorIcon,
+  BuyCategoryMulticolorIcon,
+  SellCategoryMulticolorIcon,
+  RentCategoryMulticolorIcon,
+  LoanCategoryMulticolorIcon,
+  ConstructionCategoryMulticolorIcon,
+  InteriorCategoryMulticolorIcon,
+  HomeOfficeServicesMulticolorIcon,
+  PropertyManagementMulticolorIcon,
+} from "../components/MulticolorIcons";
+
 gsap.config({ nullTargetWarn: false });
 gsap.registerPlugin(ScrollTrigger);
 
@@ -72,45 +91,51 @@ const cardReveal = {
 const propertyTypeOptions = [
   { label: "All types", value: "" },
   { label: "Plot", value: "Plot" },
-  { label: "Villa", value: "Villa" },
+  { label: "Villa / Flat", value: "Villa,Flat" },
   { label: "Independent House", value: "Independent House" },
-  { label: "Flat", value: "Flat" },
-  { label: "Commercial Land", value: "Commercial Land" },
+  { label: "Commercial Land / Building", value: "Commercial Land,Commercial Building" },
+  { label: "Farm Land", value: "Farm Land" },
   { label: "Agricultural Land", value: "Agricultural Land" },
 ];
 
 const propertyTypeIcons = {
-  Plot: LandIcon,
-  Villa: VillaIcon,
-  "Independent House": HomeModernIcon,
-  Flat: BuildingOfficeIcon,
-  "Commercial Land": BuildingOffice2Icon,
-  "Agricultural Land": LandIcon,
+  Plot: PlotMulticolorIcon,
+  "Villa / Flat": VillaFlatMulticolorIcon,
+  Villa: VillaMulticolorIcon,
+  Flat: FlatMulticolorIcon,
+  "Independent House": HouseMulticolorIcon,
+  "Commercial Land / Building": CommercialMulticolorIcon,
+  "Farm Land": FarmLandMulticolorIcon,
+  "Agricultural Land": AgricultureLandMulticolorIcon,
 };
 
 const propertyTypeDescriptions = {
   Plot: ["Residential & commercial", "plots across Hosur"],
+  "Villa / Flat": ["Gated villas & modern", "apartment residences"],
   Villa: ["Premium gated", "villa communities"],
   "Independent House": ["Spacious standalone", "homes with privacy"],
   Flat: ["Apartments in prime", "Hosur localities"],
-  "Commercial Land": ["Office & retail", "commercial spaces"],
+  "Commercial Land / Building": ["Office, retail & commercial", "spaces & land"],
+  "Farm Land": ["Farm land & agro", "plots with water sources"],
   "Agricultural Land": ["Farm & agricultural", "land listings"],
 };
 
 const shortcutGroups = [
   {
     label: "Buy",
+    icon: BuyCategoryMulticolorIcon,
     items: [
       { label: "Plot", to: "/listings?intent=buy&propertyType=Plot" },
-      { label: "Villa", to: "/listings?intent=buy&propertyType=Villa" },
+      { label: "Villa / Flat", to: "/listings?intent=buy&propertyType=Villa,Flat" },
       { label: "Independent House", to: "/listings?intent=buy&propertyType=Independent House" },
-      { label: "Flat", to: "/listings?intent=buy&propertyType=Flat" },
-      { label: "Commercial Land", to: "/listings?intent=buy&propertyType=Commercial Land" },
+      { label: "Commercial Land / Building", to: "/listings?intent=buy&propertyType=Commercial Land,Commercial Building" },
+      { label: "Farm Land", to: "/listings?intent=buy&propertyType=Farm Land" },
       { label: "Agricultural Land", to: "/listings?intent=buy&propertyType=Agricultural Land" },
     ],
   },
   {
     label: "Sell",
+    icon: SellCategoryMulticolorIcon,
     items: [
       { label: "Posted Properties", to: "/listings?intent=buy" },
       { label: "List Property", to: "/post-property" },
@@ -119,6 +144,7 @@ const shortcutGroups = [
   },
   {
     label: "Rent",
+    icon: RentCategoryMulticolorIcon,
     items: [
       { label: "Home", to: "/listings?intent=rent&propertyType=Home" },
       { label: "Office", to: "/listings?intent=rent&propertyType=Office" },
@@ -130,6 +156,7 @@ const shortcutGroups = [
   },
   {
     label: "Loan",
+    icon: LoanCategoryMulticolorIcon,
     items: [
       { label: "Home Loan", to: "/request-service?category=loan&type=Home%20Loan" },
       { label: "Plot Loan", to: "/request-service?category=loan&type=Plot%20Loan" },
@@ -139,6 +166,7 @@ const shortcutGroups = [
   },
   {
     label: "Construction",
+    icon: ConstructionCategoryMulticolorIcon,
     items: [
       { label: "House Construction", to: "/request-service?category=construction&type=House Construction" },
       { label: "Office Construction", to: "/request-service?category=construction&type=Office Construction" },
@@ -149,6 +177,7 @@ const shortcutGroups = [
   },
   {
     label: "Interior",
+    icon: InteriorCategoryMulticolorIcon,
     items: [
       { label: "Home Interior", to: "/request-service?category=interior&type=Home Interior" },
       { label: "Office Interior", to: "/request-service?category=interior&type=Office Interior" },
@@ -156,6 +185,7 @@ const shortcutGroups = [
   },
   {
     label: "Home & Office Services",
+    icon: HomeOfficeServicesMulticolorIcon,
     items: HOME_OFFICE_SERVICE_SHORTCUTS.map((item) => ({
       label: item.label,
       to: buildServiceRequestPath(item),
@@ -163,6 +193,7 @@ const shortcutGroups = [
   },
   {
     label: "Property Management Service",
+    icon: PropertyManagementMulticolorIcon,
     items: PROPERTY_MANAGEMENT_SHORTCUTS.map((item) => ({
       label: item.label,
       to: buildServiceRequestPath(item),
@@ -171,26 +202,26 @@ const shortcutGroups = [
 ];
 
 const homeStats = [
-  { value: 2500, suffix: "+", label: "Verified listings" },
-  { value: 1200, suffix: "+", label: "Buyer enquiries" },
-  { value: 150, suffix: "+", label: "Local partners" },
+  { value: 100, suffix: "+", label: "Verified listings" },
+  { value: 200, suffix: "+", label: "Buyer enquiries" },
+  { value: 50, suffix: "+", label: "Local partners" },
 ];
 
 const servicePreview = [
   {
     title: "Property Transactions Support",
     description: "Buying, selling, rental guidance, and documentation support tailored for Hosur buyers and owners.",
-    icon: BuildingOffice2Icon,
+    icon: BuyCategoryMulticolorIcon,
   },
   {
     title: "Legal & Registration Support",
     description: "Agreement support, sale deed registration, patta transfer, and property legal coordination in one place.",
-    icon: ScaleIcon,
+    icon: PropertyManagementMulticolorIcon,
   },
   {
     title: "Construction & Interior Support",
     description: "Interior planning, construction services, electrical, plumbing, and trusted contractor support.",
-    icon: WrenchScrewdriverIcon,
+    icon: ConstructionCategoryMulticolorIcon,
   },
 ];
 
@@ -198,35 +229,35 @@ const showcaseItems = [
   {
     title: "Sell Property",
     description: "Quick and verified sales",
-    icon: BanknotesIcon,
+    icon: SellCategoryMulticolorIcon,
     image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80",
     to: "/post-property",
   },
   {
     title: "Rent Property",
     description: "Lease verified homes",
-    icon: RentIcon,
+    icon: RentCategoryMulticolorIcon,
     image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
     to: "/listings?intent=rent",
   },
   {
     title: "Commercial",
     description: "Office & retail spaces",
-    icon: BuildingOffice2Icon,
+    icon: CommercialMulticolorIcon,
     image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
     to: "/listings?intent=buy&propertyType=Commercial%20Land",
   },
   {
     title: "Land Sale",
     description: "Agricultural & residential land",
-    icon: LandIcon,
+    icon: PlotMulticolorIcon,
     image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
     to: "/listings?intent=buy&propertyType=Plot",
   },
   {
     title: "Interior Design",
     description: "Customized interiors",
-    icon: PaintBrushIcon,
+    icon: InteriorCategoryMulticolorIcon,
     image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80",
     to: "/request-service?category=interior",
   },
@@ -546,37 +577,38 @@ const HomePage = () => {
           />
         </div>
 
-        {/* Shortcut dropdowns need z-index above the hero */}
-        <div ref={heroContentRef} className="relative mx-auto flex max-w-[1440px] flex-col items-center px-5 py-12 text-center will-change-transform sm:px-8 sm:py-16 lg:px-10 lg:py-20" style={{ zIndex: 20 }}>
+        <div ref={heroContentRef} className="relative mx-auto flex max-w-[1440px] flex-col items-center px-5 py-10 text-center will-change-transform sm:px-8 sm:py-14 lg:px-10 lg:py-16" style={{ zIndex: 20 }}>
           <p className="home-gsap-hero-item section-tag !text-navy">Verified real estate platform</p>
-          <h1 className="home-gsap-hero-item hero-title mt-4 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-navy">
+          <h1 className="home-gsap-hero-item hero-title mt-3 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-navy">
             Verified property listings in <span className="text-orange">Hosur</span>
           </h1>
 
-          <div className="home-gsap-hero-item mt-8 flex flex-col gap-6 w-full sm:mt-10">
-            <p className="mx-auto text-sm leading-7 text-slate-600 sm:text-base">
-              Find verified properties for sale and rent across Hosur. Search apartments, villas, plots, and houses with clearer tools and local support.
-            </p>
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+            Find verified properties for sale and rent across Hosur. Search apartments, villas, plots, and houses with clearer tools and local support.
+          </p>
 
-            {/* ── Shortcut bar ── */}
-            <div ref={shortcutBarRef} className="relative flex flex-wrap justify-center gap-2 sm:gap-2.5 lg:gap-3">
-              {shortcutGroups.map((group) => (
+          {/* ── 1. SHORTCUT CATEGORY DROPDOWNS BAR (TOP LEVEL CATEGORY NAVIGATION) ── */}
+          <div ref={shortcutBarRef} className="home-gsap-hero-item relative z-30 mt-6 flex flex-wrap justify-center gap-2.5 sm:gap-3 w-full max-w-5xl">
+            {shortcutGroups.map((group) => {
+              const CategoryIcon = group.icon;
+              return (
                 <div
                   key={group.label}
                   className="relative"
-                  style={{ zIndex: openShortcutMenu === group.label ? 9999 : 10 }}
+                  style={{ zIndex: openShortcutMenu === group.label ? 99999 : 10 }}
                   onMouseEnter={() => handleShortcutHover(group.label)}
                   onMouseLeave={handleShortcutLeave}
                 >
                   <button
                     type="button"
                     onClick={() => setOpenShortcutMenu((current) => (current === group.label ? "" : group.label))}
-                    className={`inline-flex min-h-[40px] items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition duration-200 ${
+                    className={`inline-flex min-h-[46px] items-center justify-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-bold transition-all duration-200 shadow-sm ${
                       openShortcutMenu === group.label
-                        ? "bg-navy text-white shadow-lg"
-                        : "bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300"
+                        ? "bg-navy text-white shadow-md scale-105"
+                        : "bg-white border border-slate-200 text-navy hover:bg-slate-50 hover:border-slate-300 hover:shadow"
                     }`}
                   >
+                    {CategoryIcon && <CategoryIcon className="h-6 w-6 flex-shrink-0" />}
                     <span>{group.label}</span>
                     <ChevronDownIcon className={`h-4 w-4 transition duration-300 max-sm:!hidden sm:block ${openShortcutMenu === group.label ? "rotate-180" : ""}`} />
                   </button>
@@ -585,188 +617,195 @@ const HomePage = () => {
                   {openShortcutMenu === group.label && (
                     <motion.div
                       className="absolute left-0 top-full hidden pt-2 sm:block"
-                      style={{ zIndex: 9999, minWidth: "220px" }}
-                      initial={{ opacity: 0, y: -8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
+                      style={{ zIndex: 99999, minWidth: "250px" }}
+                      initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.98 }}
                       transition={{ duration: 0.15 }}
                       onMouseEnter={() => handleShortcutHover(group.label)}
                       onMouseLeave={handleShortcutLeave}
                     >
-                      <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl max-h-[60vh] overflow-y-auto">
+                      <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-2xl max-h-[60vh] overflow-y-auto">
                         {group.items.map((item) => (
                           <Link
                             key={`${group.label}-${item.label}`}
                             to={item.to}
-                            className="block rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-800 transition duration-150 hover:bg-orange hover:text-white"
+                            className="flex items-center gap-2.5 rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-800 transition duration-150 hover:bg-orange hover:text-white"
                             onClick={() => setOpenShortcutMenu("")}
                           >
-                            {item.label}
+                            <span className="h-1.5 w-1.5 rounded-full bg-orange flex-shrink-0" />
+                            <span>{item.label}</span>
                           </Link>
                         ))}
                       </div>
                     </motion.div>
                   )}
                 </div>
-              ))}
+              );
+            })}
 
-              {/* Mobile expanded menu */}
-              {openShortcutGroup && (
-                <motion.div
-                  className="z-50 mt-2 w-full basis-full sm:hidden"
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.15 }}
+            {/* Mobile expanded menu */}
+            {openShortcutGroup && (
+              <motion.div
+                className="z-50 mt-2 w-full basis-full sm:hidden"
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.15 }}
+              >
+                <div className="mx-auto max-h-[260px] w-[min(18rem,calc(100vw-2rem))] overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 text-center shadow-lg">
+                  {openShortcutGroup.items.map((item) => (
+                    <Link
+                      key={`${openShortcutGroup.label}-${item.label}`}
+                      to={item.to}
+                      className="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 text-slate-800 transition duration-150 hover:bg-orange hover:text-white"
+                      onClick={() => setOpenShortcutMenu("")}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </div>
+
+          {/* ── 2. MAIN PROPERTY SEARCH CARD (CLEANLY POSITIONED BELOW CATEGORY BAR) ── */}
+          <div className="home-gsap-hero-item relative z-20 mt-6 w-full max-w-5xl text-left">
+            <div
+              className={`rounded-2xl border border-slate-200 bg-white p-5 shadow-xl transition-all duration-300 sm:p-6 ${
+                localityDropdownOpen ? "pb-[22rem] sm:pb-[26rem]" : ""
+              }`}
+            >
+              <p className="mb-4 text-xs font-bold uppercase tracking-wider text-navy sm:text-sm">Search properties in Hosur</p>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.8fr_0.9fr_auto] lg:items-stretch">
+                <LocalityDropdown
+                  value={search.search}
+                  onChange={(value) => setSearch((prev) => ({ ...prev, search: value }))}
+                  onOpenChange={setLocalityDropdownOpen}
+                  onSelect={() => {
+                    scrollToTop();
+                    navigate(`/listings?${queryString || "intent=buy"}`);
+                  }}
+                />
+
+                <select
+                  value={search.intent}
+                  onChange={(event) => setSearch((prev) => ({ ...prev, intent: event.target.value }))}
+                  className="site-input min-h-[52px] w-full rounded-xl text-sm font-semibold border-slate-300 text-navy focus:border-navy"
+                  aria-label="Listing intent"
                 >
-                  <div className="mx-auto max-h-[260px] w-[min(18rem,calc(100vw-2rem))] overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 text-center shadow-lg">
-                    {openShortcutGroup.items.map((item) => (
-                      <Link
-                        key={`${openShortcutGroup.label}-${item.label}`}
-                        to={item.to}
-                        className="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 text-slate-800 transition duration-150 hover:bg-orange hover:text-white"
-                        onClick={() => setOpenShortcutMenu("")}
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </div>
+                  <option value="buy">Buy</option>
+                  <option value="rent">Rent</option>
+                  <option value="new-project">New Project</option>
+                </select>
 
-            <div className="home-gsap-hero-item mt-4 flex w-full max-w-md flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center mx-auto">
-              <motion.button
-                type="button"
-                onClick={handlePostFreeProperty}
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.95 }}
-                className="group relative inline-flex min-h-[44px] w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange to-orange-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg transition duration-200 hover:shadow-2xl sm:w-auto overflow-hidden"
-              >
-                <style>{`
-                  @keyframes boom {
-                    0% { box-shadow: 0 0 0 0 rgba(255, 127, 14, 0.7); transform: scale(1); }
-                    50% { box-shadow: 0 0 0 10px rgba(255, 127, 14, 0.4); }
-                    100% { box-shadow: 0 0 0 20px rgba(255, 127, 14, 0); transform: scale(1); }
-                  }
-                  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-                  @keyframes wave { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(1.08); } }
-                  @keyframes shine { 0% { left: -100%; } 100% { left: 100%; } }
-                  .boom-button { animation: boom 2s infinite, blink 1.5s ease-in-out infinite; }
-                  .group:hover .wave-icon { animation: wave 0.5s ease-in-out infinite; }
-                  .shine-effect { position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: shine 1.2s infinite; }
-                `}</style>
-                <div className="shine-effect"></div>
-                <FlagIcon className="wave-icon h-5 w-5 transition-transform duration-300 relative z-10" />
-                <span className="relative z-10">Post your free property</span>
-                <div className="boom-button absolute inset-0 -z-10 rounded-lg bg-gradient-to-r from-orange to-orange-600" />
-              </motion.button>
-              <button
-                type="button"
-                onClick={() => {
-                  scrollToTop();
-                  navigate(`/listings?${queryString || "intent=buy"}`);
-                }}
-                className="inline-flex items-center justify-center rounded-lg border-2 border-navy px-8 py-2.5 text-sm font-bold text-navy transition hover:bg-navy/5 w-full sm:w-auto"
-              >
-                Find Your Property
-              </button>
+                {/* Property type custom dropdown */}
+                <div ref={propertyTypeMenuRef} className="relative w-full">
+                  <button
+                    type="button"
+                    onClick={() => setPropertyTypeMenuOpen((current) => !current)}
+                    className="site-input flex min-h-[52px] w-full items-center justify-between rounded-xl border-slate-300 text-left text-sm font-semibold text-navy hover:border-navy"
+                    aria-expanded={propertyTypeMenuOpen}
+                    aria-haspopup="listbox"
+                  >
+                    <span className="truncate">{selectedPropertyTypeLabel}</span>
+                    <ChevronDownIcon className={`h-4 w-4 flex-shrink-0 transition ${propertyTypeMenuOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  {propertyTypeMenuOpen && (
+                    <div
+                      className="absolute left-0 right-0 top-full z-[99999] mt-2 max-h-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-2xl"
+                      role="listbox"
+                    >
+                      {propertyTypeOptions.map((option) => {
+                        const IconComponent = option.label && propertyTypeIcons[option.label];
+                        return (
+                          <button
+                            key={option.label}
+                            type="button"
+                            onClick={() => {
+                              setSearch((prev) => ({ ...prev, propertyType: option.value }));
+                              setPropertyTypeMenuOpen(false);
+                            }}
+                            className="flex w-full items-center justify-between rounded-lg px-3.5 py-2.5 text-left text-sm font-semibold text-navy hover:bg-orange/10 hover:text-orange transition"
+                          >
+                            <span className="flex items-center gap-2.5">
+                              {IconComponent ? <IconComponent className="h-6 w-6 flex-shrink-0" /> : null}
+                              <span>{option.label}</span>
+                            </span>
+                            {option.value === search.propertyType ? <CheckIcon className="h-4 w-4 text-orange" /> : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    scrollToTop();
+                    navigate(`/listings?${queryString || "intent=buy"}`);
+                  }}
+                  className="site-button-primary min-h-[52px] w-full rounded-xl px-8 text-sm font-bold shadow-md hover:shadow-lg transition lg:w-auto"
+                >
+                  Search
+                </button>
+              </div>
             </div>
           </div>
 
+          {/* ── 3. CTA BUTTONS ── */}
+          <div className="home-gsap-hero-item mt-6 flex w-full max-w-md flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center mx-auto">
+            <motion.button
+              type="button"
+              onClick={handlePostFreeProperty}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="group relative inline-flex min-h-[46px] w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-orange to-orange-600 px-7 py-3 text-sm font-bold text-white shadow-lg transition duration-200 hover:shadow-2xl sm:w-auto overflow-hidden"
+            >
+              <style>{`
+                @keyframes boom {
+                  0% { box-shadow: 0 0 0 0 rgba(255, 127, 14, 0.7); transform: scale(1); }
+                  50% { box-shadow: 0 0 0 10px rgba(255, 127, 14, 0.4); }
+                  100% { box-shadow: 0 0 0 20px rgba(255, 127, 14, 0); transform: scale(1); }
+                }
+                @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+                @keyframes wave { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(1.08); } }
+                @keyframes shine { 0% { left: -100%; } 100% { left: 100%; } }
+                .boom-button { animation: boom 2s infinite, blink 1.5s ease-in-out infinite; }
+                .group:hover .wave-icon { animation: wave 0.5s ease-in-out infinite; }
+                .shine-effect { position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: shine 1.2s infinite; }
+              `}</style>
+              <div className="shine-effect"></div>
+              <FlagIcon className="wave-icon h-5 w-5 transition-transform duration-300 relative z-10" />
+              <span className="relative z-10">Post your free property</span>
+              <div className="boom-button absolute inset-0 -z-10 rounded-xl bg-gradient-to-r from-orange to-orange-600" />
+            </motion.button>
+            <button
+              type="button"
+              onClick={() => {
+                scrollToTop();
+                navigate(`/listings?${queryString || "intent=buy"}`);
+              }}
+              className="inline-flex items-center justify-center rounded-xl border-2 border-navy px-8 py-3 text-sm font-bold text-navy transition hover:bg-navy hover:text-white w-full sm:w-auto shadow-sm"
+            >
+              Find Your Property
+            </button>
+          </div>
+
+          {/* ── 4. STATS COUNTERS ── */}
           <div className="home-gsap-hero-item mt-8 grid w-full max-w-3xl grid-cols-3 gap-3 text-center sm:mt-10 sm:gap-6">
             {homeStats.map((item) => (
               <div key={item.label}>
                 <p className="text-xl font-bold text-navy sm:text-2xl lg:text-3xl">
                   <CountUpNumber value={item.value} suffix={item.suffix} />
                 </p>
-                <p className="mt-1 text-[11px] text-slate-500 sm:text-sm">{item.label}</p>
+                <p className="mt-1 text-[11px] text-slate-500 sm:text-sm font-medium">{item.label}</p>
               </div>
             ))}
           </div>
         </div>
       </MotionSection>
-
-      {/* ── Search bar section ── */}
-      <section className="home-gsap-section relative bg-white px-5 py-8 sm:px-8 sm:py-12 lg:px-10">
-        <div className="mx-auto max-w-[1440px] space-y-5">
-          <div
-            className={`home-gsap-card rounded-2xl border border-slate-200 bg-white p-5 shadow-lg transition-[padding] duration-200 sm:p-7 ${
-              localityDropdownOpen ? "lg:pb-[30rem]" : ""
-            }`}
-          >
-            <p className="mb-5 text-center text-base font-semibold text-navy sm:text-left">Search properties in Hosur</p>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.8fr_0.9fr_auto] lg:items-stretch">
-              <LocalityDropdown
-                value={search.search}
-                onChange={(value) => setSearch((prev) => ({ ...prev, search: value }))}
-                onOpenChange={setLocalityDropdownOpen}
-                onSelect={() => {
-                  scrollToTop();
-                  navigate(`/listings?${queryString || "intent=buy"}`);
-                }}
-              />
-
-              <select
-                value={search.intent}
-                onChange={(event) => setSearch((prev) => ({ ...prev, intent: event.target.value }))}
-                className="site-input min-h-[52px] w-full rounded-xl text-sm"
-                aria-label="Listing intent"
-              >
-                <option value="buy">Buy</option>
-                <option value="rent">Rent</option>
-                <option value="new-project">New Project</option>
-              </select>
-
-              {/* Property type custom dropdown */}
-              <div ref={propertyTypeMenuRef} className="relative w-full">
-                <button
-                  type="button"
-                  onClick={() => setPropertyTypeMenuOpen((current) => !current)}
-                  className="site-input flex min-h-[52px] w-full items-center justify-between rounded-xl text-left text-sm font-semibold"
-                  aria-expanded={propertyTypeMenuOpen}
-                  aria-haspopup="listbox"
-                >
-                  <span className="truncate">{selectedPropertyTypeLabel}</span>
-                  <ChevronDownIcon className={`h-4 w-4 flex-shrink-0 transition ${propertyTypeMenuOpen ? "rotate-180" : ""}`} />
-                </button>
-                {propertyTypeMenuOpen && (
-                  <div
-                    className="absolute left-0 right-0 top-full z-[9999] mt-2 max-h-60 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl"
-                    role="listbox"
-                  >
-                    {propertyTypeOptions.map((option) => (
-                      <button
-                        key={option.label}
-                        type="button"
-                        onClick={() => {
-                          setSearch((prev) => ({ ...prev, propertyType: option.value }));
-                          setPropertyTypeMenuOpen(false);
-                        }}
-                        className="flex w-full items-center justify-between rounded-lg px-4 py-2.5 text-left text-sm font-semibold text-navy hover:bg-surface"
-                      >
-                        {option.label}
-                        {option.value === search.propertyType ? <CheckIcon className="h-4 w-4 text-orange" /> : null}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  scrollToTop();
-                  navigate(`/listings?${queryString || "intent=buy"}`);
-                }}
-                className="site-button-primary min-h-[52px] w-full rounded-xl px-8 text-sm font-bold lg:w-auto"
-              >
-                Search
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ── Property Types ── */}
       <MotionSection
@@ -851,7 +890,7 @@ const HomePage = () => {
                   className="home-gsap-card home-service-row"
                 >
                   <div className="home-service-icon">
-                    <Icon className="h-5 w-5" />
+                    <Icon className="h-10 w-10 flex-shrink-0" />
                   </div>
                   <div>
                     <h3>{item.title}</h3>

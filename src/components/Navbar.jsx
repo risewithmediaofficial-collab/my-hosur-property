@@ -172,8 +172,8 @@ const Navbar = () => {
                 className="block object-contain sm:!h-10 sm:!max-w-[140px] lg:!h-12 lg:!max-w-[160px]"
                 style={{ height: "36px", width: "auto", maxWidth: "100px" }}
               />
-              <span className="hidden sm:inline-block text-[10px] font-medium leading-none text-slate-500 sm:text-[11px]">
-                Powered by <span className="font-bold text-navy">Gyes Construction</span>
+              <span className="hidden sm:inline-block text-[10px] font-medium leading-none text-slate-500 sm:text-[11px] whitespace-nowrap">
+                Powered by <span className="font-bold text-navy">Gyes Property & Construction</span>
               </span>
             </NavLink>
 

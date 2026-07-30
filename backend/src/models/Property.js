@@ -22,6 +22,7 @@ const propertySchema = new mongoose.Schema(
         "Commercial Land / Building",
         "Agricultural Land",
         "Agri Land",
+        "Farmland",
         "House",
         "Office",
         "Warehouse",

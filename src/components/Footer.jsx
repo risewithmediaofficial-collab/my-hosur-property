@@ -34,7 +34,7 @@ const Footer = () => (
             <div className="flex flex-col items-start gap-1">
               <BrandLogo className="h-12 w-auto max-w-[200px] sm:h-15" />
               <span className="text-[11px] font-medium leading-none text-white/60">
-                Powered by <span className="font-bold text-white">Gyes Construction</span>
+                Powered by <span className="font-bold text-white">Gyes Property & Construction</span>
               </span>
             </div>
             <p className="max-w-sm text-sm leading-7 text-white/80">

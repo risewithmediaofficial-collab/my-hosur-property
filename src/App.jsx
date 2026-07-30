@@ -277,14 +277,7 @@ const AppShell = () => {
                       </ProtectedRoute>
                     }
                   />
-                  <Route
-                    path="/plans"
-                    element={
-                      <ProtectedRoute>
-                        <PlansPage />
-                      </ProtectedRoute>
-                    }
-                  />
+                  <Route path="/plans" element={<PlansPage />} />
                   <Route
                     path="/request-service"
                     element={

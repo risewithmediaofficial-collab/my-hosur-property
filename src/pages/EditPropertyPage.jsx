@@ -127,7 +127,6 @@ const EditPropertyPage = () => {
           cctvCamera: p.amenities?.includes("CCTV Camera") ? "Yes" : "No",
           security: p.amenities?.includes("Security") ? "Yes" : "No",
           dtcp: p.amenities?.includes("DTCP") ? "Yes" : "No",
-          hmda: p.amenities?.includes("HMDA") ? "Yes" : "No",
           hntdaApproved: p.amenities?.includes("HNTDA Approved") ? "Yes" : "No",
           parking: p.amenities?.includes("Parking") ? "Yes" : "No",
           balcony: p.amenities?.includes("Balcony") ? "Yes" : "No",

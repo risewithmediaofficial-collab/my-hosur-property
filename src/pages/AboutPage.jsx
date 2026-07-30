@@ -28,47 +28,57 @@ const principles = [
   },
 ];
 
-/* ── Vision / Mission / Core Values icons as inline SVGs for clean rendering ── */
+/* ── Vision / Mission / Core Values ── */
 const VisionIcon = () => (
-  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto svg-animator">
-    <circle cx="32" cy="32" r="20" stroke="#0042a2" strokeWidth="3" fill="none"/>
-    <circle cx="32" cy="32" r="8" stroke="#0042a2" strokeWidth="3" fill="none"/>
-    <circle cx="32" cy="32" r="2" fill="#f79e26"/>
-    <line x1="32" y1="8" x2="32" y2="14" stroke="#0042a2" strokeWidth="2.5" strokeLinecap="round"/>
-    <line x1="32" y1="50" x2="32" y2="56" stroke="#0042a2" strokeWidth="2.5" strokeLinecap="round"/>
-    <line x1="8" y1="32" x2="14" y2="32" stroke="#0042a2" strokeWidth="2.5" strokeLinecap="round"/>
-    <line x1="50" y1="32" x2="56" y2="32" stroke="#0042a2" strokeWidth="2.5" strokeLinecap="round"/>
+  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-8 w-8">
+    <circle cx="24" cy="24" r="14" stroke="currentColor" strokeWidth="2.5" fill="none"/>
+    <circle cx="24" cy="24" r="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+    <circle cx="24" cy="24" r="2" fill="#f79e26"/>
+    <line x1="24" y1="6" x2="24" y2="11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    <line x1="24" y1="37" x2="24" y2="42" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    <line x1="6" y1="24" x2="11" y2="24" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    <line x1="37" y1="24" x2="42" y2="24" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
   </svg>
 );
 
 const MissionIcon = () => (
-  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto svg-animator">
-    <circle cx="32" cy="32" r="22" stroke="#0042a2" strokeWidth="3" fill="none"/>
-    <circle cx="32" cy="32" r="14" stroke="#0042a2" strokeWidth="2" fill="none" strokeDasharray="4 3"/>
-    <circle cx="32" cy="32" r="6" stroke="#0042a2" strokeWidth="2" fill="none"/>
-    <path d="M32 10 L36 20 L48 16 L40 26" stroke="#f79e26" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-    <circle cx="32" cy="32" r="2.5" fill="#f79e26"/>
+  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-8 w-8">
+    <circle cx="24" cy="24" r="16" stroke="currentColor" strokeWidth="2.5" fill="none"/>
+    <circle cx="24" cy="24" r="9" stroke="currentColor" strokeWidth="1.8" fill="none" strokeDasharray="3 2.5"/>
+    <circle cx="24" cy="24" r="4" stroke="currentColor" strokeWidth="2" fill="none"/>
+    <path d="M24 7 L27 14 L35 11 L30 19" stroke="#f79e26" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <circle cx="24" cy="24" r="2" fill="#f79e26"/>
   </svg>
 );
 
 const CoreValuesIcon = () => (
-  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto svg-animator">
-    <path d="M32 8 L40 20 L54 22 L44 33 L46 48 L32 41 L18 48 L20 33 L10 22 L24 20 Z" stroke="#0042a2" strokeWidth="2.5" fill="none" strokeLinejoin="round"/>
-    <path d="M32 16 L37 24 L46 26 L40 33 L42 42 L32 37 L22 42 L24 33 L18 26 L27 24 Z" stroke="#f79e26" strokeWidth="1.5" fill="none" strokeLinejoin="round" opacity="0.7"/>
-    <circle cx="32" cy="32" r="3" fill="#f79e26"/>
+  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-8 w-8">
+    <path d="M24 6 L30 16 L41 18 L33 27 L35 38 L24 33 L13 38 L15 27 L7 18 L18 16 Z" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinejoin="round"/>
+    <path d="M24 12 L28 19 L36 20 L30 27 L31 35 L24 31 L17 35 L18 27 L12 20 L20 19 Z" stroke="#f79e26" strokeWidth="1.2" fill="none" strokeLinejoin="round" opacity="0.8"/>
+    <circle cx="24" cy="24" r="2.5" fill="#f79e26"/>
   </svg>
 );
+
+const coreValueItems = [
+  { label: "Trust",        emoji: "🤝" },
+  { label: "Integrity",    emoji: "⚖️" },
+  { label: "Team Spirit",  emoji: "🌟" },
+  { label: "Respect",      emoji: "🙏" },
+  { label: "Passion",      emoji: "🔥" },
+  { label: "Transparency", emoji: "🔍" },
+];
 
 const vmcData = [
   {
     Icon: VisionIcon,
+    accent: "from-blue-600 to-navy",
     title: "Vision",
-    content: null,
     paragraph:
       "To become Hosur's most trusted real estate platform — offering verified listings, clear titles, and local property support that empowers every buyer, seller, and owner to make decisions with confidence and clarity.",
   },
   {
     Icon: MissionIcon,
+    accent: "from-orange to-amber-500",
     title: "Mission",
     bullets: [
       "Hosur's trusted and verified real estate marketplace, delivering lasting value and secure property transactions.",
@@ -81,8 +91,9 @@ const vmcData = [
   },
   {
     Icon: CoreValuesIcon,
+    accent: "from-emerald-500 to-teal-600",
     title: "Core Values",
-    bullets: ["Trust", "Integrity", "Team Spirit", "Respect", "Passion", "Transparency"],
+    coreValues: coreValueItems,
   },
 ];
 
@@ -119,8 +130,8 @@ const AboutPage = () => {
             {/* Story Metrics */}
             <div className="grid grid-cols-3 gap-4 mt-4 border-t border-slate-100 pt-6">
               {[
-                { value: 2500, suffix: "+", label: "Verified Listings" },
-                { value: 12000, suffix: "+", label: "Happy Clients" },
+                { value: 100, suffix: "+", label: "Verified Listings" },
+                { value: 100, suffix: "+", label: "Happy Clients" },
                 { value: 8, suffix: "+", label: "Years of Trust" }
               ].map((item) => (
                 <div key={item.label} className="text-left">
@@ -202,44 +213,67 @@ const AboutPage = () => {
       </PageSection>
 
       {/* ── Vision / Mission / Core Values ── */}
-      <section className="bg-white px-5 py-14 sm:px-8 lg:px-10 gsap-section">
+      <section className="bg-slate-50 px-5 py-16 sm:px-8 lg:px-10 gsap-section border-t border-slate-100">
         <div className="mx-auto max-w-[1440px]">
+          {/* Section header */}
+          <div className="text-center mb-12">
+            <span className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">Our Foundation</span>
+            <h2 className="mt-3 text-2xl font-bold text-navy sm:text-3xl">Vision, Mission &amp; Core Values</h2>
+            <div className="mx-auto mt-4 h-0.5 w-16 rounded-full bg-orange" />
+          </div>
+
           <div className="grid gap-8 md:grid-cols-3">
-            {vmcData.map(({ Icon, title, paragraph, bullets }) => (
+            {vmcData.map(({ Icon, accent, title, paragraph, bullets, coreValues }) => (
               <div
                 key={title}
-                className="flex flex-col items-center text-center px-4 py-6 gsap-card"
+                className="flex flex-col rounded-2xl border border-slate-200 bg-white p-8 shadow-card gsap-card hover:shadow-lg transition-shadow duration-300"
               >
-                {/* Icon */}
-                <Icon />
-
-                {/* Divider line below icon */}
-                <div className="mt-5 w-12 border-b-2 border-navy" />
+                {/* Icon badge */}
+                <div className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${accent} text-white shadow-md mb-6`}>
+                  <Icon />
+                </div>
 
                 {/* Title */}
-                <h2
+                <h3
                   style={{ fontFamily: "var(--site-heading)" }}
-                  className="mt-5 text-3xl font-bold text-navy"
+                  className="text-2xl font-bold text-navy"
                 >
                   {title}
-                </h2>
+                </h3>
+                <div className="mt-3 h-0.5 w-10 rounded-full bg-orange/60" />
 
                 {/* Content */}
                 {paragraph ? (
-                  <p className="mt-4 text-sm leading-7 text-slate-600 text-left">
+                  <p className="mt-5 text-sm leading-7 text-slate-600">
                     {paragraph}
                   </p>
                 ) : null}
 
                 {bullets ? (
-                  <ul className="mt-4 space-y-2 text-left w-full">
+                  <ul className="mt-5 space-y-3 w-full">
                     {bullets.map((b) => (
-                      <li key={b} className="flex items-start gap-2 text-sm leading-6 text-slate-600">
-                        <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-navy" />
+                      <li key={b} className="flex items-start gap-3 text-sm leading-6 text-slate-600">
+                        <span className="mt-1.5 flex-shrink-0 h-4 w-4 rounded-full bg-orange/15 flex items-center justify-center">
+                          <span className="h-1.5 w-1.5 rounded-full bg-orange block" />
+                        </span>
                         {b}
                       </li>
                     ))}
                   </ul>
+                ) : null}
+
+                {coreValues ? (
+                  <div className="mt-5 grid grid-cols-2 gap-3 w-full">
+                    {coreValues.map(({ label, emoji }) => (
+                      <div
+                        key={label}
+                        className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5"
+                      >
+                        <span className="text-lg leading-none">{emoji}</span>
+                        <span className="text-xs font-semibold text-navy">{label}</span>
+                      </div>
+                    ))}
+                  </div>
                 ) : null}
               </div>
             ))}
@@ -285,8 +319,21 @@ const AboutPage = () => {
                 Mr. Vijay Kumar
               </h2>
               <p className="mt-1 text-base font-semibold text-slate-500">
-                Founder &amp; Managing Director, Gyes Construction
+                Founder &amp; Managing Director
               </p>
+              <p className="mt-1 text-xs font-medium text-slate-400 uppercase tracking-wide">B.Tech</p>
+
+              {/* Companies */}
+              <div className="mt-4 flex flex-wrap gap-2">
+                {["Gyes Property and Construction", "Gyes Traders", "MyHosurProperty"].map((company) => (
+                  <span
+                    key={company}
+                    className="inline-flex items-center rounded-full bg-orange/10 px-3 py-1 text-xs font-semibold text-orange border border-orange/20"
+                  >
+                    {company}
+                  </span>
+                ))}
+              </div>
 
               <p className="mt-6 text-sm leading-8 text-slate-600">
                 A first-generation entrepreneur and visionary leader, Mr. Vijay Kumar is a dedicated
@@ -358,6 +405,7 @@ const AboutPage = () => {
               <p className="mt-1 text-base font-semibold text-slate-500">
                 Director, MyHosurProperty
               </p>
+              <p className="mt-1 text-xs font-medium text-slate-400 uppercase tracking-wide">B.Sc</p>
 
               <p className="mt-6 text-sm leading-8 text-slate-600">
                 Raja is a dynamic leader and key strategist at MyHosurProperty, bringing 7 years of experience in marketing and property ecosystem growth. He plays an active role in driving our vision of a trusted real estate platform, with strong experience in client coordination, property valuation, and local operations.

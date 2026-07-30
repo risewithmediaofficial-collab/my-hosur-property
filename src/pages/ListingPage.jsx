@@ -69,6 +69,15 @@ const ListingPage = () => {
 
   const filterChips = useMemo(() => buildFilterChips(applied), [applied]);
 
+  const dynamicLocations = useMemo(() => {
+    const locs = new Set();
+    (data.items || []).forEach((item) => {
+      if (item.location?.city) locs.add(item.location.city);
+      if (item.location?.area) locs.add(item.location.area);
+    });
+    return Array.from(locs);
+  }, [data.items]);
+
   const loadProperties = useCallback(
     async (query, append = false) => {
       setLoading(!append);
@@ -218,6 +227,7 @@ const ListingPage = () => {
                 values={draft}
                 onCategoryChange={handleCategoryChange}
                 onFieldChange={handleFieldChange}
+                extraLocations={dynamicLocations}
               />
             </div>
             <div className="listing-filter-footer">{filterActions}</div>
@@ -333,6 +343,7 @@ const ListingPage = () => {
                     values={draft}
                     onCategoryChange={handleCategoryChange}
                     onFieldChange={handleFieldChange}
+                    extraLocations={dynamicLocations}
                   />
                 </div>
                 <div className="property-filter-drawer-footer listing-filter-footer">{filterActions}</div>

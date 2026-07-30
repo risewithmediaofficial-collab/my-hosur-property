@@ -65,7 +65,7 @@ const SERVICE_TYPE_OPTIONS = {
   property_management: [
     "Home & Apartment Facility AMC Service",
     "Industry & Warehouse Facility AMC Service",
-    "Land Scraping & Garden Maintenance Property Management Service",
+    "Land scaping & Garden Maintenance Property Management Service",
     "NRI Property Management Service",
   ],
   home_office_services: [

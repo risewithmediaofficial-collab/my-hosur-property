@@ -130,11 +130,15 @@ export const serializeFiltersToSearchParams = (state) => {
 
 const mapBuyPropertyType = (type) => {
   const map = {
-    "Commercial Building": "Commercial",
-    "Commercial Land": "Commercial Land",
-    "Agricultural Land": "Agricultural Land",
-    Apartment: "Apartment",
-    Flat: "Flat",
+    "Commercial Building": "Commercial,Commercial Building",
+    "Commercial Land": "Commercial Land,Commercial",
+    "Commercial Land / Building": "Commercial Land,Commercial Building,Commercial",
+    "Agricultural Land": "Agricultural Land,Agri Land",
+    "Farm Land": "Farm Land,Agricultural Land,Agri Land",
+    "Villa / Flat": "Villa,Flat,Apartment",
+    Apartment: "Apartment,Flat",
+    Flat: "Flat,Apartment",
+    Villa: "Villa",
   };
   return map[type] || type;
 };

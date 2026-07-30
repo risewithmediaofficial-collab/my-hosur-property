@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { CheckCircleIcon, ShieldCheckIcon } from "../components/AppIcons";
 import useAuth from "../hooks/useAuth";
@@ -9,52 +10,119 @@ import { currency } from "../utils/format";
 import useScrollAnimation from "../hooks/useScrollAnimation";
 import QrPaymentModal from "../components/QrPaymentModal";
 
-
 const fallbackPlans = [
   {
-    name: "Starter",
-    subtitle: "For casual searchers",
+    name: "Free / 1st Time User",
+    subtitle: "3 Free Postings for 1st Time Users",
     price: 0,
-    billingLabel: "",
-    ctaLabel: "Get started",
+    billingLabel: "Free",
+    ctaLabel: "Start Free",
     recommended: false,
-    features: ["AI property recommendations", "Save up to 5 properties", "Basic market insights", "Standard support"],
-  },
-  {
-    name: "Premium",
-    subtitle: "Most popular choice",
-    price: 999,
-    billingLabel: "/month",
-    ctaLabel: "Go premium",
-    recommended: true,
+    listingLimit: 3,
+    contactUnlocks: 30,
+    leadCredits: 0,
+    durationDays: 90,
     features: [
-      "Everything in Starter",
-      "Unlimited property saves",
-      "Priority AI matching",
-      "Neighborhood safety context",
-      "Early access to new listings",
-      "Direct verified seller contact",
+      "3 Free Property Postings for 1st time users",
+      "Posts valid for 90 days",
+      "1 Contact Request per day limit",
+      "Standard Search Visibility",
     ],
   },
   {
-    name: "Elite",
-    subtitle: "For serious investors",
-    price: 2499,
+    name: "Basic Agent Plan",
+    subtitle: "For individual brokers & sellers",
+    price: 999,
     billingLabel: "/month",
-    ctaLabel: "Contact sales",
+    ctaLabel: "Choose Basic Plan",
     recommended: false,
+    listingLimit: 3,
+    contactUnlocks: 15,
+    leadCredits: 5,
+    durationDays: 30,
     features: [
-      "Everything in Premium",
-      "Investment yield projections",
-      "Dedicated property manager",
-      "Unlimited virtual tours",
-      "Verified legal documents",
-      "24/7 support",
+      "3 Active Property Listings",
+      "15 Customer Contact Requests",
+      "Basic Performance Analytics",
+      "Verified Seller / Agent Badge",
+      "Standard Support",
+    ],
+  },
+  {
+    name: "Pro Agent Plan",
+    subtitle: "Most Popular Choice for Agents",
+    price: 2999,
+    billingLabel: "/month",
+    ctaLabel: "Choose Pro Plan",
+    recommended: true,
+    listingLimit: 6,
+    contactUnlocks: 25,
+    leadCredits: 20,
+    durationDays: 30,
+    features: [
+      "6 Active Property Listings",
+      "25 Customer Contact Requests",
+      "20 Verified Lead Credits",
+      "Featured Property Highlights",
+      "Priority Agent Support",
+    ],
+  },
+  {
+    name: "Premium Agent Plan",
+    subtitle: "For established agencies & top brokers",
+    price: 4999,
+    billingLabel: "/month",
+    ctaLabel: "Choose Premium Plan",
+    recommended: false,
+    listingLimit: 12,
+    contactUnlocks: 35,
+    leadCredits: 30,
+    durationDays: 30,
+    features: [
+      "12 Active Property Listings",
+      "35 Customer Contact Requests",
+      "30 Verified Lead Credits",
+      "Top Search Placement & Priority Boost",
+      "Dedicated Relationship Support",
+    ],
+  },
+  {
+    name: "Database Pack: ₹2,500",
+    subtitle: "Hosur Buyer & Investor Contacts Pack",
+    price: 2500,
+    billingLabel: "/package",
+    ctaLabel: "Purchase Database Pack",
+    recommended: false,
+    category: "database_access",
+    features: [
+      "Verified Hosur Buyer & Investor Contacts",
+      "Direct Buyer Phone & Email Access",
+      "Location & Budget Preference Data",
+    ],
+  },
+  {
+    name: "Database Pack: ₹5,000",
+    subtitle: "Complete Hosur Real Estate Contacts Pack",
+    price: 5000,
+    billingLabel: "/package",
+    ctaLabel: "Purchase Database Pack",
+    recommended: true,
+    category: "database_access",
+    features: [
+      "Complete Hosur Real Estate Contact Database",
+      "Separate Buyer, Seller & Investor Lists",
+      "Full Contact Info & Requirement Details",
+      "Priority Updates & Direct Download Access",
     ],
   },
 ];
 
-const orderByName = { Starter: 1, Premium: 2, Elite: 3 };
+const orderByName = {
+  "Free / 1st Time User": 1,
+  "Basic Agent Plan": 2,
+  "Pro Agent Plan": 3,
+  "Premium Agent Plan": 4,
+};
 
 const normalizePlan = (plan) => {
   const fallback = fallbackPlans.find((item) => item.name.toLowerCase() === String(plan.name || "").toLowerCase());
@@ -71,6 +139,7 @@ const normalizePlan = (plan) => {
 
 const PlansPage = () => {
   useScrollAnimation();
+  const navigate = useNavigate();
   const { token, user, refreshProfile } = useAuth();
   const [plans, setPlans] = useState([]);
   const [buyingPlanId, setBuyingPlanId] = useState("");
@@ -78,9 +147,8 @@ const PlansPage = () => {
   const [selectedPlanForPayment, setSelectedPlanForPayment] = useState(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
-
   useEffect(() => {
-    fetchPlans({ targetRole: user?.role })
+    fetchPlans(user?.role ? { targetRole: user.role } : {})
       .then((res) => {
         const fetched = (res.items || []).map(normalizePlan);
         if (!fetched.length) {
@@ -98,6 +166,7 @@ const PlansPage = () => {
   }, [user?.role]);
 
   useEffect(() => {
+    if (!token) return;
     fetchMyPayments(token)
       .then((res) => setPayments(res.items || []))
       .catch(() => setPayments([]));
@@ -114,72 +183,18 @@ const PlansPage = () => {
     [payments]
   );
 
-  /*
-  const openRazorpayCheckout = async (intent, planName) => {
-    const loaded = await loadExternalScript("https://checkout.razorpay.com/v1/checkout.js");
-    if (!loaded || !window.Razorpay) throw new Error("Unable to load Razorpay checkout");
-
-    return new Promise((resolve, reject) => {
-      const options = {
-        key: intent.razorpay.keyId || import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: intent.razorpay.amount,
-        currency: intent.razorpay.currency,
-        name: "MyHosurProperty",
-        description: planName,
-        order_id: intent.razorpay.orderId,
-        prefill: {
-          name: user?.name || "",
-          email: user?.email || "",
-          contact: user?.phone || "",
-        },
-        handler: (response) => resolve(response),
-        modal: {
-          ondismiss: () => reject(new Error("Payment cancelled")),
-        },
-      };
-
-      const rz = new window.Razorpay(options);
-      rz.open();
-    });
-  };
-  */
-
   const onBuy = async (plan) => {
-    if (!plan?._id) {
-      toast.error("Plan is not available in database. Run backend seed first.");
+    if (!token || !user) {
+      toast.error("Please login or create an account to choose or purchase a plan");
+      navigate("/auth?redirect=/plans");
       return;
     }
 
-    setSelectedPlanForPayment(plan);
-    setIsPaymentModalOpen(true);
-
-    /*
-    try {
-      setBuyingPlanId(plan._id);
-      const intent = await createPaymentIntent(token, { planId: plan._id });
-
-      if (intent.razorpay?.orderId) {
-        const paymentResponse = await openRazorpayCheckout(intent, plan.name);
-        await verifyPayment(token, {
-          paymentId: intent.payment._id,
-          razorpayOrderId: paymentResponse.razorpay_order_id,
-          razorpayPaymentId: paymentResponse.razorpay_payment_id,
-          razorpaySignature: paymentResponse.razorpay_signature,
-        });
-      } else {
-        await verifyPayment(token, { paymentId: intent.payment._id, success: true });
-      }
-
-      await refreshProfile();
-      const refreshedPayments = await fetchMyPayments(token);
-      setPayments(refreshedPayments.items || []);
-      toast.success(`${plan.name} plan activated`);
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message || "Payment failed");
-    } finally {
-      setBuyingPlanId("");
+    if (!plan?._id) {
+      toast.error("Plan is not available in database. Please contact support.");
+      return;
     }
-    */
+
   };
 
 
