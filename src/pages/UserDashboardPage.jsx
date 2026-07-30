@@ -162,36 +162,28 @@ const UserDashboardPage = () => {
     { label: "Lead Credits", value: customerLeadCredits, icon: <TicketIcon className="h-4 w-4" /> },
     { label: "Saved", value: saved.length, icon: <BookmarkIcon className="h-4 w-4" /> },
   ];
+  const handleTabSelect = (newTab) => {
+    setTab(newTab);
+    setSearchParams(newTab === "overview" ? {} : { tab: newTab }, { replace: true });
+  };
+
   const navItems = [
     { key: "overview", label: "Overview", icon: <Squares2X2Icon className="h-4 w-4" /> },
-    { key: "listings", label: "My Listings", icon: <HomeModernIcon className="h-4 w-4" /> },
-    { key: "leads", label: "Leads", icon: <UserGroupIcon className="h-4 w-4" /> },
-    { key: "inquiries", label: "My Inquiries", icon: <ChatBubbleLeftRightIcon className="h-4 w-4" /> },
-    { key: "payments", label: "Payments", icon: <CreditCardIcon className="h-4 w-4" /> },
-    { key: "saved", label: "Saved", icon: <BookmarkIcon className="h-4 w-4" /> },
+    { key: "listings", label: "My Listings", icon: <HomeModernIcon className="h-4 w-4" />, badge: myProperties.length },
+    { key: "leads", label: "My Leads", icon: <UserGroupIcon className="h-4 w-4" />, badge: incomingLeads.length },
+    { key: "saved", label: "Saved Properties", icon: <BookmarkIcon className="h-4 w-4" />, badge: saved.length },
   ].map((item) => ({
     ...item,
     active: tab === item.key,
-    onClick: setTab,
+    onClick: handleTabSelect,
   }));
 
-  // Sync URL -> tab state (only when URL param changes externally)
   useEffect(() => {
-    const nextTab = searchParams.get("tab");
-    if (nextTab && VALID_TABS.includes(nextTab) && nextTab !== tab) {
-      setTab(nextTab);
+    const queryTab = searchParams.get("tab") || "overview";
+    if (queryTab !== tab && VALID_TABS.includes(queryTab)) {
+      setTab(queryTab);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
-
-  // Sync tab state -> URL
-  useEffect(() => {
-    const current = searchParams.get("tab") || "overview";
-    if (tab !== current) {
-      setSearchParams(tab === "overview" ? {} : { tab }, { replace: true });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab]);
 
   if (loading) {
     return (

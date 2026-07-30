@@ -133,18 +133,16 @@ const CustomerDashboardPage = () => {
   const allowedTabs = ["overview", "requests", "matches", "notifications", "saved", "inquiries"];
 
   useEffect(() => {
-    const nextTab = searchParams.get("tab");
-    if (nextTab && allowedTabs.includes(nextTab) && nextTab !== tab) {
-      setTab(nextTab);
+    const queryTab = searchParams.get("tab") || "overview";
+    if (queryTab !== tab && allowedTabs.includes(queryTab)) {
+      setTab(queryTab);
     }
-  }, [searchParams, tab]);
+  }, [searchParams]);
 
-  useEffect(() => {
-    const current = searchParams.get("tab") || "overview";
-    if (tab !== current) {
-      setSearchParams(tab === "overview" ? {} : { tab }, { replace: true });
-    }
-  }, [searchParams, setSearchParams, tab]);
+  const handleTabSelect = (newTab) => {
+    setTab(newTab);
+    setSearchParams(newTab === "overview" ? {} : { tab: newTab }, { replace: true });
+  };
 
   if (loading) {
     return (
@@ -178,7 +176,7 @@ const CustomerDashboardPage = () => {
       ].map((item) => ({
         ...item,
         active: tab === item.key,
-        onClick: setTab,
+        onClick: handleTabSelect,
       }))}
     >
       {tab === "overview" && (

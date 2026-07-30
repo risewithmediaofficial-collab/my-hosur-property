@@ -257,18 +257,16 @@ const AgentDashboardPage = () => {
   ];
 
   useEffect(() => {
-    const nextTab = searchParams.get("tab");
-    if (nextTab && tabs.some((item) => item.key === nextTab) && nextTab !== tab) {
-      setTab(nextTab);
+    const queryTab = searchParams.get("tab") || "overview";
+    if (queryTab !== tab) {
+      setTab(queryTab);
     }
-  }, [searchParams, tab, tabs]);
+  }, [searchParams]);
 
-  useEffect(() => {
-    const current = searchParams.get("tab") || "overview";
-    if (tab !== current) {
-      setSearchParams(tab === "overview" ? {} : { tab }, { replace: true });
-    }
-  }, [searchParams, setSearchParams, tab]);
+  const handleTabSelect = (newTab) => {
+    setTab(newTab);
+    setSearchParams(newTab === "overview" ? {} : { tab: newTab }, { replace: true });
+  };
 
   if (loading) {
     return (
@@ -290,7 +288,7 @@ const AgentDashboardPage = () => {
         ...item,
         active: tab === item.key,
         badge: item.key === "requests" && customerRequests.length ? customerRequests.length : undefined,
-        onClick: setTab,
+        onClick: handleTabSelect,
       }))}
     >
       {tab === "overview" && (

@@ -63,16 +63,14 @@ const PRIVATE_PATHS = [
 const RouteFallback = () => <Loader text="Loading page..." size={44} />;
 
 const pageTransition = {
-  initial: { opacity: 0, y: 18 },
+  initial: { opacity: 0 },
   animate: {
     opacity: 1,
-    y: 0,
-    transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.18, ease: "easeOut" },
   },
   exit: {
     opacity: 0,
-    y: -12,
-    transition: { duration: 0.2, ease: [0.4, 0, 1, 1] },
+    transition: { duration: 0.1, ease: "easeIn" },
   },
 };
 
@@ -227,7 +225,7 @@ const AppShell = () => {
           className={`flex-1 ${isFullHeight || hideNavbar ? "" : isHomeRoute ? "pb-0" : isListingsRoute ? "" : location.pathname.startsWith("/auth") ? "pb-0" : "pt-4 pb-12 md:pt-6"} ${isListingsRoute ? "flex min-h-0 flex-col overflow-hidden" : ""} ${isDashboardRoute ? "flex min-h-0 flex-col overflow-hidden" : ""}`}
         >
           <Suspense fallback={<RouteFallback />}>
-            <AnimatePresence mode="wait">
+            <AnimatePresence>
               <motion.div
                 key={location.pathname}
                 variants={lowMotionDevice ? undefined : pageTransition}

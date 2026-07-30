@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Loader from "../components/Loader";
 import useAuth from "../hooks/useAuth";
 import {
@@ -83,7 +83,19 @@ const AdminDashboardPage = () => {
   const [customExpiryDate, setCustomExpiryDate] = useState("");
   const [adminNotes, setAdminNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
-  const [activeTab, setActiveTab] = useState("overview");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryTab = searchParams.get("tab") || "overview";
+  const [activeTab, setActiveTab] = useState(queryTab);
+
+  useEffect(() => {
+    const qTab = searchParams.get("tab") || "overview";
+    setActiveTab((prev) => (prev !== qTab ? qTab : prev));
+  }, [searchParams]);
+
+  const handleTabChange = (newTab) => {
+    setActiveTab(newTab);
+    setSearchParams(newTab === "overview" ? {} : { tab: newTab }, { replace: true });
+  };
   const [leadView, setLeadView] = useState("inquiries");
   const [selectedLeadItem, setSelectedLeadItem] = useState(null);
   const [editingNotes, setEditingNotes] = useState(false);
@@ -441,7 +453,7 @@ const AdminDashboardPage = () => {
         icon: <tab.icon className="h-4 w-4" />,
         badge: tab.badge,
         active: activeTab === tab.id,
-        onClick: setActiveTab,
+        onClick: handleTabChange,
       }))}
     >
         {activeTab === "overview" && (
