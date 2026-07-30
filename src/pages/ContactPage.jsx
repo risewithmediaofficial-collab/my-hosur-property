@@ -68,83 +68,90 @@ const ContactPage = () => {
           <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
 
             {/* LEFT – Contact Form */}
-            <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-card gsap-card">
-              <h2 className="text-2xl font-bold text-navy mb-6">Send Us A Message</h2>
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-card gsap-card">
+              <h2 className="text-2xl font-bold text-navy mb-6 flex items-center gap-2">
+                <span className="h-4 w-1 rounded-full bg-orange block" />
+                Send Us A Message
+              </h2>
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 {/* Name */}
-                <FloatingInput
-                  label="Name *"
-                  type="text"
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder=" "
-                  required
-                />
+                <div>
+                  <label htmlFor="contact-name" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Name <span className="text-orange">*</span>
+                  </label>
+                  <input
+                    id="contact-name"
+                    type="text"
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    placeholder="Enter your full name"
+                    required
+                    className="site-input h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-navy shadow-xs focus:border-orange focus:ring-2 focus:ring-orange/20 transition-all"
+                  />
+                </div>
 
                 {/* Email */}
-                <FloatingInput
-                  label="E-Mail *"
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder=" "
-                  required
-                />
+                <div>
+                  <label htmlFor="contact-email" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-600">
+                    E-Mail <span className="text-orange">*</span>
+                  </label>
+                  <input
+                    id="contact-email"
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="Enter your email address"
+                    required
+                    className="site-input h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-navy shadow-xs focus:border-orange focus:ring-2 focus:ring-orange/20 transition-all"
+                  />
+                </div>
 
                 {/* Phone */}
-                <div className="group relative w-full pt-2">
-                  <label
-                    htmlFor="contact-phone"
-                    className="origin-start absolute top-2 block cursor-default text-[10px] font-bold text-navy px-1 pointer-events-none z-10 left-16"
-                  >
-                    <span className="inline-flex bg-white px-1.5">Phone *</span>
+                <div>
+                  <label htmlFor="contact-phone" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Phone Number <span className="text-orange">*</span>
                   </label>
-                  <div className="flex items-center rounded-lg border border-input bg-background px-3 py-2 shadow-sm shadow-black/5 transition-shadow focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/20">
-                    <span className="text-sm text-slate-500 mr-2">🇮🇳 +91 •</span>
+                  <div className="flex items-center rounded-xl border border-slate-200 bg-white px-3.5 py-2 shadow-xs focus-within:border-orange focus-within:ring-2 focus-within:ring-orange/20 transition-all">
+                    <span className="text-sm font-bold text-slate-500 mr-2 flex-shrink-0">🇮🇳 +91 •</span>
                     <input
                       id="contact-phone"
                       type="tel"
                       name="phone"
                       value={form.phone}
                       onChange={handleChange}
-                      placeholder=" "
+                      placeholder="Enter 10-digit phone number"
                       required
-                      className="flex-1 border-0 bg-transparent py-1.5 text-sm text-navy placeholder-slate-400 outline-none"
+                      className="w-full border-0 bg-transparent py-1 text-sm font-medium text-navy outline-none placeholder:text-slate-400"
                     />
                   </div>
                 </div>
 
                 {/* Message */}
-                <div className="group relative w-full pt-2">
-                  <label
-                    htmlFor="contact-message"
-                    className="origin-start absolute top-1/2 block -translate-y-1/2 cursor-text px-1 text-xs font-semibold text-slate-400 transition-all pointer-events-none z-10 left-4
-                      group-focus-within:top-2 group-focus-within:text-[10px] group-focus-within:text-navy group-focus-within:font-bold
-                      has-[+textarea:not(:placeholder-shown)]:top-2 has-[+textarea:not(:placeholder-shown)]:text-[10px] has-[+textarea:not(:placeholder-shown)]:font-bold has-[+textarea:not(:placeholder-shown)]:text-navy"
-                  >
-                    <span className="inline-flex bg-white px-1.5">Message</span>
+                <div>
+                  <label htmlFor="contact-message" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Message
                   </label>
                   <textarea
                     id="contact-message"
                     name="message"
                     value={form.message}
                     onChange={handleChange}
-                    rows={3}
-                    placeholder=" "
-                    className="flex w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm shadow-black/5 transition-shadow placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/20 resize-none"
+                    rows={4}
+                    placeholder="Type your message or enquiry details..."
+                    className="site-input w-full min-h-[110px] rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-navy shadow-xs focus:border-orange focus:ring-2 focus:ring-orange/20 transition-all resize-none"
                   />
                 </div>
 
-                <p className="text-xs text-slate-400 leading-5">
+                <p className="text-xs text-slate-500 leading-5">
                   By submitting this form, I authorize MyHosurProperty and its representatives to contact me via Email, SMS, WhatsApp, or Call with updates and offers.
                 </p>
 
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="site-button-primary mt-2 w-fit rounded px-8 py-3 text-sm font-bold disabled:opacity-60"
+                  className="site-button-primary mt-2 w-fit rounded-xl px-8 py-3 text-sm font-bold disabled:opacity-60"
                 >
                   {submitting ? "Sending…" : "Let's Connect"}
                 </button>
