@@ -101,7 +101,19 @@ const AdminDashboardPage = () => {
   const [editingNotes, setEditingNotes] = useState(false);
   const [tempNotes, setTempNotes] = useState("");
 
-  
+  // Search & Filter States across all admin tabs
+  const [propertySearch, setPropertySearch] = useState("");
+  const [propertyTypeFilter, setPropertyTypeFilter] = useState("all");
+  const [propertyStatusFilter, setPropertyStatusFilter] = useState("all");
+
+  const [leadSearch, setLeadSearch] = useState("");
+  const [leadStatusFilter, setLeadStatusFilter] = useState("all");
+
+  const [paymentRequestSearch, setPaymentRequestSearch] = useState("");
+  const [paymentRequestStatusFilter, setPaymentRequestStatusFilter] = useState("all");
+
+  const [paymentSearch, setPaymentSearch] = useState("");
+
   // Email state
   const [emailModalOpen, setEmailModalOpen] = useState(false);
   const [emailSubject, setEmailSubject] = useState("");
@@ -205,6 +217,117 @@ const AdminDashboardPage = () => {
 
     return matchesSearch && matchesRole && matchesStatus;
   });
+
+  const filteredPropertyListings = useMemo(() => {
+    return propertyListings.filter((p) => {
+      const q = propertySearch.toLowerCase().trim();
+      const matchesSearch =
+        !q ||
+        (p.title || "").toLowerCase().includes(q) ||
+        (p.location?.city || "").toLowerCase().includes(q) ||
+        (p.location?.area || "").toLowerCase().includes(q) ||
+        (p.location?.address || "").toLowerCase().includes(q) ||
+        (p.ownerId?.name || "").toLowerCase().includes(q) ||
+        (p.ownerId?.email || "").toLowerCase().includes(q) ||
+        (p.propertyType || "").toLowerCase().includes(q);
+
+      const matchesType = propertyTypeFilter === "all" || (p.propertyType || "").toLowerCase() === propertyTypeFilter.toLowerCase();
+      const matchesStatus = propertyStatusFilter === "all" || (p.status || "approved") === propertyStatusFilter;
+
+      return matchesSearch && matchesType && matchesStatus;
+    });
+  }, [propertyListings, propertySearch, propertyTypeFilter, propertyStatusFilter]);
+
+  const filteredPaymentRequests = useMemo(() => {
+    return paymentRequests.filter((req) => {
+      const q = paymentRequestSearch.toLowerCase().trim();
+      const matchesSearch =
+        !q ||
+        (req.name || "").toLowerCase().includes(q) ||
+        (req.email || "").toLowerCase().includes(q) ||
+        (req.phone || "").includes(q) ||
+        (req.selectedPlan || "").toLowerCase().includes(q) ||
+        (req.transactionId || "").toLowerCase().includes(q) ||
+        (req.paymentMethod || "").toLowerCase().includes(q);
+
+      const matchesStatus = paymentRequestStatusFilter === "all" || req.status === paymentRequestStatusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [paymentRequests, paymentRequestSearch, paymentRequestStatusFilter]);
+
+  const filteredPayments = useMemo(() => {
+    return payments.filter((p) => {
+      const q = paymentSearch.toLowerCase().trim();
+      const matchesSearch =
+        !q ||
+        (p.userId?.name || "").toLowerCase().includes(q) ||
+        (p.userId?.email || "").toLowerCase().includes(q) ||
+        (p.planId?.name || "").toLowerCase().includes(q) ||
+        (p.status || "").toLowerCase().includes(q);
+
+      return matchesSearch;
+    });
+  }, [payments, paymentSearch]);
+
+  const filteredLeads = useMemo(() => {
+    return leads.filter((item) => {
+      const q = leadSearch.toLowerCase().trim();
+      const name = item.userId?.name || item.contactInfo?.name || "";
+      const email = item.userId?.email || item.contactInfo?.email || "";
+      const phone = item.userId?.phone || item.contactInfo?.phone || "";
+      const title = item.propertyId?.title || "";
+
+      const matchesSearch =
+        !q ||
+        name.toLowerCase().includes(q) ||
+        email.toLowerCase().includes(q) ||
+        phone.includes(q) ||
+        title.toLowerCase().includes(q);
+
+      const matchesStatus = leadStatusFilter === "all" || item.status === leadStatusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [leads, leadSearch, leadStatusFilter]);
+
+  const filteredCustomerRequests = useMemo(() => {
+    return customerRequests.filter((item) => {
+      const q = leadSearch.toLowerCase().trim();
+      const name = item.customerName || item.customerId?.name || "";
+      const email = item.customerEmail || item.customerId?.email || "";
+      const phone = item.customerPhone || item.customerId?.phone || "";
+      const cat = formatCustomerRequestLabel(item);
+
+      const matchesSearch =
+        !q ||
+        name.toLowerCase().includes(q) ||
+        email.toLowerCase().includes(q) ||
+        phone.includes(q) ||
+        cat.toLowerCase().includes(q);
+
+      const matchesStatus = leadStatusFilter === "all" || item.status === leadStatusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [customerRequests, leadSearch, leadStatusFilter]);
+
+  const filteredLeadUnlocks = useMemo(() => {
+    return leadUnlocks.filter((item) => {
+      const q = leadSearch.toLowerCase().trim();
+      const name = item.customerId?.name || "";
+      const email = item.customerId?.email || "";
+
+      const matchesSearch =
+        !q ||
+        name.toLowerCase().includes(q) ||
+        email.toLowerCase().includes(q);
+
+      const matchesStatus = leadStatusFilter === "all" || item.status === leadStatusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [leadUnlocks, leadSearch, leadStatusFilter]);
 
   const inquiryNewCount = leads.filter((item) => item.status === "pending").length;
   const customerRequestNewCount = customerRequests.filter((item) => item.status === "open").length;
@@ -606,7 +729,7 @@ const AdminDashboardPage = () => {
           <article className="dashboard-shell flex min-h-0 flex-1 flex-col p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">Payment Verification Requests</h2>
+                <h2 className="text-lg font-bold text-slate-900">Payment Verification Requests ({filteredPaymentRequests.length})</h2>
                 <p className="mt-1 text-sm text-slate-600">
                   Moderating manual QR-based payment requests and subscription updates.
                 </p>
@@ -615,6 +738,39 @@ const AdminDashboardPage = () => {
                 {paymentRequests.filter((r) => r.status === "pending").length} pending approval
               </div>
             </div>
+
+            {/* Filter Bar */}
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <input
+                type="text"
+                placeholder="Search payment requests by user name, email, phone, plan, UTR/Txn ID..."
+                className="dashboard-control flex-1 text-sm"
+                value={paymentRequestSearch}
+                onChange={(e) => setPaymentRequestSearch(e.target.value)}
+              />
+              <select
+                className="dashboard-control w-full sm:w-44 text-sm"
+                value={paymentRequestStatusFilter}
+                onChange={(e) => setPaymentRequestStatusFilter(e.target.value)}
+              >
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+              {(paymentRequestSearch || paymentRequestStatusFilter !== "all") && (
+                <button
+                  onClick={() => {
+                    setPaymentRequestSearch("");
+                    setPaymentRequestStatusFilter("all");
+                  }}
+                  className="px-2 py-1 text-xs font-bold text-slate-500 hover:text-slate-900"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+
             <div className="mt-4 min-h-0 overflow-y-auto rounded-[1.5rem] border border-slate-200/70 text-sm">
               <table className="dashboard-table min-w-full text-left">
                 <thead className="whitespace-nowrap">
@@ -630,7 +786,7 @@ const AdminDashboardPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {paymentRequests.map((req) => (
+                  {filteredPaymentRequests.map((req) => (
                     <tr key={req._id} className="border-b border-clay/60 align-top">
                       <td className="py-3 px-3">
                         <p className="font-semibold text-slate-900">{req.name}</p>
@@ -716,10 +872,10 @@ const AdminDashboardPage = () => {
                       </td>
                     </tr>
                   ))}
-                  {paymentRequests.length === 0 && (
+                  {filteredPaymentRequests.length === 0 && (
                     <tr>
                       <td colSpan="8" className="py-12 text-center text-slate-400 text-sm">
-                        No manual payment requests found.
+                        No payment verification requests found.
                       </td>
                     </tr>
                   )}
@@ -733,17 +889,23 @@ const AdminDashboardPage = () => {
           <article className="dashboard-shell flex min-h-0 flex-1 flex-col p-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">Platform Payments</h2>
+                <h2 className="text-lg font-bold text-slate-900">Platform Payments ({filteredPayments.length})</h2>
                 <p className="mt-1 text-sm text-slate-600">
-                  Filter payments by purchased plan to review who bought each package faster.
+                  Search payments by user name, email, plan name, or filter by plan.
                 </p>
               </div>
-              <label className="block text-sm text-slate-700">
-                <span className="mb-1 block font-medium">Filter by plan</span>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <input
+                  type="text"
+                  placeholder="Search user name, email, plan name..."
+                  className="dashboard-control text-sm sm:w-64"
+                  value={paymentSearch}
+                  onChange={(e) => setPaymentSearch(e.target.value)}
+                />
                 <select
                   value={paymentPlanFilter}
                   onChange={(event) => setPaymentPlanFilter(event.target.value)}
-                  className="min-w-[220px] rounded-xl border border-clay bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-400"
+                  className="dashboard-control text-sm sm:w-52"
                 >
                   <option value="all">All plans</option>
                   {paymentPlanOptions.map((plan) => (
@@ -752,7 +914,18 @@ const AdminDashboardPage = () => {
                     </option>
                   ))}
                 </select>
-              </label>
+                {(paymentSearch || paymentPlanFilter !== "all") && (
+                  <button
+                    onClick={() => {
+                      setPaymentSearch("");
+                      setPaymentPlanFilter("all");
+                    }}
+                    className="px-2 py-1 text-xs font-bold text-slate-500 hover:text-slate-900"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
             </div>
             <div className="mt-3 min-h-0 overflow-y-auto rounded-[1.5rem] border border-slate-200/70 text-sm">
               <table className="dashboard-table min-w-full text-left">
@@ -766,7 +939,7 @@ const AdminDashboardPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {payments.map((p) => (
+                  {filteredPayments.map((p) => (
                     <tr key={p._id} className="border-b border-clay/60 align-top">
                       <td className="py-2">{p.userId?.name || "Unknown"}</td>
                       <td className="py-2 font-semibold">{p.planId?.name || "Unknown Plan"}</td>
@@ -775,10 +948,10 @@ const AdminDashboardPage = () => {
                       <td className="py-2">{new Date(p.createdAt).toLocaleDateString("en-IN")}</td>
                     </tr>
                   ))}
-                  {payments.length === 0 && (
+                  {filteredPayments.length === 0 && (
                     <tr>
-                      <td colSpan="5" className="py-6 text-center text-sm text-slate-500">
-                        No payments found for the selected plan.
+                      <td colSpan="5" className="py-12 text-center text-sm text-slate-500">
+                        No payments found for the selected search/filter criteria.
                       </td>
                     </tr>
                   )}
@@ -790,11 +963,64 @@ const AdminDashboardPage = () => {
 
         {activeTab === "properties" && (
           <section className="dashboard-shell flex min-h-0 flex-1 flex-col p-6">
-            <h2 className="text-lg font-bold text-slate-900">Posted Properties</h2>
-            <p className="mt-1 text-sm text-slate-600">
-              Properties go live as soon as users publish them. Open any listing to review it, see who posted it, or delete it from the platform.
-            </p>
-            <div className="mt-3 min-h-0 overflow-y-auto rounded-[1.5rem] border border-slate-200/70">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">Posted Properties ({filteredPropertyListings.length})</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  Search by title, location, city, owner name/email, or filter by property type & status.
+                </p>
+              </div>
+            </div>
+
+            {/* Filter Bar */}
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <input
+                type="text"
+                placeholder="Search properties by title, city, area, owner name/email..."
+                className="dashboard-control flex-1 text-sm"
+                value={propertySearch}
+                onChange={(e) => setPropertySearch(e.target.value)}
+              />
+              <select
+                className="dashboard-control w-full sm:w-44 text-sm"
+                value={propertyTypeFilter}
+                onChange={(e) => setPropertyTypeFilter(e.target.value)}
+              >
+                <option value="all">All Types</option>
+                <option value="plot">Plot</option>
+                <option value="villa">Villa</option>
+                <option value="flat">Flat</option>
+                <option value="independent house">House</option>
+                <option value="apartment">Apartment</option>
+                <option value="commercial land / building">Commercial</option>
+                <option value="farmland">Farmland</option>
+                <option value="agri land">Agri Land</option>
+              </select>
+              <select
+                className="dashboard-control w-full sm:w-36 text-sm"
+                value={propertyStatusFilter}
+                onChange={(e) => setPropertyStatusFilter(e.target.value)}
+              >
+                <option value="all">All Status</option>
+                <option value="approved">Approved</option>
+                <option value="pending">Pending</option>
+                <option value="rejected">Rejected</option>
+              </select>
+              {(propertySearch || propertyTypeFilter !== "all" || propertyStatusFilter !== "all") && (
+                <button
+                  onClick={() => {
+                    setPropertySearch("");
+                    setPropertyTypeFilter("all");
+                    setPropertyStatusFilter("all");
+                  }}
+                  className="px-2 py-1 text-xs font-bold text-slate-500 hover:text-slate-900"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+
+            <div className="mt-4 min-h-0 overflow-y-auto rounded-[1.5rem] border border-slate-200/70">
               <table className="dashboard-table min-w-full text-left text-sm">
                 <thead className="whitespace-nowrap">
                   <tr className="border-b border-clay">
@@ -807,7 +1033,7 @@ const AdminDashboardPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {propertyListings.map((p) => (
+                  {filteredPropertyListings.map((p) => (
                     <tr key={p._id} className="border-b border-clay/60 align-middle">
                       <td className="py-2">
                         <button type="button" onClick={() => openProperty(p)} className="block">
@@ -864,13 +1090,18 @@ const AdminDashboardPage = () => {
                       </td>
                     </tr>
                   ))}
-                  {propertyListings.length === 0 && <tr><td colSpan={6} className="py-8 text-center text-ink/50">No properties posted yet.</td></tr>}
+                  {filteredPropertyListings.length === 0 && (
+                    <tr>
+                      <td colSpan="6" className="py-12 text-center text-slate-400 text-sm">
+                        No properties found matching your search.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
           </section>
         )}
-
         {activeTab === "leads" && (
           <section className="dashboard-shell flex min-h-0 flex-1 flex-col p-6">
             <div className="border-b border-slate-200 pb-5">
@@ -884,6 +1115,40 @@ const AdminDashboardPage = () => {
                 <div className="dashboard-chip">
                   {leadQueueCount} new / active items
                 </div>
+              </div>
+
+              {/* Filter Bar */}
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <input
+                  type="text"
+                  placeholder="Search leads by customer name, email, phone, property title, or category..."
+                  className="dashboard-control flex-1 text-sm"
+                  value={leadSearch}
+                  onChange={(e) => setLeadSearch(e.target.value)}
+                />
+                <select
+                  className="dashboard-control w-full sm:w-44 text-sm"
+                  value={leadStatusFilter}
+                  onChange={(e) => setLeadStatusFilter(e.target.value)}
+                >
+                  <option value="all">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="open">Open</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="matched">Matched</option>
+                </select>
+                {(leadSearch || leadStatusFilter !== "all") && (
+                  <button
+                    onClick={() => {
+                      setLeadSearch("");
+                      setLeadStatusFilter("all");
+                    }}
+                    className="px-2 py-1 text-xs font-bold text-slate-500 hover:text-slate-900"
+                  >
+                    Clear
+                  </button>
+                )}
               </div>
 
               <div className="mt-4 grid gap-3 lg:grid-cols-3">
@@ -921,15 +1186,21 @@ const AdminDashboardPage = () => {
                 <div>
                   <h3 className="text-base font-bold text-slate-900">{activeLeadView.label}</h3>
                   <p className="text-sm text-slate-500">
-                    Showing {activeLeadView.total} item{activeLeadView.total === 1 ? "" : "s"} with {activeLeadView.newCount} new / open.
+                    Showing {
+                      leadView === "inquiries"
+                        ? filteredLeads.length
+                        : leadView === "requirements"
+                          ? filteredCustomerRequests.length
+                          : filteredLeadUnlocks.length
+                    } matching item(s).
                   </p>
                 </div>
               </div>
 
               <div className="min-h-0 space-y-3 overflow-y-auto pr-1">
                 {leadView === "inquiries" &&
-                  (leads.length ? (
-                    leads.map((item) => (
+                  (filteredLeads.length ? (
+                    filteredLeads.map((item) => (
                       <article key={item._id} className="dashboard-subpanel rounded-[1.25rem] px-4 py-3">
                         <div className="grid gap-3 lg:grid-cols-[1.2fr_0.95fr_0.95fr_0.7fr_auto] lg:items-center">
                           <div className="min-w-0">
@@ -969,12 +1240,12 @@ const AdminDashboardPage = () => {
                       </article>
                     ))
                   ) : (
-                    <div className="dashboard-empty px-6 py-10 text-center text-sm">No inquiry leads found.</div>
+                    <div className="dashboard-empty px-6 py-10 text-center text-sm">No inquiry leads found matching search.</div>
                   ))}
 
                 {leadView === "requirements" &&
-                  (customerRequests.length ? (
-                    customerRequests.map((item) => (
+                  (filteredCustomerRequests.length ? (
+                    filteredCustomerRequests.map((item) => (
                       <article key={item._id} className="dashboard-subpanel rounded-[1.25rem] px-4 py-3">
                         <div className="grid gap-3 lg:grid-cols-[1fr_1fr_1.15fr_0.7fr_auto] lg:items-center">
                           <div className="min-w-0">
@@ -1016,12 +1287,12 @@ const AdminDashboardPage = () => {
                       </article>
                     ))
                   ) : (
-                    <div className="dashboard-empty px-6 py-10 text-center text-sm">No customer property requests found.</div>
+                    <div className="dashboard-empty px-6 py-10 text-center text-sm">No property requests found matching search.</div>
                   ))}
 
                 {leadView === "unlocks" &&
-                  (leadUnlocks.length ? (
-                    leadUnlocks.map((item) => (
+                  (filteredLeadUnlocks.length ? (
+                    filteredLeadUnlocks.map((item) => (
                       <article key={item._id} className="dashboard-subpanel rounded-[1.25rem] px-4 py-3">
                         <div className="grid gap-3 lg:grid-cols-[0.95fr_0.95fr_0.9fr_1.1fr_auto] lg:items-center">
                           <div className="min-w-0">
@@ -1062,7 +1333,7 @@ const AdminDashboardPage = () => {
                       </article>
                     ))
                   ) : (
-                    <div className="dashboard-empty px-6 py-10 text-center text-sm">No lead unlock records found.</div>
+                    <div className="dashboard-empty px-6 py-10 text-center text-sm">No lead unlock activity found matching search.</div>
                   ))}
               </div>
             </div>
