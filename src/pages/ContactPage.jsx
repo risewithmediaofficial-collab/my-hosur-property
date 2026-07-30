@@ -10,6 +10,8 @@ import useScrollAnimation from "../hooks/useScrollAnimation";
 
 /* Department / enquiry type rows matching reference table style */
 const enquiryRows = [
+  { label: "Main / Director - 1", phone: "+91 81109 52245" },
+  { label: "Director - 2 (Raja)", phone: "+91 99940 05086" },
   { label: "To Buy or Business Enquire", phone: "+91 99940 05086" },
   { label: "To Sell", phone: "+91 91501 00499" },
   { label: "For Property Listing", phone: "+91 91501 00499" },

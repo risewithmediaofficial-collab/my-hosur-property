@@ -30,7 +30,7 @@ const supportEmail =
   extractEmailAddress(process.env.SUPPORT_EMAIL) ||
   extractEmailAddress(process.env.EMAIL_FROM) ||
   extractEmailAddress(process.env.SMTP_REPLY_TO) ||
-  "myhosurproperty786@gmail.com";
+  "Myhosurproperty.mhp@gmail.com";
 
 /**
  * Base email layout wrapper

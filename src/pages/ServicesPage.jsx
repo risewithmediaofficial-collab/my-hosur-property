@@ -83,7 +83,6 @@ const serviceHighlights = [
 ];
 
 const ServicesPage = () => {
-  useScrollAnimation();
   const [search, setSearch] = useState("");
   const [activeCategoryKey, setActiveCategoryKey] = useState(null);
 
@@ -104,6 +103,8 @@ const ServicesPage = () => {
         );
       })
     : serviceCategories;
+
+  useScrollAnimation([filteredServices.length]);
 
   return (
     <main className="page-shell w-full">
@@ -301,7 +302,9 @@ const ServicesPage = () => {
                     <img
                       src={service.image}
                       alt={service.title}
-                      className="h-full w-full object-cover transition-transform duration-700"
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                     />
                   </div>
                 </div>

@@ -6,7 +6,7 @@
 const generateHtmlEmail = ({ name, title, message, buttonText, buttonUrl, type = "general" }) => {
   const brandName = "MyHosurProperty";
   const siteUrl = process.env.CLIENT_URL || "http://localhost:5173";
-  const supportEmail = process.env.SUPPORT_EMAIL || "myhosurproperty786@gmail.com";
+  const supportEmail = process.env.SUPPORT_EMAIL || "Myhosurproperty.mhp@gmail.com";
   const businessAddress = "No 4 /409-4, First floor, Movendar Nagar, Vinayagapuram, Bagalur Road, Hosur, Krishnagiri - 635109.";
 
   // Theme colours

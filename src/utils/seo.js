@@ -36,10 +36,10 @@ export const SITE_KEYWORDS = [
   "Hosur Resale House",
   "Hosur Commercial Land",
 ].join(", ");
-export const DEFAULT_SITE_URL = "https://my-hosur-property.onrender.com";
+export const DEFAULT_SITE_URL = "https://myhosurproperty.com";
 export const DEFAULT_OG_IMAGE = "/logo.png";
-export const SITE_CONTACT_EMAIL = "myhosurproperty786@gmail.com";
-export const SITE_CONTACT_PHONE = "+91 9994005086";
+export const SITE_CONTACT_EMAIL = "Myhosurproperty.mhp@gmail.com";
+export const SITE_CONTACT_PHONE = "+91 8110952245";
 export const SITE_CONTACT_ADDRESS = "No 4 /409-4, First floor, Movendar Nagar, Vinayagapuram, Bagalur Road";
 
 const trimTrailingSlash = (value = "") => value.replace(/\/+$/, "");

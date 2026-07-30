@@ -1,6 +1,6 @@
 const trimTrailingSlash = (value = "") => String(value).replace(/\/+$/, "");
 
-const getPublicSiteUrl = () => trimTrailingSlash(process.env.CLIENT_URL || "http://localhost:5173");
+const getPublicSiteUrl = () => trimTrailingSlash(process.env.CLIENT_URL || "https://myhosurproperty.com");
 
 const slugify = (text = "") =>
   String(text)
