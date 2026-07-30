@@ -30,25 +30,6 @@ const fallbackPlans = [
     ],
   },
   {
-    name: "Basic Agent Plan",
-    subtitle: "For individual brokers & sellers",
-    price: 999,
-    billingLabel: "/month",
-    ctaLabel: "Choose Basic Plan",
-    recommended: false,
-    listingLimit: 3,
-    contactUnlocks: 15,
-    leadCredits: 5,
-    durationDays: 30,
-    features: [
-      "3 Active Property Listings",
-      "15 Customer Contact Requests",
-      "Basic Performance Analytics",
-      "Verified Seller / Agent Badge",
-      "Standard Support",
-    ],
-  },
-  {
     name: "Pro Agent Plan",
     subtitle: "Most Popular Choice for Agents",
     price: 2999,
@@ -119,9 +100,8 @@ const fallbackPlans = [
 
 const orderByName = {
   "Free / 1st Time User": 1,
-  "Basic Agent Plan": 2,
-  "Pro Agent Plan": 3,
-  "Premium Agent Plan": 4,
+  "Pro Agent Plan": 2,
+  "Premium Agent Plan": 3,
 };
 
 const normalizePlan = (plan) => {

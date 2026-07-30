@@ -25,29 +25,6 @@ const plans = [
 
   // ── 2. AGENT / BROKER / SELLER PLANS ──
   {
-    name: "Basic Agent Plan",
-    subtitle: "For individual brokers & sellers",
-    price: 999,
-    billingLabel: "/month",
-    ctaLabel: "Choose Basic Plan",
-    recommended: false,
-    features: [
-      "3 Active Property Listings",
-      "15 Customer Contact Requests",
-      "Basic Performance Analytics",
-      "Verified Seller / Agent Badge",
-      "Standard Support",
-    ],
-    listingLimit: 3,
-    durationDays: 30,
-    featuredBoost: false,
-    category: "broker_leads",
-    targetRole: ["agent", "broker", "builder", "seller"],
-    contactUnlocks: 15,
-    leadCredits: 5,
-    boostDays: 3,
-  },
-  {
     name: "Pro Agent Plan",
     subtitle: "Most Popular Choice for Agents",
     price: 2999,
