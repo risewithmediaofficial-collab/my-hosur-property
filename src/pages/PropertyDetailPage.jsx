@@ -193,11 +193,6 @@ const PropertyDetailPage = () => {
     return Math.round(p.price / area);
   }, [p]);
 
-  const estimatedEMI = useMemo(() => {
-    if (!p || !p.price) return 0;
-    return Math.round(p.price * 0.00798);
-  }, [p]);
-
   const propertyPath = p ? getPropertyPath(p) : "";
   const propertySlug = p ? buildPropertySlug(p) : "";
 
@@ -364,10 +359,6 @@ const PropertyDetailPage = () => {
                 </h1>
                 <span className="text-sm font-semibold text-slate-500 sm:text-base">
                   @ ₹{pricePerSqft.toLocaleString("en-IN")} per sqft
-                </span>
-                <span className="h-4 w-px bg-slate-300 hidden sm:inline-block" />
-                <span className="text-xs font-bold text-sky-600 bg-sky-50 px-2.5 py-1 rounded-md border border-sky-200">
-                  Estimated EMI ₹{estimatedEMI.toLocaleString("en-IN")}
                 </span>
               </div>
 
@@ -640,12 +631,61 @@ const PropertyDetailPage = () => {
 
       {/* ── 5. ABOUT PROPERTY & DESCRIPTION ── */}
       <section className="mx-auto max-w-[1440px] px-5 py-6 sm:px-8 lg:px-10">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-extrabold text-navy">About Property</h3>
-          <p className="mt-2 text-xs font-bold text-slate-500">Address: <span className="text-navy">{[p.location?.area, p.location?.city || "Hosur"].filter(Boolean).join(", ")}</span></p>
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/40">
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div>
+              <h3 className="text-xl font-extrabold text-navy">About Property</h3>
+              <p className="mt-2 text-sm text-slate-500">
+                Address: <span className="font-semibold text-slate-900">{[p.location?.area, p.location?.city || "Hosur"].filter(Boolean).join(", ")}</span>
+              </p>
+            </div>
+            <div className="inline-flex flex-col items-start gap-2 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700 md:items-end">
+              <span className="font-semibold text-slate-900">{p.propertyType || "Property"}</span>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">
+                {p.listingType === "rent" ? "Rent" : "Sale"}
+              </span>
+            </div>
+          </div>
 
-          <div className="mt-4 whitespace-pre-line text-sm leading-relaxed text-slate-700">
-            {p.description || `Verified ${p.propertyType || "property"} listing in ${p.location?.area || p.location?.city || "Hosur"}. Contact the property owner or listing agent for complete details, site visits, and legal documentation support.`}
+          <div className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
+            <div className="grid gap-3">
+              {p.propertyType && (
+                <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                  <span className="font-semibold text-slate-900">Property Type:</span> {p.propertyType}
+                </div>
+              )}
+              <div className="grid sm:grid-cols-2 gap-3">
+                {p.location?.area && (
+                  <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                    <p className="font-semibold text-slate-900">Location</p>
+                    <p className="mt-1 text-slate-600">{[p.location?.area, p.location?.city, p.location?.district, p.location?.state].filter(Boolean).join(", ")}</p>
+                  </div>
+                )}
+                {p.landArea && (
+                  <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                    <p className="font-semibold text-slate-900">Land Area</p>
+                    <p className="mt-1 text-slate-600">{p.landArea} {p.areaUnit || "sqft"}</p>
+                  </div>
+                )}
+                {p.length && (
+                  <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                    <p className="font-semibold text-slate-900">Length</p>
+                    <p className="mt-1 text-slate-600">{p.length}</p>
+                  </div>
+                )}
+                {p.width && (
+                  <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                    <p className="font-semibold text-slate-900">Width</p>
+                    <p className="mt-1 text-slate-600">{p.width}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 text-sm leading-7 text-slate-700">
+              <p className="font-semibold text-slate-900">Property Summary</p>
+              <p className="mt-3 whitespace-pre-line">{p.description || `Verified ${p.propertyType || "property"} listing in ${p.location?.area || p.location?.city || "Hosur"}. Contact the property owner or listing agent for complete details, site visits, and legal documentation support.`}</p>
+            </div>
           </div>
         </div>
       </section>
