@@ -41,7 +41,7 @@ const Footer = () => {
             {/* Column 1: Brand & Bio */}
             <div className="space-y-4">
               <div className="flex flex-col items-start gap-1">
-                <BrandLogo className="h-12 w-auto max-w-[200px] sm:h-15" />
+                <BrandLogo className="h-10 sm:h-14 w-auto max-w-[120px] sm:max-w-[180px]" />
                 <span className="text-[11px] font-medium leading-none text-white/60">
                   Powered by <span className="font-bold text-white">Gyes Property &amp; Construction</span>
                 </span>
