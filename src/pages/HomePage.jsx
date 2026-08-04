@@ -44,6 +44,8 @@ import { AnimatedTooltip } from "../components/ui/animated-tooltip";
 import servicesHeroImage from "../assets/house.png";
 import alluringRealityImg from "../assets/alluring reality.jpeg";
 import chatGptBannerImage from "../assets/ChatGPT Image Aug 4, 2026, 10_37_17 AM.png";
+import gyesConstructionLogo from "../assets/Screenshot 2026-08-04 114115.png";
+import oneClickLogo from "../assets/one click logo.png";
 import { fetchHomeProperties } from "../services/api/propertyApi";
 import { buildRealEstateAgentSchema, buildWebsiteSchema } from "../utils/seo";
 
@@ -1141,47 +1143,126 @@ const HomePage = () => {
       >
         <div className="mx-auto max-w-[1440px] text-center">
           <p className="section-tag">Trusted partnerships</p>
-          <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">Our Partners</h2>
+          <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">Our Partners &amp; Associated Businesses</h2>
           <p className="home-gsap-copy mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-            Working with industry leaders to provide comprehensive real estate solutions
+            Working with industry leaders to provide comprehensive real estate, construction, and home service solutions across Hosur.
           </p>
         </div>
 
-        <div className="mx-auto mt-12 flex justify-center max-w-[1440px] px-4">
+        {/* Partner Tooltip Avatars */}
+        <div className="mx-auto mt-10 flex justify-center max-w-[1440px] px-4">
           <AnimatedTooltip
             items={[
               {
                 id: 1,
-                name: "Gyes Property & Construction",
-                designation: "Property & construction solutions",
-                image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=200&auto=format&fit=crop",
+                name: "Gyes Construction & Materials",
+                designation: "Building & Construction Materials",
+                image: gyesConstructionLogo,
               },
               {
                 id: 2,
-                name: "Gyes Traders",
-                designation: "General trading services",
-                image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=200&auto=format&fit=crop",
+                name: "OneClick Office & Home Service",
+                designation: "Complete Interior & Home Solutions",
+                image: oneClickLogo,
               },
               {
                 id: 3,
-                name: "OneClick Office & Home Service",
-                designation: "Office & home solutions",
-                image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=200&auto=format&fit=crop",
+                name: "Gyes Property & Construction",
+                designation: "Property Development & Construction",
+                image: gyesConstructionLogo,
               },
               {
                 id: 4,
-                name: "Alluring Realty",
-                designation: "Real estate & consulting",
-                image: alluringRealityImg,
+                name: "Gyes Traders",
+                designation: "General Trading & Material Supply",
+                image: gyesConstructionLogo,
               },
               {
                 id: 5,
-                name: "Hareesh Enterprises",
-                designation: "Document writing & legal services",
-                image: "https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=200&auto=format&fit=crop",
+                name: "Alluring Realty",
+                designation: "Real Estate & Consulting",
+                image: alluringRealityImg,
               },
             ]}
           />
+        </div>
+
+        {/* Partner Brand Cards Display */}
+        <div className="mx-auto mt-12 grid max-w-[1200px] grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {/* Card 1: Gyes Construction */}
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
+            <div className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2">
+              <img
+                src={gyesConstructionLogo}
+                alt="Gyes Construction & Materials"
+                className="h-full w-full object-contain"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <p className="mt-3 text-xs font-bold text-navy">Gyes Construction</p>
+            <p className="mt-0.5 text-[11px] text-slate-500">&amp; Materials</p>
+          </div>
+
+          {/* Card 2: OneClick */}
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
+            <div className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2">
+              <img
+                src={oneClickLogo}
+                alt="OneClick Office & Home Service"
+                className="h-full w-full object-contain"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <p className="mt-3 text-xs font-bold text-navy">OneClick</p>
+            <p className="mt-0.5 text-[11px] text-slate-500">Office &amp; Home Services</p>
+          </div>
+
+          {/* Card 3: Gyes Property & Construction */}
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
+            <div className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2">
+              <img
+                src={gyesConstructionLogo}
+                alt="Gyes Property & Construction"
+                className="h-full w-full object-contain"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <p className="mt-3 text-xs font-bold text-navy">Gyes Property</p>
+            <p className="mt-0.5 text-[11px] text-slate-500">&amp; Construction</p>
+          </div>
+
+          {/* Card 4: Gyes Traders */}
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
+            <div className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2">
+              <img
+                src={gyesConstructionLogo}
+                alt="Gyes Traders"
+                className="h-full w-full object-contain"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <p className="mt-3 text-xs font-bold text-navy">Gyes Traders</p>
+            <p className="mt-0.5 text-[11px] text-slate-500">Trading &amp; Supply</p>
+          </div>
+
+          {/* Card 5: Alluring Realty */}
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card col-span-2 sm:col-span-1">
+            <div className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2">
+              <img
+                src={alluringRealityImg}
+                alt="Alluring Realty"
+                className="h-full w-full object-contain"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <p className="mt-3 text-xs font-bold text-navy">Alluring Realty</p>
+            <p className="mt-0.5 text-[11px] text-slate-500">Real Estate Consulting</p>
+          </div>
         </div>
       </MotionSection>
 
