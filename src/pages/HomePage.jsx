@@ -43,6 +43,7 @@ import useScrollToTop from "../hooks/useScrollToTop";
 import { AnimatedTooltip } from "../components/ui/animated-tooltip";
 import servicesHeroImage from "../assets/house.png";
 import alluringRealityImg from "../assets/alluring reality.jpeg";
+import chatGptBannerImage from "../assets/ChatGPT Image Aug 4, 2026, 10_37_17 AM.png";
 import { fetchHomeProperties } from "../services/api/propertyApi";
 import { buildRealEstateAgentSchema, buildWebsiteSchema } from "../utils/seo";
 
@@ -908,6 +909,35 @@ const HomePage = () => {
           <div className="home-services-image-wrap home-gsap-card">
             <img src={servicesHeroImage} alt="Modern villa property in Hosur" loading="lazy" />
           </div>
+        </div>
+      </MotionSection>
+
+      {/* ── Hosur Coverage & Localities Section ── */}
+      <MotionSection
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.1 }}
+        variants={reveal}
+        className="home-gsap-section bg-white px-5 py-12 sm:px-8 lg:px-10"
+      >
+        <div className="mx-auto max-w-[1440px] text-center">
+          <p className="section-tag">Hosur Coverage &amp; Localities</p>
+          <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">
+            Serving Every Prime Growth Corridor in <span className="text-orange">Hosur</span>
+          </h2>
+          <p className="home-gsap-copy mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+            From Hosur Town &amp; Attibele Road to Mathigiri, Begapalli, Kelamangalam, and Denkanikottai Road — we provide verified listings and complete service coverage across all major areas.
+          </p>
+        </div>
+
+        <div className="mx-auto mt-8 max-w-4xl home-gsap-card">
+          <img
+            src={chatGptBannerImage}
+            alt="Hosur Locality Map & Service Coverage"
+            className="w-full h-auto max-h-[420px] object-contain mx-auto block"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
       </MotionSection>
 

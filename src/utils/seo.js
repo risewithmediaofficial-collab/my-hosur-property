@@ -38,8 +38,8 @@ export const SITE_KEYWORDS = [
 ].join(", ");
 export const DEFAULT_SITE_URL = "https://myhosurproperty.com";
 export const DEFAULT_OG_IMAGE = "/logo.png";
-export const SITE_CONTACT_EMAIL = "Myhosurproperty.mhp@gmail.com";
-export const SITE_CONTACT_PHONE = "+91 8110952245";
+export const SITE_CONTACT_EMAIL = "myhosurproperty.mhp@gmail.com";
+export const SITE_CONTACT_PHONE = "+91 9150100499";
 export const SITE_CONTACT_ADDRESS = "No 4 /409-4, First floor, Movendar Nagar, Vinayagapuram, Bagalur Road";
 
 const trimTrailingSlash = (value = "") => value.replace(/\/+$/, "");

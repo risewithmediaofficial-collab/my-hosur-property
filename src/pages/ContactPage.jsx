@@ -1,23 +1,34 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { EnvelopeIcon, MapPinIcon, PhoneIcon } from "../components/AppIcons";
+import {
+  EnvelopeIcon,
+  FacebookIcon,
+  InstagramIcon,
+  MapPinIcon,
+  PhoneIcon,
+  ThreadsIcon,
+  WhatsAppIcon,
+  XIcon,
+} from "../components/AppIcons";
 import PageHero from "../components/PageHero";
 import SeoHead from "../components/SeoHead";
-import { FloatingInput } from "../components/ui/input";
-import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE_NUMBERS } from "../constants/contactInfo";
+import {
+  CONTACT_ADDRESS,
+  CONTACT_EMAIL,
+  CONTACT_PHONE_NUMBERS,
+  SOCIAL_LINKS,
+  WHATSAPP_QR_IMAGE,
+} from "../constants/contactInfo";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
 import useScrollAnimation from "../hooks/useScrollAnimation";
 
 /* Department / enquiry type rows matching reference table style */
 const enquiryRows = [
-  { label: "Main / Director - 1", phone: "+91 81109 52245" },
-  { label: "Director - 2 (Raja)", phone: "+91 99940 05086" },
-  { label: "To Buy or Business Enquire", phone: "+91 99940 05086" },
-  { label: "To Sell", phone: "+91 91501 00499" },
-  { label: "For Property Listing", phone: "+91 91501 00499" },
-  { label: "For Rental Enquire", phone: "+91 91501 00477" },
-  { label: "For Office & Home Service Enquire", phone: "+91 91501 00477" },
-  { label: "To Reach our Team", phone: "+91 82489 18906" },
+  { label: "Managing Director (MD)", phone: "+91 91501 00499" },
+  { label: "Director", phone: "+91 99940 05086" },
+  { label: "Admin 1", phone: "+91 82489 18906" },
+  { label: "Admin 2", phone: "+91 91501 00477" },
+  { label: "Email", phone: "myhosurproperty.mhp@gmail.com" },
 ];
 
 const ContactPage = () => {
@@ -64,7 +75,7 @@ const ContactPage = () => {
         className="gsap-section"
       />
 
-      {/* ── Main contact section: form (left) + info (right) ── */}
+      {/* ── Main contact section: form (left) + info with inline scroll (right) ── */}
       <section className="bg-white px-5 py-14 sm:px-8 lg:px-10 gsap-section">
         <div className="mx-auto max-w-[1440px]">
           <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
@@ -160,20 +171,20 @@ const ContactPage = () => {
               </form>
             </div>
 
-            {/* RIGHT – Get In Touch info */}
-            <div className="flex flex-col gap-6">
+            {/* RIGHT – Get In Touch Section Card with Inline Scroll */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-card flex flex-col gap-6 lg:max-h-[640px] lg:overflow-y-auto custom-scrollbar">
               {/* Header */}
               <div>
                 <h2 className="text-3xl font-bold text-navy leading-tight">
                   Get In Touch<br />With Us
                 </h2>
-                <p className="mt-3 text-sm leading-7 text-slate-600 max-w-sm">
+                <p className="mt-3 text-sm leading-7 text-slate-600">
                   Our team is here to assist you with clarity and care. Reach out via call, email, or by filling out the form. Let's make your property journey smooth and hassle-free.
                 </p>
               </div>
 
               {/* Phone + Email quick links */}
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-3">
                 {CONTACT_PHONE_NUMBERS.map((phone) => (
                   <a
                     key={phone.tel}
@@ -191,6 +202,74 @@ const ContactPage = () => {
                   <EnvelopeIcon className="h-4 w-4 text-orange flex-shrink-0" />
                   {CONTACT_EMAIL}
                 </a>
+              </div>
+
+              {/* Social Media Links */}
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-xs">
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Connect On Social Media</p>
+                <div className="flex flex-wrap gap-3">
+                  <a
+                    href={SOCIAL_LINKS.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:opacity-90"
+                  >
+                    <InstagramIcon className="h-4 w-4" />
+                    Instagram
+                  </a>
+                  <a
+                    href={SOCIAL_LINKS.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-blue-700"
+                  >
+                    <FacebookIcon className="h-4 w-4" />
+                    Facebook
+                  </a>
+                  <a
+                    href={SOCIAL_LINKS.threads}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-black px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-slate-800"
+                  >
+                    <ThreadsIcon className="h-4 w-4" />
+                    Threads
+                  </a>
+                  <a
+                    href={SOCIAL_LINKS.x}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-black"
+                  >
+                    <XIcon className="h-4 w-4" />
+                    X (Twitter)
+                  </a>
+                </div>
+              </div>
+
+              {/* WhatsApp QR & Direct Message Card */}
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5 flex flex-col sm:flex-row items-center gap-5 shadow-xs">
+                <div className="w-28 h-28 flex-shrink-0 overflow-hidden rounded-xl border-2 border-emerald-500 bg-white p-1 shadow-sm">
+                  <img src={WHATSAPP_QR_IMAGE} alt="WhatsApp QR Code" className="h-full w-full object-contain" />
+                </div>
+                <div className="flex-1 text-center sm:text-left">
+                  <span className="inline-block rounded-md bg-emerald-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white mb-1.5">
+                    WhatsApp Desk
+                  </span>
+                  <h3 className="text-base font-bold text-navy">Instant WhatsApp Support</h3>
+                  <p className="mt-1 text-xs leading-5 text-slate-600">
+                    Scan the QR code or click below to start a direct WhatsApp conversation with our support team.
+                  </p>
+                  <a
+                    href={SOCIAL_LINKS.whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-500 shadow-xs"
+                  >
+                    <WhatsAppIcon className="h-4 w-4" />
+                    Send WhatsApp Message
+                  </a>
+                </div>
               </div>
 
               {/* Enquiry table */}
@@ -218,6 +297,5 @@ const ContactPage = () => {
     </main>
   );
 };
-
 
 export default ContactPage;

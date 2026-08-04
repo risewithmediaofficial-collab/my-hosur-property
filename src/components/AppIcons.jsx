@@ -80,3 +80,15 @@ export { default as EyeSlashIcon } from "@mui/icons-material/VisibilityOffOutlin
 export { default as PhotoIcon } from "@mui/icons-material/ImageOutlined";
 export { default as ShareIcon } from "@mui/icons-material/ShareOutlined";
 
+export { default as InstagramIcon } from "@mui/icons-material/Instagram";
+export { default as FacebookIcon } from "@mui/icons-material/Facebook";
+export { default as WhatsAppIcon } from "@mui/icons-material/WhatsApp";
+export { default as TwitterIcon } from "@mui/icons-material/Twitter";
+export { default as XIcon } from "@mui/icons-material/X";
+
+export const ThreadsIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em" {...props}>
+    <path d="M12 2.163c-3.204 0-6.41.012-7.398.272-1.066.28-1.908 1.122-2.188 2.188-.26 1-.272 4.194-.272 7.398s.012 6.398.272 7.398c.28 1.066 1.122 1.908 2.188 2.188 1 .26 4.194.272 7.398.272s6.398-.012 7.398-.272c1.066-.28 1.908-1.122 2.188-2.188.26-1 .272-4.194.272-7.398s-.012-6.398-.272-7.398c-.28-1.066-1.122-1.908-2.188-2.188-1-.26-4.194-.272-7.398-.272zm0 16.275c-3.535 0-6.4-2.865-6.4-6.438 0-3.573 2.865-6.438 6.4-6.438 3.535 0 6.4 2.865 6.4 6.438 0 3.573-2.865 6.438-6.4 6.438zm0-10.742c-2.376 0-4.304 1.928-4.304 4.304s1.928 4.304 4.304 4.304 4.304-1.928 4.304-4.304-1.928-4.304-4.304-4.304z"/>
+  </svg>
+);
+

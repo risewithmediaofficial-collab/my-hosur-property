@@ -5,16 +5,21 @@ import {
   propertyFilterConfig,
 } from "../constants/propertyFilterConfig";
 
-export const DEFAULT_CATEGORY = "buy";
+export const DEFAULT_CATEGORY = "plot";
 export const DEFAULT_SORT = "latest";
-
-const META_KEYS = ["category", "sort", "page", "limit"];
 
 export const createDefaultFilterState = (overrides = {}) => ({
   category: DEFAULT_CATEGORY,
   sort: DEFAULT_SORT,
   page: 1,
   limit: 12,
+  country: "India",
+  state: "",
+  district: "",
+  taluk: "",
+  village: "",
+  locality: "",
+  location: "",
   ...overrides,
 });
 
@@ -42,7 +47,9 @@ export const toggleCheckboxValue = (current, option) => {
 export const clearCategoryFields = (state, categoryId) => {
   const next = { ...state, page: 1 };
   getCategoryFieldKeys(categoryId).forEach((key) => {
-    delete next[key];
+    if (!["country", "state", "district", "taluk", "village", "locality", "location"].includes(key)) {
+      delete next[key];
+    }
   });
   return next;
 };
@@ -50,38 +57,33 @@ export const clearCategoryFields = (state, categoryId) => {
 /** Reset entire filter state */
 export const resetAllFilters = () => createDefaultFilterState();
 
-/** Legacy URL params (intent, propertyType from homepage) → new state */
+/** Legacy URL params → new state */
 export const parseLegacyParams = (params) => {
   const state = createDefaultFilterState();
   const intent = params.get("intent");
   const propertyType = params.get("propertyType");
 
-  if (intent === "rent") state.category = "rentLease";
-  else if (intent === "buy" || intent === "new-project") state.category = "buy";
+  if (intent === "rent") state.category = "houseRent";
+  else if (intent === "buy" || intent === "new-project") state.category = "plot";
 
   if (propertyType) {
-    const normalized = propertyType.trim();
-    if (/agricultural|agri/i.test(normalized)) state.category = "agricultural";
-    else if (/commercial/i.test(normalized)) state.category = "commercial";
-    else if (/individual house/i.test(normalized)) state.category = "individualHouse";
-    else if (/apartment|flat/i.test(normalized)) state.category = "apartment";
-    else if (state.category === "buy") state.propertyType = normalized;
-    else if (state.category === "rentLease") state.propertyType = normalized;
+    const normalized = propertyType.trim().toLowerCase();
+    if (normalized.includes("plot")) state.category = "plot";
+    else if (normalized.includes("agri")) state.category = "agricultural";
+    else if (normalized.includes("farm")) state.category = "farmland";
+    else if (normalized.includes("villa")) state.category = "villa";
+    else if (normalized.includes("individual house") || normalized.includes("independent")) state.category = "individualHouse";
+    else if (normalized.includes("rent")) state.category = "houseRent";
+    else if (normalized.includes("commercial")) state.category = "commercial";
+    else if (normalized.includes("apartment") || normalized.includes("flat")) state.category = "apartment";
   }
 
-  if (params.get("city")) state.location = params.get("city");
-  if (params.get("area") && !state.location) state.location = params.get("area");
-  if (params.get("search")) state.location = params.get("search");
-  if (params.get("furnishingStatus")) state.furnishing = params.get("furnishingStatus");
-  if (params.get("minBhk")) state.bhk = `${params.get("minBhk")} BHK`;
+  if (params.get("city")) state.locality = params.get("city");
+  if (params.get("area") && !state.locality) state.locality = params.get("area");
+  if (params.get("search")) state.locality = params.get("search");
   if (params.get("minPrice")) state.minPrice = params.get("minPrice");
   if (params.get("maxPrice")) state.maxPrice = params.get("maxPrice");
-
-  const legacySort = params.get("sort");
-  if (legacySort === "-createdAt") state.sort = "latest";
-  else if (legacySort === "price") state.sort = "priceLowHigh";
-  else if (legacySort === "-price") state.sort = "priceHighLow";
-  else if (legacySort === "rank") state.sort = "nearbyFirst";
+  if (params.get("facing")) state.facing = params.get("facing");
 
   return state;
 };
@@ -99,8 +101,25 @@ export const parseFiltersFromSearchParams = (params) => {
   if (params.get("sort")) state.sort = params.get("sort") || DEFAULT_SORT;
   if (params.get("page")) state.page = Number(params.get("page")) || 1;
 
+  // Location fields
+  ["country", "state", "district", "taluk", "village", "locality", "location"].forEach((key) => {
+    const val = params.get(key);
+    if (val != null && val !== "") state[key] = val;
+  });
+
   const fieldKeys = getCategoryFieldKeys(state.category);
-  [...fieldKeys, "minPrice", "maxPrice", "minRent", "maxRent", "minLease", "maxLease"].forEach((key) => {
+  [
+    ...fieldKeys,
+    "minPrice",
+    "maxPrice",
+    "minRent",
+    "maxRent",
+    "length",
+    "width",
+    "maintenanceAmount",
+    "maintenanceStatus",
+    "approval",
+  ].forEach((key) => {
     const val = params.get(key);
     if (val != null && val !== "") state[key] = val;
   });
@@ -108,12 +127,17 @@ export const parseFiltersFromSearchParams = (params) => {
   return state;
 };
 
-/** Serialize filter state to URLSearchParams (applied filters only) */
+/** Serialize filter state to URLSearchParams */
 export const serializeFiltersToSearchParams = (state) => {
   const params = new URLSearchParams();
   if (state.category) params.set("category", state.category);
   if (state.sort && state.sort !== DEFAULT_SORT) params.set("sort", state.sort);
   if (state.page && state.page > 1) params.set("page", String(state.page));
+
+  const locationKeys = ["country", "state", "district", "taluk", "village", "locality", "location"];
+  locationKeys.forEach((key) => {
+    if (state[key]) params.set(key, String(state[key]));
+  });
 
   const fieldKeys = getCategoryFieldKeys(state.category);
   fieldKeys.forEach((key) => {
@@ -121,26 +145,21 @@ export const serializeFiltersToSearchParams = (state) => {
     if (val != null && val !== "") params.set(key, String(val));
   });
 
-  ["minPrice", "maxPrice", "minRent", "maxRent", "minLease", "maxLease"].forEach((key) => {
+  [
+    "minPrice",
+    "maxPrice",
+    "minRent",
+    "maxRent",
+    "length",
+    "width",
+    "maintenanceAmount",
+    "maintenanceStatus",
+    "approval",
+  ].forEach((key) => {
     if (state[key]) params.set(key, String(state[key]));
   });
 
   return params;
-};
-
-const mapBuyPropertyType = (type) => {
-  const map = {
-    "Commercial Building": "Commercial,Commercial Building",
-    "Commercial Land": "Commercial Land,Commercial",
-    "Commercial Land / Building": "Commercial Land,Commercial Building,Commercial",
-    "Agricultural Land": "Agricultural Land,Agri Land",
-    "Farm Land": "Farm Land,Agricultural Land,Agri Land",
-    "Villa / Flat": "Villa,Flat,Apartment",
-    Apartment: "Apartment,Flat",
-    Flat: "Flat,Apartment",
-    Villa: "Villa",
-  };
-  return map[type] || type;
 };
 
 /** Convert applied filters to API query object */
@@ -153,88 +172,82 @@ export const filtersToApiParams = (state) => {
     limit: state.limit || 12,
   };
 
-  const location = getFieldValue(state, "location");
-  if (location) {
-    params.city = location;
-    params.area = location;
-    params.search = location;
+  const loc = state.locality || state.village || state.taluk || state.district || state.location || "";
+  if (loc) {
+    params.city = loc;
+    params.area = loc;
+    params.search = loc;
   }
 
   const category = state.category;
 
-  if (category === "buy") {
+  if (category === "plot") {
     params.intent = "buy";
-    const types = splitValues(state.propertyType).map(mapBuyPropertyType);
-    if (types.length) params.propertyType = types.join(",");
-  } else if (category === "rentLease") {
-    params.intent = "rent";
-    const types = splitValues(state.propertyType);
-    if (types.length) params.propertyType = types.join(",");
-    if (state.minRent) params.minPrice = state.minRent;
-    if (state.maxRent) params.maxPrice = state.maxRent;
-    if (state.minLease) params.minPrice = state.minLease;
-    if (state.maxLease) params.maxPrice = state.maxLease;
-  } else if (category === "commercial") {
-    params.intent = "buy";
-    params.propertyType = "Commercial Land / Building,Commercial Land,Commercial,Office,Warehouse";
+    params.propertyType = "Plot";
   } else if (category === "agricultural") {
     params.intent = "buy";
     params.propertyType = "Agricultural Land,Agri Land";
+  } else if (category === "plotRent") {
+    params.intent = "rent";
+    params.propertyType = "Plot";
+    if (state.minRent) params.minPrice = state.minRent;
+    if (state.maxRent) params.maxPrice = state.maxRent;
+  } else if (category === "farmland") {
+    params.intent = "buy";
+    params.propertyType = "Farmland,Agricultural Land,Agri Land";
+  } else if (category === "villa") {
+    params.intent = "buy";
+    params.propertyType = "Villa";
   } else if (category === "individualHouse") {
     params.intent = "buy";
-    params.propertyType = "Individual House";
-  } else if (category === "apartment") {
+    params.propertyType = "Individual House,Independent House";
+  } else if (category === "houseRent") {
+    params.intent = "rent";
+    params.propertyType = "House,Individual House,Apartment,Flat";
+    if (state.minRent) params.minPrice = state.minRent;
+    if (state.maxRent) params.maxPrice = state.maxRent;
+  } else if (category === "apartment" || category === "flat") {
     params.intent = "buy";
     params.propertyType = "Apartment,Flat";
+  } else if (category === "commercial") {
+    params.intent = "buy";
+    params.propertyType = "Commercial Land / Building,Commercial Land,Commercial";
+  } else if (category === "buy") {
+    params.intent = "buy";
+  } else if (category === "rentLease") {
+    params.intent = "rent";
   }
 
-  if (state.minPrice && category !== "rentLease") params.minPrice = state.minPrice;
-  if (state.maxPrice && category !== "rentLease") params.maxPrice = state.maxPrice;
+  if (state.minPrice && category !== "houseRent" && category !== "plotRent") {
+    params.minPrice = state.minPrice;
+  }
+  if (state.maxPrice && category !== "houseRent" && category !== "plotRent") {
+    params.maxPrice = state.maxPrice;
+  }
 
-  const facing = splitValues(state.facing);
-  if (facing.length) params.facing = facing.join(",");
+  const facing = state.facing || getFieldValue(state, "facing");
+  if (facing) params.facing = facing;
 
   const bhkList = splitValues(state.bhk);
   if (bhkList.length) params.bhk = bhkList.join(",");
 
-  const furnishing = splitValues(state.furnishing);
-  if (furnishing.length === 1) {
-    const f = furnishing[0].replace("Semi Furnished", "Semi-Furnished");
-    params.furnishingStatus = f;
+  const approvalList = splitValues(state.approval);
+  if (approvalList.includes("RERA Approved")) {
+    params.verified = "true";
   }
 
-  const amenityHints = [
-    ...splitValues(state.nearbyPlaces),
-    ...splitValues(state.purpose),
-    ...splitValues(state.lift).map((v) => (v === "Yes" ? "Lift" : "")),
-    ...splitValues(state.security).map((v) => (v === "Yes" ? "Security" : "")),
-    ...splitValues(state.waterSource),
-    ...splitValues(state.landCondition),
-    ...splitValues(state.layoutType),
-  ].filter(Boolean);
-
-  if (amenityHints.length) params.amenities = amenityHints.join(",");
-
   const textHints = [
-    ...splitValues(state.distance),
-    ...splitValues(state.roadSize),
-    ...splitValues(state.roadType),
-    ...splitValues(state.buildingAge),
-    ...splitValues(state.monthlyIncome),
-    ...splitValues(state.acres),
-    ...splitValues(state.pricePerAcre),
-    ...splitValues(state.houseType),
     ...splitValues(state.landArea),
-    ...splitValues(state.builtUpArea),
-    ...splitValues(state.rentAdvance),
-    ...splitValues(state.floors),
-    ...splitValues(state.units),
-    ...splitValues(state.toilet).map((t) => `${t} bathroom`),
+    ...splitValues(state.plotType),
+    ...splitValues(state.carParking).map((p) => `${p} parking`),
+    ...splitValues(state.waterSource),
+    ...approvalList,
+    state.length ? `Length ${state.length}` : "",
+    state.width ? `Width ${state.width}` : "",
   ].filter(Boolean);
 
   if (textHints.length) {
     params.filterTags = textHints.join(",");
-    params.search = [params.search, ...textHints].filter(Boolean).join(" ");
   }
 
   Object.keys(params).forEach((key) => {
@@ -247,35 +260,88 @@ export const filtersToApiParams = (state) => {
   return params;
 };
 
-/** Human-readable label for a field value */
-const formatFieldLabel = (field, value) => {
-  if (!value) return "";
-  if (field.type === "rangePresets") {
-    const min = value.minPrice || value.minRent || value.minLease;
-    const max = value.maxPrice || value.maxRent || value.maxLease;
-    if (min && max) return `₹${(Number(min) / 100000).toFixed(1)}L - ₹${(Number(max) / 100000).toFixed(1)}L`;
-    if (min) return `From ₹${(Number(min) / 100000).toFixed(1)}L`;
-    return "";
-  }
-  return String(value);
-};
-
 /** Build removable filter chips from applied state */
 export const buildFilterChips = (state) => {
   const chips = [];
   const fields = propertyFilterConfig[state.category] || [];
+
+  // Location chips
+  if (state.locality) {
+    chips.push({
+      key: "locality",
+      fieldKey: "locality",
+      label: "Locality",
+      value: state.locality,
+      removeKeys: ["locality", "location"],
+    });
+  } else if (state.village) {
+    chips.push({
+      key: "village",
+      fieldKey: "village",
+      label: "Village",
+      value: state.village,
+      removeKeys: ["village"],
+    });
+  } else if (state.taluk) {
+    chips.push({
+      key: "taluk",
+      fieldKey: "taluk",
+      label: "Taluk",
+      value: state.taluk,
+      removeKeys: ["taluk"],
+    });
+  } else if (state.district) {
+    chips.push({
+      key: "district",
+      fieldKey: "district",
+      label: "District",
+      value: state.district,
+      removeKeys: ["district"],
+    });
+  }
 
   fields.forEach((field) => {
     if (field.type === "rangePresets") {
       const min = state[field.minKey];
       const max = state[field.maxKey];
       if (min || max) {
+        let labelText = "";
+        if (min && max) labelText = `₹${(Number(min) / 100000).toFixed(1)}L - ₹${(Number(max) / 100000).toFixed(1)}L`;
+        else if (min) labelText = `From ₹${(Number(min) / 100000).toFixed(1)}L`;
+        else if (max) labelText = `Up to ₹${(Number(max) / 100000).toFixed(1)}L`;
+
         chips.push({
           key: field.key,
           fieldKey: field.key,
           label: field.label,
-          value: formatFieldLabel(field, state),
+          value: labelText,
           removeKeys: [field.minKey, field.maxKey],
+        });
+      }
+      return;
+    }
+
+    if (field.type === "dimensions") {
+      if (state.length || state.width) {
+        chips.push({
+          key: "dimensions",
+          fieldKey: "dimensions",
+          label: "Dimensions",
+          value: `${state.length || "?"} x ${state.width || "?"} ft`,
+          removeKeys: [field.lengthKey, field.widthKey],
+        });
+      }
+      return;
+    }
+
+    if (field.type === "maintenance") {
+      if (state.maintenanceStatus || state.maintenanceAmount) {
+        chips.push({
+          key: "maintenance",
+          fieldKey: "maintenance",
+          label: "Maintenance",
+          value: state.maintenanceStatus || `₹${state.maintenanceAmount}`,
+          removeKeys: [field.statusKey, field.amountKey],
         });
       }
       return;
@@ -312,35 +378,56 @@ export const removeChipFromState = (state, chip) => {
   return next;
 };
 
-/** Client-side refinement when API returns broader results */
+/** Client-side property refinement */
 export const clientRefineProperties = (items, state) => {
   if (!items?.length) return items;
 
   let result = [...items];
-  const location = getFieldValue(state, "location").toLowerCase();
-  if (location) {
+
+  // Location filter
+  const targetLoc = (state.locality || state.village || state.taluk || state.district || state.location || "").toLowerCase();
+  if (targetLoc) {
     result = result.filter((item) => {
-      const hay = `${item.location?.city || ""} ${item.location?.area || ""} ${item.title || ""}`.toLowerCase();
-      return hay.includes(location);
+      const hay = `${item.location?.city || ""} ${item.location?.area || ""} ${item.location?.address || ""} ${item.title || ""}`.toLowerCase();
+      return hay.includes(targetLoc);
     });
   }
 
-  const facingList = splitValues(state.facing);
-  if (facingList.length) {
-    result = result.filter((item) => facingList.some((f) => String(item.facing || "").toLowerCase().includes(f.toLowerCase())));
+  // Facing filter
+  const facingVal = state.facing || getFieldValue(state, "facing");
+  if (facingVal) {
+    result = result.filter((item) => String(item.facing || "").toLowerCase().includes(facingVal.toLowerCase()));
   }
 
+  // BHK filter
   const bhkList = splitValues(state.bhk).map((b) => Number(String(b).replace(/\D/g, ""))).filter(Boolean);
   if (bhkList.length) {
     result = result.filter((item) => bhkList.includes(Number(item.bhk)));
   }
 
-  const tags = splitValues(state.filterTags || "").join(" ").toLowerCase();
-  if (tags) {
+  // Approval filters
+  const approvalList = splitValues(state.approval);
+  if (approvalList.length) {
     result = result.filter((item) => {
-      const hay = `${item.description || ""} ${(item.amenities || []).join(" ")} ${(item.nearbyFacilities || []).join(" ")}`.toLowerCase();
-      return tags.split(/\s+/).some((t) => t && hay.includes(t));
+      const isRera = item.verification?.isVerified || Boolean(item.verification?.reraId);
+      const descriptionText = `${item.description || ""} ${(item.amenities || []).join(" ")}`.toLowerCase();
+      return approvalList.some((appr) => {
+        if (appr === "RERA Approved") return isRera || descriptionText.includes("rera");
+        if (appr === "HNTDA Approved") return descriptionText.includes("hntda");
+        if (appr === "DTCP Approved") return descriptionText.includes("dtcp");
+        return true;
+      });
     });
+  }
+
+  // Price/Rent ranges
+  const minP = Number(state.minPrice || state.minRent);
+  const maxP = Number(state.maxPrice || state.maxRent);
+  if (minP) {
+    result = result.filter((item) => Number(item.price || 0) >= minP);
+  }
+  if (maxP) {
+    result = result.filter((item) => Number(item.price || 0) <= maxP);
   }
 
   return result;

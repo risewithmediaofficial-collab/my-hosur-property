@@ -316,16 +316,16 @@ const AboutPage = () => {
             {/* Text side */}
             <div>
               <h2 className="text-2xl font-bold text-navy sm:text-3xl">
-                Mr. Vijay Kumar
+                Mr. Vijaykumar
               </h2>
               <p className="mt-1 text-base font-semibold text-slate-500">
                 Founder &amp; Managing Director
               </p>
               <p className="mt-1 text-xs font-medium text-slate-400 uppercase tracking-wide">B.Tech</p>
 
-              {/* Companies */}
+              {/* Associated Businesses */}
               <div className="mt-4 flex flex-wrap gap-2">
-                {["Gyes Property and Construction", "Gyes Traders", "MyHosurProperty"].map((company) => (
+                {["Gyes Property & Construction", "OneClick", "My Hosur Property", "Gyes Traders"].map((company) => (
                   <span
                     key={company}
                     className="inline-flex items-center rounded-full bg-orange/10 px-3 py-1 text-xs font-semibold text-orange border border-orange/20"
@@ -336,13 +336,13 @@ const AboutPage = () => {
               </div>
 
               <p className="mt-6 text-sm leading-8 text-slate-600">
-                A first-generation entrepreneur and visionary leader, Mr. Vijay Kumar is a dedicated
+                A first-generation entrepreneur and visionary leader, Mr. Vijaykumar is a dedicated
                 contributor who began his entrepreneurial journey with an unwavering commitment to
                 transforming Hosur's real estate landscape. Over the years, he has built a trusted
                 name across property transactions, construction, and community-focused development.
               </p>
               <p className="mt-4 text-sm leading-8 text-slate-600">
-                Under his leadership, MyHosurProperty was founded with the goal of creating a
+                Under his leadership, My Hosur Property was founded with the goal of creating a
                 transparent, verified, and accessible property platform for buyers, sellers, and
                 investors in Hosur. He is deeply passionate about building communities, empowering
                 local professionals, and ensuring every property seeker gets the honest guidance
@@ -364,7 +364,7 @@ const AboutPage = () => {
             <div className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-card gsap-card">
               <img
                 src={founderImage}
-                alt="Founder of MyHosurProperty — Mr. Vijay Kumar"
+                alt="Founder of MyHosurProperty — Mr. Vijaykumar"
                 className="h-[520px] w-full object-cover object-center sm:h-[560px]"
                 loading="lazy"
                 decoding="async"
@@ -390,7 +390,7 @@ const AboutPage = () => {
             <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-card gsap-card">
               <img
                 src={directorImage}
-                alt="Director of MyHosurProperty — Raja"
+                alt="Director of MyHosurProperty — Mr. Raja"
                 className="h-[520px] w-full object-cover object-center sm:h-[560px]"
                 loading="lazy"
                 decoding="async"
@@ -400,10 +400,10 @@ const AboutPage = () => {
             {/* Text side */}
             <div>
               <h2 className="text-2xl font-bold text-navy sm:text-3xl">
-                Raja
+                Mr. Raja
               </h2>
               <p className="mt-1 text-base font-semibold text-slate-500">
-                Director, MyHosurProperty
+                Director, My Hosur Property
               </p>
               <p className="mt-1 text-xs font-medium text-slate-400 uppercase tracking-wide">B.Sc</p>
 

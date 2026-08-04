@@ -20,87 +20,148 @@ import registrationImg from "../assets/Sale deed registration.jpg";
 import pattaImg from "../assets/patta.jpg";
 import landSurveyImg from "../assets/Land survey.jpg";
 import interiorsImg from "../assets/interiros.jpg";
-import constructionImg from "../assets/contarcts works.jpg";
 import applianceServiceImg from "../assets/pankaj-ac-and-homeappliances-repair-centre-rama-mandi-chowk-jalandhar-ac-installation-services-p9tplahzyn.avif";
 import cleaningServiceImg from "../assets/toilet-washroom-cleaning-service.jpg.jpeg";
 import carpentryServiceImg from "../assets/shreya-interior-work-govindpura-bhopal-carpenters-5e67m81n6x.avif";
+import houseShiftingImg from "../assets/house shifting.jpeg";
+import paintingServiceImg from "../assets/painting_service.png";
+import pestControlImg from "../assets/pest_control.png";
+import contractsWorksImg from "../assets/contarcts works.jpg";
+import nriPropertyMgmtImg from "../assets/nri property managment.png";
+import officeInteriorImg from "../assets/office_interior.png";
+
+// Construction images from src/assets/construction images
+import constHouseImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.03 AM (1).jpeg";
+import constCommercialImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.03 AM (2).jpeg";
+import constOfficeImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.03 AM.jpeg";
+import constApartmentImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.04 AM (1).jpeg";
+import constWarehouseImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.04 AM (2).jpeg";
+import constApprovalImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.04 AM.jpeg";
 
 const getServiceImageDetails = (category, serviceType = "", propertyType = "") => {
   const sType = (serviceType || "").toLowerCase();
   const pType = (propertyType || "").toLowerCase();
 
   switch (category) {
+    case "construction":
+      if (sType.includes("house") || sType.includes("residential") || pType.includes("house") || pType.includes("villa")) {
+        return { image: constHouseImg, badge: "House Construction", caption: "Quality House Construction Services in Hosur" };
+      }
+      if (sType.includes("commercial building") || pType.includes("commercial")) {
+        return { image: constCommercialImg, badge: "Commercial Construction", caption: "Commercial Building Construction & Contracting" };
+      }
+      if (sType.includes("office")) {
+        return { image: constOfficeImg, badge: "Office Construction", caption: "Modern Office Construction & Setup" };
+      }
+      if (sType.includes("apartment") || sType.includes("flat") || pType.includes("apartment")) {
+        return { image: constApartmentImg, badge: "Apartment Construction", caption: "Multi-Storey Apartment Construction Solutions" };
+      }
+      if (sType.includes("industry") || sType.includes("warehouse")) {
+        return { image: constWarehouseImg, badge: "Industrial & Warehouse Construction", caption: "Industrial Shed & Warehouse Construction" };
+      }
+      if (sType.includes("plan") || sType.includes("2d") || sType.includes("3d") || sType.includes("hntda") || sType.includes("rera") || sType.includes("approval")) {
+        return { image: constApprovalImg, badge: "Approval Plans & Blueprints", caption: "HNTDA & RERA Approval Plans & 2D/3D Drawings" };
+      }
+      return { image: contractsWorksImg, badge: "Construction Services", caption: "Quality House & Commercial Building Construction" };
+
+    case "home_office_services":
+      if (sType.includes("deep cleaning")) {
+        return { image: cleaningServiceImg, badge: "Deep Cleaning Service", caption: "Professional Home & Office Deep Cleaning" };
+      }
+      if (sType.includes("shifting") || sType.includes("packers") || sType.includes("movers")) {
+        return { image: houseShiftingImg, badge: "Packers & Movers", caption: "Hassle-Free Home & Office Shifting" };
+      }
+      if (sType.includes("appliance") || sType.includes("tv") || sType.includes("fridge") || sType.includes("washing")) {
+        return { image: applianceServiceImg, badge: "Appliance Service", caption: "Expert TV, Fridge & Washing Machine Repair" };
+      }
+      if (sType.includes("electrical") || sType.includes("plumbing")) {
+        return { image: applianceServiceImg, badge: "Electrical & Plumbing", caption: "Certified Electrical & Plumbing Maintenance" };
+      }
+      if (sType.includes("interior") || sType.includes("carpentry")) {
+        return { image: carpentryServiceImg, badge: "Carpentry & Woodwork", caption: "Custom Carpentry & Furniture Repair" };
+      }
+      if (sType.includes("pest")) {
+        return { image: pestControlImg, badge: "Pest Control", caption: "Safe & Effective Pest Control Solutions" };
+      }
+      if (sType.includes("tank") || sType.includes("sump") || sType.includes("bathroom")) {
+        return { image: cleaningServiceImg, badge: "Tank, Sump & Bathroom Cleaning", caption: "Hygienic Sump & Overhead Tank Cleaning" };
+      }
+      if (sType.includes("painting")) {
+        return { image: paintingServiceImg, badge: "Painting Work", caption: "Interior & Exterior House Painting" };
+      }
+      if (sType.includes("sofa") || sType.includes("carpet")) {
+        return { image: cleaningServiceImg, badge: "Sofa & Carpet Cleaning", caption: "Sanitized Sofa & Upholstery Cleaning" };
+      }
+      return { image: cleaningServiceImg, badge: "Home & Office Care", caption: "Reliable Support for Home & Office Spaces" };
+
+    case "loan":
+      if (sType.includes("home loan balance transfer")) {
+        return { image: homeLoanImg, badge: "Balance Transfer", caption: "Home Loan Balance Transfer with Lower Rates" };
+      }
+      if (sType.includes("plot")) {
+        return { image: plotLoanImg, badge: "Plot Loan", caption: "Instant Approval Plot Purchase Financing" };
+      }
+      if (sType.includes("mortgage") || sType.includes("finance")) {
+        return { image: plotLoanImg, badge: "Mortgage Loan", caption: "Loan Against Property & Flexible Financing" };
+      }
+      if (sType.includes("commercial")) {
+        return { image: commercialImg, badge: "Commercial Loan", caption: "High Value Commercial Property Financing" };
+      }
+      if (sType.includes("agriculture")) {
+        return { image: agricultureLoanImg, badge: "Agriculture Loan", caption: "Low Interest Agri & Farm Land Financing" };
+      }
+      return { image: homeLoanImg, badge: "Home Loan Assistance", caption: "Quick & Easy Home Loan Approvals in Hosur" };
+
+    case "interior":
+      if (sType.includes("office")) {
+        return { image: officeInteriorImg, badge: "Office Interiors", caption: "Modern Ergonomic Office Interior Setup" };
+      }
+      return { image: interiorsImg, badge: "Home Interiors", caption: "Luxury Residential Interior Design & Furnishing" };
+
     case "property_buy":
       if (pType.includes("plot") || pType.includes("land")) {
-        return { image: plotSearchImg, badge: "Plot & Land", caption: "Verified Plots & Land in Hosur" };
+        return { image: plotSearchImg, badge: "Verified Plots", caption: "Find Approved Plots for Sale in Hosur" };
       }
       if (pType.includes("commercial") || pType.includes("office") || pType.includes("warehouse")) {
-        return { image: commercialImg, badge: "Commercial Property", caption: "Premium Commercial Spaces" };
+        return { image: commercialImg, badge: "Commercial Spaces", caption: "Buy High-Yield Commercial Property in Hosur" };
       }
       if (sType.includes("deed") || sType.includes("legal") || sType.includes("agreement")) {
-        return { image: registrationImg, badge: "Registration & Legal", caption: "Legal Verification & Registration Support" };
+        return { image: registrationImg, badge: "Legal & Documentation", caption: "Legal Verification & Sale Agreement Support" };
       }
       if (sType.includes("patta")) {
-        return { image: pattaImg, badge: "Patta Transfer", caption: "Fast & Reliable Patta Transfer Services" };
+        return { image: pattaImg, badge: "Patta Transfer", caption: "Fast & Hassle-Free Patta Name Transfer" };
       }
       if (sType.includes("survey")) {
-        return { image: landSurveyImg, badge: "Land Survey", caption: "Professional Land Measurement & Survey" };
+        return { image: landSurveyImg, badge: "Land Survey", caption: "Government Approved Land Measurement Survey" };
       }
-      return { image: buyGuidanceImg, badge: "Buy Guidance", caption: "Expert Guidance to Buy Your Ideal Property" };
+      return { image: buyGuidanceImg, badge: "Property Buy Guidance", caption: "Expert Consultation for Property Buyers" };
 
     case "property_sell":
       if (pType.includes("plot") || pType.includes("land")) {
-        return { image: plotSearchImg, badge: "Plot Sale", caption: "Sell Your Plot with Best Market Value" };
+        return { image: plotSearchImg, badge: "Plot Sale", caption: "Sell Your Plot to Direct Verified Buyers" };
       }
-      if (pType.includes("commercial") || pType.includes("office") || pType.includes("warehouse")) {
-        return { image: commercialImg, badge: "Commercial Sale", caption: "Sell Commercial Real Estate Fast" };
+      if (pType.includes("commercial")) {
+        return { image: commercialImg, badge: "Commercial Sale", caption: "Sell Commercial Land & Buildings" };
       }
-      return { image: sellGuidanceImg, badge: "Sell Guidance", caption: "Get Maximum Value for Your Property" };
+      return { image: sellGuidanceImg, badge: "Property Sell Assistance", caption: "Get Best Valuation & Fast Property Sale" };
 
     case "property_rent":
-      if (pType.includes("commercial") || pType.includes("office") || pType.includes("warehouse") || pType.includes("industrial")) {
-        return { image: commercialImg, badge: "Commercial Rent", caption: "Commercial Spaces & Warehouses for Rent" };
+      if (pType.includes("commercial") || pType.includes("office") || pType.includes("warehouse")) {
+        return { image: commercialImg, badge: "Commercial Rental", caption: "Rent Commercial Buildings & Warehouses" };
       }
-      return { image: houseImg, badge: "Residential Rent", caption: "Find Homes & Apartments for Rent in Hosur" };
-
-    case "loan":
-      if (sType.includes("plot")) {
-        return { image: plotLoanImg, badge: "Plot Loan", caption: "Lowest Interest Rates on Plot Loans" };
-      }
-      if (sType.includes("agriculture")) {
-        return { image: agricultureLoanImg, badge: "Agriculture Loan", caption: "Hassle-free Agricultural & Land Financing" };
-      }
-      return { image: homeLoanImg, badge: "Home & Personal Loan", caption: "Quick Approval Home Loan Solutions" };
-
-    case "interior":
-      if (sType.includes("carpentry") || sType.includes("office")) {
-        return { image: carpentryServiceImg, badge: "Interior & Carpentry", caption: "Custom Carpentry & Interior Work" };
-      }
-      return { image: interiorsImg, badge: "Home Interiors", caption: "Modern Interior Designs for Beautiful Homes" };
-
-    case "construction":
-      return { image: constructionImg, badge: "Construction Services", caption: "Quality House & Commercial Building Construction" };
+      return { image: houseImg, badge: "Residential Rental", caption: "Find Houses & Apartments for Rent in Hosur" };
 
     case "property_management":
-      if (sType.includes("land") || sType.includes("garden")) {
-        return { image: landSurveyImg, badge: "Land & Garden Maintenance", caption: "Landscaping & Lawn Maintenance" };
+      if (sType.includes("garden") || sType.includes("land")) {
+        return { image: landSurveyImg, badge: "Landscaping & Garden", caption: "Professional Lawn & Garden Care" };
       }
-      if (sType.includes("nri") || sType.includes("amc") || sType.includes("facility")) {
-        return { image: pattaImg, badge: "Facility AMC & Management", caption: "Comprehensive Property & Facility Management" };
+      if (sType.includes("warehouse") || sType.includes("industry")) {
+        return { image: constWarehouseImg, badge: "Facility AMC", caption: "Industrial & Warehouse Maintenance AMC" };
       }
-      return { image: landSurveyImg, badge: "Property Management", caption: "Dedicated Maintenance & Asset Care in Hosur" };
-
-    case "home_office_services":
-      if (sType.includes("clean") || sType.includes("tank") || sType.includes("sump") || sType.includes("sofa")) {
-        return { image: cleaningServiceImg, badge: "Deep Cleaning", caption: "Professional Cleaning Services" };
+      if (sType.includes("nri")) {
+        return { image: nriPropertyMgmtImg, badge: "NRI Property Care", caption: "Dedicated Property Asset Care for NRIs" };
       }
-      if (sType.includes("appliance") || sType.includes("electrical") || sType.includes("plumbing")) {
-        return { image: applianceServiceImg, badge: "Appliance & Utility Care", caption: "Expert Appliance, Electrical & Plumbing Service" };
-      }
-      if (sType.includes("carpentry") || sType.includes("painting") || sType.includes("interior")) {
-        return { image: carpentryServiceImg, badge: "Carpentry & Repairs", caption: "Quality Woodwork & Painting Services" };
-      }
-      return { image: applianceServiceImg, badge: "Home & Office Care", caption: "Reliable Service Support for Home & Office" };
+      return { image: houseImg, badge: "Property Management", caption: "Facility AMC & Complete Maintenance Services" };
 
     default:
       return { image: buyGuidanceImg, badge: "Property Service", caption: "Trusted Real Estate Services in Hosur" };
@@ -216,8 +277,8 @@ const ServiceRequestPage = () => {
         description={`Submit your ${categoryTitle.toLowerCase()} request on MyHosurProperty and let our admin team contact you.`}
       />
 
-      <section className="grid gap-6 lg:grid-cols-[0.96fr_1.04fr]">
-        <div className="marketing-card p-6 sm:p-8 md:p-10">
+      <section className="grid gap-6 lg:grid-cols-[0.96fr_1.04fr] items-start">
+        <div className="marketing-card p-6 sm:p-8 md:p-10 flex flex-col gap-6">
           <div>
             <p className="section-tag">Logged-in service desk</p>
             <h1 className="mt-3 text-3xl font-bold text-navy md:text-4xl lg:text-5xl">{categoryTitle} request</h1>
@@ -226,14 +287,15 @@ const ServiceRequestPage = () => {
             </p>
           </div>
 
-          <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300">
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300">
             <div className="relative h-64 sm:h-72 md:h-80 lg:h-96 w-full overflow-hidden bg-slate-100">
               <img
+                key={imageDetails.image}
                 src={imageDetails.image}
                 alt={`${categoryTitle} Service`}
                 loading="lazy"
                 decoding="async"
-                className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                className="h-full w-full object-cover transition-all duration-500 hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/30 to-transparent flex flex-col justify-end p-5 sm:p-6 text-white">
                 <span className="inline-block rounded-md bg-orange px-3 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-sm mb-2 w-fit">
@@ -321,9 +383,9 @@ const ServiceRequestPage = () => {
             ) : null}
 
             {showServiceType ? (
-              <label className="block">
+              <label className="block sm:col-span-2">
                 <span className="mb-2 block text-sm font-semibold text-slate-700">Service type</span>
-                <select className="site-input" value={serviceType} onChange={(event) => setServiceType(event.target.value)}>
+                <select className="site-input font-bold text-navy" value={serviceType} onChange={(event) => setServiceType(event.target.value)}>
                   {currentOption.serviceTypes.map((item) => (
                     <option key={item} value={item}>
                       {item}

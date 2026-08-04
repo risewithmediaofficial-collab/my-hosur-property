@@ -1,11 +1,13 @@
 export const PROPERTY_FILTER_CATEGORIES = [
-  { id: "buy", label: "Buy" },
-  { id: "rentLease", label: "Rent / Lease" },
-  { id: "commercial", label: "Commercial Land / Building" },
-  { id: "farmland", label: "Farmland" },
+  { id: "plot", label: "Plot" },
   { id: "agricultural", label: "Agricultural Land" },
-  { id: "individualHouse", label: "Individual House" },
+  { id: "plotRent", label: "Plot for Rent" },
+  { id: "farmland", label: "Farm Land" },
+  { id: "villa", label: "Villa" },
+  { id: "individualHouse", label: "Independent House" },
+  { id: "houseRent", label: "House for Rent" },
   { id: "apartment", label: "Apartment" },
+  { id: "commercial", label: "Commercial Land / Building" },
 ];
 
 export const SORT_OPTIONS = [
@@ -16,181 +18,296 @@ export const SORT_OPTIONS = [
   { id: "nearbyFirst", label: "Nearby First", apiSort: "rank" },
 ];
 
-export const LOCATION_SUGGESTIONS = [
-  "Hosur",
-  "Bagalur Road",
-  "Nallur Road",
-  "Avalapalli Road",
-  "Alasanatham Road",
-  "Kelamangalam Road",
-  "Thally Road",
-  "Attibele Road",
-  "Denkanikottai Road",
-  "TVS Road",
-  "Athimugam Road",
-  "Rayakottai Road",
-  "Mathigiri",
-  "Sipcot",
-  "Krishnagiri",
-  "Kelamangalam",
-  "Rayakottai",
+export const PLOT_PRICE_PRESETS = [
+  { label: "₹1 Lakh – ₹10 Lakhs", min: 100000, max: 1000000 },
+  { label: "₹10 Lakhs – ₹20 Lakhs", min: 1000000, max: 2000000 },
+  { label: "₹20 Lakhs – ₹30 Lakhs", min: 2000000, max: 3000000 },
+  { label: "₹40 Lakhs – ₹50 Lakhs", min: 4000000, max: 5000000 },
+  { label: "₹50 Lakhs – ₹60 Lakhs", min: 5000000, max: 6000000 },
+  { label: "₹70 Lakhs – ₹80 Lakhs", min: 7000000, max: 8000000 },
+  { label: "₹90 Lakhs – ₹1 Crore", min: 9000000, max: 10000000 },
+  { label: "₹1 Crore & Above", min: 10000000, max: "" },
 ];
 
-export const COMMERCIAL_LOCATIONS = [
-  "Hosur",
-  "Bagalur Road",
-  "Nallur Road",
-  "Avalapalli Road",
-  "Alasanatham Road",
-  "Kelamangalam Road",
-  "Thally Road",
-  "Attibele Road",
-  "Denkanikottai Road",
-  "TVS Road",
-  "Athimugam Road",
-  "Rayakottai Road",
-  "Sipcot",
-  "Mathigiri",
-  "Krishnagiri",
+export const FARMLAND_PRICE_PRESETS = [
+  { label: "₹1 Lakh – ₹2 Lakhs", min: 100000, max: 200000 },
+  { label: "₹2 Lakhs – ₹3 Lakhs", min: 200000, max: 300000 },
+  { label: "₹3 Lakhs – ₹4 Lakhs", min: 300000, max: 400000 },
+  { label: "₹4 Lakhs – ₹5 Lakhs", min: 400000, max: 500000 },
+  { label: "₹5 Lakhs – ₹6 Lakhs", min: 500000, max: 600000 },
+  { label: "₹6 Lakhs – ₹7 Lakhs", min: 600000, max: 700000 },
+  { label: "₹7 Lakhs – ₹8 Lakhs", min: 700000, max: 800000 },
+  { label: "₹8 Lakhs – ₹9 Lakhs", min: 800000, max: 900000 },
+  { label: "₹9 Lakhs – ₹10 Lakhs", min: 900000, max: 1000000 },
 ];
 
-export const BUDGET_PRESETS = [
-  { label: "₹25 Lakh - ₹50 Lakh", min: 2500000, max: 5000000 },
-  { label: "₹50 Lakh - ₹75 Lakh", min: 5000000, max: 7500000 },
-  { label: "₹75 Lakh - ₹1 Crore", min: 7500000, max: 10000000 },
-  { label: "₹1 Crore - ₹1.5 Crore", min: 10000000, max: 15000000 },
-  { label: "₹1.5 Crore - ₹2 Crore", min: 15000000, max: 20000000 },
-  { label: "₹2 Crore - ₹3 Crore", min: 20000000, max: 30000000 },
-  { label: "₹3 Crore - ₹5 Crore", min: 30000000, max: 50000000 },
-  { label: "₹5 Crore - ₹7 Crore", min: 50000000, max: 70000000 },
-  { label: "₹7 Crore - ₹10 Crore", min: 70000000, max: 100000000 },
-  { label: "₹10 Crore+", min: 100000000, max: "" },
+export const VILLA_HOUSE_PRICE_PRESETS = [
+  { label: "₹30 Lakhs", min: 3000000, max: 3500000 },
+  { label: "₹35 Lakhs", min: 3500000, max: 4000000 },
+  { label: "₹40 Lakhs", min: 4000000, max: 4500000 },
+  { label: "₹45 Lakhs", min: 4500000, max: 5000000 },
+  { label: "₹50 Lakhs", min: 5000000, max: 5500000 },
+  { label: "₹55 Lakhs", min: 5500000, max: 6000000 },
+  { label: "₹60 Lakhs", min: 6000000, max: 7000000 },
+  { label: "₹70 Lakhs", min: 7000000, max: 8000000 },
+  { label: "₹80 Lakhs", min: 8000000, max: 9000000 },
+  { label: "₹90 Lakhs", min: 9000000, max: 10000000 },
+  { label: "₹1 Crore", min: 10000000, max: 12000000 },
+  { label: "₹1.20 Crores", min: 12000000, max: 13000000 },
+  { label: "₹1.30 Crores", min: 13000000, max: 14000000 },
+  { label: "₹1.40 Crores", min: 14000000, max: 15000000 },
+  { label: "₹1.50 Crores", min: 15000000, max: 17500000 },
+  { label: "₹1.75 Crores", min: 17500000, max: 20000000 },
+  { label: "₹2 Crores", min: 20000000, max: 25000000 },
+  { label: "₹2 Crores & Above", min: 20000000, max: "" },
 ];
 
-export const RENT_BUDGET_PRESETS = [
-  { label: "₹2,000 - ₹5,000", min: 2000, max: 5000 },
-  { label: "₹5,000 - ₹10,000", min: 5000, max: 10000 },
-  { label: "₹10,000 - ₹20,000", min: 10000, max: 20000 },
-  { label: "₹20,000+", min: 20000, max: "" },
+export const PLOT_RENT_PRESETS = [
+  { label: "₹3,000 – ₹5,000", min: 3000, max: 5000 },
+  { label: "₹5,000 – ₹6,000", min: 5000, max: 6000 },
+  { label: "₹6,000 – ₹7,000", min: 6000, max: 7000 },
+  { label: "₹7,000 – ₹9,000", min: 7000, max: 9000 },
+  { label: "₹9,000 – ₹10,000", min: 9000, max: 10000 },
+  { label: "₹10,000 – ₹12,000", min: 10000, max: 12000 },
+  { label: "₹12,000 – ₹15,000", min: 12000, max: 15000 },
+  { label: "₹15,000 & Above", min: 15000, max: "" },
 ];
 
-export const LEASE_PRESETS = [
-  { label: "₹5 Lakh - ₹7 Lakh", min: 500000, max: 700000 },
-  { label: "₹7 Lakh - ₹10 Lakh", min: 700000, max: 1000000 },
-  { label: "₹10 Lakh - ₹15 Lakh", min: 1000000, max: 1500000 },
-  { label: "₹15 Lakh - ₹20 Lakh", min: 1500000, max: 2000000 },
-  { label: "₹20 Lakh+", min: 2000000, max: "" },
+export const HOUSE_RENT_PRESETS = [
+  { label: "₹4,000 – ₹6,000", min: 4000, max: 6000 },
+  { label: "₹6,000 – ₹8,000", min: 6000, max: 8000 },
+  { label: "₹8,000 – ₹10,000", min: 8000, max: 10000 },
+  { label: "₹10,000 – ₹12,000", min: 10000, max: 12000 },
+  { label: "₹12,000 – ₹15,000", min: 12000, max: 15000 },
+  { label: "₹15,000 – ₹20,000", min: 15000, max: 20000 },
+  { label: "₹20,000 – ₹25,000", min: 20000, max: 25000 },
+  { label: "₹25,000 – ₹30,000", min: 25000, max: 30000 },
+  { label: "₹30,000 – ₹50,000", min: 30000, max: 50000 },
+  { label: "₹50,000 & Above", min: 50000, max: "" },
 ];
 
-const facingOptions = ["East", "North", "South", "West"];
-const distanceOptions = ["1 - 3 km", "3 - 5 km", "5 - 10 km", "10 km+"];
+/** Facing options with 8 directions */
+export const FACING_OPTIONS = [
+  "East",
+  "West",
+  "North",
+  "South",
+  "North East",
+  "North West",
+  "South East",
+  "South West",
+];
+
+export const DEFAULT_PLOT_LAND_AREA_OPTIONS = ["600 sq.ft", "800 sq.ft"];
 
 /**
- * Dynamic filter definitions per category.
- * type: checkbox | radio | search | select | range | rangePresets
+ * Property filter configurations per category.
+ * Approvals are shown strictly per category requirements:
+ * - Plot & Villa: HNTDA Approved, DTCP Approved, RERA Approved
+ * - Flat & Apartment: RERA Approved ONLY (Hides HNTDA, DTCP)
+ * - Commercial Land: HNTDA, DTCP, RERA Approved
+ * - Commercial Building: RERA Approved ONLY
+ * - Independent House, House for Rent, Agricultural Land, Plot for Rent, Farm Land: NO Approval Filters Shown.
  */
 export const propertyFilterConfig = {
-  buy: [
+  // 1. Plot -> Show HNTDA, DTCP, RERA Approved
+  plot: [
     {
-      key: "propertyType",
-      label: "Property Type",
-      type: "checkbox",
-      options: [
-        "Individual House",
-        "Apartment",
-        "Villa",
-        "Plot",
-        "Commercial Building",
-        "Commercial Land",
-        "Farmland",
-        "Agricultural Land",
-      ],
+      key: "budget",
+      label: "Expected Price",
+      type: "rangePresets",
+      presets: PLOT_PRICE_PRESETS,
+      minKey: "minPrice",
+      maxKey: "maxPrice",
     },
-    { key: "location", label: "Location", type: "search", suggestions: LOCATION_SUGGESTIONS },
-    { key: "budget", label: "Budget", type: "rangePresets", presets: BUDGET_PRESETS, minKey: "minPrice", maxKey: "maxPrice" },
-    { key: "facing", label: "Facing", type: "checkbox", options: facingOptions },
-    { key: "distance", label: "Distance", type: "checkbox", options: distanceOptions },
+    {
+      key: "approval",
+      label: "Approval Filters",
+      type: "checkbox",
+      options: ["HNTDA Approved", "DTCP Approved", "RERA Approved"],
+    },
+    {
+      key: "landArea",
+      label: "Land Area",
+      type: "checkbox",
+      options: DEFAULT_PLOT_LAND_AREA_OPTIONS,
+    },
+    {
+      key: "facing",
+      label: "Facing",
+      type: "select",
+      options: FACING_OPTIONS,
+    },
+    {
+      key: "dimensions",
+      label: "Dimensions",
+      type: "dimensions",
+      lengthKey: "length",
+      widthKey: "width",
+    },
+    {
+      key: "plotType",
+      label: "Plot Type",
+      type: "checkbox",
+      options: ["Layout Plot", "Statistical Plot"],
+    },
   ],
 
+  // 2. Villa -> Show HNTDA, DTCP, RERA Approved
+  villa: [
+    {
+      key: "budget",
+      label: "Expected Price",
+      type: "rangePresets",
+      presets: VILLA_HOUSE_PRICE_PRESETS,
+      minKey: "minPrice",
+      maxKey: "maxPrice",
+    },
+    {
+      key: "approval",
+      label: "Approval Filters",
+      type: "checkbox",
+      options: ["HNTDA Approved", "DTCP Approved", "RERA Approved"],
+    },
+    {
+      key: "carParking",
+      label: "Car Parking",
+      type: "checkbox",
+      options: ["1 Car", "2 Cars", "3 Cars", "4+ Cars"],
+    },
+    {
+      key: "waterSource",
+      label: "Water Source",
+      type: "checkbox",
+      options: ["Borewell", "Layout Water"],
+    },
+    {
+      key: "facing",
+      label: "Facing",
+      type: "select",
+      options: FACING_OPTIONS,
+    },
+    {
+      key: "bhk",
+      label: "BHK",
+      type: "checkbox",
+      options: ["2 BHK", "3 BHK", "4 BHK", "5 BHK+"],
+    },
+  ],
+
+  // 3. Flat / Apartment -> Show RERA Approved ONLY (Hide HNTDA, DTCP)
+  apartment: [
+    {
+      key: "budget",
+      label: "Expected Price",
+      type: "rangePresets",
+      presets: VILLA_HOUSE_PRICE_PRESETS,
+      minKey: "minPrice",
+      maxKey: "maxPrice",
+    },
+    {
+      key: "approval",
+      label: "Approval Filters",
+      type: "checkbox",
+      options: ["RERA Approved"],
+    },
+    {
+      key: "bhk",
+      label: "BHK",
+      type: "checkbox",
+      options: ["1 BHK", "2 BHK", "3 BHK", "4 BHK"],
+    },
+    {
+      key: "facing",
+      label: "Facing",
+      type: "select",
+      options: FACING_OPTIONS,
+    },
+    {
+      key: "carParking",
+      label: "Car Parking",
+      type: "radio",
+      options: ["Yes", "No"],
+    },
+  ],
+
+  flat: [
+    {
+      key: "budget",
+      label: "Expected Price",
+      type: "rangePresets",
+      presets: VILLA_HOUSE_PRICE_PRESETS,
+      minKey: "minPrice",
+      maxKey: "maxPrice",
+    },
+    {
+      key: "approval",
+      label: "Approval Filters",
+      type: "checkbox",
+      options: ["RERA Approved"],
+    },
+    {
+      key: "bhk",
+      label: "BHK",
+      type: "checkbox",
+      options: ["1 BHK", "2 BHK", "3 BHK", "4 BHK"],
+    },
+    {
+      key: "facing",
+      label: "Facing",
+      type: "select",
+      options: FACING_OPTIONS,
+    },
+  ],
+
+  // 4. Commercial Land / Building -> Land: HNTDA, DTCP, RERA | Building: RERA ONLY
   commercial: [
+    {
+      key: "budget",
+      label: "Budget",
+      type: "rangePresets",
+      presets: VILLA_HOUSE_PRICE_PRESETS,
+      minKey: "minPrice",
+      maxKey: "maxPrice",
+    },
     {
       key: "purpose",
       label: "Purpose",
       type: "checkbox",
-      options: [
-        "Buying",
-        "Hospital",
-        "Commercial Building",
-        "Shop",
-        "Office",
-        "Showroom",
-        "Warehouse",
-        "Industrial Use",
-      ],
-    },
-    { key: "location", label: "Location", type: "search", suggestions: COMMERCIAL_LOCATIONS },
-    { key: "distance", label: "Distance", type: "checkbox", options: distanceOptions },
-    { key: "budget", label: "Budget", type: "rangePresets", presets: BUDGET_PRESETS, minKey: "minPrice", maxKey: "maxPrice" },
-    {
-      key: "roadSize",
-      label: "Road Size",
-      type: "checkbox",
-      options: ["25 - 30 feet", "30 - 40 feet", "40 - 60 feet", "60 feet+"],
-    },
-    { key: "facing", label: "Facing", type: "checkbox", options: facingOptions },
-    {
-      key: "monthlyIncome",
-      label: "Monthly Income / ROI",
-      type: "checkbox",
-      options: ["0.5% - 0.7%", "0.7% - 1%", "1%+"],
+      options: ["Commercial Land", "Commercial Building", "Shop", "Office", "Showroom", "Warehouse"],
     },
     {
-      key: "buildingAge",
-      label: "Building Age",
+      key: "approval",
+      label: "Approval Filters",
       type: "checkbox",
-      options: ["0 - 2 years", "2 - 5 years", "5 - 7 years", "7 - 10 years", "10 years+"],
+      options: ["HNTDA Approved", "DTCP Approved", "RERA Approved"],
+    },
+    {
+      key: "facing",
+      label: "Facing",
+      type: "select",
+      options: FACING_OPTIONS,
     },
   ],
 
-  apartment: [
+  // 5. Agricultural Land -> DO NOT SHOW Approval Filters
+  agricultural: [
     {
       key: "landArea",
-      label: "Land Area / Built-up Area",
+      label: "Land Area (Cents / Acres)",
       type: "checkbox",
-      options: ["600 sq.ft", "800 sq.ft", "1000 sq.ft", "1200 sq.ft", "1500 sq.ft", "1800 sq.ft", "2000 sq.ft+"],
+      options: [
+        "20 Cents",
+        "25 Cents",
+        "50 Cents",
+        "75 Cents",
+        "1 Acre",
+        "2 Acres",
+        "3 Acres",
+        "4 Acres",
+        "5 Acres & Above",
+      ],
     },
-    { key: "facing", label: "Facing", type: "checkbox", options: facingOptions },
-    {
-      key: "floors",
-      label: "Number of Floors",
-      type: "checkbox",
-      options: ["2 Floors", "4 Floors", "5 Floors", "6 Floors", "7 Floors", "8 Floors", "9 Floors", "10 Floors", "15 Floors", "20 Floors+"],
-    },
-    {
-      key: "units",
-      label: "Number of Houses / Units",
-      type: "checkbox",
-      options: ["4 Units", "5 Units", "6 Units", "7 Units", "8 Units", "9 Units", "10 Units", "15 Units", "20 Units+"],
-    },
-    { key: "lift", label: "Lift", type: "radio", options: ["Yes", "No"] },
-    { key: "security", label: "Security", type: "radio", options: ["Yes", "No"] },
-    {
-      key: "nearbyPlaces",
-      label: "Nearby Places",
-      type: "checkbox",
-      options: ["School", "Hospital", "Bus Stop", "Market", "Railway Station"],
-    },
-    { key: "clubHouse", label: "Club House", type: "radio", options: ["Yes", "No"] },
-    { key: "compoundWall", label: "Compound Wall", type: "radio", options: ["Yes", "No"] },
-    {
-      key: "ebConnection",
-      label: "EB Connection",
-      type: "checkbox",
-      options: ["Single Phase", "3 Phase"],
-    },
-  ],
-
-  agricultural: [
     {
       key: "landType",
       label: "Type of Land",
@@ -198,156 +315,165 @@ export const propertyFilterConfig = {
       options: ["Dry Land", "Wet Land"],
     },
     {
-      key: "waterSource",
-      label: "Water Source",
-      type: "checkbox",
-      options: ["Well", "Borewell", "River"],
-    },
-    { key: "location", label: "Location", type: "search", suggestions: LOCATION_SUGGESTIONS },
-    {
-      key: "roadSize",
-      label: "Road Size",
-      type: "checkbox",
-      options: ["20 feet", "30 feet", "40 feet+"],
-    },
-    {
-      key: "roadType",
-      label: "Road Type",
-      type: "checkbox",
-      options: ["Tar Road", "Sand Road", "Mud Road"],
-    },
-    {
-      key: "cityDistance",
-      label: "City to Land Distance",
-      type: "checkbox",
-      options: ["Below 5 km", "5 - 10 km", "10 - 15 km", "15 - 20 km", "20 km+", "Anywhere"],
-    },
-    {
       key: "soilType",
-      label: "Land Soil Type",
+      label: "Soil Type",
       type: "checkbox",
-      options: ["Red Soil", "Normal Soil", "Clay Soil"],
-    },
-    {
-      key: "landCondition",
-      label: "Land Condition",
-      type: "checkbox",
-      options: [
-        "Empty Land",
-        "Mango Trees",
-        "Coconut Trees",
-        "Other Trees",
-        "Registered Cultivation",
-        "Flower Cultivation",
-      ],
-    },
-    {
-      key: "acres",
-      label: "Acres",
-      type: "checkbox",
-      options: ["1 Acre", "2 - 3 Acres", "3 - 5 Acres", "5 - 10 Acres", "10 Acres+"],
-    },
-    {
-      key: "pricePerAcre",
-      label: "Price Per Acre",
-      type: "checkbox",
-      options: [
-        "₹50 Lakh",
-        "₹1 Crore",
-        "₹2 Crore",
-        "₹3 Crore",
-        "₹5 Crore+",
-        "₹1 Crore Per Acre",
-        "₹2 Crore Per Acre",
-        "₹3 Crore Per Acre+",
-      ],
+      options: ["Red Soil", "Black Soil", "Clay Soil", "Alluvial Soil", "Sandy Soil"],
     },
   ],
 
-  individualHouse: [
+  // 6. Plot for Rent -> DO NOT SHOW Approval Filters
+  plotRent: [
     {
-      key: "houseType",
-      label: "House Type",
-      type: "checkbox",
-      options: ["Simplex", "Duplex"],
+      key: "rentBudget",
+      label: "Monthly Rent",
+      type: "rangePresets",
+      presets: PLOT_RENT_PRESETS,
+      minKey: "minRent",
+      maxKey: "maxRent",
     },
-    { key: "bhk", label: "BHK", type: "checkbox", options: ["1 BHK", "2 BHK", "3 BHK"] },
     {
       key: "landArea",
       label: "Land Area",
       type: "checkbox",
-      options: ["600 sq.ft", "800 sq.ft", "1000 sq.ft", "1200 sq.ft", "1500 sq.ft", "1800 sq.ft"],
+      options: ["600 sq.ft", "800 sq.ft", "1200 sq.ft", "2400 sq.ft"],
     },
     {
-      key: "builtUpArea",
-      label: "Built-up Area",
-      type: "checkbox",
-      options: ["600 sq.ft", "700 sq.ft", "800 sq.ft", "900 sq.ft", "1000 sq.ft", "1100 sq.ft", "1500 sq.ft+"],
+      key: "facing",
+      label: "Facing",
+      type: "select",
+      options: FACING_OPTIONS,
     },
-    { key: "facing", label: "Facing", type: "checkbox", options: facingOptions },
-    {
-      key: "furnishing",
-      label: "Furnishing",
-      type: "checkbox",
-      options: ["Furnished", "Semi Furnished", "Unfurnished"],
-    },
-    {
-      key: "layoutType",
-      label: "Layout Type",
-      type: "checkbox",
-      options: ["Normal Layout", "Gated Community Layout", "DTCP Approved Layout", "HNTDA Approved Layout"],
-    },
-    {
-      key: "nearbyPlaces",
-      label: "Nearby Places",
-      type: "checkbox",
-      options: ["Bus Stop", "School", "Hospital", "Market"],
-    },
-    { key: "carParking", label: "Car Parking", type: "radio", options: ["Yes", "No"] },
-    { key: "distance", label: "Distance", type: "checkbox", options: ["3 km", "5 km", "7 km", "10 km+"] },
   ],
 
+  // 7. Farm Land -> DO NOT SHOW Approval Filters
+  farmland: [
+    {
+      key: "budget",
+      label: "Expected Price",
+      type: "rangePresets",
+      presets: FARMLAND_PRICE_PRESETS,
+      minKey: "minPrice",
+      maxKey: "maxPrice",
+    },
+    {
+      key: "landArea",
+      label: "Land Area",
+      type: "checkbox",
+      options: [
+        "10 Cents",
+        "11 Cents",
+        "15 Cents",
+        "22 Cents",
+        "25 Cents",
+        "25 Cents & Above",
+      ],
+    },
+  ],
+
+  // 8. Independent House -> DO NOT SHOW Approval Filters
+  individualHouse: [
+    {
+      key: "budget",
+      label: "Expected Price",
+      type: "rangePresets",
+      presets: VILLA_HOUSE_PRICE_PRESETS,
+      minKey: "minPrice",
+      maxKey: "maxPrice",
+    },
+    {
+      key: "carParking",
+      label: "Car Parking",
+      type: "checkbox",
+      options: ["1 Car", "2 Cars", "3 Cars", "4+ Cars"],
+    },
+    {
+      key: "waterSource",
+      label: "Water Source",
+      type: "checkbox",
+      options: ["Borewell", "Corporation Water"],
+    },
+    {
+      key: "facing",
+      label: "Facing",
+      type: "select",
+      options: FACING_OPTIONS,
+    },
+    {
+      key: "bhk",
+      label: "BHK",
+      type: "checkbox",
+      options: ["1 BHK", "2 BHK", "3 BHK", "4 BHK"],
+    },
+  ],
+
+  // 9. House for Rent -> DO NOT SHOW Approval Filters
+  houseRent: [
+    {
+      key: "rentBudget",
+      label: "Monthly Rent",
+      type: "rangePresets",
+      presets: HOUSE_RENT_PRESETS,
+      minKey: "minRent",
+      maxKey: "maxRent",
+    },
+    {
+      key: "carParking",
+      label: "Car Parking",
+      type: "radio",
+      options: ["Yes", "No"],
+    },
+    {
+      key: "monthlyMaintenance",
+      label: "Monthly Maintenance",
+      type: "maintenance",
+      amountKey: "maintenanceAmount",
+      statusKey: "maintenanceStatus",
+      options: ["Included", "Not Included"],
+    },
+    {
+      key: "waterSource",
+      label: "Water Source",
+      type: "checkbox",
+      options: ["Borewell", "Corporation Water"],
+    },
+    {
+      key: "bhk",
+      label: "BHK",
+      type: "checkbox",
+      options: ["1 BHK", "2 BHK", "3 BHK"],
+    },
+  ],
+
+  // Legacy Aliases
+  buy: [
+    {
+      key: "budget",
+      label: "Expected Price",
+      type: "rangePresets",
+      presets: PLOT_PRICE_PRESETS,
+      minKey: "minPrice",
+      maxKey: "maxPrice",
+    },
+    {
+      key: "facing",
+      label: "Facing",
+      type: "select",
+      options: FACING_OPTIONS,
+    },
+  ],
   rentLease: [
     {
-      key: "propertyType",
-      label: "Property Type",
-      type: "checkbox",
-      options: ["House", "Apartment", "PG", "Commercial Space"],
-    },
-    { key: "distance", label: "Distance", type: "checkbox", options: ["Within 3 km", "5 - 7 km", "7 - 10 km", "10 km+"] },
-    { key: "bhk", label: "BHK", type: "checkbox", options: ["1 BHK", "2 BHK", "3 BHK"] },
-    { key: "toilet", label: "Toilet", type: "checkbox", options: ["1", "2", "3"] },
-    { key: "facing", label: "Facing", type: "checkbox", options: facingOptions },
-    { key: "rentBudget", label: "Rent Budget", type: "rangePresets", presets: RENT_BUDGET_PRESETS, minKey: "minRent", maxKey: "maxRent" },
-    { key: "leaseAmount", label: "Lease Amount", type: "rangePresets", presets: LEASE_PRESETS, minKey: "minLease", maxKey: "maxLease" },
-    {
-      key: "rentAdvance",
-      label: "Rent Advance",
-      type: "checkbox",
-      options: ["1 Month", "2 Months", "3 Months", "5 Months", "10 Months+"],
-    },
-    {
-      key: "furnishing",
-      label: "Furnishing",
-      type: "checkbox",
-      options: ["Furnished", "Semi Furnished", "Unfurnished"],
-    },
-    {
-      key: "layoutType",
-      label: "Layout Type",
-      type: "checkbox",
-      options: ["Normal Layout", "Gated Community Layout"],
-    },
-    {
-      key: "floors",
-      label: "Number of Floors",
-      type: "checkbox",
-      options: ["1 Floor", "2 Floors", "3 Floors"],
+      key: "rentBudget",
+      label: "Monthly Rent",
+      type: "rangePresets",
+      presets: HOUSE_RENT_PRESETS,
+      minKey: "minRent",
+      maxKey: "maxRent",
     },
   ],
 };
 
-/** All filter field keys (excluding meta) for a category */
 export const getCategoryFieldKeys = (categoryId) => {
   const fields = propertyFilterConfig[categoryId] || [];
   const keys = new Set();
@@ -355,7 +481,13 @@ export const getCategoryFieldKeys = (categoryId) => {
     keys.add(field.key);
     if (field.minKey) keys.add(field.minKey);
     if (field.maxKey) keys.add(field.maxKey);
+    if (field.lengthKey) keys.add(field.lengthKey);
+    if (field.widthKey) keys.add(field.widthKey);
+    if (field.amountKey) keys.add(field.amountKey);
+    if (field.statusKey) keys.add(field.statusKey);
   });
+  // Add common location & approval keys
+  ["country", "state", "district", "taluk", "village", "locality", "location", "approval"].forEach((k) => keys.add(k));
   return keys;
 };
 

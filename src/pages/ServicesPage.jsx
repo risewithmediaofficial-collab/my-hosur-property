@@ -7,12 +7,12 @@ import { serviceCategories, serviceQuickLinks } from "../constants/serviceCatalo
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
 import useScrollAnimation from "../hooks/useScrollAnimation";
 
-// Import service images
 import buySellImg from "../assets/property buy guideance.jpg";
 import loanImg from "../assets/Home loan.jpg";
 import registrationImg from "../assets/Sale deed registration.jpg";
 import searchImg from "../assets/plot search.jpg";
 import interiorImg from "../assets/interiros.jpg";
+import constHouseImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.03 AM (1).jpeg";
 
 const serviceHighlights = [
   {
@@ -71,7 +71,7 @@ const serviceHighlights = [
     id: 5,
     title: "Interior & Construction Services",
     description: "Transform your vision into reality with our professional interior design and construction services. From residential homes to commercial offices, we deliver quality results on time and within budget.",
-    image: interiorImg,
+    image: constHouseImg,
     highlights: [
       "Professional team",
       "Quality materials",
