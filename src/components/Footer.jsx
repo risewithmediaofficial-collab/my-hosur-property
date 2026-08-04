@@ -39,10 +39,10 @@ const Footer = () => {
         <div className="mx-auto w-full max-w-[1440px]">
           <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr_1.1fr_0.9fr]">
             {/* Column 1: Brand & Bio */}
-            <div className="space-y-4">
-              <div className="flex flex-col items-start gap-1">
-                <BrandLogo className="h-10 sm:h-14 w-auto max-w-[120px] sm:max-w-[180px]" />
-                <span className="text-[11px] font-medium leading-none text-white/60">
+            <div className="space-y-4 text-left">
+              <div className="flex flex-col items-start text-left gap-1">
+                <BrandLogo className="w-24 sm:w-36 max-w-[100px] sm:max-w-[150px] h-auto object-contain object-left block" />
+                <span className="text-[11px] font-medium leading-none text-white/60 text-left">
                   Powered by <span className="font-bold text-white">Gyes Property &amp; Construction</span>
                 </span>
               </div>
