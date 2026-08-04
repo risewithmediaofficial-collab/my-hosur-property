@@ -105,6 +105,10 @@ const AdminDashboardPage = () => {
   const [propertySearch, setPropertySearch] = useState("");
   const [propertyTypeFilter, setPropertyTypeFilter] = useState("all");
   const [propertyStatusFilter, setPropertyStatusFilter] = useState("all");
+  const [propertyIntentFilter, setPropertyIntentFilter] = useState("all");
+  const [propertyApprovalFilter, setPropertyApprovalFilter] = useState("all");
+  const [propertyFacingFilter, setPropertyFacingFilter] = useState("all");
+  const [propertySortOrder, setPropertySortOrder] = useState("newest");
 
   const [leadSearch, setLeadSearch] = useState("");
   const [leadStatusFilter, setLeadStatusFilter] = useState("all");
@@ -219,7 +223,7 @@ const AdminDashboardPage = () => {
   });
 
   const filteredPropertyListings = useMemo(() => {
-    return propertyListings.filter((p) => {
+    let list = propertyListings.filter((p) => {
       const q = propertySearch.toLowerCase().trim();
       const matchesSearch =
         !q ||
@@ -229,14 +233,50 @@ const AdminDashboardPage = () => {
         (p.location?.address || "").toLowerCase().includes(q) ||
         (p.ownerId?.name || "").toLowerCase().includes(q) ||
         (p.ownerId?.email || "").toLowerCase().includes(q) ||
+        (p.ownerId?.phone || "").includes(q) ||
         (p.propertyType || "").toLowerCase().includes(q);
 
       const matchesType = propertyTypeFilter === "all" || (p.propertyType || "").toLowerCase() === propertyTypeFilter.toLowerCase();
       const matchesStatus = propertyStatusFilter === "all" || (p.status || "approved") === propertyStatusFilter;
 
-      return matchesSearch && matchesType && matchesStatus;
+      const matchesIntent =
+        propertyIntentFilter === "all" ||
+        (p.listingType || p.intent || "sale").toLowerCase() === propertyIntentFilter.toLowerCase();
+
+      const matchesApproval =
+        propertyApprovalFilter === "all" ||
+        (propertyApprovalFilter === "hntda" && (p.hntdaApproved || p.approvals?.hntda)) ||
+        (propertyApprovalFilter === "dtcp" && (p.dtcpApproved || p.approvals?.dtcp)) ||
+        (propertyApprovalFilter === "rera" && (p.reraApproved || p.approvals?.rera));
+
+      const matchesFacing =
+        propertyFacingFilter === "all" ||
+        (p.facing || "").toLowerCase() === propertyFacingFilter.toLowerCase();
+
+      return matchesSearch && matchesType && matchesStatus && matchesIntent && matchesApproval && matchesFacing;
     });
-  }, [propertyListings, propertySearch, propertyTypeFilter, propertyStatusFilter]);
+
+    if (propertySortOrder === "price-low") {
+      list.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
+    } else if (propertySortOrder === "price-high") {
+      list.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
+    } else if (propertySortOrder === "oldest") {
+      list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    } else {
+      list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    return list;
+  }, [
+    propertyListings,
+    propertySearch,
+    propertyTypeFilter,
+    propertyStatusFilter,
+    propertyIntentFilter,
+    propertyApprovalFilter,
+    propertyFacingFilter,
+    propertySortOrder,
+  ]);
 
   const filteredPaymentRequests = useMemo(() => {
     return paymentRequests.filter((req) => {
@@ -973,51 +1013,115 @@ const AdminDashboardPage = () => {
             </div>
 
             {/* Filter Bar */}
-            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <input
-                type="text"
-                placeholder="Search properties by title, city, area, owner name/email..."
-                className="dashboard-control flex-1 text-sm"
-                value={propertySearch}
-                onChange={(e) => setPropertySearch(e.target.value)}
-              />
-              <select
-                className="dashboard-control w-full sm:w-44 text-sm"
-                value={propertyTypeFilter}
-                onChange={(e) => setPropertyTypeFilter(e.target.value)}
-              >
-                <option value="all">All Types</option>
-                <option value="plot">Plot</option>
-                <option value="villa">Villa</option>
-                <option value="flat">Flat</option>
-                <option value="independent house">House</option>
-                <option value="apartment">Apartment</option>
-                <option value="commercial land / building">Commercial</option>
-                <option value="farmland">Farmland</option>
-                <option value="agri land">Agri Land</option>
-              </select>
-              <select
-                className="dashboard-control w-full sm:w-36 text-sm"
-                value={propertyStatusFilter}
-                onChange={(e) => setPropertyStatusFilter(e.target.value)}
-              >
-                <option value="all">All Status</option>
-                <option value="approved">Approved</option>
-                <option value="pending">Pending</option>
-                <option value="rejected">Rejected</option>
-              </select>
-              {(propertySearch || propertyTypeFilter !== "all" || propertyStatusFilter !== "all") && (
-                <button
-                  onClick={() => {
-                    setPropertySearch("");
-                    setPropertyTypeFilter("all");
-                    setPropertyStatusFilter("all");
-                  }}
-                  className="px-2 py-1 text-xs font-bold text-slate-500 hover:text-slate-900"
+            <div className="mt-4 flex flex-col gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <input
+                  type="text"
+                  placeholder="Search properties by title, city, area, owner name/email/phone..."
+                  className="dashboard-control flex-1 text-sm"
+                  value={propertySearch}
+                  onChange={(e) => setPropertySearch(e.target.value)}
+                />
+                <select
+                  className="dashboard-control w-full sm:w-40 text-sm"
+                  value={propertySortOrder}
+                  onChange={(e) => setPropertySortOrder(e.target.value)}
                 >
-                  Clear
-                </button>
-              )}
+                  <option value="newest">Sort: Newest</option>
+                  <option value="oldest">Sort: Oldest</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                </select>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <select
+                  className="dashboard-control w-full sm:w-40 text-sm"
+                  value={propertyTypeFilter}
+                  onChange={(e) => setPropertyTypeFilter(e.target.value)}
+                >
+                  <option value="all">All Types</option>
+                  <option value="plot">Plot</option>
+                  <option value="villa">Villa</option>
+                  <option value="flat">Flat</option>
+                  <option value="independent house">House</option>
+                  <option value="apartment">Apartment</option>
+                  <option value="commercial land / building">Commercial</option>
+                  <option value="farmland">Farmland</option>
+                  <option value="agri land">Agri Land</option>
+                </select>
+
+                <select
+                  className="dashboard-control w-full sm:w-36 text-sm"
+                  value={propertyIntentFilter}
+                  onChange={(e) => setPropertyIntentFilter(e.target.value)}
+                >
+                  <option value="all">All Purpose</option>
+                  <option value="buy">Sale / Buy</option>
+                  <option value="rent">Rent</option>
+                </select>
+
+                <select
+                  className="dashboard-control w-full sm:w-40 text-sm"
+                  value={propertyApprovalFilter}
+                  onChange={(e) => setPropertyApprovalFilter(e.target.value)}
+                >
+                  <option value="all">All Approvals</option>
+                  <option value="hntda">HNTDA Approved</option>
+                  <option value="dtcp">DTCP Approved</option>
+                  <option value="rera">RERA Approved</option>
+                </select>
+
+                <select
+                  className="dashboard-control w-full sm:w-36 text-sm"
+                  value={propertyFacingFilter}
+                  onChange={(e) => setPropertyFacingFilter(e.target.value)}
+                >
+                  <option value="all">All Facing</option>
+                  <option value="east">East</option>
+                  <option value="west">West</option>
+                  <option value="north">North</option>
+                  <option value="south">South</option>
+                  <option value="north east">North East</option>
+                  <option value="north west">North West</option>
+                  <option value="south east">South East</option>
+                  <option value="south west">South West</option>
+                </select>
+
+                <select
+                  className="dashboard-control w-full sm:w-36 text-sm"
+                  value={propertyStatusFilter}
+                  onChange={(e) => setPropertyStatusFilter(e.target.value)}
+                >
+                  <option value="all">All Status</option>
+                  <option value="approved">Approved</option>
+                  <option value="pending">Pending</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+
+                {(propertySearch ||
+                  propertyTypeFilter !== "all" ||
+                  propertyStatusFilter !== "all" ||
+                  propertyIntentFilter !== "all" ||
+                  propertyApprovalFilter !== "all" ||
+                  propertyFacingFilter !== "all" ||
+                  propertySortOrder !== "newest") && (
+                  <button
+                    onClick={() => {
+                      setPropertySearch("");
+                      setPropertyTypeFilter("all");
+                      setPropertyStatusFilter("all");
+                      setPropertyIntentFilter("all");
+                      setPropertyApprovalFilter("all");
+                      setPropertyFacingFilter("all");
+                      setPropertySortOrder("newest");
+                    }}
+                    className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 transition"
+                  >
+                    Clear All Filters
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="mt-4 min-h-0 overflow-y-auto rounded-[1.5rem] border border-slate-200/70">
