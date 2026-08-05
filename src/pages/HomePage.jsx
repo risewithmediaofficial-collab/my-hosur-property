@@ -1206,7 +1206,12 @@ const HomePage = () => {
 
           {/* Card 2: OneClick */}
           <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
-            <div className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2">
+            <a
+              href="https://oneclick2serve.com/"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
+            >
               <img
                 src={oneClickLogo}
                 alt="OneClick Office & Home Service"
@@ -1214,14 +1219,19 @@ const HomePage = () => {
                 loading="lazy"
                 decoding="async"
               />
-            </div>
+            </a>
             <p className="mt-3 text-xs font-bold text-navy">OneClick</p>
             <p className="mt-0.5 text-[11px] text-slate-500">Office &amp; Home Services</p>
           </div>
 
           {/* Card 3: Gyes Property & Construction */}
           <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
-            <div className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2">
+            <a
+              href="https://gyesproperty.com/"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
+            >
               <img
                 src={gyesConstructionLogo}
                 alt="Gyes Property & Construction"
@@ -1229,14 +1239,19 @@ const HomePage = () => {
                 loading="lazy"
                 decoding="async"
               />
-            </div>
+            </a>
             <p className="mt-3 text-xs font-bold text-navy">Gyes Property</p>
             <p className="mt-0.5 text-[11px] text-slate-500">&amp; Construction</p>
           </div>
 
           {/* Card 4: Gyes Traders */}
           <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
-            <div className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2">
+            <a
+              href="https://www.gyestraders.com/"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
+            >
               <img
                 src={gyesConstructionLogo}
                 alt="Gyes Traders"
@@ -1244,7 +1259,7 @@ const HomePage = () => {
                 loading="lazy"
                 decoding="async"
               />
-            </div>
+            </a>
             <p className="mt-3 text-xs font-bold text-navy">Gyes Traders</p>
             <p className="mt-0.5 text-[11px] text-slate-500">Trading &amp; Supply</p>
           </div>
