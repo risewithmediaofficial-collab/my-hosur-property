@@ -306,10 +306,10 @@ const typeFieldConfig = {
     featureFields: ["gatedCommunity", "cctvCamera", "security", "balcony", "powerBackup", "hntda", "rera"],
   },
   Flat: {
-    description: "Flat details with floor, rooms, flat area, and facilities.",
+    description: "Flat details with flat area, length, width, facing, and plot type.",
     detailTitle: "Flat Details",
     priceLabel: "Expected Sale Price",
-    detailFields: ["propertyClass", "flatArea", "bhk", "bathrooms", "builtupArea", "landArea", "floorNumber", "totalFloors", "furnishingStatus", "facing"],
+    detailFields: ["propertyClass", "flatArea", "length", "width", "plotType", "facing", "individualPlot", "layoutPlot"],
     featureFields: ["lift", "security", "parking", "balcony", "powerBackup", "hntda", "rera"],
   },
   "Independent House": {
@@ -323,7 +323,7 @@ const typeFieldConfig = {
     description: "Rental house details with monthly rent, car parking, maintenance, water source, and facilities.",
     detailTitle: "Rental Details",
     priceLabel: "Monthly Rent",
-    detailFields: ["propertyClass", "bhk", "bathrooms", "monthlyRent", "advance", "furnishingStatus", "carParking", "waterSourceType", "monthlyMaintenance"],
+    detailFields: ["propertyClass", "bhk", "bathrooms", "monthlyRent", "furnishingStatus", "carParking", "waterSourceType", "monthlyMaintenance"],
     featureFields: ["security", "lift", "powerBackup", "hntda", "rera"],
   },
   Apartment: {
@@ -334,10 +334,10 @@ const typeFieldConfig = {
     featureFields: ["lift", "security", "parking", "balcony", "powerBackup", "hntda", "rera"],
   },
   PG: {
-    description: "PG / Hostel details with sharing type, rent, advance, TV, WiFi, Gym, Washing Machine, and Hot Water.",
+    description: "PG / Hostel details with sharing type, rent, TV, WiFi, Gym, Washing Machine, and Hot Water.",
     detailTitle: "PG Details",
     priceLabel: "Monthly Rent",
-    detailFields: ["propertyClass", "sharingType", "monthlyRent", "advance", "furnishingStatus", "bathrooms"],
+    detailFields: ["propertyClass", "sharingType", "monthlyRent", "furnishingStatus", "bathrooms"],
     featureFields: ["foodIncluded", "tv", "wifi", "gym", "washingMachine", "hotWater", "security", "cctvCamera", "waterSupply", "powerBackup", "hntda", "rera"],
   },
   "Commercial Land / Building": {
@@ -867,9 +867,21 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
     }
   };
 
+  const getFieldLabel = (field, type = form.propertyType) => {
+    if (type === "Flat") {
+      if (field === "plotType") return "Flat Type";
+      if (field === "individualPlot") return "Individual Flat";
+      if (field === "layoutPlot") return "Layout Flat";
+    }
+    return fieldLabels[field] || field;
+  };
+
   const renderInput = (field) => {
     if (field === "bhk" && form.propertyType === "Villa") {
       return <Select field={field} value={form[field]} options={["", "2", "3", "4", "5"]} onChange={update} />;
+    }
+    if (field === "bathrooms") {
+      return <Select field={field} value={form[field]} options={["", "1", "2", "3", "4"]} onChange={update} />;
     }
     if (field === "villaType") {
       return <Select field={field} value={form[field]} options={["Simplex", "Duplex"]} onChange={update} />;
@@ -881,7 +893,10 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
       return <Select field={field} value={form[field]} options={soilTypeOptions} onChange={update} />;
     }
     if (field === "plotType") {
-      return <Select field={field} value={form[field]} options={["", "Layout Plot", "Statistical Plot"]} onChange={update} />;
+      const options = form.propertyType === "Flat"
+        ? ["", "Layout Flat", "Statistical Flat"]
+        : ["", "Layout Plot", "Statistical Plot"];
+      return <Select field={field} value={form[field]} options={options} onChange={update} />;
     }
     if (field === "carParking") {
       const isRent = form.propertyType === "Rent";
@@ -924,14 +939,14 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         </div>
       );
     }
-    if (field === "landArea") {
+    if (field === "landArea" || field === "flatArea") {
       if (form.propertyType === "Agri Land") {
         return <DropdownInput field={field} value={form[field]} options={agriLandAreaOptions} onChange={update} placeholder="e.g. 25 Cents" />;
       }
       if (form.propertyType === "Farmland") {
         return <DropdownInput field={field} value={form[field]} options={farmlandAreaOptions} onChange={update} placeholder="e.g. 15 Cents" />;
       }
-      return <DropdownInput field={field} value={form[field]} options={landAreaOptions} onChange={update} placeholder="e.g. 600 sq.ft" />;
+      return <DropdownInput field={field} value={form[field]} options={landAreaOptions} onChange={update} placeholder={field === "flatArea" ? "e.g. 1000 sq.ft" : "e.g. 600 sq.ft"} />;
     }
     if (field === "price") {
       if (form.propertyType === "Plot") {
@@ -978,7 +993,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
     if (field === "individualPlot") {
       return <YesNoGroup field={field} value={form[field]} onChange={update} />;
     }
-    return <input className="site-input" value={form[field]} onChange={(e) => update(field, e.target.value)} placeholder={fieldLabels[field]} />;
+    return <input className="site-input" value={form[field]} onChange={(e) => update(field, e.target.value)} placeholder={getFieldLabel(field, form.propertyType)} />;
   };
 
   const renderFormBody = () => {
@@ -1041,18 +1056,13 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
             <Field label={config.priceLabel} required>
               {renderInput(config.priceLabel.includes("Rent") ? "monthlyRent" : "price")}
             </Field>
-            {(form.propertyType === "Rent" || form.propertyType === "PG") && (
-              <Field label="Advance Amount">
-                {renderInput("advance")}
-              </Field>
-            )}
           </div>
         </FormSection>
 
         <FormSection title={config.detailTitle}>
           <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
             {config.detailFields.map((field) => (
-              <Field key={field} label={fieldLabels[field]}>
+              <Field key={field} label={getFieldLabel(field, form.propertyType)}>
                 {renderInput(field)}
               </Field>
             ))}
@@ -1063,7 +1073,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
           <div className="rounded-2xl border border-slate-200/80 bg-slate-50/60 p-5 grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
             {config.featureFields.map((field) => (
               <div key={field}>
-                <p className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">{fieldLabels[field]}</p>
+                <p className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">{getFieldLabel(field, form.propertyType)}</p>
                 <YesNoGroup field={field} value={form[field]} onChange={update} />
               </div>
             ))}
