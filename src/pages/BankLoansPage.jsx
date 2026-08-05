@@ -105,7 +105,7 @@ const BankLoansPage = () => {
                               <span>{bank.name}</span>
                             </button>
                           ))}
-                        </motion.div>
+                        </m.div>
                       </>
                     )}
                   </AnimatePresence>
