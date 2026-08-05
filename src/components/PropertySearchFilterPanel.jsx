@@ -143,7 +143,7 @@ const FieldControl = ({ field, values, update, category }) => {
   if (field.type === "select") {
     return (
       <select
-        className="property-filter-input property-filter-select w-full"
+        className="site-input property-filter-input property-filter-select w-full"
         value={getFieldValue(values, field.key)}
         onChange={(e) => update(field.key, e.target.value)}
       >

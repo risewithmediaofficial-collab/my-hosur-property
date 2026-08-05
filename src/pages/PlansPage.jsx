@@ -5,7 +5,6 @@ import { CheckCircleIcon, ShieldCheckIcon } from "../components/AppIcons";
 import useAuth from "../hooks/useAuth";
 import { fetchPlans, activateFreePlan } from "../services/api/planApi";
 import { fetchMyPayments } from "../services/api/paymentApi";
-import { loadExternalScript } from "../utils/loadExternalScript";
 import { currency } from "../utils/format";
 import useScrollAnimation from "../hooks/useScrollAnimation";
 import QrPaymentModal from "../components/QrPaymentModal";
@@ -26,6 +25,24 @@ const fallbackPlans = [
       "3 Free Property Postings for 1st time users",
       "Posts valid for 90 days",
       "1 Contact Request per day limit",
+      "Standard Search Visibility",
+    ],
+  },
+  {
+    name: "Basic Plan",
+    subtitle: "Starter plan for regular property posting",
+    price: 999,
+    billingLabel: "/30 days",
+    ctaLabel: "Choose Basic Plan",
+    recommended: false,
+    listingLimit: 3,
+    contactUnlocks: 15,
+    leadCredits: 10,
+    durationDays: 30,
+    features: [
+      "3 Active Property Listings",
+      "15 Customer Contact Requests",
+      "Valid for 30 days",
       "Standard Search Visibility",
     ],
   },
@@ -102,8 +119,9 @@ const fallbackPlans = [
 
 const orderByName = {
   "Free / 1st Time User": 1,
-  "Pro Agent Plan": 2,
-  "Premium Agent Plan": 3,
+  "Basic Plan": 2,
+  "Pro Agent Plan": 3,
+  "Premium Agent Plan": 4,
 };
 
 const normalizePlan = (plan) => {
@@ -130,7 +148,7 @@ const PlansPage = () => {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   useEffect(() => {
-    fetchPlans(user?.role ? { targetRole: user.role } : {})
+    fetchPlans()
       .then((res) => {
         const fetched = (res.items || []).map(normalizePlan);
         if (!fetched.length) {
@@ -196,7 +214,7 @@ const PlansPage = () => {
   };
 
 
-  const regularPlans = plans.filter((plan) => plan.category !== "database_access");
+  const regularPlans = plans.filter((plan) => plan.category !== "database_access" && Number(plan.price || 0) > 0);
   const dbPacks = plans.filter((plan) => plan.category === "database_access");
 
   const renderPlanCard = (plan) => {

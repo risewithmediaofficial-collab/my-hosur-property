@@ -52,7 +52,21 @@ const propertySchema = new mongoose.Schema(
     possessionDate: Date,
     facing: {
       type: String,
-      enum: ["North", "South", "East", "West", "North-East", "North-West", "South-East", "South-West"],
+      enum: [
+        "North",
+        "South",
+        "East",
+        "West",
+        "East North",
+        "South West",
+        "North-East",
+        "North-West",
+        "South-East",
+        "South-West",
+        "North East",
+        "North West",
+        "South East",
+      ],
     },
     verification: {
       isVerified: { type: Boolean, default: false },

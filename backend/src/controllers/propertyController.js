@@ -35,6 +35,17 @@ const PROPERTY_TYPES = [
   "Industrial Shed",
 ];
 
+const expandFacingAliases = (facing) => {
+  const aliases = {
+    "East North": ["East North", "North East", "North-East"],
+    "North East": ["East North", "North East", "North-East"],
+    "North-East": ["East North", "North East", "North-East"],
+    "South West": ["South West", "South-West"],
+    "South-West": ["South West", "South-West"],
+  };
+  return aliases[facing] || [facing];
+};
+
 const propertyValidators = [
   body("title").trim().notEmpty(),
   body("description").trim().isLength({ min: 10 }),
@@ -45,6 +56,21 @@ const propertyValidators = [
   body("listingSource").optional().isIn(["owner", "builder", "agent"]),
   body("possessionStatus").optional().isIn(["Ready to Move", "Under Construction"]),
   body("areaUnit").optional().isIn(["sqft", "sqm"]),
+  body("facing").optional().isIn([
+    "North",
+    "South",
+    "East",
+    "West",
+    "East North",
+    "South West",
+    "North-East",
+    "North-West",
+    "South-East",
+    "South-West",
+    "North East",
+    "North West",
+    "South East",
+  ]),
   body("isSold").optional().isBoolean(),
   body("location.city").trim().notEmpty(),
   body("location.area").trim().notEmpty(),
@@ -122,8 +148,9 @@ const buildQuery = (q) => {
       .split(",")
       .map((item) => item.trim())
       .filter(Boolean);
-    if (facings.length > 1) query.facing = { $in: facings };
-    else if (facings.length === 1) query.facing = facings[0];
+    const expandedFacings = [...new Set(facings.flatMap(expandFacingAliases))];
+    if (expandedFacings.length > 1) query.facing = { $in: expandedFacings };
+    else if (expandedFacings.length === 1) query.facing = expandedFacings[0];
   }
 
   if (q.bhk) {

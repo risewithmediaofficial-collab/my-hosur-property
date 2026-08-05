@@ -1,19 +1,17 @@
-import whatsappQrImg from "../assets/whatsapp qr.jpeg";
-
 export const CONTACT_EMAIL = "myhosurproperty.mhp@gmail.com";
 
 export const CONTACT_PHONE_NUMBERS = [
-  {
-    role: "Managing Director (MD)",
-    raw: "9150100499",
-    display: "+91 91501 00499",
-    tel: "+919150100499",
-  },
   {
     role: "Director",
     raw: "9994005086",
     display: "+91 99940 05086",
     tel: "+919994005086",
+  },
+  {
+    role: "Managing Director (MD)",
+    raw: "9150100499",
+    display: "+91 91501 00499",
+    tel: "+919150100499",
   },
   {
     role: "Admin 1",
@@ -38,8 +36,6 @@ export const CONTACT_ADDRESS =
 
 export const WHATSAPP_LINK =
   "https://wa.me/919150100499?text=Hello%20MyHosurProperty%2C%20I%20would%20like%20to%20enquire%20about%20your%20services";
-
-export const WHATSAPP_QR_IMAGE = whatsappQrImg;
 
 export const SOCIAL_LINKS = {
   instagram: "https://www.instagram.com/myhosurproperty?igsh=MWcxNzk5eHI1ZTd0YQ==",

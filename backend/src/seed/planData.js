@@ -25,6 +25,28 @@ const plans = [
 
   // ── 2. AGENT / BROKER / SELLER PLANS ──
   {
+    name: "Basic Plan",
+    subtitle: "Starter plan for regular property posting",
+    price: 999,
+    billingLabel: "/30 days",
+    ctaLabel: "Choose Basic Plan",
+    recommended: false,
+    features: [
+      "3 Active Property Listings",
+      "15 Customer Contact Requests",
+      "Valid for 30 days",
+      "Standard Search Visibility",
+    ],
+    listingLimit: 3,
+    durationDays: 30,
+    featuredBoost: false,
+    category: "seller_listing",
+    targetRole: ["seller", "agent", "broker", "builder"],
+    contactUnlocks: 15,
+    leadCredits: 10,
+    boostDays: 0,
+  },
+  {
     name: "Pro Agent Plan",
     subtitle: "Most Popular Choice for Agents",
     price: 2999,

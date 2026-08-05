@@ -141,7 +141,7 @@ const LocationCascadeFilter = ({ values, update }) => {
         <div>
           <label className="mb-1 block text-[11px] font-semibold text-slate-600">Country</label>
           <select
-            className="property-filter-input property-filter-select w-full"
+            className="site-input property-filter-input property-filter-select w-full"
             value={country}
             onChange={handleCountryChange}
           >
@@ -158,7 +158,7 @@ const LocationCascadeFilter = ({ values, update }) => {
         <div>
           <label className="mb-1 block text-[11px] font-semibold text-slate-600">State</label>
           <select
-            className="property-filter-input property-filter-select w-full"
+            className="site-input property-filter-input property-filter-select w-full"
             value={state}
             onChange={handleStateChange}
             disabled={!country || stateList.length === 0}
@@ -176,7 +176,7 @@ const LocationCascadeFilter = ({ values, update }) => {
         <div>
           <label className="mb-1 block text-[11px] font-semibold text-slate-600">District</label>
           <select
-            className="property-filter-input property-filter-select w-full"
+            className="site-input property-filter-input property-filter-select w-full"
             value={district}
             onChange={handleDistrictChange}
             disabled={!state || districtList.length === 0}
@@ -194,7 +194,7 @@ const LocationCascadeFilter = ({ values, update }) => {
         <div>
           <label className="mb-1 block text-[11px] font-semibold text-slate-600">Taluk</label>
           <select
-            className="property-filter-input property-filter-select w-full"
+            className="site-input property-filter-input property-filter-select w-full"
             value={taluk}
             onChange={handleTalukChange}
             disabled={!district || talukList.length === 0}
@@ -212,7 +212,7 @@ const LocationCascadeFilter = ({ values, update }) => {
         <div>
           <label className="mb-1 block text-[11px] font-semibold text-slate-600">Village</label>
           <select
-            className="property-filter-input property-filter-select w-full"
+            className="site-input property-filter-input property-filter-select w-full"
             value={village}
             onChange={handleVillageChange}
             disabled={!taluk || villageList.length === 0}
@@ -230,7 +230,7 @@ const LocationCascadeFilter = ({ values, update }) => {
         <div>
           <label className="mb-1 block text-[11px] font-semibold text-slate-600">Area / Locality</label>
           <select
-            className="property-filter-input property-filter-select w-full"
+            className="site-input property-filter-input property-filter-select w-full"
             value={locality}
             onChange={handleLocalityChange}
             disabled={!village && areaList.length === 0}

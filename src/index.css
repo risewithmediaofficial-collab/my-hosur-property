@@ -21,6 +21,14 @@ body,
   padding: 0;
 }
 
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+
 #root {
   display: flex;
   flex-direction: column;
@@ -61,7 +69,23 @@ body,
 
 * {
   box-sizing: border-box;
+  min-width: 0;
 }
+
+/* Ensure all images are responsive and never overflow */
+img,
+video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Prevent long words / numbers breaking mobile layout */
+p, span, a, li, td, th {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
 
 /* Remove the default browser square focus outline on all interactive elements */
 *:focus {
@@ -275,7 +299,8 @@ p {
 .form-modern select,
 .form-modern textarea,
 .site-input,
-.dashboard-control {
+.dashboard-control,
+.property-filter-input {
   background: rgba(255, 255, 255, 0.92);
   border: 0;
   box-shadow: inset 0 0 0 1px rgba(0, 66, 162, 0.08), 0 1px 0 rgba(255, 255, 255, 0.82);
@@ -286,7 +311,8 @@ p {
 .form-modern select:focus,
 .form-modern textarea:focus,
 .site-input:focus,
-.dashboard-control:focus {
+.dashboard-control:focus,
+.property-filter-input:focus {
   outline: none;
   background: #ffffff;
   box-shadow: inset 0 0 0 1px rgba(0, 66, 162, 0.36), 0 12px 28px rgba(0, 66, 162, 0.1);
@@ -410,7 +436,11 @@ p {
 /* Custom styled dropdown select elements — removes browser default look */
 select,
 .site-input select,
-select.site-input {
+select.site-input,
+select.property-filter-input,
+select.soft-input,
+select.dashboard-control,
+select.auth-select {
   appearance: none !important;
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
@@ -423,13 +453,21 @@ select.site-input {
 }
 
 select:hover,
-select.site-input:hover {
+select.site-input:hover,
+select.property-filter-input:hover,
+select.soft-input:hover,
+select.dashboard-control:hover,
+select.auth-select:hover {
   border-color: #0042a2 !important;
   background-color: #f8fafc !important;
 }
 
 select:focus,
-select.site-input:focus {
+select.site-input:focus,
+select.property-filter-input:focus,
+select.soft-input:focus,
+select.dashboard-control:focus,
+select.auth-select:focus {
   border-color: #f79e26 !important;
   outline: none !important;
   box-shadow: 0 0 0 3px rgba(247, 158, 38, 0.2) !important;
@@ -1989,15 +2027,15 @@ body {
 
 .property-filter-input {
   width: 100%;
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(0, 66, 162, 0.12);
   border-radius: 10px;
   background: #ffffff;
-  padding: 0.65rem 0.8rem;
-  font-size: 0.8125rem;
+  padding: 0.65rem 0.875rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: #111111;
   outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
 .property-filter-input-search {

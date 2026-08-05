@@ -58,9 +58,157 @@ const areaOptions = [
   "Other (Enter Manually)"
 ];
 
-const landAreaOptions = ["1200 sq feet", "1500 sq feet", "1800 sq feet", "2400 sq feet"];
+const districtOptions = [
+  "Krishnagiri",
+  "Hosur",
+  "Denkanikottai",
+  "Shoolagiri",
+  "Rayakottai",
+  "Kelamangalam",
+  "Bengaluru",
+  "Other (Enter Manually)",
+];
+
+const villageOptions = [
+  "Bagalur",
+  "Mathigiri",
+  "Avalapalli",
+  "Kelamangalam",
+  "Rayakottai",
+  "Chennathur",
+  "Nallur",
+  "Alasanatham",
+  "Other (Enter Manually)",
+];
+
+const landAreaOptions = ["600 sq.ft", "800 sq.ft"];
+const plotPriceOptions = [
+  "₹1 Lakh to ₹10 Lakhs",
+  "₹10 Lakhs to ₹20 Lakhs",
+  "₹20 Lakhs to ₹30 Lakhs",
+  "₹30 Lakhs to ₹40 Lakhs",
+  "₹40 Lakhs to ₹50 Lakhs",
+  "₹50 Lakhs to ₹60 Lakhs",
+  "₹60 Lakhs to ₹70 Lakhs",
+  "₹70 Lakhs to ₹80 Lakhs",
+  "₹80 Lakhs to ₹90 Lakhs",
+  "₹90 Lakhs to ₹1 Crore",
+  "₹1 Crore & Above",
+];
+const villaPriceOptions = [
+  "₹30 Lakhs",
+  "₹35 Lakhs",
+  "₹40 Lakhs",
+  "₹45 Lakhs",
+  "₹50 Lakhs",
+  "₹55 Lakhs",
+  "₹60 Lakhs",
+  "₹70 Lakhs",
+  "₹80 Lakhs",
+  "₹90 Lakhs",
+  "₹1 Crore",
+  "₹1.20 Crores",
+  "₹1.30 Crores",
+  "₹1.40 Crores",
+  "₹1.50 Crores",
+  "₹1.75 Crores",
+  "₹2 Crores",
+  "₹2 Crores & Above",
+];
+const flatPriceOptions = [
+  "₹20 Lakhs to ₹30 Lakhs",
+  "₹30 Lakhs to ₹40 Lakhs",
+  "₹40 Lakhs to ₹50 Lakhs",
+  "₹50 Lakhs to ₹60 Lakhs",
+  "₹60 Lakhs to ₹70 Lakhs",
+  "₹70 Lakhs to ₹80 Lakhs",
+  "₹80 Lakhs to ₹90 Lakhs",
+  "₹90 Lakhs to ₹1 Crore",
+  "₹1 Crore to ₹1.50 Crores",
+  "₹1.50 Crores to ₹2 Crores",
+  "₹2 Crores & Above",
+];
+const commercialPriceOptions = [
+  "₹10 Lakhs to ₹20 Lakhs",
+  "₹20 Lakhs to ₹30 Lakhs",
+  "₹30 Lakhs to ₹40 Lakhs",
+  "₹40 Lakhs to ₹50 Lakhs",
+  "₹50 Lakhs to ₹75 Lakhs",
+  "₹75 Lakhs to ₹1 Crore",
+  "₹1 Crore to ₹2 Crores",
+  "₹2 Crores to ₹5 Crores",
+  "₹5 Crores & Above",
+];
+const farmlandPriceOptions = [
+  "₹1 Lakh to ₹2 Lakhs",
+  "₹2 Lakhs to ₹3 Lakhs",
+  "₹3 Lakhs to ₹4 Lakhs",
+  "₹4 Lakhs to ₹5 Lakhs",
+  "₹5 Lakhs to ₹6 Lakhs",
+  "₹6 Lakhs to ₹7 Lakhs",
+  "₹7 Lakhs to ₹8 Lakhs",
+  "₹8 Lakhs to ₹9 Lakhs",
+  "₹9 Lakhs to ₹10 Lakhs",
+  "₹10 Lakhs & Above",
+];
+const agriPriceOptions = [
+  "₹1 Lakh to ₹5 Lakhs",
+  "₹5 Lakhs to ₹10 Lakhs",
+  "₹10 Lakhs to ₹20 Lakhs",
+  "₹20 Lakhs to ₹30 Lakhs",
+  "₹30 Lakhs to ₹50 Lakhs",
+  "₹50 Lakhs to ₹1 Crore",
+  "₹1 Crore to ₹2 Crores",
+  "₹2 Crores & Above",
+];
+const pgRentOptions = [
+  "₹2,000 to ₹3,000",
+  "₹3,000 to ₹4,000",
+  "₹4,000 to ₹5,000",
+  "₹5,000 to ₹6,000",
+  "₹6,000 to ₹7,000",
+  "₹7,000 to ₹8,000",
+  "₹8,000 to ₹10,000",
+  "₹10,000 & Above",
+];
+const farmlandAreaOptions = [
+  "10 Cents",
+  "11 Cents",
+  "15 Cents",
+  "22 Cents",
+  "25 Cents",
+  "25 Cents & Above",
+];
+const agriLandAreaOptions = [
+  "20 Cents",
+  "25 Cents",
+  "50 Cents",
+  "75 Cents",
+  "1 Acre",
+  "2 Acres",
+  "3 Acres",
+  "4 Acres",
+  "5 Acres & Above",
+];
+const houseRentOptions = [
+  "₹4,000 to ₹6,000",
+  "₹6,000 to ₹8,000",
+  "₹8,000 to ₹10,000",
+  "₹10,000 to ₹12,000",
+  "₹12,000 to ₹15,000",
+  "₹15,000 to ₹20,000",
+  "₹20,000 to ₹25,000",
+  "₹25,000 to ₹30,000",
+  "₹30,000 to ₹50,000",
+  "₹50,000 & Above",
+];
+const carParkingOptions = ["1 Car", "2 Cars", "3 Cars", "4+ Cars"];
+const carParkingYesNoOptions = ["Yes", "No"];
+const waterSourceVillaOptions = ["Borewell", "Layout Water"];
+const waterSourceHouseOptions = ["Borewell", "Corporation Water"];
+const maintenanceOptions = ["Included", "Not Included"];
 const priceOptions = ["7.00 L", "10.00 L", "12.00 L", "15.00 L", "25.00 L", "50.00 L", "75.00 L", "1.00 Cr"];
-const facingOptions = ["East", "West", "North", "South"];
+const facingOptions = ["East", "West", "North", "South", "North East", "North West", "South East", "South West"];
 const yesNoOptions = ["Yes", "No"];
 const propertyClassOptions = ["General", "SC/ST"];
 const soilTypeOptions = ["Red Soil", "Black Soil", "Clay Soil", "Alluvial Soil", "Sandy Soil", "Loam Soil"];
@@ -91,6 +239,7 @@ const defaultForm = {
   cents: "",
   length: "",
   width: "",
+  plotType: "",
   individualPlot: "Yes",
   gatedCommunity: "No",
   cctvCamera: "No",
@@ -109,15 +258,20 @@ const defaultForm = {
   possessionStatus: "Ready to Move",
   facing: "",
   parking: "No",
+  carParking: "",
   balcony: "No",
   lift: "No",
   powerBackup: "No",
   waterSupply: "No",
+  waterSourceType: "",
   roadAccess: "No",
   boundaryWall: "No",
   electricity: "No",
   sharingType: "",
   monthlyRent: "",
+  monthlyMaintenance: "",
+  maintenanceType: "",
+  layoutPlot: "Yes",
   foodIncluded: "No",
   tv: "No",
   wifi: "No",
@@ -138,18 +292,18 @@ const defaultForm = {
 
 const typeFieldConfig = {
   Plot: {
-    description: "Land-only details. No BHK, floor, furnishing, or house-facing fields.",
+    description: "Land-only details. No BHK, floor, or furnishing fields.",
     detailTitle: "Plot Details",
     priceLabel: "Expected Plot Price",
-    detailFields: ["propertyClass", "landArea", "length", "width", "individualPlot"],
+    detailFields: ["propertyClass", "landArea", "length", "width", "plotType", "facing", "individualPlot", "layoutPlot"],
     featureFields: ["gatedCommunity", "cctvCamera", "security", "dtcp", "hntda", "rera"],
   },
   Villa: {
-    description: "Independent villa details with rooms, land/build-up area, and facilities.",
+    description: "Independent villa details with rooms, land/build-up area, car parking, water source, and facilities.",
     detailTitle: "Villa Details",
     priceLabel: "Expected Sale Price",
-    detailFields: ["propertyClass", "villaType", "bhk", "bathrooms", "builtupArea", "landArea", "furnishingStatus", "facing"],
-    featureFields: ["gatedCommunity", "cctvCamera", "security", "parking", "balcony", "powerBackup", "hntda", "rera"],
+    detailFields: ["propertyClass", "villaType", "bhk", "bathrooms", "builtupArea", "landArea", "furnishingStatus", "facing", "carParking", "waterSourceType"],
+    featureFields: ["gatedCommunity", "cctvCamera", "security", "balcony", "powerBackup", "hntda", "rera"],
   },
   Flat: {
     description: "Flat details with floor, rooms, flat area, and facilities.",
@@ -159,18 +313,18 @@ const typeFieldConfig = {
     featureFields: ["lift", "security", "parking", "balcony", "powerBackup", "hntda", "rera"],
   },
   "Independent House": {
-    description: "House details with rooms, land/building area, advance, and utilities.",
+    description: "House details with rooms, land/building area, car parking, water source, and utilities.",
     detailTitle: "Individual House Details",
     priceLabel: "Expected Sale Price",
-    detailFields: ["propertyClass", "bhk", "bathrooms", "builtupArea", "landArea", "advance", "furnishingStatus", "facing"],
-    featureFields: ["parking", "waterSupply", "security", "cctvCamera", "dtcp", "hntda", "rera"],
+    detailFields: ["propertyClass", "bhk", "bathrooms", "builtupArea", "landArea", "furnishingStatus", "facing", "carParking", "waterSourceType"],
+    featureFields: ["security", "cctvCamera", "dtcp", "hntda", "rera"],
   },
   Rent: {
-    description: "Rental property details with rent, advance, rooms, and facilities.",
+    description: "Rental house details with monthly rent, car parking, maintenance, water source, and facilities.",
     detailTitle: "Rental Details",
     priceLabel: "Monthly Rent",
-    detailFields: ["propertyClass", "bhk", "bathrooms", "monthlyRent", "advance", "furnishingStatus"],
-    featureFields: ["parking", "waterSupply", "security", "lift", "powerBackup", "hntda", "rera"],
+    detailFields: ["propertyClass", "bhk", "bathrooms", "monthlyRent", "advance", "furnishingStatus", "carParking", "waterSourceType", "monthlyMaintenance"],
+    featureFields: ["security", "lift", "powerBackup", "hntda", "rera"],
   },
   Apartment: {
     description: "Apartment details with floor, rooms, land area, and common facilities.",
@@ -194,18 +348,18 @@ const typeFieldConfig = {
     featureFields: ["dtcp", "hntda", "rera", "roadAccess", "parking", "security", "cctvCamera"],
   },
   Farmland: {
-    description: "Farmland details with cents, borewell, well, soil type, and farmhouse count.",
+    description: "Farmland details with land area, soil type, borewell, well, and crop suitability.",
     detailTitle: "Farmland Details",
     priceLabel: "Expected Farmland Price",
-    detailFields: ["propertyClass", "cents", "landArea", "roadWidth", "waterSource", "soilType", "cropSuitable"],
-    featureFields: ["borewell", "well", "farmhouse", "roadAccess", "waterSupply", "electricity", "boundaryWall", "hntda", "rera"],
+    detailFields: ["propertyClass", "landArea", "roadWidth", "waterSource", "soilType", "cropSuitable"],
+    featureFields: ["borewell", "well", "farmhouse", "roadAccess", "waterSupply", "electricity", "boundaryWall"],
   },
   "Agri Land": {
-    description: "Agricultural land details with borewell, well, soil type, and farmhouse count.",
+    description: "Agricultural land details — land area in cents or acres. No HNTDA or RERA fields.",
     detailTitle: "Agricultural Land Details",
     priceLabel: "Expected Land Price",
     detailFields: ["propertyClass", "landArea", "roadWidth", "waterSource", "soilType", "cropSuitable"],
-    featureFields: ["borewell", "well", "farmhouse", "roadAccess", "waterSupply", "electricity", "boundaryWall", "hntda", "rera"],
+    featureFields: ["borewell", "well", "farmhouse", "roadAccess", "waterSupply", "electricity", "boundaryWall"],
   },
 };
 
@@ -216,7 +370,9 @@ const fieldLabels = {
   cents: "Land Area in Cents",
   length: "Length",
   width: "Width",
+  plotType: "Plot Type",
   individualPlot: "Individual Plot",
+  layoutPlot: "Layout Plot",
   bhk: "BHK / Rooms",
   bathrooms: "Bathrooms",
   builtupArea: "Built-up Area",
@@ -230,6 +386,7 @@ const fieldLabels = {
   frontage: "Frontage",
   roadWidth: "Road Width",
   waterSource: "Water Source",
+  waterSourceType: "Water Source",
   cropSuitable: "Crop Suitable",
   gatedCommunity: "Gated Community",
   cctvCamera: "CCTV Camera",
@@ -238,6 +395,7 @@ const fieldLabels = {
   hntda: "HNTDA Approved",
   rera: "RERA Approved",
   parking: "Parking",
+  carParking: "Car Parking",
   balcony: "Balcony",
   lift: "Lift",
   powerBackup: "Power Backup / UPS",
@@ -257,13 +415,32 @@ const fieldLabels = {
   farmhouse: "Farmhouse",
   farmhouseCount: "Number of Farmhouses",
   villaType: "Villa Type",
+  monthlyMaintenance: "Monthly Maintenance",
 };
 
 const toNumber = (value) => {
   if (!value) return 0;
-  const cleaned = String(value).replace(/[^\d.]/g, "");
-  const amount = Number(cleaned || 0);
-  return /l/i.test(String(value)) ? amount * 100000 : amount;
+
+  const normalized = String(value).trim().toLowerCase();
+  const rangeMatch = normalized.match(/^(\d+(?:\.\d+)?)\s*(?:l|cr)?\s*(?:to|-|and above)?\s*(\d*(?:\.\d+)?)?/);
+  const baseValue = rangeMatch && rangeMatch[1] ? Number(rangeMatch[1]) : null;
+  const isCr = /cr/.test(normalized);
+  const isL = /l/.test(normalized) || (!isCr && /\d/.test(normalized));
+
+  if (baseValue === null || Number.isNaN(baseValue)) {
+    const cleaned = String(value).replace(/[^\d.]/g, "");
+    return Number(cleaned || 0);
+  }
+
+  if (isCr) {
+    return baseValue * 10000000;
+  }
+
+  if (isL) {
+    return baseValue * 100000;
+  }
+
+  return baseValue;
 };
 
 const getApiPropertyType = (type) => {
@@ -464,13 +641,10 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
       form.state.trim(),
       form.city.trim(),
       form.area.trim(),
-      form.houseAddress.trim(),
-      form.description.trim(),
     ];
 
-    if (required.some((value) => !value)) return "Please fill location, price, and description details.";
+    if (required.some((value) => !value)) return "Please fill location and price details.";
     if (!form.price && !form.monthlyRent) return "Please fill expected price or monthly rent details.";
-    if (form.description.trim().length < 10) return "Please add a more detailed property description.";
 
     return "";
   };
@@ -622,6 +796,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         form.builtupArea ? `Built-up Area: ${form.builtupArea}` : "",
         form.bhk ? `Rooms: ${form.bhk}` : "",
         form.advance ? `Advance: ${form.advance}` : "",
+        form.layoutPlot ? `Layout Plot: ${form.layoutPlot}` : "",
         form.hntda ? `HNTDA Approved: ${form.hntda}` : "",
         form.rera ? `RERA Approved: ${form.rera}` : "",
         form.length ? `Length: ${form.length}` : "",
@@ -639,6 +814,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         description: detailLines.join("\n"),
         price,
         propertyType: apiPropertyType,
+        layoutPlot: form.layoutPlot,
         bhk: Number(form.bhk || 0),
         bathrooms: Number(form.bathrooms || 0),
         listingType: getListingType(form.propertyType),
@@ -704,14 +880,94 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
     if (field === "soilType") {
       return <Select field={field} value={form[field]} options={soilTypeOptions} onChange={update} />;
     }
-    if (field === "landArea") {
-      return <DataInput field={field} value={form[field]} options={landAreaOptions} onChange={update} placeholder="e.g. 1200 sq feet" />;
+    if (field === "plotType") {
+      return <Select field={field} value={form[field]} options={["", "Layout Plot", "Statistical Plot"]} onChange={update} />;
     }
-    if (["price", "monthlyRent", "advance"].includes(field)) {
-      return <DataInput field={field} value={form[field]} options={priceOptions} onChange={update} placeholder="e.g. 50 L" />;
+    if (field === "carParking") {
+      const isRent = form.propertyType === "Rent";
+      if (isRent) {
+        return (
+          <div className="flex flex-wrap gap-2">
+            {carParkingYesNoOptions.map((opt) => (
+              <button key={opt} type="button" onClick={() => update(field, opt)}
+                className={`rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-150 border ${
+                  form[field] === opt ? "border-navy bg-navy text-white shadow-sm" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                }`}>{opt}</button>
+            ))}
+          </div>
+        );
+      }
+      return <Select field={field} value={form[field]} options={["", ...carParkingOptions]} onChange={update} />;
+    }
+    if (field === "waterSourceType") {
+      const isVilla = form.propertyType === "Villa";
+      const opts = isVilla ? waterSourceVillaOptions : waterSourceHouseOptions;
+      return <Select field={field} value={form[field]} options={["", ...opts]} onChange={update} />;
+    }
+    if (field === "monthlyMaintenance") {
+      return (
+        <div className="space-y-2">
+          <input
+            className="site-input h-11"
+            value={form.monthlyMaintenance}
+            onChange={(e) => update("monthlyMaintenance", e.target.value)}
+            placeholder="Amount (e.g. ₹500)"
+          />
+          <div className="flex flex-wrap gap-2">
+            {maintenanceOptions.map((opt) => (
+              <button key={opt} type="button" onClick={() => update("maintenanceType", opt)}
+                className={`rounded-xl px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-150 border ${
+                  form.maintenanceType === opt ? "border-navy bg-navy text-white shadow-sm" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                }`}>{opt}</button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    if (field === "landArea") {
+      if (form.propertyType === "Agri Land") {
+        return <DropdownInput field={field} value={form[field]} options={agriLandAreaOptions} onChange={update} placeholder="e.g. 25 Cents" />;
+      }
+      if (form.propertyType === "Farmland") {
+        return <DropdownInput field={field} value={form[field]} options={farmlandAreaOptions} onChange={update} placeholder="e.g. 15 Cents" />;
+      }
+      return <DropdownInput field={field} value={form[field]} options={landAreaOptions} onChange={update} placeholder="e.g. 600 sq.ft" />;
+    }
+    if (field === "price") {
+      if (form.propertyType === "Plot") {
+        return <DropdownInput field={field} value={form[field]} options={plotPriceOptions} onChange={update} placeholder="Select price range" />;
+      }
+      if (form.propertyType === "Villa" || form.propertyType === "Independent House") {
+        return <DropdownInput field={field} value={form[field]} options={villaPriceOptions} onChange={update} placeholder="Select price" />;
+      }
+      if (form.propertyType === "Flat" || form.propertyType === "Apartment") {
+        return <DropdownInput field={field} value={form[field]} options={flatPriceOptions} onChange={update} placeholder="Select price range" />;
+      }
+      if (form.propertyType === "Commercial Land / Building") {
+        return <DropdownInput field={field} value={form[field]} options={commercialPriceOptions} onChange={update} placeholder="Select price range" />;
+      }
+      if (form.propertyType === "Farmland") {
+        return <DropdownInput field={field} value={form[field]} options={farmlandPriceOptions} onChange={update} placeholder="Select price range" />;
+      }
+      if (form.propertyType === "Agri Land") {
+        return <DropdownInput field={field} value={form[field]} options={agriPriceOptions} onChange={update} placeholder="Select price range" />;
+      }
+      return <DropdownInput field={field} value={form[field]} options={priceOptions} onChange={update} placeholder="e.g. 50 L" />;
+    }
+    if (field === "monthlyRent") {
+      if (form.propertyType === "PG") {
+        return <DropdownInput field={field} value={form[field]} options={pgRentOptions} onChange={update} placeholder="Select rent range" />;
+      }
+      return <DropdownInput field={field} value={form[field]} options={houseRentOptions} onChange={update} placeholder="Select rent range" />;
+    }
+    if (field === "advance") {
+      return <DropdownInput field={field} value={form[field]} options={priceOptions} onChange={update} placeholder="e.g. 50 L" />;
     }
     if (field === "facing") {
       return <Select field={field} value={form[field]} options={["", ...facingOptions]} onChange={update} />;
+    }
+    if (field === "layoutPlot") {
+      return <YesNoGroup field={field} value={form[field]} onChange={update} />;
     }
     if (field === "furnishingStatus") {
       return <Select field={field} value={form[field]} options={["Furnished", "Semi-Furnished", "Unfurnished"]} onChange={update} />;
@@ -745,6 +1001,11 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
               <ReadOnlyField label="Contact Name" value={accountContact.name} fallback="Name not available" />
               <ReadOnlyField label="Mobile Number" value={accountContact.phone} fallback="Phone not available" />
               <ReadOnlyField label="Email ID" value={accountContact.email} fallback="Email not available" />
+              <ReadOnlyField
+                label="Posted By"
+                value={roleLabels[user?.role] || form.postedBy || "Owner"}
+                fallback="Owner"
+              />
             </div>
           </div>
         </FormSection>
@@ -761,15 +1022,15 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
               <LocationDropdownOrInput field="area" value={form.area} options={areaOptions} onChange={update} placeholder="Type Area" />
             </Field>
             <Field label="District">
-              <input className="site-input h-11" value={form.district} onChange={(e) => update("district", e.target.value)} placeholder="e.g. Krishnagiri" />
+              <LocationDropdownOrInput field="district" value={form.district} options={districtOptions} onChange={update} placeholder="Type District" />
             </Field>
             <Field label="Village / Landmark">
-              <input className="site-input h-11" value={form.village} onChange={(e) => update("village", e.target.value)} placeholder="e.g. Bagalur" />
+              <LocationDropdownOrInput field="village" value={form.village} options={villageOptions} onChange={update} placeholder="Type Village" />
             </Field>
             <Field label="Country">
               <input className="site-input h-11" value={form.country} onChange={(e) => update("country", e.target.value)} placeholder="India" />
             </Field>
-            <Field label="Full Address / Survey Details" required className="md:col-span-3">
+            <Field label="Full Address / Survey Details" className="md:col-span-3">
               <textarea className="site-input min-h-[96px] resize-none" rows="3" value={form.houseAddress} onChange={(e) => update("houseAddress", e.target.value)} placeholder="Door No., Street, Survey No., Landmarks" />
             </Field>
           </div>
@@ -780,9 +1041,9 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
             <Field label={config.priceLabel} required>
               {renderInput(config.priceLabel.includes("Rent") ? "monthlyRent" : "price")}
             </Field>
-            {(form.propertyType === "Rent" || form.propertyType === "PG" || form.propertyType === "Independent House") && (
+            {(form.propertyType === "Rent" || form.propertyType === "PG") && (
               <Field label="Advance Amount">
-                <input className="site-input h-11" value={form.advance} onChange={(e) => update("advance", e.target.value)} placeholder="e.g. 50,000" />
+                {renderInput("advance")}
               </Field>
             )}
           </div>
@@ -824,15 +1085,12 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         </FormSection>
 
         <FormSection title="Description">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4">
             <Field label="Listing Title">
-              <input className="site-input" value={form.title} onChange={(e) => update("title", e.target.value)} placeholder={`${form.propertyType} in ${form.village}`} />
+              <input className="site-input" value={form.title} onChange={(e) => update("title", e.target.value)} placeholder={`${form.propertyType} in ${form.village || form.area || form.city}`} />
             </Field>
-            <Field label="Posted By">
-              <Select field="postedBy" value={form.postedBy} options={["owner", "agent", "builder"]} onChange={update} />
-            </Field>
-            <Field label="Property Description" required className="md:col-span-2">
-              <textarea className="site-input min-h-[120px] resize-none" rows="4" minLength={10} value={form.description} onChange={(e) => update("description", e.target.value)} placeholder=" " />
+            <Field label="Property Description">
+              <textarea className="site-input min-h-[120px] resize-none" rows="4" value={form.description} onChange={(e) => update("description", e.target.value)} placeholder="Describe the property (optional)" />
             </Field>
           </div>
         </FormSection>
@@ -879,10 +1137,10 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
                         <button
                           type="button"
                           onClick={() => removeSelectedImage(idx)}
-                          className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white shadow-md hover:bg-red-700 transition-colors"
+                          className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-white shadow hover:bg-red-700 transition-colors z-10"
                           title="Remove image"
                         >
-                          <XMarkIcon className="h-3 w-3" />
+                          <XMarkIcon className="h-2.5 w-2.5" />
                         </button>
                         <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-1 py-0.5 text-[9px] text-white truncate text-center">
                           {preview.name}
@@ -892,8 +1150,17 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
                   </div>
                 </div>
               )}
-              <button type="button" onClick={uploadImageAssets} disabled={uploading || !imageFiles.length} className="site-button-secondary mt-3 px-4 py-2 text-sm disabled:opacity-50">
-                {uploading ? "Uploading..." : "Upload selected images"}
+              <button
+                type="button"
+                onClick={uploadImageAssets}
+                disabled={uploading || !imageFiles.length}
+                className={`mt-3 px-4 py-2 text-sm font-bold rounded-xl border transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed ${
+                  imageFiles.length > 0
+                    ? "bg-orange border-orange text-white shadow-md hover:opacity-90 hover:shadow-lg"
+                    : "bg-white border-slate-200 text-slate-500"
+                }`}
+              >
+                {uploading ? "Uploading..." : `Upload selected images${imageFiles.length > 0 ? ` (${imageFiles.length})` : ""}`}
               </button>
               {!!uploadedImages.length && (
                 <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-5">
@@ -1234,23 +1501,55 @@ const Select = ({ field, value, options, onChange }) => (
   </select>
 );
 
-const DataInput = ({ field, value, options, onChange, placeholder }) => {
-  const listId = `${field}-options`;
+const DropdownInput = ({ field, value, options, onChange, placeholder }) => {
+  const isCustom = Boolean(value) && !options.includes(value);
+  const [useManual, setUseManual] = useState(isCustom);
+  const showManual = useManual || isCustom;
+
   return (
-    <>
-      <input
-        className="site-input h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-navy shadow-xs focus:border-orange focus:ring-2 focus:ring-orange/20 transition-all"
-        list={listId}
-        value={value}
-        onChange={(e) => onChange(field, e.target.value)}
-        placeholder={placeholder}
-      />
-      <datalist id={listId}>
-        {options.map((option) => (
-          <option key={option} value={option} />
-        ))}
-      </datalist>
-    </>
+    <div className="space-y-1.5">
+      {!showManual ? (
+        <select
+          className="site-input h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-navy shadow-xs focus:border-orange focus:ring-2 focus:ring-orange/20 transition-all cursor-pointer"
+          value={options.includes(value) ? value : ""}
+          onChange={(e) => {
+            if (e.target.value === "__manual__") {
+              setUseManual(true);
+              onChange(field, "");
+            } else {
+              onChange(field, e.target.value);
+            }
+          }}
+        >
+          <option value="">Select</option>
+          {options.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+          <option value="__manual__">Other (Enter Manually)</option>
+        </select>
+      ) : (
+        <div className="flex gap-2">
+          <input
+            className="site-input h-11 flex-1 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-navy shadow-xs focus:border-orange focus:ring-2 focus:ring-orange/20 transition-all"
+            value={value}
+            onChange={(e) => onChange(field, e.target.value)}
+            placeholder={placeholder}
+          />
+          <button
+            type="button"
+            onClick={() => {
+              setUseManual(false);
+              onChange(field, "");
+            }}
+            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100"
+          >
+            Dropdown
+          </button>
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -1273,38 +1572,14 @@ const YesNoGroup = ({ field, value, onChange }) => (
   </div>
 );
 
-const MinPriceRangeGroup = ({ value, onChange }) => (
-  <div className="flex flex-wrap gap-2">
-    {independentHouseMinPriceRanges.map((range) => (
-      <button
-        key={range}
-        type="button"
-        onClick={() => onChange(range)}
-        className={`rounded-lg border px-4 py-2.5 text-sm font-bold transition ${
-          value === range
-            ? "border-orange bg-orange text-white shadow-sm"
-            : "border-slate-200 bg-white text-slate-800 hover:border-orange hover:bg-orange hover:text-white"
-        }`}
-      >
-        {range}
-      </button>
-    ))}
-  </div>
-);
-
 const LocationDropdownOrInput = ({ field, value, options, onChange, placeholder }) => {
   const isCustom = Boolean(value) && !options.includes(value);
   const [useManual, setUseManual] = useState(isCustom);
-
-  useEffect(() => {
-    if (Boolean(value) && !options.includes(value)) {
-      setUseManual(true);
-    }
-  }, [value, options]);
+  const showManual = useManual || isCustom;
 
   return (
     <div className="space-y-1.5">
-      {!useManual ? (
+      {!showManual ? (
         <select
           className="site-input h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-navy shadow-xs focus:border-orange focus:ring-2 focus:ring-orange/20 transition-all cursor-pointer"
           value={options.includes(value) ? value : value ? "Other (Enter Manually)" : ""}
@@ -1323,7 +1598,9 @@ const LocationDropdownOrInput = ({ field, value, options, onChange, placeholder 
               {opt}
             </option>
           ))}
-          <option value="Other (Enter Manually)">Other (Enter Manually)</option>
+          {!options.includes("Other (Enter Manually)") && (
+            <option value="Other (Enter Manually)">Other (Enter Manually)</option>
+          )}
         </select>
       ) : (
         <div className="flex gap-2">

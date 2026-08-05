@@ -24,7 +24,7 @@ export const LOCATION_DATA = {
                     {
                       id: "Bagalur",
                       name: "Bagalur",
-                      areas: ["Bagalur Road", "SIPCOT Phase 2", "STI Sananthur", "Bagalur Town", "Sananthur"],
+                      areas: ["Bagalur Road", "SIPCOT Phase 2", "STI Chennathur", "Bagalur Town", "Chennathur"],
                     },
                     {
                       id: "Alasanatham",

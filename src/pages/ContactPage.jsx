@@ -17,7 +17,6 @@ import {
   CONTACT_EMAIL,
   CONTACT_PHONE_NUMBERS,
   SOCIAL_LINKS,
-  WHATSAPP_QR_IMAGE,
 } from "../constants/contactInfo";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
 import useScrollAnimation from "../hooks/useScrollAnimation";
@@ -76,9 +75,9 @@ const ContactPage = () => {
       />
 
       {/* ── Main contact section: form (left) + info with inline scroll (right) ── */}
-      <section className="bg-white px-5 py-14 sm:px-8 lg:px-10 gsap-section">
+      <section className="bg-white px-4 py-8 sm:px-8 sm:py-14 lg:px-10 gsap-section">
         <div className="mx-auto max-w-[1440px]">
-          <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
+          <div className="grid gap-6 lg:gap-10 lg:grid-cols-2 lg:items-start">
 
             {/* LEFT – Contact Form */}
             <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-card gsap-card">
@@ -164,7 +163,7 @@ const ContactPage = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="site-button-primary mt-2 w-fit rounded-xl px-8 py-3 text-sm font-bold disabled:opacity-60"
+                  className="site-button-primary mt-2 w-full sm:w-fit rounded-xl px-8 py-3 text-sm font-bold disabled:opacity-60"
                 >
                   {submitting ? "Sending…" : "Let's Connect"}
                 </button>
@@ -172,7 +171,7 @@ const ContactPage = () => {
             </div>
 
             {/* RIGHT – Get In Touch Section Card with Inline Scroll */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-card flex flex-col gap-6 lg:max-h-[640px] lg:overflow-y-auto custom-scrollbar">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-8 shadow-card flex flex-col gap-5 lg:max-h-[640px] lg:overflow-y-auto custom-scrollbar">
               {/* Header */}
               <div>
                 <h2 className="text-3xl font-bold text-navy leading-tight">
@@ -248,23 +247,20 @@ const ContactPage = () => {
               </div>
 
               {/* WhatsApp QR & Direct Message Card */}
-              <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5 flex flex-col sm:flex-row items-center gap-5 shadow-xs">
-                <div className="w-28 h-28 flex-shrink-0 overflow-hidden rounded-xl border-2 border-emerald-500 bg-white p-1 shadow-sm">
-                  <img src={WHATSAPP_QR_IMAGE} alt="WhatsApp QR Code" className="h-full w-full object-contain" />
-                </div>
-                <div className="flex-1 text-center sm:text-left">
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5 shadow-xs">
+                <div className="text-center sm:text-left">
                   <span className="inline-block rounded-md bg-emerald-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white mb-1.5">
                     WhatsApp Desk
                   </span>
                   <h3 className="text-base font-bold text-navy">Instant WhatsApp Support</h3>
                   <p className="mt-1 text-xs leading-5 text-slate-600">
-                    Scan the QR code or click below to start a direct WhatsApp conversation with our support team.
+                    Click below to start a direct WhatsApp conversation with our support team.
                   </p>
                   <a
                     href={SOCIAL_LINKS.whatsapp}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-3 inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-500 shadow-xs"
+                    className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-500 shadow-xs"
                   >
                     <WhatsAppIcon className="h-4 w-4" />
                     Send WhatsApp Message
@@ -277,10 +273,10 @@ const ContactPage = () => {
                 {enquiryRows.map((row, idx) => (
                   <div
                     key={row.label}
-                    className={`flex items-center justify-between px-5 py-3.5 text-sm ${idx % 2 === 0 ? "bg-white" : "bg-slate-50"}`}
+                    className={`flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between px-4 py-3 text-sm ${idx % 2 === 0 ? "bg-white" : "bg-slate-50"}`}
                   >
-                    <span className="text-slate-600 font-medium">{row.label}</span>
-                    <span className="font-semibold text-navy">{row.phone}</span>
+                    <span className="text-slate-500 font-medium text-xs uppercase tracking-wide">{row.label}</span>
+                    <span className="font-semibold text-navy break-all">{row.phone}</span>
                   </div>
                 ))}
               </div>

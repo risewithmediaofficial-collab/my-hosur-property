@@ -43,6 +43,17 @@ export const toggleCheckboxValue = (current, option) => {
   return joinValues(list);
 };
 
+const expandFacingAliases = (facing) => {
+  const aliases = {
+    "East North": ["East North", "North East", "North-East"],
+    "North East": ["East North", "North East", "North-East"],
+    "North-East": ["East North", "North East", "North-East"],
+    "South West": ["South West", "South-West"],
+    "South-West": ["South West", "South-West"],
+  };
+  return aliases[facing] || [facing];
+};
+
 /** Clear only fields belonging to a category */
 export const clearCategoryFields = (state, categoryId) => {
   const next = { ...state, page: 1 };
@@ -396,7 +407,13 @@ export const clientRefineProperties = (items, state) => {
   // Facing filter
   const facingVal = state.facing || getFieldValue(state, "facing");
   if (facingVal) {
-    result = result.filter((item) => String(item.facing || "").toLowerCase().includes(facingVal.toLowerCase()));
+    const selectedFacings = splitValues(facingVal)
+      .flatMap(expandFacingAliases)
+      .map((value) => value.toLowerCase());
+    result = result.filter((item) => {
+      const itemFacing = String(item.facing || "").toLowerCase();
+      return selectedFacings.some((facing) => itemFacing.includes(facing));
+    });
   }
 
   // BHK filter

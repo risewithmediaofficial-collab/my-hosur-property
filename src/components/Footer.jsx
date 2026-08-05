@@ -1,11 +1,9 @@
-import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   CONTACT_ADDRESS,
   CONTACT_EMAIL,
   CONTACT_PHONE_NUMBERS,
   SOCIAL_LINKS,
-  WHATSAPP_QR_IMAGE,
 } from "../constants/contactInfo";
 import BrandLogo from "./BrandLogo";
 import {
@@ -31,8 +29,6 @@ const scrollToTop = () => {
 };
 
 const Footer = () => {
-  const [showQrModal, setShowQrModal] = useState(false);
-
   return (
     <footer className="bg-navy text-white">
       <div className="px-5 py-12 sm:px-8 lg:px-10">
@@ -153,19 +149,13 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Column 4: WhatsApp QR Code Card */}
+            {/* Column 4: WhatsApp Support */}
             <div className="space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">Connect on WhatsApp</h4>
               <div className="rounded-xl border border-white/15 bg-white/5 p-4 text-center">
-                <p className="text-xs font-medium text-white/80 mb-2.5">Scan QR code to chat with us instantly</p>
-                <div className="mx-auto w-32 h-32 overflow-hidden rounded-lg border-2 border-orange bg-white p-1 shadow-md">
-                  <img
-                    src={WHATSAPP_QR_IMAGE}
-                    alt="WhatsApp QR Code — My Hosur Property"
-                    className="h-full w-full object-contain cursor-pointer"
-                    onClick={() => setShowQrModal(true)}
-                  />
-                </div>
+                <p className="text-xs font-medium text-white/80 mb-2.5">
+                  Chat with our team directly on WhatsApp for quick support.
+                </p>
                 <a
                   href={SOCIAL_LINKS.whatsapp}
                   target="_blank"
@@ -212,40 +202,6 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* QR Code Zoom Modal */}
-      {showQrModal && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4"
-          onClick={() => setShowQrModal(false)}
-        >
-          <div
-            className="relative max-w-sm rounded-2xl bg-white p-6 text-center text-navy shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-lg font-bold">Scan WhatsApp QR Code</h3>
-            <p className="mt-1 text-xs text-slate-500">Scan with your phone camera or WhatsApp to start messaging</p>
-            <div className="my-4 mx-auto w-64 h-64 overflow-hidden rounded-xl border-2 border-orange bg-white p-2">
-              <img src={WHATSAPP_QR_IMAGE} alt="WhatsApp QR Code" className="h-full w-full object-contain" />
-            </div>
-            <a
-              href={SOCIAL_LINKS.whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-500"
-            >
-              <WhatsAppIcon className="h-4 w-4" />
-              Open WhatsApp Now
-            </a>
-            <button
-              type="button"
-              onClick={() => setShowQrModal(false)}
-              className="mt-3 block w-full text-xs font-semibold text-slate-400 hover:text-slate-600"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
     </footer>
   );
 };

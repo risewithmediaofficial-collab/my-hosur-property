@@ -86,15 +86,13 @@ export const HOUSE_RENT_PRESETS = [
   { label: "₹50,000 & Above", min: 50000, max: "" },
 ];
 
-/** Facing options with 8 directions */
+/** Facing options used by posting and listing search */
 export const FACING_OPTIONS = [
   "East",
   "West",
   "North",
   "South",
-  "North East",
-  "North West",
-  "South East",
+  "East North",
   "South West",
 ];
 
@@ -135,7 +133,7 @@ export const propertyFilterConfig = {
     {
       key: "facing",
       label: "Facing",
-      type: "select",
+      type: "checkbox",
       options: FACING_OPTIONS,
     },
     {
@@ -184,7 +182,7 @@ export const propertyFilterConfig = {
     {
       key: "facing",
       label: "Facing",
-      type: "select",
+      type: "checkbox",
       options: FACING_OPTIONS,
     },
     {
@@ -220,7 +218,7 @@ export const propertyFilterConfig = {
     {
       key: "facing",
       label: "Facing",
-      type: "select",
+      type: "checkbox",
       options: FACING_OPTIONS,
     },
     {
@@ -255,7 +253,7 @@ export const propertyFilterConfig = {
     {
       key: "facing",
       label: "Facing",
-      type: "select",
+      type: "checkbox",
       options: FACING_OPTIONS,
     },
   ],
@@ -285,7 +283,7 @@ export const propertyFilterConfig = {
     {
       key: "facing",
       label: "Facing",
-      type: "select",
+      type: "checkbox",
       options: FACING_OPTIONS,
     },
   ],
@@ -341,7 +339,7 @@ export const propertyFilterConfig = {
     {
       key: "facing",
       label: "Facing",
-      type: "select",
+      type: "checkbox",
       options: FACING_OPTIONS,
     },
   ],
@@ -396,7 +394,7 @@ export const propertyFilterConfig = {
     {
       key: "facing",
       label: "Facing",
-      type: "select",
+      type: "checkbox",
       options: FACING_OPTIONS,
     },
     {
@@ -458,7 +456,7 @@ export const propertyFilterConfig = {
     {
       key: "facing",
       label: "Facing",
-      type: "select",
+      type: "checkbox",
       options: FACING_OPTIONS,
     },
   ],

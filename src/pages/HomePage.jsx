@@ -40,7 +40,6 @@ import SeoHead from "../components/SeoHead";
 import useDebounce from "../hooks/useDebounce";
 import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
-import { AnimatedTooltip } from "../components/ui/animated-tooltip";
 import servicesHeroImage from "../assets/house.png";
 import alluringRealityImg from "../assets/alluring reality.jpeg";
 import chatGptBannerImage from "../assets/ChatGPT Image Aug 4, 2026, 10_37_17 AM.png";
@@ -1149,61 +1148,8 @@ const HomePage = () => {
           </p>
         </div>
 
-        {/* Partner Tooltip Avatars */}
-        <div className="mx-auto mt-10 flex justify-center max-w-[1440px] px-4">
-          <AnimatedTooltip
-            items={[
-              {
-                id: 1,
-                name: "Gyes Construction & Materials",
-                designation: "Building & Construction Materials",
-                image: gyesConstructionLogo,
-              },
-              {
-                id: 2,
-                name: "OneClick Office & Home Service",
-                designation: "Complete Interior & Home Solutions",
-                image: oneClickLogo,
-              },
-              {
-                id: 3,
-                name: "Gyes Property & Construction",
-                designation: "Property Development & Construction",
-                image: gyesConstructionLogo,
-              },
-              {
-                id: 4,
-                name: "Gyes Traders",
-                designation: "General Trading & Material Supply",
-                image: gyesConstructionLogo,
-              },
-              {
-                id: 5,
-                name: "Alluring Realty",
-                designation: "Real Estate & Consulting",
-                image: alluringRealityImg,
-              },
-            ]}
-          />
-        </div>
-
         {/* Partner Brand Cards Display */}
-        <div className="mx-auto mt-12 grid max-w-[1200px] grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {/* Card 1: Gyes Construction */}
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
-            <div className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2">
-              <img
-                src={gyesConstructionLogo}
-                alt="Gyes Construction & Materials"
-                className="h-full w-full object-contain"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-            <p className="mt-3 text-xs font-bold text-navy">Gyes Construction</p>
-            <p className="mt-0.5 text-[11px] text-slate-500">&amp; Materials</p>
-          </div>
-
+        <div className="mx-auto mt-12 grid max-w-[1200px] grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {/* Card 2: OneClick */}
           <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
             <a
@@ -1265,8 +1211,13 @@ const HomePage = () => {
           </div>
 
           {/* Card 5: Alluring Realty */}
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card col-span-2 sm:col-span-1">
-            <div className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2">
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
+            <a
+              href="https://alluringrealty.com/"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
+            >
               <img
                 src={alluringRealityImg}
                 alt="Alluring Realty"
@@ -1274,7 +1225,7 @@ const HomePage = () => {
                 loading="lazy"
                 decoding="async"
               />
-            </div>
+            </a>
             <p className="mt-3 text-xs font-bold text-navy">Alluring Realty</p>
             <p className="mt-0.5 text-[11px] text-slate-500">Real Estate Consulting</p>
           </div>
