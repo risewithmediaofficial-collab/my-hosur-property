@@ -46,14 +46,14 @@ const buildFreeOnboardingPack = () => {
   const freePostExpiry = addDays(new Date(), FREE_POST_VALIDITY_DAYS);
 
   return {
-    leadCredits: 5,
+    leadCredits: 0,
     canPostProperty: true,
     freePost: {
       used: false,
       expiresAt: freePostExpiry,
     },
     contactAccess: {
-      monthlyLimit: 10,
+      monthlyLimit: 30,
       usedCount: 0,
       resetAt,
       isPremium: false,
@@ -61,10 +61,10 @@ const buildFreeOnboardingPack = () => {
     activePlan: {
       planId: null,
       expiresAt: freePostExpiry,
-      listingLimit: 1,
+      listingLimit: 3,
       listingsUsed: 0,
       isBoosted: false,
-      contactUnlocks: 5,
+      contactUnlocks: 30,
       leadCredits: 0,
       boostDays: 0,
     },
@@ -74,7 +74,7 @@ const buildFreeOnboardingPack = () => {
 const ensureFreeOnboardingValidity = async (user) => {
   if (!user || user.activePlan?.planId) return user;
 
-  const isFreeListingPlan = (user.activePlan?.listingLimit || 0) === 1;
+  const isFreeListingPlan = (user.activePlan?.listingLimit || 0) <= 3 && (user.activePlan?.listingLimit || 0) > 0;
   if (!isFreeListingPlan) return user;
 
   const accountStart = user.createdAt || new Date();
@@ -82,7 +82,13 @@ const ensureFreeOnboardingValidity = async (user) => {
   const currentFreeExpiry = user.freePost?.expiresAt ? new Date(user.freePost.expiresAt) : null;
   const currentPlanExpiry = user.activePlan?.expiresAt ? new Date(user.activePlan.expiresAt) : null;
 
-  if ((!currentFreeExpiry || currentFreeExpiry < expectedExpiry) || (!currentPlanExpiry || currentPlanExpiry < expectedExpiry)) {
+  const needsExpiryUpdate = !currentFreeExpiry || currentFreeExpiry < expectedExpiry || !currentPlanExpiry || currentPlanExpiry < expectedExpiry;
+  const needsPlanUpdate =
+    (user.activePlan?.listingLimit || 0) !== 3 ||
+    (user.activePlan?.contactUnlocks || 0) !== 30 ||
+    (user.contactAccess?.monthlyLimit || 0) !== 30;
+
+  if (needsExpiryUpdate || needsPlanUpdate) {
     user.freePost = {
       ...(user.freePost?.toObject ? user.freePost.toObject() : user.freePost || {}),
       expiresAt: expectedExpiry,
@@ -90,6 +96,16 @@ const ensureFreeOnboardingValidity = async (user) => {
     user.activePlan = {
       ...(user.activePlan?.toObject ? user.activePlan.toObject() : user.activePlan || {}),
       expiresAt: expectedExpiry,
+      listingLimit: 3,
+      contactUnlocks: 30,
+      leadCredits: 0,
+    };
+    user.contactAccess = {
+      ...(user.contactAccess?.toObject ? user.contactAccess.toObject() : user.contactAccess || {}),
+      monthlyLimit: 30,
+      usedCount: user.contactAccess?.usedCount || 0,
+      resetAt: expectedExpiry,
+      isPremium: false,
     };
     await user.save();
   }

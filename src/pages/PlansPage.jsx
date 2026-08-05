@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { CheckCircleIcon, ShieldCheckIcon } from "../components/AppIcons";
 import useAuth from "../hooks/useAuth";
-import { fetchPlans } from "../services/api/planApi";
+import { fetchPlans, activateFreePlan } from "../services/api/planApi";
 import { fetchMyPayments } from "../services/api/paymentApi";
 import { loadExternalScript } from "../utils/loadExternalScript";
 import { currency } from "../utils/format";
@@ -172,11 +172,27 @@ const PlansPage = () => {
       return;
     }
 
-    if (!plan?._id) {
-      toast.error("Plan is not available in database. Please contact support.");
-      return;
-    }
+    const planKey = plan._id || plan.name;
+    setBuyingPlanId(planKey);
 
+    try {
+      if (!plan || plan.price === 0) {
+        const payload = { planName: plan?.name };
+        await activateFreePlan(token, payload);
+        await refreshProfile();
+        toast.success("Free plan activated successfully. You can now post 3 free listings for 90 days.");
+        return;
+      }
+
+      setSelectedPlanForPayment(plan);
+      setIsPaymentModalOpen(true);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || error.message || "Unable to activate plan. Please try again."
+      );
+    } finally {
+      setBuyingPlanId("");
+    }
   };
 
 
