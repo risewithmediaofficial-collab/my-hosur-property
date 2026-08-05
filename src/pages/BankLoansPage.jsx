@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { AnimatePresence, m } from "framer-motion";
+import { AnimatePresence, } from "framer-motion";
 import { ArrowRightIcon, CheckCircleIcon, ChevronDownIcon } from "../components/AppIcons";
 import SeoHead from "../components/SeoHead";
 import LoanCalculator from "../components/LoanCalculator";
