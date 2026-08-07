@@ -1,5 +1,3 @@
-import BrandLogo from "./BrandLogo";
-
 const DashboardSidebar = ({
   title,
   subtitle,
@@ -12,39 +10,38 @@ const DashboardSidebar = ({
   mainClassName = "",
   contentClassName = "",
   onLogout,
-  hideLogo = false,
 }) => {
   return (
-    <div className={`flex min-h-[calc(100vh-4rem)] flex-col overflow-x-hidden bg-transparent md:min-h-0 md:flex-row ${rootClassName}`}>
+    <div className={`flex min-h-[calc(100vh-4rem)] flex-col overflow-x-hidden bg-slate-50/50 md:min-h-0 md:flex-row ${rootClassName}`}>
       {/* ── Desktop Sidebar ── */}
       <aside className={`sticky top-20 z-10 hidden h-[calc(100vh-5rem)] w-[21rem] shrink-0 overflow-y-auto px-4 pb-6 pt-4 md:flex md:min-h-0 md:flex-col ${asideClassName}`}>
-        <div className="dashboard-shell flex h-full min-h-0 flex-col gap-6 p-6">
+        <div className="dashboard-shell flex h-full min-h-0 flex-col gap-6 p-6 bg-white border border-slate-200/80 rounded-3xl shadow-sm">
           <div>
-            <p className="dashboard-kicker">{subtitle}</p>
-            <h1 className="dashboard-display mt-3 text-[2.15rem] font-semibold leading-[1.02] text-slate-900">{title}</h1>
-            {description ? <p className="dashboard-muted mt-3 text-sm leading-6">{description}</p> : null}
+            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">{subtitle}</p>
+            <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900">{title}</h1>
+            {description ? <p className="mt-2 text-xs leading-relaxed text-slate-500">{description}</p> : null}
           </div>
 
-          <div className="flex min-h-0 flex-1 flex-col pt-4 shadow-[inset_0_1px_0_rgba(0,66,162,0.07)]">
-            <p className="pb-3 text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400">Dashboard sections</p>
-            <nav className="min-h-0 flex-1 space-y-1.5 overflow-y-auto pr-1 pb-2">
+          <div className="flex min-h-0 flex-1 flex-col pt-4 border-t border-slate-100">
+            <p className="pb-3 text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-400">Dashboard Navigation</p>
+            <nav className="min-h-0 flex-1 space-y-1.5 overflow-y-auto pr-1 pb-2 hide-scrollbar">
               {navItems.map((item) => (
                 <button
                   key={item.key}
                   type="button"
                   onClick={() => item.onClick?.(item.key)}
-                  className={`flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${
+                  className={`flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-left text-sm font-bold transition-all duration-200 ${
                     item.active
-                      ? "bg-slate-50 text-slate-950 shadow-[0_12px_22px_rgba(0,66,162,0.06),inset_0_0_0_1px_rgba(0,66,162,0.1)]"
-                      : "bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                      ? "bg-slate-900 text-white shadow-md shadow-slate-900/10"
+                      : "bg-transparent text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
                   }`}
                 >
                   <span className="flex min-w-0 flex-1 items-center gap-3">
-                    {item.icon ? <span className="flex-shrink-0 text-base">{item.icon}</span> : null}
+                    {item.icon ? <span className={`flex-shrink-0 text-base ${item.active ? "text-orange-400" : "text-slate-400"}`}>{item.icon}</span> : null}
                     <span className="min-w-0 truncate">{item.label}</span>
                   </span>
-                  {item.badge ? (
-                    <span className={`ml-2 rounded-full px-2.5 py-1 text-[10px] font-bold ${item.active ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600"}`}>
+                  {item.badge !== undefined && item.badge !== null ? (
+                    <span className={`ml-2 rounded-full px-2.5 py-0.5 text-[10px] font-extrabold ${item.active ? "bg-white/20 text-white" : "bg-slate-100 text-slate-700"}`}>
                       {item.badge}
                     </span>
                   ) : null}
@@ -52,15 +49,6 @@ const DashboardSidebar = ({
               ))}
             </nav>
           </div>
-
-          {!hideLogo && (
-            <div className="pt-4 shadow-[inset_0_1px_0_rgba(0,66,162,0.06)]">
-              <div className="flex justify-center">
-                <BrandLogo className="h-auto w-[180px]" />
-              </div>
-              <p className="mt-2 text-center text-xs tracking-[0.16em] text-slate-400">2026</p>
-            </div>
-          )}
         </div>
       </aside>
 
