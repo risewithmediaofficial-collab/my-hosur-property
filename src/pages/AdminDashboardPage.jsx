@@ -638,15 +638,23 @@ const AdminDashboardPage = () => {
         {activeTab === "overview" && (
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {overviewStats.map(({ key, label, value, icon }) => (
-              <article key={key} className="dashboard-stat p-5 text-left">
-                <div className="flex items-center gap-3 text-slate-700">
-                  <div className="rounded-full bg-slate-100 p-2.5">
-                    {icon}
+              <button
+                key={key}
+                type="button"
+                onClick={() => handleTabChange(key)}
+                className="dashboard-stat p-5 text-left transition-all duration-200 hover:-translate-y-1 hover:border-slate-300 hover:shadow-md cursor-pointer group w-full"
+              >
+                <div className="flex items-center justify-between gap-3 text-slate-700">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-full bg-slate-100 p-2.5 group-hover:bg-slate-900 group-hover:text-white transition-colors">
+                      {icon}
+                    </div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 group-hover:text-slate-900">{label}</p>
                   </div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">{label}</p>
+                  <span className="text-xs font-bold text-slate-400 group-hover:text-orange-600 transition-colors">View →</span>
                 </div>
                 <p className="mt-5 text-4xl font-extrabold text-slate-900">{value}</p>
-              </article>
+              </button>
             ))}
           </section>
         )}

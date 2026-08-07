@@ -196,19 +196,27 @@ const CustomerDashboardPage = () => {
             </div>
           </section>
 
-          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {[
-              { label: "Total Requirements", value: requests.length },
-              { label: "Open Requirements", value: openCount },
-              { label: "Matched Requirements", value: matchedCount },
-              { label: "Unread Notifications", value: unreadCount },
-              { label: "Saved Properties", value: saved.length },
-              { label: "Property Chats", value: inquiryHistory.length },
+              { tab: "requests", label: "Total Requirements", value: requests.length },
+              { tab: "requests", label: "Open Requirements", value: openCount },
+              { tab: "matches", label: "Matched Requirements", value: matchedCount },
+              { tab: "notifications", label: "Unread Notifications", value: unreadCount },
+              { tab: "saved", label: "Saved Properties", value: saved.length },
+              { tab: "inquiries", label: "My Inquiries", value: inquiryHistory.length },
             ].map((item) => (
-              <div key={item.label} className="dashboard-stat p-5 text-slate-900">
-                <p className="text-sm uppercase tracking-[0.18em] text-slate-600">{item.label}</p>
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => handleTabSelect(item.tab)}
+                className="dashboard-stat p-5 text-left text-slate-900 transition-all duration-200 hover:-translate-y-1 hover:border-slate-300 hover:shadow-md cursor-pointer group w-full"
+              >
+                <div className="flex items-center justify-between text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
+                  <span className="group-hover:text-slate-900 transition-colors">{item.label}</span>
+                  <span className="text-xs font-bold text-slate-400 group-hover:text-orange-600 transition-colors">View →</span>
+                </div>
                 <p className="mt-4 text-4xl font-extrabold text-slate-900">{item.value}</p>
-              </div>
+              </button>
             ))}
           </section>
 

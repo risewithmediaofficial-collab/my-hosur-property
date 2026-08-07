@@ -221,32 +221,45 @@ const UserDashboardPage = () => {
             </div>
           </section>
 
-          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div className="dashboard-stat p-5">
-              <p className="text-sm text-slate-500">Member since</p>
-              <p className="mt-2 text-xl font-bold text-slate-900">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Member since</p>
+              <p className="mt-2 text-lg font-bold text-slate-900">
                 {user?.createdAt ? new Date(user.createdAt).toLocaleDateString("en-IN") : "Recently joined"}
               </p>
             </div>
+            <button
+              type="button"
+              onClick={() => handleTabSelect("payments")}
+              className="dashboard-stat p-5 text-left transition-all duration-200 hover:-translate-y-1 hover:border-slate-300 hover:shadow-md cursor-pointer group"
+            >
+              <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400">
+                <span>Active plan</span>
+                <span className="text-xs font-bold text-slate-400 group-hover:text-orange-600 transition-colors">View →</span>
+              </div>
+              <p className="mt-2 text-lg font-bold text-slate-900 group-hover:text-slate-950">{user?.activePlan?.planId?.name || "Standard"}</p>
+            </button>
             <div className="dashboard-stat p-5">
-              <p className="text-sm text-slate-500">Active plan</p>
-              <p className="mt-2 text-xl font-bold text-slate-900">{user?.activePlan?.planId?.name || "Standard"}</p>
-            </div>
-            <div className="dashboard-stat p-5">
-              <p className="text-sm text-slate-500">Lead credits</p>
-              <p className="mt-2 text-xl font-bold text-slate-900">{customerLeadCredits}</p>
-              <button onClick={onBuyPack} className="dashboard-primary mt-3 px-4 py-2 text-xs">
+              <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400">
+                <span>Lead credits</span>
+                <span className="text-lg font-extrabold text-slate-900">{customerLeadCredits}</span>
+              </div>
+              <button onClick={onBuyPack} className="dashboard-primary mt-3 w-full py-2 text-xs flex items-center justify-center gap-1.5">
                 <TicketIcon className="h-4 w-4" />
-                Buy 5 Credits
+                Buy Credits
               </button>
             </div>
-            <div className="dashboard-stat p-5">
-              <p className="text-sm text-slate-500">My inquiries</p>
-              <p className="mt-2 text-xl font-bold text-slate-900">{inquiryHistory.length}</p>
-              <button onClick={() => setTab("inquiries")} className="dashboard-secondary mt-3 px-4 py-2 text-xs">
-                View history
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => handleTabSelect("inquiries")}
+              className="dashboard-stat p-5 text-left transition-all duration-200 hover:-translate-y-1 hover:border-slate-300 hover:shadow-md cursor-pointer group"
+            >
+              <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400">
+                <span>My inquiries</span>
+                <span className="text-xs font-bold text-slate-400 group-hover:text-orange-600 transition-colors">View →</span>
+              </div>
+              <p className="mt-2 text-3xl font-extrabold text-slate-900 group-hover:text-slate-950">{inquiryHistory.length}</p>
+            </button>
           </section>
 
           {pendingLeads.length > 0 && (
