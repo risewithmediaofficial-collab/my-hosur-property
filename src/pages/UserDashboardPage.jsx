@@ -306,23 +306,23 @@ const UserDashboardPage = () => {
           {myProperties.length === 0 ? (
             <div className="dashboard-empty p-10 text-center">No properties posted yet.</div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-2xl border border-slate-200">
               <table className="dashboard-table min-w-full text-left text-sm">
-                <thead>
+                <thead className="whitespace-nowrap bg-slate-50 border-b border-slate-200">
                   <tr>
-                    <th>Image</th>
-                    <th>Listing</th>
-                    <th>City</th>
-                    <th>Status</th>
-                    <th className="text-right">Action</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Image</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Listing</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">City</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Status</th>
+                    <th className="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {myProperties.map((property) => {
                     const isExpired = property.expiresAt && new Date(property.expiresAt) <= new Date();
                     return (
-                    <tr key={property._id}>
-                      <td>
+                    <tr key={property._id} className="border-b border-slate-100 hover:bg-slate-50/50">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <img
                           src={property.images?.[0] || PROPERTY_PLACEHOLDER_IMAGE}
                           alt={getPropertyImageAlt(property)}
@@ -331,15 +331,15 @@ const UserDashboardPage = () => {
                           decoding="async"
                         />
                       </td>
-                      <td className="font-medium text-slate-900">{property.title}</td>
-                      <td>{property.location?.city}</td>
-                      <td>
-                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${isExpired ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-600"}`}>
+                      <td className="px-4 py-3 font-semibold text-slate-900">{property.title}</td>
+                      <td className="px-4 py-3 whitespace-nowrap text-slate-700">{property.location?.city || "-"}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-extrabold uppercase tracking-wider whitespace-nowrap ${isExpired ? "bg-amber-100 text-amber-800" : "bg-slate-100 text-slate-700"}`}>
                           {isExpired ? "expired" : property.status}
                         </span>
                       </td>
-                      <td className="text-right">
-                        <button onClick={() => navigate(`/edit-property/${property._id}`)} className="dashboard-secondary px-3 py-2 text-xs">
+                      <td className="px-4 py-3 text-right whitespace-nowrap">
+                        <button onClick={() => navigate(`/edit-property/${property._id}`)} className="dashboard-secondary px-3 py-1.5 text-xs font-bold">
                           Edit
                         </button>
                       </td>

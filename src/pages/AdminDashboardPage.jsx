@@ -1150,68 +1150,68 @@ const AdminDashboardPage = () => {
 
             <div className="mt-4 min-h-0 overflow-y-auto rounded-[1.5rem] border border-slate-200/70">
               <table className="dashboard-table min-w-full text-left text-sm">
-                <thead className="whitespace-nowrap">
-                  <tr className="border-b border-clay">
-                    <th className="py-2">Image</th>
-                    <th className="py-2">Property</th>
-                    <th className="py-2">Location</th>
-                    <th className="py-2">Posted By</th>
-                    <th className="py-2">Status</th>
-                    <th className="py-2 text-right">Action</th>
+                <thead className="whitespace-nowrap bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Image</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Property</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Location</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Posted By</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Status</th>
+                    <th className="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredPropertyListings.map((p) => (
-                    <tr key={p._id} className="border-b border-clay/60 align-middle">
-                      <td className="py-2">
+                    <tr key={p._id} className="border-b border-slate-100 align-middle hover:bg-slate-50/50">
+                      <td className="px-4 py-3.5 whitespace-nowrap">
                         <button type="button" onClick={() => openProperty(p)} className="block">
                           <img
                             src={p.images?.[0] || PROPERTY_PLACEHOLDER_IMAGE}
                             alt={getPropertyImageAlt(p)}
-                            className="h-12 w-12 rounded-md border border-clay object-cover"
+                            className="h-11 w-11 rounded-lg border border-slate-200 object-cover"
                             loading="lazy"
                             decoding="async"
                           />
                         </button>
                       </td>
-                      <td className="py-2">
-                        <button type="button" onClick={() => openProperty(p)} className="text-left transition hover:text-ink">
-                          <p className="font-medium">{p.title}</p>
-                          <p className="text-xs text-ink/65">
+                      <td className="px-4 py-3.5">
+                        <button type="button" onClick={() => openProperty(p)} className="text-left transition hover:text-orange-600">
+                          <p className="font-bold text-slate-900 leading-snug">{p.title}</p>
+                          <p className="text-xs font-semibold text-slate-500 mt-0.5">
                             Rs. {Number(p.price || 0).toLocaleString("en-IN")} · {p.propertyType || "Property"} · {p.listingType || "sale"}
                           </p>
-                          <p className="text-xs text-ink/50">Posted {new Date(p.createdAt).toLocaleDateString("en-IN")}</p>
+                          <p className="text-[11px] text-slate-400 mt-0.5">Posted {new Date(p.createdAt).toLocaleDateString("en-IN")}</p>
                         </button>
                       </td>
-                      <td className="py-2 text-ink/70">
-                        <p>{p.location?.city || "-"}</p>
-                        <p className="text-xs text-ink/50">{p.location?.area || "-"}</p>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-700">
+                        <p className="font-semibold text-slate-900">{p.location?.city || "-"}</p>
+                        <p className="text-xs text-slate-500">{p.location?.area || "-"}</p>
                       </td>
-                      <td className="py-2 text-ink/70">
-                        <p className="font-medium text-ink">{p.ownerId?.name || "Unknown"}</p>
-                        <p className="text-xs">{p.ownerId?.email || "No email"}</p>
-                        {p.ownerId?.phone ? <p className="text-xs font-semibold text-orange-600">{p.ownerId.phone}</p> : null}
-                        <p className="text-xs capitalize">{p.ownerType || p.ownerId?.role || "user"}</p>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-700">
+                        <p className="font-bold text-slate-900">{p.ownerId?.name || "Unknown"}</p>
+                        <p className="text-xs text-slate-500">{p.ownerId?.email || "No email"}</p>
+                        {p.ownerId?.phone ? <p className="text-xs font-bold text-orange-600">{p.ownerId.phone}</p> : null}
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{p.ownerType || p.ownerId?.role || "user"}</p>
                       </td>
-                      <td className="py-2">
-                        <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
+                      <td className="px-4 py-3.5 whitespace-nowrap">
+                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-extrabold uppercase tracking-wider whitespace-nowrap ${
                           p.status === "approved"
-                            ? "bg-green-100 text-green-700"
+                            ? "bg-emerald-100 text-emerald-800"
                             : p.status === "pending"
-                              ? "bg-amber-100 text-amber-700"
-                              : "bg-red-100 text-red-700"
+                              ? "bg-amber-100 text-amber-800"
+                              : "bg-red-100 text-red-800"
                         }`}>
                           {p.status}
                         </span>
                       </td>
-                      <td className="py-2 text-right">
+                      <td className="px-4 py-3.5 text-right whitespace-nowrap">
                         <div className="flex flex-wrap justify-end gap-2">
-                          <button onClick={() => openProperty(p)} className="rounded-md border border-clay bg-white px-3 py-1 text-xs font-semibold hover:bg-stone">
+                          <button onClick={() => openProperty(p)} className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-sm">
                             View
                           </button>
                           <button
                             onClick={() => onDeleteProperty(p._id, p.title)}
-                            className="rounded-md bg-red-600 px-3 py-1 text-xs font-semibold text-white hover:bg-red-700"
+                            className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-700 shadow-sm"
                           >
                             Delete
                           </button>

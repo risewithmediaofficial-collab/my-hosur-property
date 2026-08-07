@@ -80,10 +80,14 @@ video {
   display: block;
 }
 
-/* Prevent long words / numbers breaking mobile layout */
-p, span, a, li, td, th {
+/* Prevent long words / numbers breaking mobile layout except in tables and badges */
+p, span, a, li {
   word-break: break-word;
   overflow-wrap: break-word;
+}
+
+td, th, .dashboard-table th, .dashboard-table td, [class*="status"], [class*="badge"] {
+  white-space: nowrap;
 }
 
 
