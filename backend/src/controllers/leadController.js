@@ -189,7 +189,7 @@ const myLeads = async (req, res) => {
   }
 
   const items = leads.map(l => {
-    const isUnlocked = l.isUnlockedByOwner || (l.brokerAssignments.some(ba => String(ba.brokerId) === String(req.user._id) && ba.purchasedAt));
+    const isUnlocked = l.status === "approved" || l.isUnlockedByOwner || (l.brokerAssignments.some(ba => String(ba.brokerId) === String(req.user._id) && ba.purchasedAt));
     return {
       ...l.toObject(),
       contactInfo: isUnlocked ? l.contactInfo : { name: l.contactInfo?.name, phone: "Masked", email: "Masked" },
@@ -272,11 +272,15 @@ const updateBrokerLeadStatus = async (req, res) => {
 };
 
 const updateLeadStatus = async (req, res) => {
-  const lead = await Lead.findById(req.params.id);
+  const lead = await Lead.findById(req.params.id)
+    .populate("propertyId", "title location")
+    .populate("userId", "name email phone")
+    .populate("ownerId", "name email phone");
   if (!lead) return res.status(404).json({ message: "Lead not found" });
 
-  if (String(lead.ownerId) !== String(req.user._id) && req.user.role !== "admin") {
-    return res.status(403).json({ message: "Only the property owner can approve/reject this request" });
+  const ownerIdStr = String(lead.ownerId?._id || lead.ownerId);
+  if (ownerIdStr !== String(req.user._id) && req.user.role !== "admin") {
+    return res.status(403).json({ message: "Only the property owner or admin can approve/reject this request" });
   }
 
   const { status } = req.body;
@@ -285,7 +289,71 @@ const updateLeadStatus = async (req, res) => {
   }
 
   lead.status = status;
+  if (status === "approved") {
+    lead.isUnlockedByOwner = true;
+  }
   await lead.save();
+
+  // Send notification emails when approved/rejected
+  try {
+    if (lead.ownerId?.email && status === "approved") {
+      const ownerEmailHtml = baseEmailLayout(
+        `
+        <h2 style="margin:0 0 4px;font-size:20px;font-weight:700;color:#1E293B;">
+          Contact Request Approved ✓
+        </h2>
+        <div style="width:40px;height:3px;background:#10B981;border-radius:2px;margin:12px 0 20px;"></div>
+
+        <p style="margin:0 0 16px;color:#64748B;">
+          Admin has approved a buyer contact request for your property <strong>"${lead.propertyId?.title || "Property"}"</strong>.
+        </p>
+
+        <div style="background:#ECFDF5;padding:16px;border-radius:8px;margin:20px 0;border-left:4px solid #10B981;">
+          <p style="margin:0;color:#065F46;font-weight:600;">Buyer Details Unlocked:</p>
+          <p style="margin:8px 0 0;color:#065F46;font-size:14px;"><strong>Name:</strong> ${lead.contactInfo?.name || lead.userId?.name || "N/A"}</p>
+          <p style="margin:4px 0 0;color:#065F46;font-size:14px;"><strong>Phone:</strong> ${lead.contactInfo?.phone || lead.userId?.phone || "N/A"}</p>
+          <p style="margin:4px 0 0;color:#065F46;font-size:14px;"><strong>Email:</strong> ${lead.contactInfo?.email || lead.userId?.email || "N/A"}</p>
+        </div>
+        `,
+        "✓ Contact Request Approved"
+      );
+      await sendEmail({
+        to: lead.ownerId.email,
+        subject: `✓ Buyer Contact Request Approved - ${lead.propertyId?.title || "Property"}`,
+        html: ownerEmailHtml,
+      });
+    }
+
+    if (lead.userId?.email && status === "approved") {
+      const buyerEmailHtml = baseEmailLayout(
+        `
+        <h2 style="margin:0 0 4px;font-size:20px;font-weight:700;color:#1E293B;">
+          Contact Details Unlocked! ✓
+        </h2>
+        <div style="width:40px;height:3px;background:#10B981;border-radius:2px;margin:12px 0 20px;"></div>
+
+        <p style="margin:0 0 16px;color:#64748B;">
+          Your request to view contact details for <strong>"${lead.propertyId?.title || "Property"}"</strong> has been approved by Admin.
+        </p>
+
+        <div style="background:#ECFDF5;padding:16px;border-radius:8px;margin:20px 0;border-left:4px solid #10B981;">
+          <p style="margin:0;color:#065F46;font-weight:600;">Property Owner Contact:</p>
+          <p style="margin:8px 0 0;color:#065F46;font-size:14px;"><strong>Name:</strong> ${lead.ownerId?.name || "Owner"}</p>
+          <p style="margin:4px 0 0;color:#065F46;font-size:14px;"><strong>Phone:</strong> ${lead.ownerId?.phone || "N/A"}</p>
+          <p style="margin:4px 0 0;color:#065F46;font-size:14px;"><strong>Email:</strong> ${lead.ownerId?.email || "N/A"}</p>
+        </div>
+        `,
+        "✓ Contact Details Approved"
+      );
+      await sendEmail({
+        to: lead.userId.email,
+        subject: `✓ Contact Request Approved - ${lead.propertyId?.title || "Property"}`,
+        html: buyerEmailHtml,
+      });
+    }
+  } catch (err) {
+    console.error("[updateLeadStatus] Email error:", err.message);
+  }
 
   return res.json({ message: `Lead ${status} successfully`, lead });
 };

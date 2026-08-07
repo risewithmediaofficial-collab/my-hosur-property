@@ -452,7 +452,7 @@ const AgentDashboardPage = () => {
                               : "bg-red-100 text-red-700"
                         }`}
                       >
-                        {lead.status}
+                        {lead.status === "pending" ? "Pending Admin Approval" : lead.status === "approved" ? "Approved by Admin" : lead.status}
                       </span>
                     </td>
                     <td className="space-y-2 text-right">

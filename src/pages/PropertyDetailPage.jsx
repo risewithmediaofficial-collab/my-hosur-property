@@ -233,8 +233,9 @@ const PropertyDetailPage = () => {
     ? { name: p.listingContact.name, phone: p.listingContact.phone, email: p.ownerId?.email }
     : { name: p?.ownerId?.name, phone: p?.ownerId?.phone, email: p?.ownerId?.email };
 
-  const isApproved = myLead?.status === "approved" || String(p?.ownerId?._id || p?.ownerId) === String(user?._id);
+  const isApproved = myLead?.status === "approved" || String(p?.ownerId?._id || p?.ownerId) === String(user?._id) || user?.role === "admin";
   const isPending = myLead?.status === "pending";
+  const isRejected = myLead?.status === "rejected";
   const isSaved = p?._id ? savedIds.includes(p._id) : false;
 
   const nearbyPlaces = useMemo(() => {
@@ -604,10 +605,16 @@ const PropertyDetailPage = () => {
                   <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">Approved Owner Contact</p>
                   <p className="mt-1 text-lg font-extrabold text-navy">{modalContact.name}</p>
                   <p className="text-xl font-bold text-orange mt-0.5">{modalContact.phone}</p>
+                  {modalContact.email && <p className="text-sm font-semibold text-slate-600 mt-1">{modalContact.email}</p>}
                 </div>
               ) : isPending ? (
                 <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 text-center">
-                  <p className="text-sm font-bold text-amber-800">Contact Request Pending Owner Approval</p>
+                  <p className="text-sm font-bold text-amber-800">Contact Request Pending Admin Approval</p>
+                  <p className="text-xs text-amber-700 mt-1">Your request is sent to Admin for approval. Owner contact will appear once approved.</p>
+                </div>
+              ) : isRejected ? (
+                <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 text-center">
+                  <p className="text-sm font-bold text-rose-800">Contact Request Declined by Admin</p>
                 </div>
               ) : (
                 <button

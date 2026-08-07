@@ -250,10 +250,10 @@ const UserDashboardPage = () => {
             <section className="dashboard-panel p-6">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h3 className="dashboard-display text-2xl font-semibold text-slate-900">Action required</h3>
-                  <p className="dashboard-muted text-sm">You have pending buyer requests waiting for your approval.</p>
+                  <h3 className="dashboard-display text-2xl font-semibold text-slate-900">Buyer Inquiries</h3>
+                  <p className="dashboard-muted text-sm">Buyer contact requests are currently under review by Admin.</p>
                 </div>
-                <span className="dashboard-chip">{pendingLeads.length} pending</span>
+                <span className="dashboard-chip">{pendingLeads.length} pending Admin approval</span>
               </div>
               <div className="mt-6 space-y-3">
                 {pendingLeads.map((lead) => (
@@ -261,16 +261,11 @@ const UserDashboardPage = () => {
                     <div className="flex flex-wrap items-center justify-between gap-4">
                       <div>
                         <p className="font-bold text-slate-900">{lead.contactInfo?.name || "Buyer"}</p>
-                        <p className="dashboard-muted text-sm">Property: {lead.propertyId?.title}</p>
+                        <p className="dashboard-muted text-sm">Property: {lead.propertyId?.title || "Property"}</p>
                       </div>
-                      <div className="flex gap-2">
-                        <button onClick={() => handleLeadAction(lead._id, "approved")} className="dashboard-primary px-4 py-2 text-xs">
-                          Approve
-                        </button>
-                        <button onClick={() => handleLeadAction(lead._id, "rejected")} className="dashboard-secondary px-4 py-2 text-xs">
-                          Reject
-                        </button>
-                      </div>
+                      <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+                        Pending Admin Approval
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -355,38 +350,58 @@ const UserDashboardPage = () => {
             </button>
           </div>
           <div className="space-y-4">
-            {incomingLeads
-              .filter((lead) => lead.status === "pending")
-              .map((lead) => (
+            {incomingLeads.map((lead) => {
+              const isApproved = lead.status === "approved" || lead.isUnlockedByOwner;
+              const hasFullContact = isApproved && lead.contactInfo?.phone && lead.contactInfo?.phone !== "Masked";
+              return (
                 <div key={lead._id} className="dashboard-subpanel p-4">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <p className="font-semibold text-slate-900">{lead.contactInfo?.name || "Buyer"}</p>
-                      <p className="dashboard-muted text-sm">Property: {lead.propertyId?.title}</p>
+                      <p className="font-semibold text-slate-900">{lead.contactInfo?.name || lead.userId?.name || "Buyer"}</p>
+                      <p className="dashboard-muted text-sm">Property: {lead.propertyId?.title || "Property"}</p>
                     </div>
-                    <div className="flex gap-2">
-                      <button onClick={() => handleLeadAction(lead._id, "approved")} className="dashboard-primary px-4 py-2 text-xs">
-                        Approve
-                      </button>
-                      <button onClick={() => handleLeadAction(lead._id, "rejected")} className="dashboard-secondary px-4 py-2 text-xs">
-                        Reject
-                      </button>
-                    </div>
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${
+                      lead.status === "approved"
+                        ? "bg-green-100 text-green-700"
+                        : lead.status === "rejected"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-amber-100 text-amber-700"
+                    }`}>
+                      {lead.status === "pending" ? "Pending Admin Approval" : lead.status === "approved" ? "Approved by Admin" : lead.status}
+                    </span>
                   </div>
-                  <div className={`mt-4 rounded-2xl p-4 ${!lead.isUnlockedByOwner ? "bg-white/80 blur-sm grayscale opacity-60" : "bg-white"}`}>
-                    <p className="text-sm text-slate-600">
-                      {lead.contactInfo?.phone} | {lead.contactInfo?.email}
-                    </p>
-                    {!lead.isUnlockedByOwner && (
-                      <button onClick={() => onUnlockLead(lead._id)} className="mt-2 text-xs font-semibold text-slate-700 underline">
-                        Unlock Contact
-                      </button>
+                  <div className={`mt-4 rounded-2xl p-4 ${!hasFullContact ? "bg-slate-50 border border-slate-200" : "bg-emerald-50/60 border border-emerald-200"}`}>
+                    {hasFullContact ? (
+                      <div>
+                        <p className="text-sm font-bold text-slate-900">Requester Contact Details:</p>
+                        <p className="mt-1 text-sm font-semibold text-emerald-800">
+                          📞 Phone: <a href={`tel:${lead.contactInfo.phone}`} className="underline">{lead.contactInfo.phone}</a>
+                        </p>
+                        <p className="mt-0.5 text-sm font-semibold text-emerald-800">
+                          ✉️ Email: <a href={`mailto:${lead.contactInfo.email}`} className="underline">{lead.contactInfo.email}</a>
+                        </p>
+                        {lead.contactInfo?.message && (
+                          <p className="mt-2 text-xs text-slate-700">Message: {lead.contactInfo.message}</p>
+                        )}
+                      </div>
+                    ) : (
+                      <div>
+                        <p className="text-sm font-medium text-slate-600">
+                          Contact details will be visible once Admin approves this request.
+                        </p>
+                        {!lead.isUnlockedByOwner && (
+                          <button onClick={() => onUnlockLead(lead._id)} className="mt-2 text-xs font-semibold text-slate-700 underline">
+                            Unlock Contact (Direct Credit)
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
-              ))}
-            {incomingLeads.filter((lead) => lead.status === "pending").length === 0 && (
-              <div className="dashboard-empty p-10 text-center">No pending leads found.</div>
+              );
+            })}
+            {incomingLeads.length === 0 && (
+              <div className="dashboard-empty p-10 text-center">No property leads found.</div>
             )}
           </div>
         </section>

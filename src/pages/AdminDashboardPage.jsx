@@ -28,6 +28,7 @@ import PropertyPostingForm from "../components/PropertyPostingForm";
 import DashboardSidebar from "../components/DashboardSidebar";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
 import { deleteProperty, fetchProperties } from "../services/api/propertyApi";
+import { updateLeadApproval } from "../services/api/leadApi";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
 import { getPropertyImageAlt, getPropertyPath } from "../utils/seo";
 import {
@@ -426,6 +427,20 @@ const AdminDashboardPage = () => {
       load();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to delete property");
+    }
+  };
+
+  const handleModerateLead = async (leadId, status) => {
+    try {
+      await updateLeadApproval(token, leadId, status);
+      toast.success(`Contact request ${status} successfully`);
+      const updated = await fetchAdminLeads(token);
+      setLeads(updated.items || []);
+      if (selectedLeadItem?.item?._id === leadId) {
+        setSelectedLeadItem((prev) => (prev ? { ...prev, item: { ...prev.item, status } } : null));
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to update lead status");
     }
   };
 
@@ -1166,6 +1181,7 @@ const AdminDashboardPage = () => {
                       <td className="py-2 text-ink/70">
                         <p className="font-medium text-ink">{p.ownerId?.name || "Unknown"}</p>
                         <p className="text-xs">{p.ownerId?.email || "No email"}</p>
+                        {p.ownerId?.phone ? <p className="text-xs font-semibold text-orange-600">{p.ownerId.phone}</p> : null}
                         <p className="text-xs capitalize">{p.ownerType || p.ownerId?.role || "user"}</p>
                       </td>
                       <td className="py-2">
@@ -1322,6 +1338,7 @@ const AdminDashboardPage = () => {
                             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Posted By</p>
                             <p className="truncate text-sm font-semibold text-slate-900">{item.ownerId?.name || "N/A"}</p>
                             <p className="truncate text-xs text-slate-500">{item.ownerId?.email || "No email"}</p>
+                            {item.ownerId?.phone ? <p className="truncate text-xs font-semibold text-orange-600">{item.ownerId.phone}</p> : null}
                           </div>
                           <div className="flex flex-wrap items-center gap-2">
                             <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
@@ -1331,12 +1348,28 @@ const AdminDashboardPage = () => {
                                   ? "bg-red-100 text-red-700"
                                   : "bg-amber-100 text-amber-700"
                             }`}>
-                              {item.status}
+                              {item.status === "pending" ? "Pending Admin Approval" : item.status}
                             </span>
                             <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{item.intentType}</span>
                           </div>
-                          <div className="flex items-center justify-start gap-2 lg:justify-end">
-                            <button onClick={() => openLeadModal("inquiries", item)} className="dashboard-secondary px-4 py-2 text-xs">
+                          <div className="flex flex-wrap items-center justify-start gap-2 lg:justify-end">
+                            {item.status === "pending" && (
+                              <>
+                                <button
+                                  onClick={() => handleModerateLead(item._id, "approved")}
+                                  className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700 transition"
+                                >
+                                  Approve
+                                </button>
+                                <button
+                                  onClick={() => handleModerateLead(item._id, "rejected")}
+                                  className="rounded-md bg-red-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-700 transition"
+                                >
+                                  Reject
+                                </button>
+                              </>
+                            )}
+                            <button onClick={() => openLeadModal("inquiries", item)} className="dashboard-secondary px-3 py-1.5 text-xs">
                               View
                             </button>
                           </div>
@@ -1749,7 +1782,23 @@ const AdminDashboardPage = () => {
 
             <div className="flex flex-col gap-3 border-t border-slate-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs text-slate-500">Use this popup to review full details without leaving the admin queue.</p>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
+                {selectedLeadItem.type === "inquiries" && selectedLeadItem.item.status === "pending" && (
+                  <>
+                    <button
+                      onClick={() => handleModerateLead(selectedLeadItem.item._id, "approved")}
+                      className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700 transition"
+                    >
+                      Approve Contact Request
+                    </button>
+                    <button
+                      onClick={() => handleModerateLead(selectedLeadItem.item._id, "rejected")}
+                      className="rounded-lg bg-red-600 px-4 py-2 text-sm font-bold text-white hover:bg-red-700 transition"
+                    >
+                      Reject Request
+                    </button>
+                  </>
+                )}
                 {selectedLeadItem.type === "inquiries" && selectedLeadItem.item.propertyId ? (
                   <button
                     onClick={() => {
