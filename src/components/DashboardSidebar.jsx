@@ -40,8 +40,16 @@ const DashboardSidebar = ({
                     {item.icon ? <span className={`flex-shrink-0 text-base ${item.active ? "text-orange-400" : "text-slate-400"}`}>{item.icon}</span> : null}
                     <span className="min-w-0 truncate">{item.label}</span>
                   </span>
-                  {item.badge !== undefined && item.badge !== null ? (
-                    <span className={`ml-2 rounded-full px-2.5 py-0.5 text-[10px] font-extrabold ${item.active ? "bg-white/20 text-white" : "bg-slate-100 text-slate-700"}`}>
+                  {item.badge !== undefined && item.badge !== null && item.badge !== 0 ? (
+                    <span
+                      className={`ml-2 shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-extrabold transition-colors ${
+                        String(item.badge).includes("NEW") || String(item.badge).includes("OPEN")
+                          ? "bg-amber-500 text-white shadow-sm shadow-amber-500/30 animate-pulse"
+                          : item.active
+                            ? "bg-white/20 text-white"
+                            : "bg-slate-100 text-slate-700"
+                      }`}
+                    >
                       {item.badge}
                     </span>
                   ) : null}

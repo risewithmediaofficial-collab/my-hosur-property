@@ -167,10 +167,13 @@ const UserDashboardPage = () => {
     setSearchParams(newTab === "overview" ? {} : { tab: newTab }, { replace: true });
   };
 
+  const pendingLeadsCount = incomingLeads.filter((l) => l.status === "pending").length;
   const navItems = [
     { key: "overview", label: "Overview", icon: <Squares2X2Icon className="h-4 w-4" /> },
     { key: "listings", label: "My Listings", icon: <HomeModernIcon className="h-4 w-4" />, badge: myProperties.length },
-    { key: "leads", label: "My Leads", icon: <UserGroupIcon className="h-4 w-4" />, badge: incomingLeads.length },
+    { key: "leads", label: "My Leads", icon: <UserGroupIcon className="h-4 w-4" />, badge: pendingLeadsCount > 0 ? `${pendingLeadsCount} NEW` : incomingLeads.length },
+    { key: "inquiries", label: "My Inquiries", icon: <ChatBubbleLeftRightIcon className="h-4 w-4" />, badge: inquiryHistory.length },
+    { key: "payments", label: "Payments", icon: <CreditCardIcon className="h-4 w-4" />, badge: payments.length },
     { key: "saved", label: "Saved Properties", icon: <BookmarkIcon className="h-4 w-4" />, badge: saved.length },
   ].map((item) => ({
     ...item,

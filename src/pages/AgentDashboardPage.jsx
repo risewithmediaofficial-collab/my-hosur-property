@@ -241,13 +241,14 @@ const AgentDashboardPage = () => {
     }
   };
 
+  const pendingLeadsCount = leads.filter((l) => l.status === "pending").length;
   const tabs = [
     { key: "overview", label: "Overview", icon: <Squares2X2Icon className="h-4 w-4" /> },
-    { key: "listings", label: "Listings", icon: <HomeModernIcon className="h-4 w-4" /> },
-    { key: "leads", label: "Leads", icon: <UserGroupIcon className="h-4 w-4" /> },
-    { key: "saved", label: "Saved", icon: <BookmarkIcon className="h-4 w-4" /> },
-    { key: "payments", label: "Payment History", icon: <CreditCardIcon className="h-4 w-4" /> },
-    ...(isBroker ? [{ key: "requests", label: "Requests", icon: <ClipboardDocumentListIcon className="h-4 w-4" /> }] : []),
+    { key: "listings", label: "Listings", icon: <HomeModernIcon className="h-4 w-4" />, badge: properties.length },
+    { key: "leads", label: "Inquiries", icon: <UserGroupIcon className="h-4 w-4" />, badge: pendingLeadsCount > 0 ? `${pendingLeadsCount} NEW` : leads.length },
+    { key: "saved", label: "Saved", icon: <BookmarkIcon className="h-4 w-4" />, badge: saved.length },
+    { key: "payments", label: "Payment History", icon: <CreditCardIcon className="h-4 w-4" />, badge: paymentRequests.length },
+    ...(isBroker ? [{ key: "requests", label: "Requests", icon: <ClipboardDocumentListIcon className="h-4 w-4" />, badge: customerRequests.length }] : []),
   ];
   const sidebarStats = [
     { label: "Total Listings", value: properties.length, icon: <HomeModernIcon className="h-4 w-4" /> },
@@ -287,7 +288,7 @@ const AgentDashboardPage = () => {
       navItems={tabs.map((item) => ({
         ...item,
         active: tab === item.key,
-        badge: item.key === "requests" && customerRequests.length ? customerRequests.length : undefined,
+        badge: item.badge,
         onClick: handleTabSelect,
       }))}
     >
@@ -342,14 +343,14 @@ const AgentDashboardPage = () => {
           </div>
           <div className="overflow-x-auto">
             <table className="dashboard-table min-w-full text-left text-sm">
-              <thead>
+              <thead className="whitespace-nowrap bg-slate-50 border-b border-slate-200">
                 <tr>
-                  <th>Image</th>
-                  <th>Title</th>
-                  <th>City</th>
-                  <th>Status</th>
-                  <th>Price</th>
-                  <th className="text-right">Action</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Image</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Title</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">City</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Price</th>
+                  <th className="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -361,7 +362,7 @@ const AgentDashboardPage = () => {
                       <img
                         src={property.images?.[0] || PROPERTY_PLACEHOLDER_IMAGE}
                         alt={getPropertyImageAlt(property)}
-                        className="h-12 w-12 rounded-xl border border-slate-200 object-cover"
+                        className="h-10 w-10 rounded-xl border border-slate-200 object-cover"
                         loading="lazy"
                         decoding="async"
                       />
@@ -369,17 +370,21 @@ const AgentDashboardPage = () => {
                     <td className="font-medium text-slate-900">{property.title}</td>
                     <td>{property.location?.city}</td>
                     <td>
-                      {isExpired ? <StatusBadge status="expired" /> : <StatusBadge status={property.status} />}
+                      <span className={`rounded-full px-3 py-1 text-xs font-semibold ${isExpired ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-600"}`}>
+                        {isExpired ? "expired" : property.status}
+                      </span>
                     </td>
-                    <td>Rs.{(property.price || 0).toLocaleString("en-IN")}</td>
-                    <td className="space-x-2 text-right">
-                      <button onClick={() => onPromote(property._id)} className="dashboard-primary px-3 py-2 text-xs">
-                        <BoltIcon className="h-4 w-4" />
-                        Boost
-                      </button>
-                      <button onClick={() => navigate(`/edit-property/${property._id}`)} className="dashboard-secondary px-3 py-2 text-xs">
-                        Edit
-                      </button>
+                    <td>Rs. {Number(property.price || 0).toLocaleString("en-IN")}</td>
+                    <td className="space-y-2 text-right">
+                      <div className="flex flex-wrap justify-end gap-2">
+                        <button onClick={() => onPromote(property._id)} className="dashboard-secondary px-3 py-1 text-xs">
+                          <BoltIcon className="h-3.5 w-3.5 text-amber-500" />
+                          Boost
+                        </button>
+                        <button onClick={() => navigate(`/edit-property/${property._id}`)} className="dashboard-primary px-3 py-1 text-xs">
+                          Edit
+                        </button>
+                      </div>
                     </td>
                   </tr>
                   );
@@ -406,15 +411,15 @@ const AgentDashboardPage = () => {
             </div>
             <div className="dashboard-subpanel px-4 py-3 text-sm font-semibold text-slate-900">Credits: {customerLeadCredits}</div>
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-2xl border border-slate-200">
             <table className="dashboard-table min-w-full text-left text-sm">
-              <thead>
+              <thead className="whitespace-nowrap bg-slate-50 border-b border-slate-200">
                 <tr>
-                  <th>Property</th>
-                  <th>Contact</th>
-                  <th>Intent</th>
-                  <th>Status</th>
-                  <th className="text-right">Action</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Property</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Contact</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Intent</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Status</th>
+                  <th className="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Action</th>
                 </tr>
               </thead>
               <tbody>

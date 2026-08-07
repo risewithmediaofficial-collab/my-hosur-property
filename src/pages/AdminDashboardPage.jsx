@@ -375,17 +375,18 @@ const AdminDashboardPage = () => {
   const leadUnlockNewCount = leadUnlocks.filter((item) => item.status === "created").length;
   const leadQueueCount = inquiryNewCount + customerRequestNewCount + leadUnlockNewCount;
 
+  const pendingPaymentReqCount = paymentRequests.filter((r) => r.status === "pending").length;
   const tabs = useMemo(
     () => [
       { id: "overview", label: "Overview", icon: ChartBarIcon },
       { id: "users", label: "Users", icon: UsersIcon, badge: metrics.users || users.length || 0 },
       { id: "properties", label: "Properties", icon: HomeModernIcon, badge: propertyListings.length || metrics.properties || 0 },
-      { id: "leads", label: "Requests & Leads", icon: ChatBubbleLeftRightIcon, badge: leadQueueCount || leads.length + customerRequests.length + leadUnlocks.length },
-      { id: "payment-requests", label: "Payment Requests", icon: TicketIcon, badge: paymentRequests.filter(r => r.status === "pending").length },
+      { id: "leads", label: "Requests & Leads", icon: ChatBubbleLeftRightIcon, badge: inquiryNewCount > 0 ? `${inquiryNewCount} NEW` : leadQueueCount },
+      { id: "payment-requests", label: "Payment Requests", icon: TicketIcon, badge: pendingPaymentReqCount > 0 ? `${pendingPaymentReqCount} NEW` : paymentRequests.length },
       { id: "payments", label: "Payments", icon: BanknotesIcon, badge: payments.length },
       { id: "settings", label: "Settings", icon: Cog6ToothIcon },
     ],
-    [customerRequests.length, leadQueueCount, leadUnlocks.length, leads.length, metrics.properties, metrics.users, payments.length, propertyListings.length, users.length, paymentRequests.length]
+    [inquiryNewCount, leadQueueCount, metrics.properties, metrics.users, paymentRequests.length, payments.length, pendingPaymentReqCount, propertyListings.length, users.length]
   );
 
   const leadViews = useMemo(

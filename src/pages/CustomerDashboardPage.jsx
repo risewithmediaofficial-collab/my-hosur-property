@@ -167,11 +167,11 @@ const CustomerDashboardPage = () => {
         { label: "Saved", value: saved.length, icon: <BookmarkIcon className="h-4 w-4" /> },
       ]}
       navItems={[
-        { key: "overview", label: "Overview", icon: <Squares2X2Icon className="h-4 w-4" />, badge: undefined },
-        { key: "requests", label: "My Requests", icon: <ClipboardDocumentListIcon className="h-4 w-4" />, badge: requests.length || undefined },
+        { key: "overview", label: "Overview", icon: <Squares2X2Icon className="h-4 w-4" /> },
+        { key: "requests", label: "My Requests", icon: <ClipboardDocumentListIcon className="h-4 w-4" />, badge: openCount > 0 ? `${openCount} OPEN` : requests.length || undefined },
         { key: "matches", label: "Matches", icon: <HomeModernIcon className="h-4 w-4" />, badge: matchedCount || undefined },
-        { key: "notifications", label: "Notifications", icon: <BellIcon className="h-4 w-4" />, badge: unreadCount || undefined },
-        { key: "inquiries", label: "Property Chats", icon: <ChatBubbleLeftRightIcon className="h-4 w-4" />, badge: inquiryHistory.length || undefined },
+        { key: "notifications", label: "Notifications", icon: <BellIcon className="h-4 w-4" />, badge: unreadCount > 0 ? `${unreadCount} NEW` : undefined },
+        { key: "inquiries", label: "My Inquiries", icon: <ChatBubbleLeftRightIcon className="h-4 w-4" />, badge: inquiryHistory.length || undefined },
         { key: "saved", label: "Saved", icon: <BookmarkIcon className="h-4 w-4" />, badge: saved.length || undefined },
       ].map((item) => ({
         ...item,
