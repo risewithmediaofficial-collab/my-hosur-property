@@ -1047,9 +1047,18 @@ const HomePage = () => {
         className="home-gsap-section bg-white px-5 py-16 sm:px-8 lg:px-10"
       >
         {/* Adissia header layout */}
-        <div className="mx-auto flex max-w-[1440px] items-center gap-4 border-b border-slate-100 pb-4 mb-10">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-widest border-r border-slate-300 pr-4">FEATURED PROPERTIES</span>
-          <span className="text-xs font-bold text-orange uppercase tracking-wider">HOSUR'S PREMIUM SELECTION</span>
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-4 border-b border-slate-100 pb-4 mb-10 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest border-r border-slate-300 pr-4">FEATURED PROPERTIES</span>
+            <span className="text-xs font-bold text-orange uppercase tracking-wider">HOSUR'S PREMIUM SELECTION</span>
+          </div>
+          <Link
+            to="/listings"
+            className="inline-flex w-fit items-center gap-2 rounded-lg border border-navy bg-white px-4 py-2 text-sm font-bold text-navy transition hover:border-orange hover:bg-orange hover:text-white"
+          >
+            <span>View All Properties</span>
+            <ArrowRightIcon className="h-4 w-4" />
+          </Link>
         </div>
 
         {/* 2-Column Responsive Layout */}

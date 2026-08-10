@@ -656,48 +656,53 @@ const PropertyDetailPage = () => {
             </div>
           </div>
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
-            <div className="grid gap-3">
-              {p.propertyType && (
-                <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  <span className="font-semibold text-slate-900">Property Type:</span> {p.propertyType}
+          <div className="mt-6 space-y-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {p.propertyType ? (
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Property Type</p>
+                  <p className="mt-1 font-semibold text-slate-900">{p.propertyType}</p>
                 </div>
-              )}
-              <div className="grid sm:grid-cols-2 gap-3">
-                {p.location?.area && (
-                  <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                    <p className="font-semibold text-slate-900">Location</p>
-                    <p className="mt-1 text-slate-600">
-                      {[p.location?.area, p.location?.village, p.location?.taluk, p.location?.district, p.location?.city, p.location?.state, p.location?.country]
-                        .filter(Boolean)
-                        .join(", ")}
-                    </p>
-                  </div>
-                )}
-                {p.landArea && (
-                  <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                    <p className="font-semibold text-slate-900">Land Area</p>
-                    <p className="mt-1 text-slate-600">{p.landArea} {p.areaUnit || "sqft"}</p>
-                  </div>
-                )}
-                {p.length && (
-                  <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                    <p className="font-semibold text-slate-900">Length</p>
-                    <p className="mt-1 text-slate-600">{p.length}</p>
-                  </div>
-                )}
-                {p.width && (
-                  <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                    <p className="font-semibold text-slate-900">Width</p>
-                    <p className="mt-1 text-slate-600">{p.width}</p>
-                  </div>
-                )}
-              </div>
+              ) : null}
+              {p.location?.area ? (
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 sm:col-span-2">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Location</p>
+                  <p className="mt-1 text-slate-700">
+                    {[p.location?.area, p.location?.village, p.location?.taluk, p.location?.district, p.location?.city, p.location?.state, p.location?.country]
+                      .filter(Boolean)
+                      .join(", ")}
+                  </p>
+                </div>
+              ) : null}
+              {p.landArea ? (
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Land Area</p>
+                  <p className="mt-1 font-semibold text-slate-900">{p.landArea} {p.areaUnit || "sqft"}</p>
+                </div>
+              ) : null}
+              {p.builtupArea ? (
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Built-up Area</p>
+                  <p className="mt-1 font-semibold text-slate-900">{formatArea(p.builtupArea, p.areaUnit)}</p>
+                </div>
+              ) : null}
+              {p.length ? (
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Length</p>
+                  <p className="mt-1 font-semibold text-slate-900">{p.length}</p>
+                </div>
+              ) : null}
+              {p.width ? (
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Width</p>
+                  <p className="mt-1 font-semibold text-slate-900">{p.width}</p>
+                </div>
+              ) : null}
             </div>
 
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 text-sm leading-7 text-slate-700">
-              <p className="font-semibold text-slate-900">Property Summary</p>
-              <p className="mt-3 whitespace-pre-line">{p.description || `Verified ${p.propertyType || "property"} listing in ${p.location?.area || p.location?.city || "Hosur"}. Contact the property owner or listing agent for complete details, site visits, and legal documentation support.`}</p>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm leading-7 text-slate-700">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Property Summary</p>
+              <p className="mt-3 whitespace-pre-line text-slate-700">{p.description || `Verified ${p.propertyType || "property"} listing in ${p.location?.area || p.location?.city || "Hosur"}. Contact the property owner or listing agent for complete details, site visits, and legal documentation support.`}</p>
             </div>
           </div>
         </div>
