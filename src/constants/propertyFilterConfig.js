@@ -147,7 +147,7 @@ export const propertyFilterConfig = {
       key: "plotType",
       label: "Plot Type",
       type: "checkbox",
-      options: ["Layout Plot", "Statistical Plot"],
+      options: ["Individual Plot", "Residential Plot"],
     },
   ],
 
@@ -177,7 +177,7 @@ export const propertyFilterConfig = {
       key: "waterSource",
       label: "Water Source",
       type: "checkbox",
-      options: ["Borewell", "Layout Water"],
+      options: ["Borewell", "Layout Water", "Corporation Water"],
     },
     {
       key: "facing",

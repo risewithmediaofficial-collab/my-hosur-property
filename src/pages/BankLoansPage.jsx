@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { AnimatePresence, } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRightIcon, CheckCircleIcon, ChevronDownIcon } from "../components/AppIcons";
 import SeoHead from "../components/SeoHead";
 import LoanCalculator from "../components/LoanCalculator";
@@ -80,7 +80,7 @@ const BankLoansPage = () => {
                           className="fixed inset-0 z-40 cursor-default"
                           onClick={() => setIsDropdownOpen(false)}
                         />
-                        <m.div
+                        <motion.div
                           initial={{ opacity: 0, y: -8 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -8 }}
@@ -105,7 +105,7 @@ const BankLoansPage = () => {
                               <span>{bank.name}</span>
                             </button>
                           ))}
-                        </m.div>
+                        </motion.div>
                       </>
                     )}
                   </AnimatePresence>

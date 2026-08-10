@@ -7,6 +7,15 @@ import useAuth from "../hooks/useAuth";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
 import { createProperty, updateProperty, uploadPropertyFiles } from "../services/api/propertyApi";
 import { updateProfile } from "../services/api/authApi";
+import { INDIA_STATE_OPTIONS, searchIndiaLocationNames } from "../services/geoLocationService";
+import {
+  getAreasByVillage,
+  getCountries,
+  getDistrictsByState,
+  getStatesByCountry,
+  getTaluksByDistrict,
+  getVillagesByTaluk,
+} from "../constants/locationData";
 
 const propertyTypes = [
   "Plot",
@@ -15,6 +24,7 @@ const propertyTypes = [
   "Independent House",
   "Rent",
   "Apartment",
+  "Warehouse",
   "PG",
   "Commercial Land / Building",
   "Farmland",
@@ -81,7 +91,16 @@ const villageOptions = [
   "Other (Enter Manually)",
 ];
 
-const landAreaOptions = ["600 sq.ft", "800 sq.ft"];
+const landAreaOptions = [
+  "600 sq.ft",
+  "800 sq.ft",
+  "1000 sq.ft",
+  "1200 sq.ft",
+  "1500 sq.ft",
+  "1800 sq.ft",
+  "2000 sq.ft",
+  "2400 sq.ft",
+];
 const plotPriceOptions = [
   "₹1 Lakh to ₹10 Lakhs",
   "₹10 Lakhs to ₹20 Lakhs",
@@ -204,14 +223,174 @@ const houseRentOptions = [
 ];
 const carParkingOptions = ["1 Car", "2 Cars", "3 Cars", "4+ Cars"];
 const carParkingYesNoOptions = ["Yes", "No"];
-const waterSourceVillaOptions = ["Borewell", "Layout Water"];
+const waterSourceVillaOptions = ["Borewell", "Layout Water", "Corporation Water"];
 const waterSourceHouseOptions = ["Borewell", "Corporation Water"];
 const maintenanceOptions = ["Included", "Not Included"];
+const warehouseTypeOptions = ["Industrial", "Commercial", "Logistics", "Godown", "Cold Storage", "Manufacturing", "Distribution", "Other"];
+const propertyConditionOptions = ["New", "Good", "Average", "Needs Renovation"];
+const flooringTypeOptions = ["Concrete", "VDF", "Other"];
+const vehicleAccessOptions = ["Bike", "Car", "Van", "LCV", "Truck", "32-ft Truck", "Container Truck"];
+const priceBasisOptions = ["Built-up Area", "Land Area", "Total Property"];
+const maintenanceBillingOptions = ["Monthly", "Quarterly", "Yearly"];
+const contactMethodOptions = ["Phone", "WhatsApp", "Email"];
+const gateTypeOptions = ["Sliding", "Rolling Shutter", "Swing Gate", "Other"];
+const warehouseWaterOptions = ["Corporation Water", "Borewell", "Other"];
+const pgTypeOptions = ["Gents", "Ladies"];
+const warehouseUsageOptions = [
+  "Logistics",
+  "E-commerce",
+  "Manufacturing",
+  "Distribution",
+  "Storage",
+  "FMCG",
+  "Automobile",
+  "Engineering",
+  "Food Processing",
+  "Cold Storage",
+  "Retail Storage",
+  "Other",
+];
+const warehouseAmenityFields = [
+  "parking",
+  "security",
+  "cctvCamera",
+  "compoundWall",
+  "lift",
+  "goodsLift",
+  "generator",
+  "powerBackup",
+  "officeRoom",
+  "staffRoom",
+  "washroom",
+  "pantry",
+  "loadingArea",
+  "storageArea",
+  "openYard",
+  "solar",
+  "fireSafety",
+];
+const warehouseApprovalFields = [
+  "hntdaApproval",
+  "dtcpApproval",
+  "reraApproval",
+  "panchayatApproval",
+  "rocApproval",
+  "buildingApproval",
+  "fireNoc",
+  "completionCertificate",
+  "occupancyCertificate",
+  "propertyTaxPaid",
+  "ebConnection",
+  "patta",
+  "ecAvailable",
+];
+const cornerOptions = ["Not Corner", "One Side Corner", "Two Side Corner"];
+const roadTypeOptions = ["Tar Road", "Concrete Road", "Mud Road", "Gravel Road", "Highway", "Main Road", "Layout Road", "Other"];
 const priceOptions = ["7.00 L", "10.00 L", "12.00 L", "15.00 L", "25.00 L", "50.00 L", "75.00 L", "1.00 Cr"];
 const facingOptions = ["East", "West", "North", "South", "North East", "North West", "South East", "South West"];
 const yesNoOptions = ["Yes", "No"];
-const propertyClassOptions = ["General", "SC/ST"];
+const propertyClassOptions = ["General", "AD Condition"];
+const hidePropertyClassTypes = ["Rent", "PG", "Commercial Land / Building", "Warehouse"];
 const soilTypeOptions = ["Red Soil", "Black Soil", "Clay Soil", "Alluvial Soil", "Sandy Soil", "Loam Soil"];
+
+const defaultWarehouseDetails = {
+  pincode: "",
+  googleMapsLocation: "",
+  propertyAge: "",
+  constructionYear: "",
+  propertyCondition: "",
+  totalLandArea: "",
+  landAreaUnit: "Sq.ft",
+  builtupWarehouseArea: "",
+  carpetArea: "",
+  groundFloorArea: "",
+  firstFloorArea: "",
+  otherFloorArea: "",
+  openYardArea: "",
+  parkingArea: "",
+  warehouseType: "",
+  ceilingHeight: "",
+  clearHeight: "",
+  floorLoadCapacity: "",
+  flooringType: "",
+  numberOfShutters: "",
+  shutterHeight: "",
+  shutterWidth: "",
+  numberOfLoadingBays: "",
+  dockLeveler: "No",
+  loadingUnloadingArea: "No",
+  vehicleAccess: [],
+  internalRoadWidth: "",
+  truckTurningSpace: "No",
+  containerAccess: "No",
+  electricityAvailable: "No",
+  connectionType: "",
+  sanctionedLoad: "",
+  transformer: "No",
+  transformerCapacity: "",
+  generator: "No",
+  generatorCapacity: "",
+  powerBackup: "No",
+  solarPower: "No",
+  waterSource: "",
+  borewell: "No",
+  waterStorageCapacity: "",
+  overheadTank: "",
+  undergroundTank: "",
+  drainageAvailable: "No",
+  securityGuard: "No",
+  cctv: "No",
+  cctvCount: "",
+  securityRoom: "No",
+  compoundWall: "No",
+  mainGate: "No",
+  gateType: "",
+  fireSafetySystem: "No",
+  fireNoc: "No",
+  fireExtinguishers: "No",
+  fireHydrant: "No",
+  sprinklerSystem: "No",
+  fireAlarm: "No",
+  emergencyExit: "No",
+  officeSpace: "No",
+  officeArea: "",
+  reception: "No",
+  managerRoom: "No",
+  staffRoom: "No",
+  meetingRoom: "No",
+  pantry: "No",
+  washroom: "No",
+  loadingDock: "No",
+  dockHeight: "",
+  ramp: "No",
+  goodsLift: "No",
+  forkliftAccess: "No",
+  forkliftAvailable: "No",
+  hntdaApproval: "No",
+  dtcpApproval: "No",
+  reraApproval: "No",
+  panchayatApproval: "No",
+  rocApproval: "No",
+  buildingApproval: "No",
+  completionCertificate: "No",
+  occupancyCertificate: "No",
+  propertyTaxPaid: "No",
+  ebConnection: "No",
+  patta: "No",
+  ecAvailable: "No",
+  sellingPrice: "",
+  pricePerSqft: "",
+  priceBasis: "Built-up Area",
+  maintenance: "Without Maintenance",
+  maintenanceAmount: "",
+  maintenanceFrequency: "Monthly",
+  suitableFor: [],
+  propertyVideo: "",
+  virtual360View: "",
+  contactPerson: "",
+  whatsappNumber: "",
+  preferredContactMethod: "Phone",
+};
 
 const defaultForm = {
   propertyType: "",
@@ -242,11 +421,14 @@ const defaultForm = {
   plotType: "",
   individualPlot: "Yes",
   gatedCommunity: "No",
+  park: "No",
   cctvCamera: "No",
   security: "No",
   dtcp: "No",
   hntda: "No",
   rera: "No",
+  panchayatApproval: "No",
+  rocApproval: "No",
   reraId: "",
   bhk: "",
   bathrooms: "",
@@ -255,6 +437,9 @@ const defaultForm = {
   totalFloors: "",
   builtupArea: "",
   areaUnit: "sqft",
+  measurementType: "Square Feet",
+  ratePerUnit: "",
+  totalAmount: "",
   possessionStatus: "Ready to Move",
   facing: "",
   parking: "No",
@@ -268,6 +453,7 @@ const defaultForm = {
   boundaryWall: "No",
   electricity: "No",
   sharingType: "",
+  pgType: "",
   monthlyRent: "",
   monthlyMaintenance: "",
   maintenanceType: "",
@@ -280,6 +466,8 @@ const defaultForm = {
   hotWater: "No",
   frontage: "",
   roadWidth: "",
+  roadType: "",
+  corner: "",
   waterSource: "",
   cropSuitable: "",
   borewell: "No",
@@ -288,6 +476,7 @@ const defaultForm = {
   farmhouse: "No",
   farmhouseCount: "1",
   villaType: "Simplex",
+  warehouseDetails: defaultWarehouseDetails,
 };
 
 const typeFieldConfig = {
@@ -295,70 +484,77 @@ const typeFieldConfig = {
     description: "Land-only details. No BHK, floor, or furnishing fields.",
     detailTitle: "Plot Details",
     priceLabel: "Expected Plot Price",
-    detailFields: ["propertyClass", "landArea", "length", "width", "plotType", "facing", "individualPlot", "layoutPlot"],
-    featureFields: ["gatedCommunity", "cctvCamera", "security", "dtcp", "hntda", "rera"],
+    detailFields: ["propertyClass", "length", "width", "plotType", "facing"],
+    featureFields: ["gatedCommunity", "park", "cctvCamera", "security", "dtcp", "hntda", "rera", "panchayatApproval", "rocApproval"],
   },
   Villa: {
     description: "Independent villa details with rooms, land/build-up area, car parking, water source, and facilities.",
     detailTitle: "Villa Details",
     priceLabel: "Expected Sale Price",
-    detailFields: ["propertyClass", "villaType", "bhk", "bathrooms", "builtupArea", "landArea", "furnishingStatus", "facing", "carParking", "waterSourceType"],
-    featureFields: ["gatedCommunity", "cctvCamera", "security", "balcony", "powerBackup", "hntda", "rera"],
+    detailFields: ["propertyClass", "villaType", "bhk", "bathrooms", "builtupArea", "furnishingStatus", "facing", "carParking", "waterSourceType", "roadWidth", "roadType"],
+    featureFields: ["gatedCommunity", "park", "cctvCamera", "security", "balcony", "powerBackup", "hntda", "rera"],
   },
   Flat: {
     description: "Flat details with flat area, length, width, facing, and plot type.",
     detailTitle: "Flat Details",
     priceLabel: "Expected Sale Price",
-    detailFields: ["propertyClass", "flatArea", "length", "width", "plotType", "facing", "individualPlot", "layoutPlot"],
-    featureFields: ["lift", "security", "parking", "balcony", "powerBackup", "hntda", "rera"],
+    detailFields: ["propertyClass", "flatArea", "length", "width", "plotType", "facing"],
+    featureFields: ["park", "lift", "security", "parking", "balcony", "powerBackup", "hntda", "rera", "panchayatApproval", "rocApproval"],
   },
   "Independent House": {
     description: "House details with rooms, land/building area, car parking, water source, and utilities.",
     detailTitle: "Individual House Details",
     priceLabel: "Expected Sale Price",
-    detailFields: ["propertyClass", "bhk", "bathrooms", "builtupArea", "landArea", "furnishingStatus", "facing", "carParking", "waterSourceType"],
+    detailFields: ["propertyClass", "bhk", "bathrooms", "builtupArea", "furnishingStatus", "facing", "carParking", "waterSourceType"],
     featureFields: ["security", "cctvCamera", "dtcp", "hntda", "rera"],
   },
   Rent: {
     description: "Rental house details with monthly rent, car parking, maintenance, water source, and facilities.",
     detailTitle: "Rental Details",
     priceLabel: "Monthly Rent",
-    detailFields: ["propertyClass", "bhk", "bathrooms", "monthlyRent", "furnishingStatus", "carParking", "waterSourceType", "monthlyMaintenance"],
+    detailFields: ["bhk", "bathrooms", "monthlyRent", "advance", "furnishingStatus", "facing", "carParking", "waterSourceType", "monthlyMaintenance", "roadWidth", "roadType"],
     featureFields: ["security", "lift", "powerBackup", "hntda", "rera"],
   },
   Apartment: {
     description: "Apartment details with floor, rooms, land area, and common facilities.",
     detailTitle: "Apartment Details",
     priceLabel: "Expected Sale Price",
-    detailFields: ["propertyClass", "bhk", "bathrooms", "builtupArea", "landArea", "floorNumber", "totalFloors", "furnishingStatus", "facing"],
-    featureFields: ["lift", "security", "parking", "balcony", "powerBackup", "hntda", "rera"],
+    detailFields: ["propertyClass", "bhk", "bathrooms", "builtupArea", "floorNumber", "totalFloors", "furnishingStatus", "facing"],
+    featureFields: ["park", "lift", "security", "parking", "balcony", "powerBackup", "hntda", "rera"],
   },
   PG: {
     description: "PG / Hostel details with sharing type, rent, TV, WiFi, Gym, Washing Machine, and Hot Water.",
     detailTitle: "PG Details",
     priceLabel: "Monthly Rent",
-    detailFields: ["propertyClass", "sharingType", "monthlyRent", "furnishingStatus", "bathrooms"],
+    detailFields: ["pgType", "sharingType", "monthlyRent", "advance", "furnishingStatus", "bathrooms", "facing", "roadWidth", "roadType"],
     featureFields: ["foodIncluded", "tv", "wifi", "gym", "washingMachine", "hotWater", "security", "cctvCamera", "waterSupply", "powerBackup", "hntda", "rera"],
   },
   "Commercial Land / Building": {
     description: "Commercial land & building details with length, width, and approvals.",
     detailTitle: "Commercial Details",
     priceLabel: "Expected Commercial Price",
-    detailFields: ["propertyClass", "landArea", "builtupArea", "length", "width", "frontage", "roadWidth"],
+    detailFields: ["builtupArea", "length", "width", "frontage", "roadWidth", "roadType", "corner"],
     featureFields: ["dtcp", "hntda", "rera", "roadAccess", "parking", "security", "cctvCamera"],
+  },
+  Warehouse: {
+    description: "Warehouse details with land/build-up area, access, parking, and logistics-ready facilities.",
+    detailTitle: "Warehouse Details",
+    priceLabel: "Expected Warehouse Price",
+    detailFields: ["facing", "roadWidth", "roadType", "frontage", "totalFloors"],
+    featureFields: ["parking", "security", "powerBackup", "roadAccess", "electricity"],
   },
   Farmland: {
     description: "Farmland details with land area, soil type, borewell, well, and crop suitability.",
     detailTitle: "Farmland Details",
     priceLabel: "Expected Farmland Price",
-    detailFields: ["propertyClass", "landArea", "roadWidth", "waterSource", "soilType", "cropSuitable"],
+    detailFields: ["propertyClass", "roadWidth", "roadType", "waterSource", "soilType", "cropSuitable"],
     featureFields: ["borewell", "well", "farmhouse", "roadAccess", "waterSupply", "electricity", "boundaryWall"],
   },
   "Agri Land": {
     description: "Agricultural land details — land area in cents or acres. No HNTDA or RERA fields.",
     detailTitle: "Agricultural Land Details",
     priceLabel: "Expected Land Price",
-    detailFields: ["propertyClass", "landArea", "roadWidth", "waterSource", "soilType", "cropSuitable"],
+    detailFields: ["propertyClass", "roadWidth", "waterSource", "soilType", "cropSuitable"],
     featureFields: ["borewell", "well", "farmhouse", "roadAccess", "waterSupply", "electricity", "boundaryWall"],
   },
 };
@@ -371,29 +567,36 @@ const fieldLabels = {
   length: "Length",
   width: "Width",
   plotType: "Plot Type",
-  individualPlot: "Individual Plot",
-  layoutPlot: "Layout Plot",
   bhk: "BHK / Rooms",
   bathrooms: "Bathrooms",
   builtupArea: "Built-up Area",
   furnishingStatus: "Furnishing",
   floorNumber: "Floor Number",
   totalFloors: "Total Floors",
+  measurementType: "Measurement",
+  ratePerUnit: "Rate",
+  totalAmount: "Total Amount",
   facing: "Facing",
   monthlyRent: "Monthly Rent",
   advance: "Advance",
   sharingType: "Sharing Type",
+  pgType: "PG Type",
   frontage: "Frontage",
-  roadWidth: "Road Width",
+  roadWidth: "Road Size",
+  roadType: "Road Type",
+  corner: "Corners",
   waterSource: "Water Source",
   waterSourceType: "Water Source",
   cropSuitable: "Crop Suitable",
   gatedCommunity: "Gated Community",
+  park: "Park",
   cctvCamera: "CCTV Camera",
   security: "Security",
   dtcp: "DTCP Approved",
   hntda: "HNTDA Approved",
   rera: "RERA Approved",
+  panchayatApproval: "Panchayat Approval",
+  rocApproval: "ROC Approval",
   parking: "Parking",
   carParking: "Car Parking",
   balcony: "Balcony",
@@ -416,31 +619,41 @@ const fieldLabels = {
   farmhouseCount: "Number of Farmhouses",
   villaType: "Villa Type",
   monthlyMaintenance: "Monthly Maintenance",
+  compoundWall: "Compound Wall",
+  goodsLift: "Goods Lift",
+  generator: "Generator",
+  officeRoom: "Office Room",
+  staffRoom: "Staff Room",
+  washroom: "Washroom",
+  pantry: "Pantry",
+  loadingArea: "Loading Area",
+  storageArea: "Storage Area",
+  openYard: "Open Yard",
+  solar: "Solar",
+  fireSafety: "Fire Safety",
 };
 
 const toNumber = (value) => {
-  if (!value) return 0;
+  if (value === null || value === undefined || value === "") return 0;
 
-  const normalized = String(value).trim().toLowerCase();
-  const rangeMatch = normalized.match(/^(\d+(?:\.\d+)?)\s*(?:l|cr)?\s*(?:to|-|and above)?\s*(\d*(?:\.\d+)?)?/);
-  const baseValue = rangeMatch && rangeMatch[1] ? Number(rangeMatch[1]) : null;
-  const isCr = /cr/.test(normalized);
-  const isL = /l/.test(normalized) || (!isCr && /\d/.test(normalized));
+  const normalized = String(value).trim();
+  const match = normalized.match(/([0-9]+(?:\.[0-9]+)?)/);
+  if (!match) return 0;
 
-  if (baseValue === null || Number.isNaN(baseValue)) {
-    const cleaned = String(value).replace(/[^\d.]/g, "");
-    return Number(cleaned || 0);
-  }
+  const baseValue = Number(match[1]);
+  const lower = normalized.toLowerCase();
+  const isCr = /\b(cr|crore|crores)\b/.test(lower);
+  const isL = /\b(l|lakh|lakhs)\b/.test(lower);
 
-  if (isCr) {
-    return baseValue * 10000000;
-  }
-
-  if (isL) {
-    return baseValue * 100000;
-  }
-
+  if (isCr) return baseValue * 10000000;
+  if (isL) return baseValue * 100000;
   return baseValue;
+};
+
+const computeTotalAmount = (formData) => {
+  const areaValue = toNumber(formData.landArea);
+  const rateValue = toNumber(formData.ratePerUnit);
+  return areaValue > 0 && rateValue > 0 ? areaValue * rateValue : 0;
 };
 
 const getApiPropertyType = (type) => {
@@ -450,6 +663,12 @@ const getApiPropertyType = (type) => {
 };
 
 const getListingType = (type) => (type === "Rent" || type === "PG" ? "rent" : "sale");
+
+const normalizePlotType = (value) => {
+  if (value === "Layout Plot" || value === "Layout Flat") return "Residential Plot";
+  if (value === "Statistical Plot" || value === "Statistical Flat") return "Individual Plot";
+  return value || "";
+};
 
 const roleLabels = {
   buyer: "Buyer",
@@ -475,10 +694,42 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   const isEditMode = Boolean(initialData);
   const hasPostingAccess = ["seller", "agent", "broker", "builder", "admin"].includes(user?.role) || Boolean(user?.canPostProperty);
 
-  const [form, setForm] = useState(initialData?.form || defaultForm);
+  const [form, setForm] = useState(() => {
+    if (!initialData?.form) return defaultForm;
+    return {
+      ...initialData.form,
+      plotType: normalizePlotType(initialData.form.plotType),
+      warehouseDetails: {
+        ...defaultWarehouseDetails,
+        ...(initialData.form.warehouseDetails || {}),
+      },
+    };
+  });
   const [modalOpen, setModalOpen] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  const countryOptions = useMemo(() => getCountries().map((item) => item.name), []);
+  const stateOptions = useMemo(
+    () => [...new Set([...INDIA_STATE_OPTIONS, ...getStatesByCountry(form.country || "India").map((item) => item.name)])],
+    [form.country]
+  );
+  const districtOptions = useMemo(
+    () => getDistrictsByState(form.country || "India", form.state).map((item) => item.name),
+    [form.country, form.state]
+  );
+  const talukOptions = useMemo(
+    () => getTaluksByDistrict(form.country || "India", form.state, form.district).map((item) => item.name),
+    [form.country, form.state, form.district]
+  );
+  const villageOptions = useMemo(
+    () => getVillagesByTaluk(form.country || "India", form.state, form.district, form.taluk).map((item) => item.name),
+    [form.country, form.state, form.district, form.taluk]
+  );
+  const areaOptions = useMemo(() => {
+    const villages = getVillagesByTaluk(form.country || "India", form.state, form.district, form.taluk);
+    return villages.flatMap((village) => village.areas || []);
+  }, [form.country, form.state, form.district, form.taluk]);
   const [imageFiles, setImageFiles] = useState([]);
   const [docFiles, setDocFiles] = useState([]);
   const [uploadedImages, setUploadedImages] = useState(initialData?.images || []);
@@ -578,6 +829,25 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
+  const updateWarehouse = (key, value) => {
+    setForm((prev) => ({
+      ...prev,
+      warehouseDetails: {
+        ...defaultWarehouseDetails,
+        ...(prev.warehouseDetails || {}),
+        [key]: value,
+      },
+    }));
+  };
+
+  const toggleWarehouseListValue = (key, value) => {
+    const currentValues = Array.isArray(form.warehouseDetails?.[key]) ? form.warehouseDetails[key] : [];
+    const nextValues = currentValues.includes(value)
+      ? currentValues.filter((item) => item !== value)
+      : [...currentValues, value];
+    updateWarehouse(key, nextValues);
+  };
+
   const handleSaveProfile = async (e) => {
     e.preventDefault();
     if (!profileForm.email || !profileForm.address || !profileForm.role) {
@@ -616,6 +886,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
       ...preserveContactFields(form),
       propertyType: type,
       listingType: getListingType(type),
+      warehouseDetails: { ...defaultWarehouseDetails },
     });
     setImageFiles([]);
     setDocFiles([]);
@@ -628,7 +899,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
     setModalOpen(false);
     setImageFiles([]);
     setDocFiles([]);
-    setForm((prev) => ({ ...defaultForm, ...preserveContactFields(prev) }));
+    setForm((prev) => ({ ...defaultForm, ...preserveContactFields(prev), warehouseDetails: { ...defaultWarehouseDetails } }));
   };
 
   const validateForm = () => {
@@ -638,13 +909,41 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
     const required = [
       form.propertyType,
+      form.country.trim(),
       form.state.trim(),
-      form.city.trim(),
+      form.district.trim(),
+      form.taluk.trim(),
       form.area.trim(),
+      form.village.trim(),
     ];
 
     if (required.some((value) => !value)) return "Please fill location and price details.";
-    if (!form.price && !form.monthlyRent) return "Please fill expected price or monthly rent details.";
+
+    if (form.propertyType === "Commercial Land / Building" && !form.corner) {
+      return "Please select the commercial building corners.";
+    }
+
+    if (form.propertyType === "Rent" || form.propertyType === "PG") {
+      if (!toNumber(form.monthlyRent)) return "Please enter the rent price.";
+      return "";
+    }
+
+    if (form.propertyType === "Warehouse") {
+      const warehouse = { ...defaultWarehouseDetails, ...(form.warehouseDetails || {}) };
+      if (!toNumber(warehouse.sellingPrice || form.price)) return "Please enter the warehouse selling price.";
+      if (!toNumber(warehouse.totalLandArea || form.landArea) && !toNumber(warehouse.builtupWarehouseArea || form.builtupArea)) {
+        return "Please enter warehouse land area or built-up area.";
+      }
+      return "";
+    }
+
+    const areaValue = toNumber(form.landArea || form.flatArea || form.cents || form.builtupArea);
+    const rateValue = toNumber(form.ratePerUnit);
+    const totalAmount = computeTotalAmount(form);
+
+    if (!areaValue) return "Please enter the total area for price calculation.";
+    if (!rateValue) return "Please enter the rate per unit to calculate the total amount.";
+    if (!totalAmount) return "Please check area and rate details to calculate the total amount.";
 
     return "";
   };
@@ -778,33 +1077,62 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
     try {
       setPublishing(true);
       const apiPropertyType = getApiPropertyType(form.propertyType);
-      const price = toNumber(form.price || form.monthlyRent);
+      const warehouseDetails = { ...defaultWarehouseDetails, ...(form.warehouseDetails || {}) };
+      const monthlyRent = toNumber(form.monthlyRent);
+      const priceFieldValue = toNumber(form.price);
+      const totalAmount = computeTotalAmount(form);
+      const warehouseSellingPrice = toNumber(warehouseDetails.sellingPrice);
+      const warehouseBuiltupArea = toNumber(warehouseDetails.builtupWarehouseArea || form.builtupArea);
+      const warehousePricePerSqft = warehouseDetails.pricePerSqft || (
+        warehouseSellingPrice > 0 && warehouseBuiltupArea > 0 ? Math.round(warehouseSellingPrice / warehouseBuiltupArea) : ""
+      );
+      const isRentListing = getListingType(form.propertyType) === "rent";
+      const amount = form.propertyType === "Warehouse"
+        ? (warehouseSellingPrice || priceFieldValue || totalAmount)
+        : isRentListing ? (monthlyRent || priceFieldValue) : (totalAmount || priceFieldValue);
       const title = form.title.trim() || `${form.propertyType} in ${form.area || form.village || form.city}, ${form.city || "Hosur"}`;
       const activeConfig = typeFieldConfig[form.propertyType] || { detailFields: [], featureFields: [] };
+      const showPropertyClass = !hidePropertyClassTypes.includes(form.propertyType);
 
-      const amenities = activeConfig.featureFields
+      const baseAmenities = activeConfig.featureFields
         .filter((field) => form[field] === "Yes")
         .map((field) => fieldLabels[field]);
+      const warehouseAmenities = form.propertyType === "Warehouse"
+        ? warehouseAmenityFields
+            .filter((field) => warehouseDetails[field] === "Yes" || form[field] === "Yes")
+            .map((field) => fieldLabels[field] || field)
+        : [];
+      const amenities = [...new Set([...baseAmenities, ...warehouseAmenities])];
 
       const detailLines = [
         `Property Type: ${form.propertyType}`,
-        `Property Category: ${form.propertyClass || "General"}`,
-        `Location: ${form.area}, ${form.city}, ${form.district || ""}, ${form.state}`,
+        showPropertyClass ? `Property Category: ${form.propertyClass || "General"}` : "",
+        `Location: ${form.area}, ${form.village || ""}, ${form.taluk || ""}, ${form.district || ""}, ${form.state || ""}`,
         form.landArea ? `Land Area: ${form.landArea}` : "",
         form.flatArea ? `Flat Area: ${form.flatArea}` : "",
         form.cents ? `Cents: ${form.cents}` : "",
         form.builtupArea ? `Built-up Area: ${form.builtupArea}` : "",
-        form.bhk ? `Rooms: ${form.bhk}` : "",
+        form.monthlyRent ? `Monthly Rent: ${form.monthlyRent}` : "",
         form.advance ? `Advance: ${form.advance}` : "",
-        form.layoutPlot ? `Layout Plot: ${form.layoutPlot}` : "",
-        form.hntda ? `HNTDA Approved: ${form.hntda}` : "",
-        form.rera ? `RERA Approved: ${form.rera}` : "",
+        form.pgType ? `PG Type: ${form.pgType}` : "",
+        form.sharingType ? `Sharing Type: ${form.sharingType}` : "",
         form.length ? `Length: ${form.length}` : "",
         form.width ? `Width: ${form.width}` : "",
+        form.frontage ? `Frontage: ${form.frontage}` : "",
+        form.roadWidth ? `Road Width: ${form.roadWidth}` : "",
+        form.roadType ? `Road Type: ${form.roadType}` : "",
+        form.corner ? `Corners: ${form.corner}` : "",
+        form.cropSuitable ? `Crop Suitable: ${form.cropSuitable}` : "",
         form.soilType ? `Soil Type: ${form.soilType}` : "",
         form.farmhouse === "Yes" ? `Farmhouses: ${form.farmhouseCount || 1}` : "",
-        form.roadWidth ? `Road Width: ${form.roadWidth}` : "",
-        form.waterSource ? `Water Source: ${form.waterSource}` : "",
+        form.monthlyMaintenance ? `Maintenance: ${form.monthlyMaintenance} ${form.maintenanceType || ""}` : "",
+        form.rera ? `RERA Approved: ${form.rera}` : "",
+        form.hntda ? `HNTDA Approved: ${form.hntda}` : "",
+        form.propertyType === "Warehouse" && warehouseDetails.warehouseType ? `Warehouse Type: ${warehouseDetails.warehouseType}` : "",
+        form.propertyType === "Warehouse" && warehouseDetails.builtupWarehouseArea ? `Built-up Warehouse Area: ${warehouseDetails.builtupWarehouseArea} sq.ft` : "",
+        form.propertyType === "Warehouse" && warehouseDetails.openYardArea ? `Open Yard: ${warehouseDetails.openYardArea} sq.ft` : "",
+        form.propertyType === "Warehouse" && warehouseDetails.vehicleAccess?.length ? `Vehicle Access: ${warehouseDetails.vehicleAccess.join(", ")}` : "",
+        form.propertyType === "Warehouse" && warehousePricePerSqft ? `Price per Sq.Ft: ${warehousePricePerSqft}` : "",
         amenities.length ? `Facilities: ${amenities.join(", ")}` : "",
         form.description,
       ].filter(Boolean);
@@ -812,15 +1140,46 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
       const payload = {
         title,
         description: detailLines.join("\n"),
-        price,
+        price: amount,
+        monthlyRent: monthlyRent || (isRentListing ? amount : undefined),
+        advance: form.advance || "",
+        totalAmount: form.propertyType === "Warehouse" ? (warehouseSellingPrice || totalAmount || undefined) : (totalAmount || undefined),
         propertyType: apiPropertyType,
-        layoutPlot: form.layoutPlot,
+        propertyClass: showPropertyClass ? (form.propertyClass || "General") : undefined,
+        measurementType: form.measurementType || (form.propertyType === "Agri Land" || form.propertyType === "Farmland" ? "Cent" : "Square Feet"),
+        ratePerUnit: form.ratePerUnit ? toNumber(form.ratePerUnit) : undefined,
+        landArea: form.propertyType === "Warehouse" ? (warehouseDetails.totalLandArea || form.landArea || "") : (form.landArea || ""),
+        flatArea: form.flatArea || "",
+        plotType: form.plotType || "",
+        villaType: form.villaType || "",
+        pgType: form.pgType || "",
+        sharingType: form.sharingType || "",
+        monthlyMaintenance: form.monthlyMaintenance ? toNumber(form.monthlyMaintenance) : undefined,
+        maintenanceType: form.maintenanceType || undefined,
+        waterSourceType: form.propertyType === "Warehouse" ? (warehouseDetails.waterSource || form.waterSourceType || "") : (form.waterSourceType || ""),
+        waterSource: form.waterSource || "",
+        frontage: form.frontage || "",
+        roadWidth: form.roadWidth || "",
+        roadType: form.roadType || "",
+        corner: form.corner || "",
+        soilType: form.soilType || "",
+        cropSuitable: form.cropSuitable || "",
+        farmhouseCount: form.farmhouse === "Yes" ? Number(form.farmhouseCount || 1) : undefined,
+        borewell: form.borewell || "No",
+        well: form.well || "No",
+        layoutPlot: form.plotType === "Residential Plot" ? "Yes" : "No",
+        individualPlot: form.plotType === "Individual Plot" ? "Yes" : "No",
+        length: form.length || "",
+        width: form.width || "",
         bhk: Number(form.bhk || 0),
         bathrooms: Number(form.bathrooms || 0),
         listingType: getListingType(form.propertyType),
         furnishingStatus: form.furnishingStatus,
         listingSource: form.postedBy,
-        builtupArea: toNumber(form.builtupArea || form.landArea || form.flatArea),
+        builtupArea: form.propertyType === "Warehouse"
+          ? toNumber(warehouseDetails.builtupWarehouseArea || form.builtupArea || warehouseDetails.totalLandArea)
+          : toNumber(form.builtupArea || form.landArea || form.flatArea),
+        carpetArea: form.propertyType === "Warehouse" ? toNumber(warehouseDetails.carpetArea) : undefined,
         areaUnit: form.areaUnit,
         possessionStatus: form.possessionStatus,
         facing: form.facing || undefined,
@@ -829,7 +1188,13 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         isSold: form.isSold === true || form.isSold === "true",
         amenities,
         nearbyFacilities: [],
-        virtualTourUrl: "",
+        virtualTourUrl: form.propertyType === "Warehouse" ? warehouseDetails.virtual360View : "",
+        warehouseDetails: form.propertyType === "Warehouse"
+          ? {
+              ...warehouseDetails,
+              pricePerSqft: warehousePricePerSqft ? String(warehousePricePerSqft) : "",
+            }
+          : undefined,
         images: uploadedImages,
         documents: uploadedDocs,
         verification: {
@@ -841,9 +1206,16 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
           email: accountContact.email || "",
         },
         location: {
-          city: (form.city || "Hosur").trim(),
+          country: form.country.trim() || "India",
+          state: form.state.trim(),
+          district: form.district.trim(),
+          taluk: form.taluk.trim(),
+          village: form.village.trim(),
+          city: (form.city || form.taluk || form.district || "Hosur").trim(),
           area: (form.area || "General").trim(),
-          address: [form.houseAddress, form.village, form.taluk, form.district, form.state, form.country].filter(Boolean).join(", "),
+          address: [form.houseAddress, form.village, form.taluk, form.district, form.state, form.country]
+            .filter(Boolean)
+            .join(", "),
         },
       };
 
@@ -870,18 +1242,49 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   const getFieldLabel = (field, type = form.propertyType) => {
     if (type === "Flat") {
       if (field === "plotType") return "Flat Type";
-      if (field === "individualPlot") return "Individual Flat";
-      if (field === "layoutPlot") return "Layout Flat";
     }
+    if (type === "Agri Land" && field === "cropSuitable") return "Crops / Trees in Land";
     return fieldLabels[field] || field;
   };
 
+  const isRequiredDetailField = (field) => (
+    form.propertyType === "Commercial Land / Building" && field === "corner"
+  );
+
   const renderInput = (field) => {
     if (field === "bhk" && form.propertyType === "Villa") {
-      return <Select field={field} value={form[field]} options={["", "2", "3", "4", "5"]} onChange={update} />;
+      return <Select field={field} value={form[field]} options={["", "1", "2", "3", "4", "5"]} onChange={update} />;
     }
     if (field === "bathrooms") {
       return <Select field={field} value={form[field]} options={["", "1", "2", "3", "4"]} onChange={update} />;
+    }
+    if (field === "measurementType") {
+      const options = ["Square Feet", "Cent", "Acre"];
+      return <Select field={field} value={form[field]} options={options} onChange={update} />;
+    }
+    if (field === "ratePerUnit") {
+      const unit = form.measurementType === "Cent" ? "per cent" : form.measurementType === "Acre" ? "per acre" : "/ sq.ft";
+      return (
+        <div className="space-y-2">
+          <div className="relative">
+            <input
+              className="site-input h-11"
+              value={form.ratePerUnit}
+              onChange={(e) => update("ratePerUnit", e.target.value)}
+              placeholder="e.g. 2500"
+            />
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">₹ {unit}</span>
+          </div>
+        </div>
+      );
+    }
+    if (field === "totalAmount") {
+      const total = computeTotalAmount(form);
+      return (
+        <div className="site-input h-11 rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm font-semibold text-navy flex items-center justify-between">
+          <span>{total > 0 ? `₹${total.toLocaleString("en-IN")}` : "Calculated total amount"}</span>
+        </div>
+      );
     }
     if (field === "villaType") {
       return <Select field={field} value={form[field]} options={["Simplex", "Duplex"]} onChange={update} />;
@@ -892,10 +1295,25 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
     if (field === "soilType") {
       return <Select field={field} value={form[field]} options={soilTypeOptions} onChange={update} />;
     }
+    if (field === "corner") {
+      return <Select field={field} value={form[field]} options={["", ...cornerOptions]} onChange={update} />;
+    }
+    if (field === "roadType") {
+      return <Select field={field} value={form[field]} options={["", ...roadTypeOptions]} onChange={update} />;
+    }
+    if (field === "cropSuitable" && form.propertyType === "Agri Land") {
+      return (
+        <textarea
+          className="site-input min-h-[88px] resize-none"
+          rows="3"
+          value={form.cropSuitable}
+          onChange={(e) => update("cropSuitable", e.target.value)}
+          placeholder="Enter crops / trees in land, e.g. mango trees, coconut trees, paddy, ragi"
+        />
+      );
+    }
     if (field === "plotType") {
-      const options = form.propertyType === "Flat"
-        ? ["", "Layout Flat", "Statistical Flat"]
-        : ["", "Layout Plot", "Statistical Plot"];
+      const options = ["", "Individual Plot", "Residential Plot"];
       return <Select field={field} value={form[field]} options={options} onChange={update} />;
     }
     if (field === "carParking") {
@@ -939,14 +1357,24 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         </div>
       );
     }
-    if (field === "landArea" || field === "flatArea") {
-      if (form.propertyType === "Agri Land") {
-        return <DropdownInput field={field} value={form[field]} options={agriLandAreaOptions} onChange={update} placeholder="e.g. 25 Cents" />;
+    if (field === "landArea") {
+      if (form.measurementType === "Cent" || form.measurementType === "Acre") {
+        return (
+          <input
+            className="site-input"
+            value={form[field]}
+            onChange={(e) => update(field, e.target.value)}
+            placeholder={form.measurementType === "Acre" ? "Enter area in Acres" : "Enter area in Cents"}
+          />
+        );
       }
-      if (form.propertyType === "Farmland") {
-        return <DropdownInput field={field} value={form[field]} options={farmlandAreaOptions} onChange={update} placeholder="e.g. 15 Cents" />;
+      return <DropdownInput field={field} value={form[field]} options={landAreaOptions} onChange={update} placeholder="e.g. 1000 sq.ft" />;
+    }
+    if (field === "flatArea") {
+      if (form.propertyType === "Agri Land" || form.propertyType === "Farmland") {
+        return <input className="site-input" value={form[field]} onChange={(e) => update(field, e.target.value)} placeholder="Enter area in Cents or Acres" />;
       }
-      return <DropdownInput field={field} value={form[field]} options={landAreaOptions} onChange={update} placeholder={field === "flatArea" ? "e.g. 1000 sq.ft" : "e.g. 600 sq.ft"} />;
+      return <DropdownInput field={field} value={form[field]} options={landAreaOptions} onChange={update} placeholder="e.g. 1000 sq.ft" />;
     }
     if (field === "price") {
       if (form.propertyType === "Plot") {
@@ -970,19 +1398,30 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
       return <DropdownInput field={field} value={form[field]} options={priceOptions} onChange={update} placeholder="e.g. 50 L" />;
     }
     if (field === "monthlyRent") {
-      if (form.propertyType === "PG") {
-        return <DropdownInput field={field} value={form[field]} options={pgRentOptions} onChange={update} placeholder="Select rent range" />;
-      }
-      return <DropdownInput field={field} value={form[field]} options={houseRentOptions} onChange={update} placeholder="Select rent range" />;
+      return (
+        <input
+          className="site-input h-11"
+          value={form[field]}
+          onChange={(e) => update(field, e.target.value)}
+          placeholder="Enter rent price"
+        />
+      );
     }
     if (field === "advance") {
-      return <DropdownInput field={field} value={form[field]} options={priceOptions} onChange={update} placeholder="e.g. 50 L" />;
+      return (
+        <input
+          className="site-input h-11"
+          value={form[field]}
+          onChange={(e) => update(field, e.target.value)}
+          placeholder="Enter advance amount"
+        />
+      );
     }
     if (field === "facing") {
-      return <Select field={field} value={form[field]} options={["", ...facingOptions]} onChange={update} />;
-    }
-    if (field === "layoutPlot") {
-      return <YesNoGroup field={field} value={form[field]} onChange={update} />;
+      const options = form.propertyType === "Villa"
+        ? ["", "East", "West", "North", "South"]
+        : ["", ...facingOptions];
+      return <Select field={field} value={form[field]} options={options} onChange={update} />;
     }
     if (field === "furnishingStatus") {
       return <Select field={field} value={form[field]} options={["Furnished", "Semi-Furnished", "Unfurnished"]} onChange={update} />;
@@ -990,10 +1429,235 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
     if (field === "sharingType") {
       return <Select field={field} value={form[field]} options={["", "Single Sharing", "Two Sharing", "Three Sharing", "Four Sharing"]} onChange={update} />;
     }
-    if (field === "individualPlot") {
-      return <YesNoGroup field={field} value={form[field]} onChange={update} />;
+    if (field === "pgType") {
+      return <Select field={field} value={form[field]} options={["", ...pgTypeOptions]} onChange={update} />;
     }
     return <input className="site-input" value={form[field]} onChange={(e) => update(field, e.target.value)} placeholder={getFieldLabel(field, form.propertyType)} />;
+  };
+
+  const renderWarehouseTextField = (field, label, placeholder = "") => (
+    <Field label={label}>
+      <input
+        className="site-input h-11"
+        value={form.warehouseDetails?.[field] || ""}
+        onChange={(e) => updateWarehouse(field, e.target.value)}
+        placeholder={placeholder}
+      />
+    </Field>
+  );
+
+  const renderWarehouseSelectField = (field, label, options) => (
+    <Field label={label}>
+      <Select
+        field={field}
+        value={form.warehouseDetails?.[field] || ""}
+        options={["", ...options]}
+        onChange={updateWarehouse}
+      />
+    </Field>
+  );
+
+  const renderWarehouseYesNo = (field, label) => (
+    <div>
+      <p className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">{label}</p>
+      <YesNoGroup field={field} value={form.warehouseDetails?.[field] || "No"} onChange={updateWarehouse} />
+    </div>
+  );
+
+  const renderWarehouseMultiSelect = (field, label, options) => {
+    const selected = Array.isArray(form.warehouseDetails?.[field]) ? form.warehouseDetails[field] : [];
+    return (
+      <div>
+        <p className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">{label}</p>
+        <div className="flex flex-wrap gap-2">
+          {options.map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => toggleWarehouseListValue(field, option)}
+              className={`rounded-xl border px-3 py-2 text-xs font-bold transition ${
+                selected.includes(option)
+                  ? "border-navy bg-navy text-white"
+                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderWarehouseSections = () => {
+    if (form.propertyType !== "Warehouse") return null;
+
+    return (
+      <>
+        <FormSection title="Warehouse Basic Details">
+          <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
+            {renderWarehouseTextField("pincode", "Pincode", "e.g. 635109")}
+            {renderWarehouseTextField("googleMapsLocation", "Google Maps Location", "Paste map link")}
+            {renderWarehouseTextField("propertyAge", "Property Age", "e.g. 5 years")}
+            {renderWarehouseTextField("constructionYear", "Construction Year", "e.g. 2021")}
+            {renderWarehouseSelectField("propertyCondition", "Property Condition", propertyConditionOptions)}
+          </div>
+        </FormSection>
+
+        <FormSection title="Warehouse Area Details">
+          <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
+            {renderWarehouseTextField("totalLandArea", "Total Land Area", "e.g. 20000")}
+            {renderWarehouseSelectField("landAreaUnit", "Land Area Unit", ["Sq.ft", "Cent", "Acre"])}
+            {renderWarehouseTextField("builtupWarehouseArea", "Built-up Area - Sq.ft", "e.g. 15000")}
+            {renderWarehouseTextField("carpetArea", "Carpet / Usable Area - Sq.ft", "e.g. 14000")}
+            {renderWarehouseTextField("groundFloorArea", "Ground Floor Area", "Sq.ft")}
+            {renderWarehouseTextField("firstFloorArea", "First Floor Area", "Sq.ft")}
+            {renderWarehouseTextField("otherFloorArea", "Other Floor Area", "Sq.ft")}
+            {renderWarehouseTextField("openYardArea", "Open Yard Area", "Sq.ft")}
+            {renderWarehouseTextField("parkingArea", "Parking Area", "Sq.ft")}
+          </div>
+        </FormSection>
+
+        <FormSection title="Warehouse Structure">
+          <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
+            {renderWarehouseSelectField("warehouseType", "Warehouse Type", warehouseTypeOptions)}
+            {renderWarehouseTextField("ceilingHeight", "Ceiling Height", "e.g. 28 ft")}
+            {renderWarehouseTextField("clearHeight", "Clear Height", "e.g. 24 ft")}
+            {renderWarehouseTextField("floorLoadCapacity", "Floor Load Capacity", "e.g. 5 MT")}
+            {renderWarehouseSelectField("flooringType", "Flooring Type", flooringTypeOptions)}
+            {renderWarehouseTextField("numberOfShutters", "Number of Shutters", "e.g. 4")}
+            {renderWarehouseTextField("shutterHeight", "Shutter Height", "e.g. 14 ft")}
+            {renderWarehouseTextField("shutterWidth", "Shutter Width", "e.g. 12 ft")}
+            {renderWarehouseTextField("numberOfLoadingBays", "Number of Loading Bays", "e.g. 2")}
+          </div>
+          <div className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+            {renderWarehouseYesNo("dockLeveler", "Dock Leveler")}
+            {renderWarehouseYesNo("loadingUnloadingArea", "Loading / Unloading Area")}
+          </div>
+        </FormSection>
+
+        <FormSection title="Vehicle & Transportation Access">
+          <div className="space-y-5">
+            {renderWarehouseMultiSelect("vehicleAccess", "Vehicle Access", vehicleAccessOptions)}
+            <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
+              {renderWarehouseTextField("internalRoadWidth", "Internal Road Width", "e.g. 30 ft")}
+              {renderWarehouseYesNo("truckTurningSpace", "Truck Turning Space")}
+              {renderWarehouseYesNo("containerAccess", "Container Access")}
+            </div>
+          </div>
+        </FormSection>
+
+        <FormSection title="Electricity">
+          <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
+            {renderWarehouseYesNo("electricityAvailable", "Electricity Available")}
+            {renderWarehouseSelectField("connectionType", "Connection Type", ["Single Phase", "Three Phase"])}
+            {renderWarehouseTextField("sanctionedLoad", "Sanctioned Load - kW / HP", "e.g. 100 kW")}
+            {renderWarehouseYesNo("transformer", "Transformer")}
+            {renderWarehouseTextField("transformerCapacity", "Transformer Capacity", "e.g. 250 kVA")}
+            {renderWarehouseYesNo("generator", "Generator")}
+            {renderWarehouseTextField("generatorCapacity", "Generator Capacity", "e.g. 125 kVA")}
+            {renderWarehouseYesNo("powerBackup", "Power Backup")}
+            {renderWarehouseYesNo("solarPower", "Solar Power")}
+          </div>
+        </FormSection>
+
+        <FormSection title="Water & Drainage">
+          <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
+            {renderWarehouseSelectField("waterSource", "Water Source", warehouseWaterOptions)}
+            {renderWarehouseYesNo("borewell", "Borewell")}
+            {renderWarehouseTextField("waterStorageCapacity", "Water Storage Capacity", "Litres")}
+            {renderWarehouseTextField("overheadTank", "Overhead Tank", "Litres")}
+            {renderWarehouseTextField("undergroundTank", "Underground Tank", "Litres")}
+            {renderWarehouseYesNo("drainageAvailable", "Drainage Available")}
+          </div>
+        </FormSection>
+
+        <FormSection title="Security">
+          <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
+            {renderWarehouseYesNo("securityGuard", "Security Guard")}
+            {renderWarehouseYesNo("cctv", "CCTV")}
+            {renderWarehouseTextField("cctvCount", "Number of CCTV Cameras", "e.g. 12")}
+            {renderWarehouseYesNo("securityRoom", "Security Room")}
+            {renderWarehouseYesNo("compoundWall", "Compound Wall")}
+            {renderWarehouseYesNo("mainGate", "Main Gate")}
+            {renderWarehouseSelectField("gateType", "Gate Type", gateTypeOptions)}
+          </div>
+        </FormSection>
+
+        <FormSection title="Fire & Safety">
+          <div className="grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+            {renderWarehouseYesNo("fireSafetySystem", "Fire Safety System")}
+            {renderWarehouseYesNo("fireNoc", "Fire NOC")}
+            {renderWarehouseYesNo("fireExtinguishers", "Fire Extinguishers")}
+            {renderWarehouseYesNo("fireHydrant", "Fire Hydrant")}
+            {renderWarehouseYesNo("sprinklerSystem", "Sprinkler System")}
+            {renderWarehouseYesNo("fireAlarm", "Fire Alarm")}
+            {renderWarehouseYesNo("emergencyExit", "Emergency Exit")}
+          </div>
+        </FormSection>
+
+        <FormSection title="Office & Loading Facilities">
+          <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
+            {renderWarehouseYesNo("officeSpace", "Office Space")}
+            {renderWarehouseTextField("officeArea", "Office Area - Sq.ft", "e.g. 800")}
+            {renderWarehouseYesNo("reception", "Reception")}
+            {renderWarehouseYesNo("managerRoom", "Manager Room")}
+            {renderWarehouseYesNo("staffRoom", "Staff Room")}
+            {renderWarehouseYesNo("meetingRoom", "Meeting Room")}
+            {renderWarehouseYesNo("pantry", "Pantry")}
+            {renderWarehouseYesNo("washroom", "Washroom")}
+            {renderWarehouseYesNo("loadingDock", "Loading Dock")}
+            {renderWarehouseTextField("dockHeight", "Dock Height", "e.g. 4 ft")}
+            {renderWarehouseYesNo("ramp", "Ramp")}
+            {renderWarehouseYesNo("goodsLift", "Goods Lift")}
+            {renderWarehouseYesNo("forkliftAccess", "Forklift Access")}
+            {renderWarehouseYesNo("forkliftAvailable", "Forklift Available")}
+          </div>
+        </FormSection>
+
+        <FormSection title="Warehouse Amenities">
+          <div className="rounded-2xl border border-slate-200/80 bg-slate-50/60 p-5 grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+            {warehouseAmenityFields.map((field) => renderWarehouseYesNo(field, fieldLabels[field] || field))}
+          </div>
+        </FormSection>
+
+        <FormSection title="Approvals & Documents">
+          <div className="rounded-2xl border border-slate-200/80 bg-slate-50/60 p-5 grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+            {warehouseApprovalFields.map((field) => renderWarehouseYesNo(field, field.replace(/([A-Z])/g, " $1").replace(/^./, (char) => char.toUpperCase())))}
+          </div>
+        </FormSection>
+
+        <FormSection title="Warehouse Price & Maintenance">
+          <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
+            {renderWarehouseTextField("sellingPrice", "Total Selling Price", "e.g. 5 Cr")}
+            {renderWarehouseTextField("pricePerSqft", "Price per Sq.ft", "Auto or enter manually")}
+            {renderWarehouseSelectField("priceBasis", "Price Basis", priceBasisOptions)}
+            {renderWarehouseSelectField("maintenance", "Maintenance", ["With Maintenance", "Without Maintenance"])}
+            {form.warehouseDetails?.maintenance === "With Maintenance" ? renderWarehouseTextField("maintenanceAmount", "Maintenance Amount", "e.g. 25000") : null}
+            {form.warehouseDetails?.maintenance === "With Maintenance" ? renderWarehouseSelectField("maintenanceFrequency", "Maintenance Frequency", maintenanceBillingOptions) : null}
+          </div>
+        </FormSection>
+
+        <FormSection title="Business / Usage Information">
+          {renderWarehouseMultiSelect("suitableFor", "Suitable For", warehouseUsageOptions)}
+        </FormSection>
+
+        <FormSection title="Warehouse Media Links">
+          <div className="grid gap-x-5 gap-y-5 md:grid-cols-2">
+            {renderWarehouseTextField("propertyVideo", "Property Video", "Paste video URL")}
+            {renderWarehouseTextField("virtual360View", "360 View", "Paste 360 view URL")}
+          </div>
+        </FormSection>
+
+        <FormSection title="Warehouse Contact Preference">
+          <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
+            {renderWarehouseTextField("contactPerson", "Contact Person", accountContact.name || "")}
+            {renderWarehouseTextField("whatsappNumber", "WhatsApp Number", accountContact.phone || "")}
+            {renderWarehouseSelectField("preferredContactMethod", "Preferred Contact Method", contactMethodOptions)}
+          </div>
+        </FormSection>
+      </>
+    );
   };
 
   const renderFormBody = () => {
@@ -1027,23 +1691,96 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
         <FormSection title="Location Details">
           <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
+            <Field label="Country" required>
+              <LocationDropdownOrInput
+                field="country"
+                value={form.country}
+                options={countryOptions}
+                onChange={(field, value) => {
+                  update("country", value);
+                  update("state", "");
+                  update("district", "");
+                  update("taluk", "");
+                  update("village", "");
+                  update("area", "");
+                }}
+                placeholder="Select Country"
+              />
+            </Field>
             <Field label="State" required>
-              <LocationDropdownOrInput field="state" value={form.state} options={stateOptions} onChange={update} placeholder="Type State" />
+              <GeoLocationDropdown
+                field="state"
+                value={form.state}
+                options={stateOptions}
+                searchType="state"
+                onChange={(field, value) => {
+                  update("state", value);
+                  update("district", "");
+                  update("taluk", "");
+                  update("village", "");
+                  update("area", "");
+                }}
+                placeholder="Select State"
+              />
+            </Field>
+            <Field label="District" required>
+              <GeoLocationDropdown
+                field="district"
+                value={form.district}
+                options={districtOptions}
+                searchType="district"
+                context={form}
+                onChange={(field, value) => {
+                  update("district", value);
+                  update("taluk", "");
+                  update("village", "");
+                  update("area", "");
+                }}
+                placeholder="Select District"
+              />
             </Field>
             <Field label="City / Taluk" required>
-              <LocationDropdownOrInput field="city" value={form.city} options={cityOptions} onChange={update} placeholder="Type City" />
+              <GeoLocationDropdown
+                field="taluk"
+                value={form.taluk}
+                options={talukOptions}
+                searchType="city"
+                context={form}
+                onChange={(field, value) => {
+                  update("taluk", value);
+                  update("village", "");
+                  update("area", "");
+                }}
+                placeholder="Select Taluk"
+              />
             </Field>
             <Field label="Area / Locality" required>
-              <LocationDropdownOrInput field="area" value={form.area} options={areaOptions} onChange={update} placeholder="Type Area" />
+              <GeoLocationDropdown
+                field="area"
+                value={form.area}
+                options={areaOptions}
+                searchType="area"
+                context={form}
+                onChange={update}
+                placeholder="Select Area / Locality"
+              />
             </Field>
-            <Field label="District">
-              <LocationDropdownOrInput field="district" value={form.district} options={districtOptions} onChange={update} placeholder="Type District" />
-            </Field>
-            <Field label="Village / Landmark">
-              <LocationDropdownOrInput field="village" value={form.village} options={villageOptions} onChange={update} placeholder="Type Village" />
-            </Field>
-            <Field label="Country">
-              <input className="site-input h-11" value={form.country} onChange={(e) => update("country", e.target.value)} placeholder="India" />
+            <Field label="Village / Landmark" required>
+              <GeoLocationDropdown
+                field="village"
+                value={form.village}
+                options={villageOptions}
+                searchType="village"
+                context={form}
+                onChange={(field, value) => {
+                  update("village", value);
+                  if (value && !form.area) {
+                    const defaultArea = getAreasByVillage(form.country || "India", form.state, form.district, form.taluk, value)[0] || "";
+                    if (defaultArea) update("area", defaultArea);
+                  }
+                }}
+                placeholder="Select Village"
+              />
             </Field>
             <Field label="Full Address / Survey Details" className="md:col-span-3">
               <textarea className="site-input min-h-[96px] resize-none" rows="3" value={form.houseAddress} onChange={(e) => update("houseAddress", e.target.value)} placeholder="Door No., Street, Survey No., Landmarks" />
@@ -1051,48 +1788,63 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
           </div>
         </FormSection>
 
-        <FormSection title="Price Details">
-          <div className="grid gap-x-5 gap-y-5 md:grid-cols-2">
-            <Field label={config.priceLabel} required>
-              {renderInput(config.priceLabel.includes("Rent") ? "monthlyRent" : "price")}
-            </Field>
-          </div>
-        </FormSection>
+        {!["Warehouse", "Rent", "PG"].includes(form.propertyType) ? (
+          <FormSection title="Price Details">
+            <div className="grid gap-x-5 gap-y-5 md:grid-cols-2">
+              <Field label="Measurement" required>
+                {renderInput("measurementType")}
+              </Field>
+              <Field label="Land Area" required>
+                {renderInput("landArea")}
+              </Field>
+              <Field label="Rate" required>
+                {renderInput("ratePerUnit")}
+              </Field>
+              <Field label="Total Amount">
+                {renderInput("totalAmount")}
+              </Field>
+            </div>
+          </FormSection>
+        ) : null}
 
         <FormSection title={config.detailTitle}>
           <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
             {config.detailFields.map((field) => (
-              <Field key={field} label={getFieldLabel(field, form.propertyType)}>
+              <Field key={field} label={getFieldLabel(field, form.propertyType)} required={isRequiredDetailField(field)}>
                 {renderInput(field)}
               </Field>
             ))}
           </div>
         </FormSection>
 
-        <FormSection title="Facilities / Features">
-          <div className="rounded-2xl border border-slate-200/80 bg-slate-50/60 p-5 grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
-            {config.featureFields.map((field) => (
-              <div key={field}>
-                <p className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">{getFieldLabel(field, form.propertyType)}</p>
-                <YesNoGroup field={field} value={form[field]} onChange={update} />
+        {renderWarehouseSections()}
+
+        {form.propertyType !== "Warehouse" ? (
+          <FormSection title="Facilities / Features">
+            <div className="rounded-2xl border border-slate-200/80 bg-slate-50/60 p-5 grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+              {config.featureFields.map((field) => (
+                <div key={field}>
+                  <p className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">{getFieldLabel(field, form.propertyType)}</p>
+                  <YesNoGroup field={field} value={form[field]} onChange={update} />
+                </div>
+              ))}
+            </div>
+            {form.farmhouse === "Yes" ? (
+              <div className="mt-4 max-w-md">
+                <Field label="Number of Farmhouses">
+                  <input className="site-input h-11" value={form.farmhouseCount} onChange={(e) => update("farmhouseCount", e.target.value)} placeholder="e.g. 1" />
+                </Field>
               </div>
-            ))}
-          </div>
-          {form.farmhouse === "Yes" ? (
-            <div className="mt-4 max-w-md">
-              <Field label="Number of Farmhouses">
-                <input className="site-input h-11" value={form.farmhouseCount} onChange={(e) => update("farmhouseCount", e.target.value)} placeholder="e.g. 1" />
-              </Field>
-            </div>
-          ) : null}
-          {form.rera === "Yes" ? (
-            <div className="mt-4 max-w-md">
-              <Field label="RERA ID">
-                <input className="site-input h-11" value={form.reraId} onChange={(e) => update("reraId", e.target.value)} placeholder="Enter RERA registration number" />
-              </Field>
-            </div>
-          ) : null}
-        </FormSection>
+            ) : null}
+            {form.rera === "Yes" ? (
+              <div className="mt-4 max-w-md">
+                <Field label="RERA ID">
+                  <input className="site-input h-11" value={form.reraId} onChange={(e) => update("reraId", e.target.value)} placeholder="Enter RERA registration number" />
+                </Field>
+              </div>
+            ) : null}
+          </FormSection>
+        ) : null}
 
         <FormSection title="Description">
           <div className="grid gap-4">
@@ -1632,6 +2384,119 @@ const LocationDropdownOrInput = ({ field, value, options, onChange, placeholder 
           </button>
         </div>
       )}
+    </div>
+  );
+};
+
+const GeoLocationDropdown = ({ field, value, options = [], onChange, placeholder, searchType, context = {} }) => {
+  const [remoteOptions, setRemoteOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const typedValue = String(value || "").trim().toLowerCase();
+  const localOptions = useMemo(
+    () => options.filter((option) => option !== "Other (Enter Manually)"),
+    [options]
+  );
+  const mergedOptions = useMemo(() => {
+    const allOptions = [...new Set([...localOptions, ...remoteOptions].filter(Boolean))];
+    if (!typedValue) return allOptions;
+
+    return allOptions
+      .filter((option) => option.toLowerCase().includes(typedValue))
+      .sort((a, b) => {
+        const aText = a.toLowerCase();
+        const bText = b.toLowerCase();
+        const aStarts = aText.startsWith(typedValue);
+        const bStarts = bText.startsWith(typedValue);
+        if (aStarts !== bStarts) return aStarts ? -1 : 1;
+        if (aText === typedValue) return -1;
+        if (bText === typedValue) return 1;
+        return a.localeCompare(b);
+      });
+  }, [localOptions, remoteOptions, typedValue]);
+
+  useEffect(() => {
+    const searchValue = String(value || "").trim();
+    const canLoadDefaultOptions = open && ["district", "city", "village", "area"].includes(searchType);
+    if (!searchType || (searchValue.length < 2 && !canLoadDefaultOptions)) {
+      setRemoteOptions([]);
+      setLoading(false);
+      return undefined;
+    }
+
+    let ignore = false;
+    setLoading(true);
+
+    const timer = window.setTimeout(() => {
+      searchIndiaLocationNames({
+        type: searchType,
+        search: searchValue,
+        state: context.state,
+        district: context.district,
+        city: context.taluk || context.city,
+        village: context.village,
+      })
+        .then((items) => {
+          if (!ignore) setRemoteOptions(items);
+        })
+        .catch(() => {
+          if (!ignore) setRemoteOptions([]);
+        })
+        .finally(() => {
+          if (!ignore) setLoading(false);
+        });
+    }, 350);
+
+    return () => {
+      ignore = true;
+      window.clearTimeout(timer);
+    };
+  }, [context.city, context.district, context.state, context.taluk, context.village, open, searchType, value]);
+
+  return (
+    <div className="relative">
+      <input
+        className="site-input h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 pr-20 text-sm font-medium text-navy shadow-xs focus:border-orange focus:ring-2 focus:ring-orange/20 transition-all"
+        value={value || ""}
+        onChange={(e) => {
+          onChange(field, e.target.value);
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => window.setTimeout(() => setOpen(false), 120)}
+        placeholder={placeholder || `Select ${field}`}
+        autoComplete="new-password"
+        name={`geo-${searchType || field}-lookup`}
+        role="combobox"
+        aria-expanded={open}
+      />
+      {loading ? (
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-slate-400">
+          Searching
+        </span>
+      ) : null}
+      {open && mergedOptions.length ? (
+        <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-[80] max-h-56 overflow-y-auto rounded-xl border border-slate-200 bg-white py-1 shadow-xl">
+          {mergedOptions.map((option) => (
+            <button
+              key={option}
+              type="button"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                onChange(field, option);
+                setOpen(false);
+              }}
+              className={`block w-full px-4 py-2.5 text-left text-sm font-semibold transition ${
+                value === option
+                  ? "bg-orange/10 text-orange"
+                  : "bg-white text-navy hover:bg-slate-50"
+              }`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 };

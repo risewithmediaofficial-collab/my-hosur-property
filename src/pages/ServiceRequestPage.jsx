@@ -29,6 +29,16 @@ import pestControlImg from "../assets/pest_control.png";
 import contractsWorksImg from "../assets/contarcts works.jpg";
 import nriPropertyMgmtImg from "../assets/nri property managment.png";
 import officeInteriorImg from "../assets/office_interior.png";
+import electricalPlumbingServiceImg from "../assets/service-ai/electrical-plumbing-service.jpg";
+import tankSumpBathroomCleaningImg from "../assets/service-ai/tank-sump-bathroom-cleaning.jpg";
+import sofaCarpetCleaningImg from "../assets/service-ai/sofa-carpet-cleaning.jpg";
+import mortgagePrivateFinanceImg from "../assets/service-ai/mortgage-private-finance.jpg";
+import approvalPlansBlueprintsImg from "../assets/service-ai/approval-plans-blueprints.jpg";
+import homeApartmentAmcImg from "../assets/service-ai/home-apartment-amc.jpg";
+import landscapingGardenMaintenanceImg from "../assets/service-ai/landscaping-garden-maintenance.jpg";
+import officeRentalServiceImg from "../assets/service-ai/office-rental-service.jpg";
+import warehouseRentalServiceImg from "../assets/service-ai/warehouse-rental-service.jpg";
+import landRentalServiceImg from "../assets/service-ai/land-rental-service.jpg";
 
 // Construction images from src/assets/construction images
 import constHouseImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.03 AM (1).jpeg";
@@ -36,7 +46,6 @@ import constCommercialImg from "../assets/construction images/WhatsApp Image 202
 import constOfficeImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.03 AM.jpeg";
 import constApartmentImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.04 AM (1).jpeg";
 import constWarehouseImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.04 AM (2).jpeg";
-import constApprovalImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.04 AM.jpeg";
 
 const getServiceImageDetails = (category, serviceType = "", propertyType = "") => {
   const sType = (serviceType || "").toLowerCase();
@@ -60,7 +69,7 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
         return { image: constWarehouseImg, badge: "Industrial & Warehouse Construction", caption: "Industrial Shed & Warehouse Construction" };
       }
       if (sType.includes("plan") || sType.includes("2d") || sType.includes("3d") || sType.includes("hntda") || sType.includes("rera") || sType.includes("approval")) {
-        return { image: constApprovalImg, badge: "Approval Plans & Blueprints", caption: "HNTDA & RERA Approval Plans & 2D/3D Drawings" };
+        return { image: approvalPlansBlueprintsImg, badge: "Approval Plans & Blueprints", caption: "HNTDA & RERA Approval Plans & 2D/3D Drawings" };
       }
       return { image: contractsWorksImg, badge: "Construction Services", caption: "Quality House & Commercial Building Construction" };
 
@@ -75,7 +84,7 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
         return { image: applianceServiceImg, badge: "Appliance Service", caption: "Expert TV, Fridge & Washing Machine Repair" };
       }
       if (sType.includes("electrical") || sType.includes("plumbing")) {
-        return { image: applianceServiceImg, badge: "Electrical & Plumbing", caption: "Certified Electrical & Plumbing Maintenance" };
+        return { image: electricalPlumbingServiceImg, badge: "Electrical & Plumbing", caption: "Certified Electrical & Plumbing Maintenance" };
       }
       if (sType.includes("interior") || sType.includes("carpentry")) {
         return { image: carpentryServiceImg, badge: "Carpentry & Woodwork", caption: "Custom Carpentry & Furniture Repair" };
@@ -84,13 +93,13 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
         return { image: pestControlImg, badge: "Pest Control", caption: "Safe & Effective Pest Control Solutions" };
       }
       if (sType.includes("tank") || sType.includes("sump") || sType.includes("bathroom")) {
-        return { image: cleaningServiceImg, badge: "Tank, Sump & Bathroom Cleaning", caption: "Hygienic Sump & Overhead Tank Cleaning" };
+        return { image: tankSumpBathroomCleaningImg, badge: "Tank, Sump & Bathroom Cleaning", caption: "Hygienic Sump & Overhead Tank Cleaning" };
       }
       if (sType.includes("painting")) {
         return { image: paintingServiceImg, badge: "Painting Work", caption: "Interior & Exterior House Painting" };
       }
       if (sType.includes("sofa") || sType.includes("carpet")) {
-        return { image: cleaningServiceImg, badge: "Sofa & Carpet Cleaning", caption: "Sanitized Sofa & Upholstery Cleaning" };
+        return { image: sofaCarpetCleaningImg, badge: "Sofa & Carpet Cleaning", caption: "Sanitized Sofa & Upholstery Cleaning" };
       }
       return { image: cleaningServiceImg, badge: "Home & Office Care", caption: "Reliable Support for Home & Office Spaces" };
 
@@ -102,7 +111,7 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
         return { image: plotLoanImg, badge: "Plot Loan", caption: "Instant Approval Plot Purchase Financing" };
       }
       if (sType.includes("mortgage") || sType.includes("finance")) {
-        return { image: plotLoanImg, badge: "Mortgage Loan", caption: "Loan Against Property & Flexible Financing" };
+        return { image: mortgagePrivateFinanceImg, badge: "Mortgage Loan", caption: "Loan Against Property & Flexible Financing" };
       }
       if (sType.includes("commercial")) {
         return { image: commercialImg, badge: "Commercial Loan", caption: "High Value Commercial Property Financing" };
@@ -146,22 +155,28 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
       return { image: sellGuidanceImg, badge: "Property Sell Assistance", caption: "Get Best Valuation & Fast Property Sale" };
 
     case "property_rent":
-      if (pType.includes("commercial") || pType.includes("office") || pType.includes("warehouse")) {
-        return { image: commercialImg, badge: "Commercial Rental", caption: "Rent Commercial Buildings & Warehouses" };
+      if (pType.includes("warehouse") || pType.includes("industrial")) {
+        return { image: warehouseRentalServiceImg, badge: "Warehouse Rental", caption: "Rent Warehouses & Industrial Sheds" };
+      }
+      if (pType.includes("land")) {
+        return { image: landRentalServiceImg, badge: "Land Rental", caption: "Rent Empty Land with Road Access" };
+      }
+      if (pType.includes("commercial") || pType.includes("office")) {
+        return { image: officeRentalServiceImg, badge: "Commercial Rental", caption: "Rent Offices & Commercial Spaces" };
       }
       return { image: houseImg, badge: "Residential Rental", caption: "Find Houses & Apartments for Rent in Hosur" };
 
     case "property_management":
       if (sType.includes("garden") || sType.includes("land")) {
-        return { image: landSurveyImg, badge: "Landscaping & Garden", caption: "Professional Lawn & Garden Care" };
+        return { image: landscapingGardenMaintenanceImg, badge: "Landscaping & Garden", caption: "Professional Lawn & Garden Care" };
       }
       if (sType.includes("warehouse") || sType.includes("industry")) {
-        return { image: constWarehouseImg, badge: "Facility AMC", caption: "Industrial & Warehouse Maintenance AMC" };
+        return { image: warehouseRentalServiceImg, badge: "Facility AMC", caption: "Industrial & Warehouse Maintenance AMC" };
       }
       if (sType.includes("nri")) {
         return { image: nriPropertyMgmtImg, badge: "NRI Property Care", caption: "Dedicated Property Asset Care for NRIs" };
       }
-      return { image: houseImg, badge: "Property Management", caption: "Facility AMC & Complete Maintenance Services" };
+      return { image: homeApartmentAmcImg, badge: "Property Management", caption: "Facility AMC & Complete Maintenance Services" };
 
     default:
       return { image: buyGuidanceImg, badge: "Property Service", caption: "Trusted Real Estate Services in Hosur" };

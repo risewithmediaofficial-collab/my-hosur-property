@@ -82,6 +82,7 @@ export { default as ShareIcon } from "@mui/icons-material/ShareOutlined";
 
 export { default as InstagramIcon } from "@mui/icons-material/Instagram";
 export { default as FacebookIcon } from "@mui/icons-material/Facebook";
+export { default as YouTubeIcon } from "@mui/icons-material/YouTube";
 export { default as WhatsAppIcon } from "@mui/icons-material/WhatsApp";
 export { default as TwitterIcon } from "@mui/icons-material/Twitter";
 export { default as XIcon } from "@mui/icons-material/X";

@@ -2,28 +2,28 @@ export const CONTACT_EMAIL = "myhosurproperty.mhp@gmail.com";
 
 export const CONTACT_PHONE_NUMBERS = [
   {
-    role: "Director",
+    role: "To Buy or Business Enquiry",
     raw: "9994005086",
     display: "+91 99940 05086",
     tel: "+919994005086",
   },
   {
-    role: "Managing Director (MD)",
+    role: "To Sell",
     raw: "9150100499",
     display: "+91 91501 00499",
     tel: "+919150100499",
   },
   {
-    role: "Admin 1",
-    raw: "8248918906",
-    display: "+91 82489 18906",
-    tel: "+918248918906",
-  },
-  {
-    role: "Admin 2",
+    role: "For Rental / Office & Home Service Enquiry",
     raw: "9150100477",
     display: "+91 91501 00477",
     tel: "+919150100477",
+  },
+  {
+    role: "To Reach Our Team",
+    raw: "8248918906",
+    display: "+91 82489 18906",
+    tel: "+918248918906",
   },
 ];
 
@@ -35,11 +35,12 @@ export const CONTACT_ADDRESS =
   "No 4 /409-4, First floor, Movendar Nagar, Vinayagapuram, Bagalur Road, Hosur, Krishnagiri - 635109.";
 
 export const WHATSAPP_LINK =
-  "https://wa.me/919150100499?text=Hello%20MyHosurProperty%2C%20I%20would%20like%20to%20enquire%20about%20your%20services";
+  "https://wa.me/message/XJQW55BVGWT3C1";
 
 export const SOCIAL_LINKS = {
   instagram: "https://www.instagram.com/myhosurproperty?igsh=MWcxNzk5eHI1ZTd0YQ==",
   facebook: "https://www.facebook.com/share/1EBur7bmBy/",
+  youtube: "https://youtube.com/@myhosurproperty?si=T4wyMr-f0a0c_M53",
   threads: "https://www.threads.com/@myhosurproperty",
   x: "https://x.com/hosurproperties",
   whatsapp: WHATSAPP_LINK,

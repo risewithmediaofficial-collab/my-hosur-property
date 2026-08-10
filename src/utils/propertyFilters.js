@@ -190,6 +190,12 @@ export const filtersToApiParams = (state) => {
     params.search = loc;
   }
 
+  if (state.country) params.country = state.country;
+  if (state.state) params.state = state.state;
+  if (state.district) params.district = state.district;
+  if (state.taluk) params.taluk = state.taluk;
+  if (state.village) params.village = state.village;
+
   const category = state.category;
 
   if (category === "plot") {
@@ -277,6 +283,51 @@ export const buildFilterChips = (state) => {
   const fields = propertyFilterConfig[state.category] || [];
 
   // Location chips
+  if (state.country && state.country !== "India") {
+    chips.push({
+      key: "country",
+      fieldKey: "country",
+      label: "Country",
+      value: state.country,
+      removeKeys: ["country"],
+    });
+  }
+  if (state.state) {
+    chips.push({
+      key: "state",
+      fieldKey: "state",
+      label: "State",
+      value: state.state,
+      removeKeys: ["state"],
+    });
+  }
+  if (state.district) {
+    chips.push({
+      key: "district",
+      fieldKey: "district",
+      label: "District",
+      value: state.district,
+      removeKeys: ["district"],
+    });
+  }
+  if (state.taluk) {
+    chips.push({
+      key: "taluk",
+      fieldKey: "taluk",
+      label: "Taluk",
+      value: state.taluk,
+      removeKeys: ["taluk"],
+    });
+  }
+  if (state.village) {
+    chips.push({
+      key: "village",
+      fieldKey: "village",
+      label: "Village",
+      value: state.village,
+      removeKeys: ["village"],
+    });
+  }
   if (state.locality) {
     chips.push({
       key: "locality",
@@ -285,29 +336,13 @@ export const buildFilterChips = (state) => {
       value: state.locality,
       removeKeys: ["locality", "location"],
     });
-  } else if (state.village) {
+  } else if (!state.village && state.location) {
     chips.push({
-      key: "village",
-      fieldKey: "village",
-      label: "Village",
-      value: state.village,
-      removeKeys: ["village"],
-    });
-  } else if (state.taluk) {
-    chips.push({
-      key: "taluk",
-      fieldKey: "taluk",
-      label: "Taluk",
-      value: state.taluk,
-      removeKeys: ["taluk"],
-    });
-  } else if (state.district) {
-    chips.push({
-      key: "district",
-      fieldKey: "district",
-      label: "District",
-      value: state.district,
-      removeKeys: ["district"],
+      key: "location",
+      fieldKey: "location",
+      label: "Search",
+      value: state.location,
+      removeKeys: ["location"],
     });
   }
 

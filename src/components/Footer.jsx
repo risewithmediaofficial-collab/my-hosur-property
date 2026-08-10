@@ -14,8 +14,7 @@ import {
   PhoneIcon,
   ThreadsIcon,
   WhatsAppIcon,
-  XIcon,
-} from "./AppIcons";
+  XIcon,  YouTubeIcon,} from "./AppIcons";
 
 const scrollToTop = () => {
   const htmlElement = document.documentElement;
@@ -70,6 +69,16 @@ const Footer = () => {
                     aria-label="Facebook"
                   >
                     <FacebookIcon className="h-4 w-4" />
+                  </a>
+                  <a
+                    href={SOCIAL_LINKS.youtube}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 text-white transition hover:bg-orange hover:text-white"
+                    title="YouTube"
+                    aria-label="YouTube"
+                  >
+                    <YouTubeIcon className="h-4 w-4" />
                   </a>
                   <a
                     href={SOCIAL_LINKS.threads}

@@ -81,6 +81,8 @@ const PropertyDetailPage = () => {
   const [isFullscreenImage, setIsFullscreenImage] = useState(false);
 
   const p = data.property;
+  const propertyViewCount = Math.max(Number(p?.viewCount || 0), 0);
+  const propertyViewLabel = `${propertyViewCount.toLocaleString("en-IN")} ${propertyViewCount === 1 ? "person" : "people"} viewed this property`;
 
   useEffect(() => {
     const loadProperty = async () => {
@@ -465,7 +467,7 @@ const PropertyDetailPage = () => {
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-white">
                   <EyeIcon className="h-3 w-3" />
                 </span>
-                <span>3 people viewed this property yesterday</span>
+                <span>{propertyViewLabel}</span>
               </div>
 
               {/* Bottom-right: Zoom Fullscreen Button */}
@@ -665,7 +667,11 @@ const PropertyDetailPage = () => {
                 {p.location?.area && (
                   <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
                     <p className="font-semibold text-slate-900">Location</p>
-                    <p className="mt-1 text-slate-600">{[p.location?.area, p.location?.city, p.location?.district, p.location?.state].filter(Boolean).join(", ")}</p>
+                    <p className="mt-1 text-slate-600">
+                      {[p.location?.area, p.location?.village, p.location?.taluk, p.location?.district, p.location?.city, p.location?.state, p.location?.country]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </p>
                   </div>
                 )}
                 {p.landArea && (

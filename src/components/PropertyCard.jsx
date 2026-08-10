@@ -102,7 +102,7 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
           <Link
             to={href}
             onClick={scrollToTop}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-navy text-navy transition-all duration-300 group-hover:bg-navy group-hover:text-white group-hover:border-navy"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-navy text-navy transition-all duration-300 hover:border-orange hover:bg-orange hover:text-white group-hover:border-orange group-hover:bg-orange group-hover:text-white"
             aria-label={`View ${item.title} property`}
           >
             <ArrowRightIcon className="h-5 w-5" />

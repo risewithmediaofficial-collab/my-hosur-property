@@ -42,6 +42,31 @@ const propertySchema = new mongoose.Schema(
     carpetArea: { type: Number, min: 0 },
     builtupArea: { type: Number, min: 0 },
     areaUnit: { type: String, enum: ["sqft", "sqm"], default: "sqft" },
+    propertyClass: { type: String, trim: true, default: "General" },
+    measurementType: { type: String, enum: ["Square Feet", "Cent", "Acre"], default: "Square Feet" },
+    ratePerUnit: { type: Number, min: 0 },
+    landArea: { type: String, trim: true },
+    totalAmount: { type: Number, min: 0 },
+    plotType: { type: String, trim: true },
+    villaType: { type: String, trim: true },
+    pgType: { type: String, trim: true },
+    sharingType: { type: String, trim: true },
+    monthlyMaintenance: { type: Number, min: 0 },
+    maintenanceType: { type: String, trim: true },
+    monthlyRent: { type: Number, min: 0 },
+    advance: { type: String, trim: true },
+    waterSourceType: { type: String, trim: true },
+    waterSource: { type: String, trim: true },
+    frontage: { type: String, trim: true },
+    roadWidth: { type: String, trim: true },
+    roadType: { type: String, trim: true },
+    corner: { type: String, trim: true },
+    farmhouseCount: { type: Number, min: 0 },
+    soilType: { type: String, trim: true },
+    cropSuitable: { type: String, trim: true },
+    carParking: { type: String, trim: true },
+    layoutPlot: { type: String, trim: true },
+    individualPlot: { type: String, trim: true },
     floorNumber: { type: Number, min: 0 },
     totalFloors: { type: Number, min: 0 },
     possessionStatus: {
@@ -74,6 +99,11 @@ const propertySchema = new mongoose.Schema(
       lastVerifiedAt: Date,
     },
     location: {
+      country: { type: String, required: true, trim: true, default: "India" },
+      state: { type: String, required: true, trim: true },
+      district: { type: String, required: true, trim: true },
+      taluk: { type: String, required: true, trim: true },
+      village: { type: String, required: true, trim: true },
       city: { type: String, required: true, trim: true },
       area: { type: String, required: true, trim: true },
       address: { type: String, trim: true },
@@ -83,6 +113,7 @@ const propertySchema = new mongoose.Schema(
     amenities: [{ type: String }],
     nearbyFacilities: [{ type: String }],
     virtualTourUrl: { type: String, trim: true },
+    warehouseDetails: { type: mongoose.Schema.Types.Mixed, default: undefined },
     listingContact: {
       name: { type: String, trim: true },
       phone: { type: String, trim: true },
@@ -113,6 +144,15 @@ const propertySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-propertySchema.index({ "location.city": "text", "location.area": "text", title: "text" });
+propertySchema.index({
+  "location.country": "text",
+  "location.state": "text",
+  "location.district": "text",
+  "location.taluk": "text",
+  "location.village": "text",
+  "location.city": "text",
+  "location.area": "text",
+  title: "text",
+});
 
 module.exports = mongoose.model("Property", propertySchema);

@@ -43,7 +43,7 @@ import useScrollToTop from "../hooks/useScrollToTop";
 import servicesHeroImage from "../assets/house.png";
 import alluringRealityImg from "../assets/alluring reality.jpeg";
 import chatGptBannerImage from "../assets/ChatGPT Image Aug 4, 2026, 10_37_17 AM.png";
-import gyesConstructionLogo from "../assets/Screenshot 2026-08-04 114115.png";
+import gyesLogo from "../assets/gyes property and constrcution logo.jpeg";
 import oneClickLogo from "../assets/one click logo.png";
 import { fetchHomeProperties } from "../services/api/propertyApi";
 import { buildRealEstateAgentSchema, buildWebsiteSchema } from "../utils/seo";
@@ -619,7 +619,7 @@ const HomePage = () => {
                   {openShortcutMenu === group.label && (
                     <motion.div
                       className="absolute left-0 top-full hidden pt-2 sm:block"
-                      style={{ zIndex: 99999, minWidth: "250px" }}
+                      style={{ zIndex: 99999, minWidth: "320px" }}
                       initial={{ opacity: 0, y: -8, scale: 0.98 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -8, scale: 0.98 }}
@@ -628,17 +628,20 @@ const HomePage = () => {
                       onMouseLeave={handleShortcutLeave}
                     >
                       <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-2xl max-h-[60vh] overflow-y-auto">
-                        {group.items.map((item) => (
-                          <Link
-                            key={`${group.label}-${item.label}`}
-                            to={item.to}
-                            className="flex items-center gap-2.5 rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-800 transition duration-150 hover:bg-orange hover:text-white"
-                            onClick={() => setOpenShortcutMenu("")}
-                          >
-                            <span className="h-1.5 w-1.5 rounded-full bg-orange flex-shrink-0" />
-                            <span>{item.label}</span>
-                          </Link>
-                        ))}
+                        {group.items.map((item) => {
+                          const isLongShortcutLabel = item.label.length > 34;
+                          return (
+                            <Link
+                              key={`${group.label}-${item.label}`}
+                              to={item.to}
+                              className="flex min-h-[44px] items-center gap-3 rounded-lg px-4 py-2 text-left text-[15px] font-semibold leading-tight text-slate-800 transition duration-150 hover:bg-orange hover:text-white"
+                              onClick={() => setOpenShortcutMenu("")}
+                            >
+                              <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-orange" />
+                              <span className={`min-w-0 flex-1 ${isLongShortcutLabel ? "whitespace-normal" : "whitespace-nowrap"}`}>{item.label}</span>
+                            </Link>
+                          );
+                        })}
                       </div>
                     </motion.div>
                   )}
@@ -1150,7 +1153,46 @@ const HomePage = () => {
 
         {/* Partner Brand Cards Display */}
         <div className="mx-auto mt-12 grid max-w-[1200px] grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {/* Card 2: OneClick */}
+          {/* Card: Gyes Property & Construction */}
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
+            <a
+              href="https://gyesproperty.com/"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
+            >
+              <img
+                src={gyesLogo}
+                alt="Gyes Property & Construction"
+                className="h-full w-full object-contain"
+                loading="lazy"
+                decoding="async"
+              />
+            </a>
+            <p className="mt-3 text-xs font-bold text-navy">Gyes Property &amp; Construction</p>
+          </div>
+
+          {/* Card: Gyes Traders */}
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
+            <a
+              href="https://www.gyestraders.com/"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
+            >
+              <img
+                src={gyesLogo}
+                alt="Gyes Traders"
+                className="h-full w-full object-contain"
+                loading="lazy"
+                decoding="async"
+              />
+            </a>
+            <p className="mt-3 text-xs font-bold text-navy">Gyes Traders</p>
+            <p className="mt-0.5 text-[11px] text-slate-500">Trading &amp; Supply</p>
+          </div>
+
+          {/* Card: OneClick */}
           <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
             <a
               href="https://oneclick2serve.com/"
@@ -1170,47 +1212,7 @@ const HomePage = () => {
             <p className="mt-0.5 text-[11px] text-slate-500">Office &amp; Home Services</p>
           </div>
 
-          {/* Card 3: Gyes Property & Construction */}
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
-            <a
-              href="https://gyesproperty.com/"
-              target="_blank"
-              rel="noreferrer noopener"
-              className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
-            >
-              <img
-                src={gyesConstructionLogo}
-                alt="Gyes Property & Construction"
-                className="h-full w-full object-contain"
-                loading="lazy"
-                decoding="async"
-              />
-            </a>
-            <p className="mt-3 text-xs font-bold text-navy">Gyes Property</p>
-            <p className="mt-0.5 text-[11px] text-slate-500">&amp; Construction</p>
-          </div>
-
-          {/* Card 4: Gyes Traders */}
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
-            <a
-              href="https://www.gyestraders.com/"
-              target="_blank"
-              rel="noreferrer noopener"
-              className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
-            >
-              <img
-                src={gyesConstructionLogo}
-                alt="Gyes Traders"
-                className="h-full w-full object-contain"
-                loading="lazy"
-                decoding="async"
-              />
-            </a>
-            <p className="mt-3 text-xs font-bold text-navy">Gyes Traders</p>
-            <p className="mt-0.5 text-[11px] text-slate-500">Trading &amp; Supply</p>
-          </div>
-
-          {/* Card 5: Alluring Realty */}
+          {/* Card: Alluring Realty */}
           <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
             <a
               href="https://alluringrealty.com/"

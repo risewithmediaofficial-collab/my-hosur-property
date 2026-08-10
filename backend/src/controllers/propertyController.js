@@ -52,6 +52,7 @@ const propertyValidators = [
   body("price").isNumeric(),
   body("propertyType").isIn(PROPERTY_TYPES),
   body("listingType").optional().isIn(["sale", "rent", "new-project"]),
+  body("measurementType").optional().isIn(["Square Feet", "Cent", "Acre"]),
   body("furnishingStatus").optional().isIn(["Furnished", "Semi-Furnished", "Unfurnished"]),
   body("listingSource").optional().isIn(["owner", "builder", "agent"]),
   body("possessionStatus").optional().isIn(["Ready to Move", "Under Construction"]),
@@ -72,8 +73,16 @@ const propertyValidators = [
     "South East",
   ]),
   body("isSold").optional().isBoolean(),
+  body("location.country").trim().notEmpty(),
+  body("location.state").trim().notEmpty(),
+  body("location.district").trim().notEmpty(),
+  body("location.taluk").trim().notEmpty(),
+  body("location.village").trim().notEmpty(),
   body("location.city").trim().notEmpty(),
   body("location.area").trim().notEmpty(),
+  body("monthlyRent").optional().isNumeric(),
+  body("ratePerUnit").optional().isNumeric(),
+  body("totalAmount").optional().isNumeric(),
 ];
 
 const buildQuery = (q) => {
@@ -119,6 +128,9 @@ const buildQuery = (q) => {
     query.$or = [
       { "location.city": locRegex },
       { "location.area": locRegex },
+      { "location.district": locRegex },
+      { "location.taluk": locRegex },
+      { "location.village": locRegex },
       { "location.address": locRegex },
       { title: locRegex },
       { description: locRegex },
@@ -126,6 +138,11 @@ const buildQuery = (q) => {
   } else {
     if (q.city) query["location.city"] = new RegExp(q.city, "i");
     if (q.area) query["location.area"] = new RegExp(q.area, "i");
+    if (q.district) query["location.district"] = new RegExp(q.district, "i");
+    if (q.taluk) query["location.taluk"] = new RegExp(q.taluk, "i");
+    if (q.village) query["location.village"] = new RegExp(q.village, "i");
+    if (q.state) query["location.state"] = new RegExp(q.state, "i");
+    if (q.country) query["location.country"] = new RegExp(q.country, "i");
   }
 
   if (q.propertyType) {
@@ -330,7 +347,11 @@ const getPropertyById = async (req, res) => {
 
     console.log("Property found:", property._id);
     
-    await Property.findByIdAndUpdate(req.params.id, { $inc: { viewCount: 1 } });
+    const updatedProperty = await Property.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { viewCount: 1 } },
+      { new: true }
+    ).populate("ownerId", "name email phone role");
 
     const similar = await Property.find({
       _id: { $ne: property._id },
@@ -349,7 +370,7 @@ const getPropertyById = async (req, res) => {
       notes: "Balanced locality with schools, transit, and daily services.",
     };
 
-    const responseData = { property, similar, localityInsights, accessRestricted: false };
+    const responseData = { property: updatedProperty || property, similar, localityInsights, accessRestricted: false };
     console.log("Sending response:", responseData);
     return res.json(responseData);
   } catch (error) {

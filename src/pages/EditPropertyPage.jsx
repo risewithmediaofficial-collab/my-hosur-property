@@ -41,6 +41,10 @@ const parseDescription = (fullDescription) => {
       extracted.width = trimmed.replace("Width:", "").trim();
     } else if (trimmed.startsWith("Road Width:")) {
       extracted.roadWidth = trimmed.replace("Road Width:", "").trim();
+    } else if (trimmed.startsWith("Road Type:")) {
+      extracted.roadType = trimmed.replace("Road Type:", "").trim();
+    } else if (trimmed.startsWith("Corners:")) {
+      extracted.corner = trimmed.replace("Corners:", "").trim();
     } else if (trimmed.startsWith("Water Source:")) {
       extracted.waterSource = trimmed.replace("Water Source:", "").trim();
     } else if (trimmed.startsWith("Facilities:")) {
@@ -76,7 +80,6 @@ const EditPropertyPage = () => {
           return;
         }
 
-        const addressParts = (p.location?.address || "").split(",").map(part => part.trim());
         const frontendPropertyType = getFrontendPropertyType(p.propertyType, p.listingType);
         const isRent = frontendPropertyType === "Rent" || frontendPropertyType === "PG";
         const parsedDesc = parseDescription(p.description);
@@ -84,31 +87,40 @@ const EditPropertyPage = () => {
         const initialForm = {
           propertyType: frontendPropertyType || "Apartment",
           title: p.title || "",
-          description: parsedDesc.description || "",
+          description: parsedDesc.description || p.description || "",
           isSold: Boolean(p.isSold || false),
           contactName: p.listingContact?.name || "",
           contactPhone: p.listingContact?.phone || "",
           contactEmail: p.listingContact?.email || "",
-          country: addressParts.length >= 1 ? addressParts[addressParts.length - 1] : "India",
-          state: addressParts.length >= 2 ? addressParts[addressParts.length - 2] : "Tamil Nadu",
-          district: addressParts.length >= 3 ? addressParts[addressParts.length - 3] : "Krishnagiri",
-          taluk: addressParts.length >= 4 ? addressParts[addressParts.length - 4] : "Hosur",
-          village: addressParts.length >= 5 ? addressParts[addressParts.length - 5] : "Bagalur",
-          houseAddress: addressParts.length >= 6 ? addressParts.slice(0, addressParts.length - 5).join(", ") : (p.location?.address || ""),
-          city: p.location?.city || "Hosur",
+          country: p.location?.country || "India",
+          state: p.location?.state || "Tamil Nadu",
+          district: p.location?.district || "Krishnagiri",
+          taluk: p.location?.taluk || "Hosur",
+          village: p.location?.village || "",
+          houseAddress: p.location?.address || "",
+          city: p.location?.city || "",
           area: p.location?.area || "",
           postedBy: p.listingSource || "owner",
           listingType: p.listingType || "sale",
           price: isRent ? "" : String(p.price || ""),
-          monthlyRent: isRent ? String(p.price || "") : "",
-          minPrice: parsedDesc.minPrice || "",
-          maxPrice: parsedDesc.maxPrice || "",
-          landArea: parsedDesc.landArea || "",
-          length: parsedDesc.length || "",
-          width: parsedDesc.width || "",
-          roadWidth: parsedDesc.roadWidth || "",
-          waterSource: parsedDesc.waterSource || "",
-          hntda: parsedDesc.hntda || "No",
+          monthlyRent: isRent ? String(p.monthlyRent || p.price || "") : "",
+          landArea: p.landArea || "",
+          flatArea: p.flatArea || "",
+          length: p.length || "",
+          width: p.width || "",
+          plotType: p.plotType || "",
+          individualPlot: p.individualPlot || "Yes",
+          layoutPlot: p.layoutPlot || "Yes",
+          gatedCommunity: p.amenities?.includes("Gated Community") ? "Yes" : "No",
+          park: p.amenities?.includes("Park") ? "Yes" : "No",
+          cctvCamera: p.amenities?.includes("CCTV Camera") ? "Yes" : "No",
+          security: p.amenities?.includes("Security") ? "Yes" : "No",
+          dtcp: p.amenities?.includes("DTCP") ? "Yes" : "No",
+          hntda: p.amenities?.includes("HNTDA Approved") ? "Yes" : "No",
+          rera: p.verification?.reraId ? "Yes" : "No",
+          panchayatApproval: p.amenities?.includes("Panchayat Approval") ? "Yes" : "No",
+          rocApproval: p.amenities?.includes("ROC Approval") ? "Yes" : "No",
+          reraId: p.verification?.reraId || "",
           bhk: String(p.bhk || ""),
           bathrooms: String(p.bathrooms || "1"),
           furnishingStatus: p.furnishingStatus || "Unfurnished",
@@ -119,15 +131,26 @@ const EditPropertyPage = () => {
           areaUnit: p.areaUnit || "sqft",
           possessionStatus: p.possessionStatus || "Ready to Move",
           facing: p.facing || "",
-          rera: p.verification?.reraId ? "Yes" : "No",
-          reraId: p.verification?.reraId || "",
+          monthlyMaintenance: p.monthlyMaintenance ? String(p.monthlyMaintenance) : "",
+          maintenanceType: p.maintenanceType || "",
+          waterSourceType: p.waterSourceType || "",
+          waterSource: p.waterSource || "",
+          frontage: p.frontage || "",
+          roadWidth: p.roadWidth || parsedDesc.roadWidth || "",
+          roadType: p.roadType || parsedDesc.roadType || "",
+          corner: p.corner || parsedDesc.corner || "",
+          cropSuitable: p.cropSuitable || "",
+          soilType: p.soilType || "Red Soil",
+          farmhouse: p.farmhouseCount ? "Yes" : "No",
+          farmhouseCount: String(p.farmhouseCount || "1"),
+          villaType: p.villaType || "Simplex",
+          sharingType: p.sharingType || "",
+          advance: p.advance || "",
+          measurementType: p.measurementType || (frontendPropertyType === "Agri Land" || frontendPropertyType === "Farmland" ? "Cent" : "Square Feet"),
+          ratePerUnit: p.ratePerUnit ? String(p.ratePerUnit) : "",
+          totalAmount: p.totalAmount ? String(p.totalAmount) : "",
+          warehouseDetails: p.warehouseDetails || {},
           // Yes/No fields for features/amenities
-          individualPlot: p.amenities?.includes("Individual Plot") ? "Yes" : "No",
-          gatedCommunity: p.amenities?.includes("Gated Community") ? "Yes" : "No",
-          cctvCamera: p.amenities?.includes("CCTV Camera") ? "Yes" : "No",
-          security: p.amenities?.includes("Security") ? "Yes" : "No",
-          dtcp: p.amenities?.includes("DTCP") ? "Yes" : "No",
-          hntdaApproved: p.amenities?.includes("HNTDA Approved") ? "Yes" : "No",
           parking: p.amenities?.includes("Parking") ? "Yes" : "No",
           balcony: p.amenities?.includes("Balcony") ? "Yes" : "No",
           lift: p.amenities?.includes("Lift") ? "Yes" : "No",
@@ -137,6 +160,13 @@ const EditPropertyPage = () => {
           boundaryWall: p.amenities?.includes("Boundary Wall") ? "Yes" : "No",
           electricity: p.amenities?.includes("Electricity") ? "Yes" : "No",
           foodIncluded: p.amenities?.includes("Food Included") ? "Yes" : "No",
+          tv: p.amenities?.includes("TV") ? "Yes" : "No",
+          wifi: p.amenities?.includes("WiFi") ? "Yes" : "No",
+          gym: p.amenities?.includes("Gym") ? "Yes" : "No",
+          washingMachine: p.amenities?.includes("Washing Machine") ? "Yes" : "No",
+          hotWater: p.amenities?.includes("Hot Water") ? "Yes" : "No",
+          borewell: p.borewell || "No",
+          well: p.well || "No",
         };
 
         setProperty({

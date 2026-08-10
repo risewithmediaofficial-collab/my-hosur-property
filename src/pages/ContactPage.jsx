@@ -9,6 +9,7 @@ import {
   ThreadsIcon,
   WhatsAppIcon,
   XIcon,
+  YouTubeIcon,
 } from "../components/AppIcons";
 import PageHero from "../components/PageHero";
 import SeoHead from "../components/SeoHead";
@@ -20,15 +21,6 @@ import {
 } from "../constants/contactInfo";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
 import useScrollAnimation from "../hooks/useScrollAnimation";
-
-/* Department / enquiry type rows matching reference table style */
-const enquiryRows = [
-  { label: "Managing Director (MD)", phone: "+91 91501 00499" },
-  { label: "Director", phone: "+91 99940 05086" },
-  { label: "Admin 1", phone: "+91 82489 18906" },
-  { label: "Admin 2", phone: "+91 91501 00477" },
-  { label: "Email", phone: "myhosurproperty.mhp@gmail.com" },
-];
 
 const ContactPage = () => {
   useScrollAnimation();
@@ -174,6 +166,7 @@ const ContactPage = () => {
             <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-8 shadow-card flex flex-col gap-5 lg:max-h-[640px] lg:overflow-y-auto custom-scrollbar">
               {/* Header */}
               <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange">For enquiries</p>
                 <h2 className="text-3xl font-bold text-navy leading-tight">
                   Get In Touch<br />With Us
                 </h2>
@@ -182,24 +175,35 @@ const ContactPage = () => {
                 </p>
               </div>
 
-              {/* Phone + Email quick links */}
-              <div className="flex flex-wrap gap-3">
-                {CONTACT_PHONE_NUMBERS.map((phone) => (
-                  <a
-                    key={phone.tel}
-                    href={`tel:${phone.tel}`}
-                    className="inline-flex items-center gap-2 rounded-lg bg-navy/5 px-4 py-2.5 text-sm font-semibold text-navy transition hover:bg-navy hover:text-white"
-                  >
-                    <PhoneIcon className="h-4 w-4 text-orange flex-shrink-0" />
-                    {phone.display}
-                  </a>
-                ))}
+              {/* Enquiry contacts */}
+              <div className="space-y-3">
+                <p className="text-sm font-semibold text-navy">Enquiry Contacts</p>
+                <div className="grid gap-3">
+                  {CONTACT_PHONE_NUMBERS.map((phone) => (
+                    <a
+                      key={`${phone.role}-${phone.tel}`}
+                      href={`tel:${phone.tel}`}
+                      className="group block rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-orange hover:bg-white"
+                    >
+                      <span className="block text-xs uppercase tracking-[0.24em] text-slate-500 mb-2">
+                        {phone.role}
+                      </span>
+                      <span className="inline-flex items-center gap-2 text-sm font-semibold text-navy">
+                        <PhoneIcon className="h-4 w-4 text-orange flex-shrink-0" />
+                        {phone.display}
+                      </span>
+                    </a>
+                  ))}
+                </div>
                 <a
                   href={`mailto:${CONTACT_EMAIL}`}
-                  className="inline-flex items-center gap-2 rounded-lg bg-navy/5 px-4 py-2.5 text-sm font-semibold text-navy transition hover:bg-navy hover:text-white"
+                  className="group block rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-orange hover:bg-white"
                 >
-                  <EnvelopeIcon className="h-4 w-4 text-orange flex-shrink-0" />
-                  {CONTACT_EMAIL}
+                  <span className="block text-xs uppercase tracking-[0.24em] text-slate-500 mb-2">Email</span>
+                  <span className="inline-flex items-center gap-2 text-sm font-semibold text-navy">
+                    <EnvelopeIcon className="h-4 w-4 text-orange flex-shrink-0" />
+                    {CONTACT_EMAIL}
+                  </span>
                 </a>
               </div>
 
@@ -224,6 +228,15 @@ const ContactPage = () => {
                   >
                     <FacebookIcon className="h-4 w-4" />
                     Facebook
+                  </a>
+                  <a
+                    href={SOCIAL_LINKS.youtube}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-red-700"
+                  >
+                    <YouTubeIcon className="h-4 w-4" />
+                    YouTube
                   </a>
                   <a
                     href={SOCIAL_LINKS.threads}
@@ -266,19 +279,6 @@ const ContactPage = () => {
                     Send WhatsApp Message
                   </a>
                 </div>
-              </div>
-
-              {/* Enquiry table */}
-              <div className="overflow-hidden rounded-xl border border-slate-200">
-                {enquiryRows.map((row, idx) => (
-                  <div
-                    key={row.label}
-                    className={`flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between px-4 py-3 text-sm ${idx % 2 === 0 ? "bg-white" : "bg-slate-50"}`}
-                  >
-                    <span className="text-slate-500 font-medium text-xs uppercase tracking-wide">{row.label}</span>
-                    <span className="font-semibold text-navy break-all">{row.phone}</span>
-                  </div>
-                ))}
               </div>
 
               {/* Address */}
