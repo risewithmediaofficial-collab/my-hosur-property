@@ -25,10 +25,10 @@ import {
 } from "../utils/propertyFilters";
 import { buildCanonicalListingQuery } from "../utils/seo";
 
-const ListingSkeleton = () => (
-  <div className="grid gap-6 sm:grid-cols-2 2xl:grid-cols-3">
-    {Array.from({ length: 6 }).map((_, index) => (
-      <div key={index} className="overflow-hidden rounded-xl border border-slate-200 bg-white p-4">
+const ListingSkeleton = ({ isSidebarOpen }) => (
+  <div className={`grid gap-6 ${isSidebarOpen ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"}`}>
+    {Array.from({ length: 8 }).map((_, index) => (
+      <div key={index} className="overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="h-52 animate-pulse rounded-lg bg-slate-100" />
         <div className="mt-4 h-5 w-3/4 animate-pulse rounded bg-slate-100" />
         <div className="mt-3 h-4 w-1/2 animate-pulse rounded bg-slate-100" />
@@ -42,6 +42,7 @@ const ListingPage = () => {
   const [params, setParams] = useSearchParams();
   const { token, isAuthenticated } = useAuth();
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [desktopFilterOpen, setDesktopFilterOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState(() => parseFiltersFromSearchParams(params));
   const [applied, setApplied] = useState(() => parseFiltersFromSearchParams(params));
@@ -192,6 +193,11 @@ const ListingPage = () => {
     setMobileFilterOpen(true);
   };
 
+  const openDesktopFilters = () => {
+    setDraft({ ...applied });
+    setDesktopFilterOpen((prev) => !prev);
+  };
+
   const filterActions = (
     <>
       <button type="button" onClick={applyFilters} className="property-filter-btn-primary w-full">
@@ -217,9 +223,9 @@ const ListingPage = () => {
         canonicalPath={buildCanonicalListingQuery(applied)}
       />
 
-      <div className="listing-page-layout mx-auto flex min-h-0 w-full max-w-[1440px] flex-1 flex-col">
+      <div className={`listing-page-layout mx-auto flex min-h-0 w-full max-w-[1440px] flex-1 flex-col ${desktopFilterOpen ? "is-sidebar-open" : ""}`}>
         {/* Left: filters — own scrollbar, never tied to properties */}
-        <aside className="listing-filter-aside" aria-label="Property filters">
+        <aside className={desktopFilterOpen ? "listing-filter-aside hidden md:flex" : "hidden"} aria-label="Property filters">
           <div className="listing-filter-shell">
             <div className="listing-filter-scroll" data-scroll-panel="filters">
               <PropertySearchFilterPanel
@@ -237,28 +243,45 @@ const ListingPage = () => {
         {/* Right: properties — own scrollbar, independent from filters */}
         <section className="listing-results flex min-h-0 flex-1 flex-col gsap-section" aria-label="Property results">
           <div className="listing-results-header">
-            <div className="listing-results-intro gsap-hero-item">
-              <p className="section-tag">Property listings</p>
-              <h1 className="mt-2 text-2xl font-bold text-navy sm:text-3xl">Search your property in Hosur</h1>
-              <p className="mt-2 text-sm text-slate-600">
-                {loading ? "Searching properties..." : `${data.total || data.items.length} properties found`}
-                {applied.category ? ` · ${getCategoryLabel(applied.category)}` : ""}
-              </p>
+            <div className="flex items-start justify-between gap-4">
+              <div className="listing-results-intro gsap-hero-item">
+                <p className="section-tag">Property listings</p>
+                <h1 className="mt-1.5 text-2xl font-bold text-navy sm:text-3xl">Search your property in Hosur</h1>
+                <p className="mt-1 text-sm text-slate-600">
+                  {loading ? "Searching properties..." : `${data.total || data.items.length} properties found`}
+                  {applied.category ? ` · ${getCategoryLabel(applied.category)}` : ""}
+                </p>
+              </div>
+
+              {/* Filter Icon Button (No text, professional icon toggle) */}
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={openDesktopFilters}
+                  className={`property-filter-toggle-icon-btn hidden md:inline-flex ${desktopFilterOpen ? "is-active" : ""}`}
+                  aria-label={desktopFilterOpen ? "Close filters sidebar" : "Open filters sidebar"}
+                  title={desktopFilterOpen ? "Close filters" : "Filter properties"}
+                  aria-expanded={desktopFilterOpen}
+                >
+                  <AdjustmentsHorizontalIcon className="h-5 w-5" />
+                  {filterChips.length ? <span className="property-filter-badge-dot">{filterChips.length}</span> : null}
+                </button>
+                <button
+                  type="button"
+                  onClick={openMobileFilters}
+                  className="property-filter-toggle-icon-btn inline-flex md:hidden"
+                  aria-label="Open filters"
+                  title="Filter properties"
+                  aria-expanded={mobileFilterOpen}
+                >
+                  <AdjustmentsHorizontalIcon className="h-5 w-5" />
+                  {filterChips.length ? <span className="property-filter-badge-dot">{filterChips.length}</span> : null}
+                </button>
+              </div>
             </div>
 
-            <button
-              type="button"
-              onClick={openMobileFilters}
-              className="property-filter-mobile-btn md:hidden"
-              aria-expanded={mobileFilterOpen}
-            >
-              <AdjustmentsHorizontalIcon className="h-5 w-5" />
-              Filters
-              {filterChips.length ? <span className="property-filter-badge">{filterChips.length}</span> : null}
-            </button>
-
             {filterChips.length ? (
-              <div className="listing-results-chips">
+              <div className="listing-results-chips mt-3">
                 {filterChips.map((chip) => (
                   <button
                     key={chip.key}
@@ -282,9 +305,9 @@ const ListingPage = () => {
             <div className="listing-results-scroll-inner">
             <div className="mt-4 md:mt-6">
               {loading && !data.items.length ? (
-                <ListingSkeleton />
+                <ListingSkeleton isSidebarOpen={desktopFilterOpen} />
               ) : data.items.length ? (
-                <div className="grid gap-6 sm:grid-cols-2 2xl:grid-cols-3">
+                <div className={`grid gap-6 ${desktopFilterOpen ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"}`}>
                   {data.items.map((item) => (
                     <PropertyCard key={item._id} item={item} onSave={onSave} isSaved={savedIds.includes(item._id)} />
                   ))}

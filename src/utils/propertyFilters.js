@@ -5,7 +5,7 @@ import {
   propertyFilterConfig,
 } from "../constants/propertyFilterConfig";
 
-export const DEFAULT_CATEGORY = "plot";
+export const DEFAULT_CATEGORY = "";
 export const DEFAULT_SORT = "latest";
 
 export const createDefaultFilterState = (overrides = {}) => ({
@@ -13,7 +13,7 @@ export const createDefaultFilterState = (overrides = {}) => ({
   sort: DEFAULT_SORT,
   page: 1,
   limit: 12,
-  country: "India",
+  country: "",
   state: "",
   district: "",
   taluk: "",
@@ -135,6 +135,20 @@ export const parseFiltersFromSearchParams = (params) => {
     if (val != null && val !== "") state[key] = val;
   });
 
+  // Ignore a default India country filter when no other location criteria are applied,
+  // so /listings shows all properties unless the user actually selects a specific location.
+  if (
+    state.country === "India" &&
+    !state.state &&
+    !state.district &&
+    !state.taluk &&
+    !state.village &&
+    !state.locality &&
+    !state.location
+  ) {
+    state.country = "";
+  }
+
   return state;
 };
 
@@ -177,11 +191,11 @@ export const serializeFiltersToSearchParams = (state) => {
 export const filtersToApiParams = (state) => {
   const sortOption = SORT_OPTIONS.find((s) => s.id === state.sort) || SORT_OPTIONS[0];
   const params = {
-    category: state.category,
     sort: sortOption.apiSort,
     page: state.page || 1,
     limit: state.limit || 12,
   };
+  if (state.category) params.category = state.category;
 
   const loc = state.locality || state.village || state.taluk || state.district || state.location || "";
   if (loc) {
@@ -485,4 +499,7 @@ export const clientRefineProperties = (items, state) => {
   return result;
 };
 
-export const getCategoryLabel = (id) => PROPERTY_FILTER_CATEGORIES.find((c) => c.id === id)?.label || id;
+export const getCategoryLabel = (id) => {
+  if (!id) return "All";
+  return PROPERTY_FILTER_CATEGORIES.find((c) => c.id === id)?.label || id;
+};

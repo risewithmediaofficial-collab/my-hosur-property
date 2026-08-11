@@ -478,7 +478,7 @@ const HomePage = () => {
 
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
-    if (search.intent) params.set("intent", search.intent);
+    if (search.intent && search.intent !== "buy") params.set("intent", search.intent);
     if (debouncedSearch) params.set("search", debouncedSearch);
     if (search.city) params.set("city", search.city);
     if (search.propertyType) params.set("propertyType", search.propertyType);
@@ -749,7 +749,7 @@ const HomePage = () => {
                   type="button"
                   onClick={() => {
                     scrollToTop();
-                    navigate(`/listings?${queryString || "intent=buy"}`);
+                    navigate(`/listings${queryString ? `?${queryString}` : ""}`);
                   }}
                   className="site-button-primary min-h-[52px] w-full rounded-xl px-8 text-sm font-bold shadow-md hover:shadow-lg transition lg:w-auto"
                 >
@@ -790,7 +790,7 @@ const HomePage = () => {
               type="button"
               onClick={() => {
                 scrollToTop();
-                navigate(`/listings?${queryString || "intent=buy"}`);
+                navigate(`/listings${queryString ? `?${queryString}` : ""}`);
               }}
               className="inline-flex items-center justify-center rounded-xl border-2 border-navy px-8 py-3 text-sm font-bold text-navy transition hover:bg-navy hover:text-white w-full sm:w-auto shadow-sm"
             >

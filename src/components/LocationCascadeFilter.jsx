@@ -9,7 +9,7 @@ import {
 } from "../constants/locationData";
 
 const LocationCascadeFilter = ({ values, update }) => {
-  const country = values.country || "India";
+  const country = values.country || "";
   const state = values.state || "";
   const district = values.district || "";
   const taluk = values.taluk || "";
@@ -40,13 +40,6 @@ const LocationCascadeFilter = ({ values, update }) => {
       ? getAreasByVillage(country, state, district, taluk, village)
       : [];
   }, [country, state, district, taluk, village]);
-
-  // Set default country on load if not set
-  useEffect(() => {
-    if (!values.country) {
-      update("country", "India");
-    }
-  }, [values.country, update]);
 
   const handleCountryChange = (e) => {
     const val = e.target.value;
