@@ -26,6 +26,8 @@ const PROPERTY_TYPES = [
   "Office",
   "Apartment",
   "Warehouse",
+  "Warehouse / Industry",
+  "Industry",
   "Commercial Land & Building",
   "Commercial Land / Building",
   "Empty Land",

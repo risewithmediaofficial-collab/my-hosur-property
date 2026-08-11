@@ -24,7 +24,7 @@ const propertyTypes = [
   "Independent House",
   "Rent",
   "Apartment",
-  "Warehouse",
+  "Warehouse / Industry",
   "PG",
   "Commercial Land / Building",
   "Farmland",
@@ -290,7 +290,7 @@ const priceOptions = ["7.00 L", "10.00 L", "12.00 L", "15.00 L", "25.00 L", "50.
 const facingOptions = ["East", "West", "North", "South", "North East", "North West", "South East", "South West"];
 const yesNoOptions = ["Yes", "No"];
 const propertyClassOptions = ["General", "AD Condition"];
-const hidePropertyClassTypes = ["Rent", "PG", "Commercial Land / Building", "Warehouse"];
+const hidePropertyClassTypes = ["Rent", "PG", "Commercial Land / Building", "Warehouse", "Warehouse / Industry"];
 const soilTypeOptions = ["Red Soil", "Black Soil", "Clay Soil", "Alluvial Soil", "Sandy Soil", "Loam Soil"];
 
 const defaultWarehouseDetails = {
@@ -491,21 +491,21 @@ const typeFieldConfig = {
     description: "Independent villa details with rooms, land/build-up area, car parking, water source, and facilities.",
     detailTitle: "Villa Details",
     priceLabel: "Expected Sale Price",
-    detailFields: ["propertyClass", "villaType", "bhk", "bathrooms", "builtupArea", "furnishingStatus", "facing", "carParking", "waterSourceType", "roadWidth", "roadType"],
+    detailFields: ["price", "propertyClass", "villaType", "bhk", "bathrooms", "builtupArea", "furnishingStatus", "facing", "carParking", "waterSourceType", "roadWidth", "roadType"],
     featureFields: ["gatedCommunity", "park", "cctvCamera", "security", "balcony", "powerBackup", "hntda", "rera"],
   },
   Flat: {
     description: "Flat details with flat area, length, width, facing, and plot type.",
     detailTitle: "Flat Details",
     priceLabel: "Expected Sale Price",
-    detailFields: ["propertyClass", "flatArea", "length", "width", "plotType", "facing"],
+    detailFields: ["price", "propertyClass", "flatArea", "length", "width", "plotType", "facing"],
     featureFields: ["park", "lift", "security", "parking", "balcony", "powerBackup", "hntda", "rera", "panchayatApproval", "rocApproval"],
   },
   "Independent House": {
     description: "House details with rooms, land/building area, car parking, water source, and utilities.",
     detailTitle: "Individual House Details",
     priceLabel: "Expected Sale Price",
-    detailFields: ["propertyClass", "bhk", "bathrooms", "builtupArea", "furnishingStatus", "facing", "carParking", "waterSourceType"],
+    detailFields: ["price", "propertyClass", "bhk", "bathrooms", "builtupArea", "furnishingStatus", "facing", "carParking", "waterSourceType"],
     featureFields: ["security", "cctvCamera", "dtcp", "hntda", "rera"],
   },
   Rent: {
@@ -519,7 +519,7 @@ const typeFieldConfig = {
     description: "Apartment details with floor, rooms, land area, and common facilities.",
     detailTitle: "Apartment Details",
     priceLabel: "Expected Sale Price",
-    detailFields: ["propertyClass", "bhk", "bathrooms", "builtupArea", "floorNumber", "totalFloors", "furnishingStatus", "facing"],
+    detailFields: ["price", "propertyClass", "bhk", "bathrooms", "builtupArea", "floorNumber", "totalFloors", "furnishingStatus", "facing"],
     featureFields: ["park", "lift", "security", "parking", "balcony", "powerBackup", "hntda", "rera"],
   },
   PG: {
@@ -536,10 +536,17 @@ const typeFieldConfig = {
     detailFields: ["builtupArea", "length", "width", "frontage", "roadWidth", "roadType", "corner"],
     featureFields: ["dtcp", "hntda", "rera", "roadAccess", "parking", "security", "cctvCamera"],
   },
+  "Warehouse / Industry": {
+    description: "Warehouse & Industry details with land/build-up area, access, parking, and logistics-ready facilities.",
+    detailTitle: "Warehouse / Industry Details",
+    priceLabel: "Expected Warehouse / Industry Price",
+    detailFields: ["facing", "roadWidth", "roadType", "frontage", "totalFloors"],
+    featureFields: ["parking", "security", "powerBackup", "roadAccess", "electricity"],
+  },
   Warehouse: {
-    description: "Warehouse details with land/build-up area, access, parking, and logistics-ready facilities.",
-    detailTitle: "Warehouse Details",
-    priceLabel: "Expected Warehouse Price",
+    description: "Warehouse & Industry details with land/build-up area, access, parking, and logistics-ready facilities.",
+    detailTitle: "Warehouse / Industry Details",
+    priceLabel: "Expected Warehouse / Industry Price",
     detailFields: ["facing", "roadWidth", "roadType", "frontage", "totalFloors"],
     featureFields: ["parking", "security", "powerBackup", "roadAccess", "electricity"],
   },
@@ -560,6 +567,7 @@ const typeFieldConfig = {
 };
 
 const fieldLabels = {
+  price: "Expected Sale Price",
   propertyClass: "Property Category",
   landArea: "Land Area",
   flatArea: "Flat Area",
@@ -923,12 +931,15 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
       return "Please select the commercial building corners.";
     }
 
-    if (form.propertyType === "Rent" || form.propertyType === "PG") {
-      if (!toNumber(form.monthlyRent)) return "Please enter the rent price.";
+    const isWarehouse = form.propertyType === "Warehouse" || form.propertyType === "Warehouse / Industry";
+    const isExpectedPriceOnly = ["Villa", "Independent House", "Flat", "Apartment"].includes(form.propertyType);
+
+    if (isExpectedPriceOnly) {
+      if (!toNumber(form.price)) return "Please enter the expected sale price.";
       return "";
     }
 
-    if (form.propertyType === "Warehouse") {
+    if (isWarehouse) {
       const warehouse = { ...defaultWarehouseDetails, ...(form.warehouseDetails || {}) };
       if (!toNumber(warehouse.sellingPrice || form.price)) return "Please enter the warehouse selling price.";
       if (!toNumber(warehouse.totalLandArea || form.landArea) && !toNumber(warehouse.builtupWarehouseArea || form.builtupArea)) {
@@ -1086,10 +1097,15 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
       const warehousePricePerSqft = warehouseDetails.pricePerSqft || (
         warehouseSellingPrice > 0 && warehouseBuiltupArea > 0 ? Math.round(warehouseSellingPrice / warehouseBuiltupArea) : ""
       );
+      const isWarehouse = form.propertyType === "Warehouse" || form.propertyType === "Warehouse / Industry";
+      const isExpectedPriceOnly = ["Villa", "Independent House", "Flat", "Apartment"].includes(form.propertyType);
       const isRentListing = getListingType(form.propertyType) === "rent";
-      const amount = form.propertyType === "Warehouse"
+
+      const amount = isWarehouse
         ? (warehouseSellingPrice || priceFieldValue || totalAmount)
-        : isRentListing ? (monthlyRent || priceFieldValue) : (totalAmount || priceFieldValue);
+        : isRentListing ? (monthlyRent || priceFieldValue)
+        : isExpectedPriceOnly ? (priceFieldValue || totalAmount)
+        : (totalAmount || priceFieldValue);
       const title = form.title.trim() || `${form.propertyType} in ${form.area || form.village || form.city}, ${form.city || "Hosur"}`;
       const activeConfig = typeFieldConfig[form.propertyType] || { detailFields: [], featureFields: [] };
       const showPropertyClass = !hidePropertyClassTypes.includes(form.propertyType);
@@ -1097,7 +1113,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
       const baseAmenities = activeConfig.featureFields
         .filter((field) => form[field] === "Yes")
         .map((field) => fieldLabels[field]);
-      const warehouseAmenities = form.propertyType === "Warehouse"
+      const warehouseAmenities = isWarehouse
         ? warehouseAmenityFields
             .filter((field) => warehouseDetails[field] === "Yes" || form[field] === "Yes")
             .map((field) => fieldLabels[field] || field)
@@ -1128,11 +1144,11 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         form.monthlyMaintenance ? `Maintenance: ${form.monthlyMaintenance} ${form.maintenanceType || ""}` : "",
         form.rera ? `RERA Approved: ${form.rera}` : "",
         form.hntda ? `HNTDA Approved: ${form.hntda}` : "",
-        form.propertyType === "Warehouse" && warehouseDetails.warehouseType ? `Warehouse Type: ${warehouseDetails.warehouseType}` : "",
-        form.propertyType === "Warehouse" && warehouseDetails.builtupWarehouseArea ? `Built-up Warehouse Area: ${warehouseDetails.builtupWarehouseArea} sq.ft` : "",
-        form.propertyType === "Warehouse" && warehouseDetails.openYardArea ? `Open Yard: ${warehouseDetails.openYardArea} sq.ft` : "",
-        form.propertyType === "Warehouse" && warehouseDetails.vehicleAccess?.length ? `Vehicle Access: ${warehouseDetails.vehicleAccess.join(", ")}` : "",
-        form.propertyType === "Warehouse" && warehousePricePerSqft ? `Price per Sq.Ft: ${warehousePricePerSqft}` : "",
+        isWarehouse && warehouseDetails.warehouseType ? `Warehouse Type: ${warehouseDetails.warehouseType}` : "",
+        isWarehouse && warehouseDetails.builtupWarehouseArea ? `Built-up Warehouse Area: ${warehouseDetails.builtupWarehouseArea} sq.ft` : "",
+        isWarehouse && warehouseDetails.openYardArea ? `Open Yard: ${warehouseDetails.openYardArea} sq.ft` : "",
+        isWarehouse && warehouseDetails.vehicleAccess?.length ? `Vehicle Access: ${warehouseDetails.vehicleAccess.join(", ")}` : "",
+        isWarehouse && warehousePricePerSqft ? `Price per Sq.Ft: ${warehousePricePerSqft}` : "",
         amenities.length ? `Facilities: ${amenities.join(", ")}` : "",
         form.description,
       ].filter(Boolean);
@@ -1143,12 +1159,12 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         price: amount,
         monthlyRent: monthlyRent || (isRentListing ? amount : undefined),
         advance: form.advance || "",
-        totalAmount: form.propertyType === "Warehouse" ? (warehouseSellingPrice || totalAmount || undefined) : (totalAmount || undefined),
+        totalAmount: (isWarehouse || isExpectedPriceOnly) ? (warehouseSellingPrice || priceFieldValue || totalAmount || undefined) : (totalAmount || undefined),
         propertyType: apiPropertyType,
         propertyClass: showPropertyClass ? (form.propertyClass || "General") : undefined,
         measurementType: form.measurementType || (form.propertyType === "Agri Land" || form.propertyType === "Farmland" ? "Cent" : "Square Feet"),
         ratePerUnit: form.ratePerUnit ? toNumber(form.ratePerUnit) : undefined,
-        landArea: form.propertyType === "Warehouse" ? (warehouseDetails.totalLandArea || form.landArea || "") : (form.landArea || ""),
+        landArea: isWarehouse ? (warehouseDetails.totalLandArea || form.landArea || "") : (form.landArea || ""),
         flatArea: form.flatArea || "",
         plotType: form.plotType || "",
         villaType: form.villaType || "",
@@ -1176,10 +1192,10 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         listingType: getListingType(form.propertyType),
         furnishingStatus: form.furnishingStatus,
         listingSource: form.postedBy,
-        builtupArea: form.propertyType === "Warehouse"
+        builtupArea: isWarehouse
           ? toNumber(warehouseDetails.builtupWarehouseArea || form.builtupArea || warehouseDetails.totalLandArea)
           : toNumber(form.builtupArea || form.landArea || form.flatArea),
-        carpetArea: form.propertyType === "Warehouse" ? toNumber(warehouseDetails.carpetArea) : undefined,
+        carpetArea: isWarehouse ? toNumber(warehouseDetails.carpetArea) : undefined,
         areaUnit: form.areaUnit,
         possessionStatus: form.possessionStatus,
         facing: form.facing || undefined,
@@ -1188,8 +1204,8 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         isSold: form.isSold === true || form.isSold === "true",
         amenities,
         nearbyFacilities: [],
-        virtualTourUrl: form.propertyType === "Warehouse" ? warehouseDetails.virtual360View : "",
-        warehouseDetails: form.propertyType === "Warehouse"
+        virtualTourUrl: isWarehouse ? warehouseDetails.virtual360View : "",
+        warehouseDetails: isWarehouse
           ? {
               ...warehouseDetails,
               pricePerSqft: warehousePricePerSqft ? String(warehousePricePerSqft) : "",
@@ -1490,7 +1506,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   };
 
   const renderWarehouseSections = () => {
-    if (form.propertyType !== "Warehouse") return null;
+    if (form.propertyType !== "Warehouse" && form.propertyType !== "Warehouse / Industry") return null;
 
     return (
       <>
@@ -1788,7 +1804,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
           </div>
         </FormSection>
 
-        {!["Warehouse", "Rent", "PG"].includes(form.propertyType) ? (
+        {!["Warehouse", "Warehouse / Industry", "Rent", "PG", "Villa", "Independent House", "Flat", "Apartment"].includes(form.propertyType) ? (
           <FormSection title="Price Details">
             <div className="grid gap-x-5 gap-y-5 md:grid-cols-2">
               <Field label="Measurement" required>
@@ -1819,7 +1835,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
         {renderWarehouseSections()}
 
-        {form.propertyType !== "Warehouse" ? (
+        {(form.propertyType !== "Warehouse" && form.propertyType !== "Warehouse / Industry") ? (
           <FormSection title="Facilities / Features">
             <div className="rounded-2xl border border-slate-200/80 bg-slate-50/60 p-5 grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
               {config.featureFields.map((field) => (

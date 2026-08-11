@@ -26,6 +26,8 @@ const propertySchema = new mongoose.Schema(
         "House",
         "Office",
         "Warehouse",
+        "Warehouse / Industry",
+        "Industry",
         "Empty Land",
         "Land",
         "Industrial Shed",

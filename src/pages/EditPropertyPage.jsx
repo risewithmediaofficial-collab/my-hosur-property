@@ -9,6 +9,7 @@ import PageSection from "../components/PageSection";
 
 const getFrontendPropertyType = (apiType, listingType) => {
   if (apiType === "House" && listingType === "rent") return "Rent";
+  if (apiType === "Warehouse" || apiType === "Industrial Shed" || apiType === "Industry") return "Warehouse / Industry";
   return apiType;
 };
 

@@ -1073,6 +1073,7 @@ const AdminDashboardPage = () => {
                   <option value="commercial land / building">Commercial</option>
                   <option value="farmland">Farmland</option>
                   <option value="agri land">Agri Land</option>
+                  <option value="warehouse / industry">Warehouse / Industry</option>
                 </select>
 
                 <select
