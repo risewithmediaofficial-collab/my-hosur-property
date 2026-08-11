@@ -239,6 +239,7 @@ const PropertyDetailPage = () => {
   const isPending = myLead?.status === "pending";
   const isRejected = myLead?.status === "rejected";
   const isSaved = p?._id ? savedIds.includes(p._id) : false;
+  const canEdit = Boolean(p && (user?.role === "admin" || String(p?.ownerId?._id || p?.ownerId) === String(user?._id)));
 
   const nearbyPlaces = useMemo(() => {
     if (!p) return [];
@@ -389,6 +390,16 @@ const PropertyDetailPage = () => {
 
             {/* Action buttons */}
             <div className="flex flex-wrap items-center gap-3 shrink-0">
+              {canEdit && (
+                <button
+                  type="button"
+                  onClick={() => navigate(`/edit-property/${p._id}`)}
+                  className="inline-flex items-center gap-2 rounded-xl bg-orange-600 border border-orange-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-orange-700 transition shadow-sm"
+                >
+                  Edit Property
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={() => handleToggleSaved(p._id)}

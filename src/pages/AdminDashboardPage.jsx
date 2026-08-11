@@ -1210,6 +1210,12 @@ const AdminDashboardPage = () => {
                             View
                           </button>
                           <button
+                            onClick={() => navigate(`/edit-property/${p._id}`)}
+                            className="rounded-lg border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-bold text-orange-700 hover:bg-orange-100 shadow-sm"
+                          >
+                            Edit
+                          </button>
+                          <button
                             onClick={() => onDeleteProperty(p._id, p.title)}
                             className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-700 shadow-sm"
                           >
@@ -1573,6 +1579,9 @@ const AdminDashboardPage = () => {
                         <div className="flex gap-2">
                           <button onClick={() => { setSelectedUser(null); openProperty(p); }} className="dashboard-secondary px-2 py-1 text-[10px]">
                             View Property
+                          </button>
+                          <button onClick={() => { setSelectedUser(null); navigate(`/edit-property/${p._id}`); }} className="rounded-md border border-orange-200 bg-orange-50 px-2 py-1 text-[10px] font-bold text-orange-700 hover:bg-orange-100">
+                            Edit
                           </button>
                           <button onClick={() => onDeleteProperty(p._id, p.title)} className="rounded-md bg-red-600 px-2 py-1 text-[10px] font-bold text-white hover:bg-red-700">
                             Delete
