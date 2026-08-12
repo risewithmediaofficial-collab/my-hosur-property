@@ -392,10 +392,10 @@ const createProperty = async (req, res) => {
   const bypassPlanCheck = user.role === "admin";
   if (!bypassPlanCheck) {
     if (!plan || !plan.expiresAt || new Date(plan.expiresAt) < new Date()) {
-      return res.status(402).json({ message: "Active listing plan required before posting" });
+      return res.status(402).json({ message: "Your 6-month free posting period has ended. Please purchase a plan to post additional properties." });
     }
     if ((plan.listingsUsed || 0) >= (plan.listingLimit || 0)) {
-      return res.status(402).json({ message: "Listing limit reached. Upgrade your plan." });
+      return res.status(402).json({ message: "You have reached your 6 free listings limit. Please purchase a plan to post additional properties." });
     }
   }
 

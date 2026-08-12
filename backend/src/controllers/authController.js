@@ -9,7 +9,7 @@ const { sendWelcomeTemplateEmail } = require("../utils/sendEmailJs");
 const { sendEmailOtp, hasMsg91EmailConfig } = require("../utils/sendEmailOtp");
 const { sendWhatsAppOtp } = require("../utils/sendWhatsAppOtp");
 
-const FREE_POST_VALIDITY_DAYS = 90;
+const FREE_POST_VALIDITY_DAYS = 180;
 const OTP_EXPIRY_MINUTES = Math.max(Number(process.env.OTP_EXPIRY_MINUTES) || 5, 1);
 const OTP_RESEND_COOLDOWN_SECONDS = Math.max(Number(process.env.OTP_RESEND_COOLDOWN_SECONDS) || 45, 15);
 const OTP_MAX_ATTEMPTS = Math.max(Number(process.env.OTP_MAX_ATTEMPTS) || 5, 3);
@@ -61,7 +61,7 @@ const buildFreeOnboardingPack = () => {
     activePlan: {
       planId: null,
       expiresAt: freePostExpiry,
-      listingLimit: 3,
+      listingLimit: 6,
       listingsUsed: 0,
       isBoosted: false,
       contactUnlocks: 30,
@@ -74,7 +74,7 @@ const buildFreeOnboardingPack = () => {
 const ensureFreeOnboardingValidity = async (user) => {
   if (!user || user.activePlan?.planId) return user;
 
-  const isFreeListingPlan = (user.activePlan?.listingLimit || 0) <= 3 && (user.activePlan?.listingLimit || 0) > 0;
+  const isFreeListingPlan = (user.activePlan?.listingLimit || 0) <= 6 && (user.activePlan?.listingLimit || 0) > 0;
   if (!isFreeListingPlan) return user;
 
   const accountStart = user.createdAt || new Date();
@@ -84,7 +84,7 @@ const ensureFreeOnboardingValidity = async (user) => {
 
   const needsExpiryUpdate = !currentFreeExpiry || currentFreeExpiry < expectedExpiry || !currentPlanExpiry || currentPlanExpiry < expectedExpiry;
   const needsPlanUpdate =
-    (user.activePlan?.listingLimit || 0) !== 3 ||
+    (user.activePlan?.listingLimit || 0) !== 6 ||
     (user.activePlan?.contactUnlocks || 0) !== 30 ||
     (user.contactAccess?.monthlyLimit || 0) !== 30;
 
@@ -96,7 +96,7 @@ const ensureFreeOnboardingValidity = async (user) => {
     user.activePlan = {
       ...(user.activePlan?.toObject ? user.activePlan.toObject() : user.activePlan || {}),
       expiresAt: expectedExpiry,
-      listingLimit: 3,
+      listingLimit: 6,
       contactUnlocks: 30,
       leadCredits: 0,
     };

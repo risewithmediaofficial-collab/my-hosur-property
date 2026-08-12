@@ -805,7 +805,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   const contactLeft = Math.max(contactLimit - contactUsed, 0);
   const leadCreditsLeft = Math.max((user?.activePlan?.leadCredits || 0) + (user?.leadCredits || 0), 0);
   const planExpired = Boolean(user?.activePlan?.expiresAt && new Date(user.activePlan.expiresAt) < new Date());
-  const activePlanName = user?.activePlan?.planId?.name || (isAdmin ? "Admin access" : postingLimit === 1 ? "Free 90-day listing" : "Active posting plan");
+  const activePlanName = user?.activePlan?.planId?.name || (isAdmin ? "Admin access" : "Active posting plan");
   const accountType = roleLabels[user?.role] || "User";
   const accountContact = useMemo(
     () => ({
@@ -832,7 +832,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
   useEffect(() => {
     if (!isAdmin && hasPostingAccess && !canPostForFree && !initialData) {
-      toast.error("Your free 90-day posting period has ended or no plan credits left. Buy a plan to post.");
+      toast.error("You have used your 6 free listings quota or your 6-month free posting period has ended. Please purchase a plan to post additional properties.");
       navigate("/plans");
     }
   }, [canPostForFree, isAdmin, hasPostingAccess, navigate, initialData]);
@@ -2097,7 +2097,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
       {hasPostingAccess && !isAdmin && !canPostForFree && !initialData && (
         <div className="rounded-xl bg-surface p-4">
-          <p className="text-sm text-slate-600">Your free 90-day period has expired or your plan credits are used up. Buy a plan to continue posting properties.</p>
+          <p className="text-sm text-slate-600">You have used your 6 free listings quota or your 6-month free posting period has ended. Please purchase a plan to post additional properties.</p>
           <button onClick={() => navigate("/plans")} className="site-button-primary mt-3 px-4 py-2 text-sm">
             Go to plans
           </button>

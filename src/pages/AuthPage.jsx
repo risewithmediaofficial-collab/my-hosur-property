@@ -1254,7 +1254,7 @@ const AuthPage = () => {
                             <motion.div variants={item} className="auth-free-badge">
                               <ShieldCheckIcon className="auth-free-badge-icon" />
                               <span>
-                                New accounts include <strong>1 free property listing</strong> for 90 days.
+                                New accounts include <strong>verified property posting access</strong>.
                               </span>
                             </motion.div>
                           ) : null}

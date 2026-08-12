@@ -198,7 +198,7 @@ const PlansPage = () => {
         const payload = { planName: plan?.name };
         await activateFreePlan(token, payload);
         await refreshProfile();
-        toast.success("Free plan activated successfully. You can now post 3 free listings for 90 days.");
+        toast.success("Free plan activated successfully.");
         return;
       }
 
