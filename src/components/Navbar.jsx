@@ -168,10 +168,9 @@ const Navbar = () => {
               <img
                 src={logoSrc}
                 alt="MyHosurProperty"
-                className="block object-contain sm:!h-10 sm:!max-w-[140px] lg:!h-12 lg:!max-w-[160px] mx-auto"
-                style={{ height: "36px", width: "auto", maxWidth: "120px" }}
+                className="block h-8 sm:h-10 lg:h-12 w-auto max-w-[110px] sm:max-w-[140px] lg:max-w-[160px] object-contain mx-auto"
               />
-              <span className="inline-block text-[9px] sm:text-[10px] lg:text-[11px] font-medium leading-none text-slate-500 whitespace-nowrap text-center">
+              <span className="hidden sm:inline-block text-[10px] lg:text-[11px] font-medium leading-none text-slate-500 whitespace-nowrap text-center">
                 Powered by <span className="font-bold text-navy">Gyes Property & Construction</span>
               </span>
             </NavLink>
