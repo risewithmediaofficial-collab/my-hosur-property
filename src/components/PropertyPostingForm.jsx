@@ -796,6 +796,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
     [user?.activePlan?.listingsUsed, user?.activePlan?.listingLimit]
   );
 
+  const remainingPosts = Math.max((user?.activePlan?.listingLimit || 0) - (user?.activePlan?.listingsUsed || 0), 0);
   const canPostForFree = isAdmin || (hasActivePlan && hasPostingQuota);
   const postingLimit = user?.activePlan?.listingLimit || 0;
   const postingUsed = user?.activePlan?.listingsUsed || 0;
