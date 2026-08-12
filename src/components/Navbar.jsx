@@ -163,16 +163,15 @@ const Navbar = () => {
                 scrollToTop();
                 closeMenu();
               }}
-              className="inline-flex min-w-0 shrink-0 flex-col items-start gap-0"
-              style={{ maxWidth: "clamp(60px, 20vw, 160px)" }}
+              className="inline-flex min-w-0 shrink-0 flex-col items-center justify-center text-center gap-0.5"
             >
               <img
                 src={logoSrc}
                 alt="MyHosurProperty"
-                className="block object-contain sm:!h-10 sm:!max-w-[140px] lg:!h-12 lg:!max-w-[160px]"
-                style={{ height: "36px", width: "auto", maxWidth: "100px" }}
+                className="block object-contain sm:!h-10 sm:!max-w-[140px] lg:!h-12 lg:!max-w-[160px] mx-auto"
+                style={{ height: "36px", width: "auto", maxWidth: "120px" }}
               />
-              <span className="hidden sm:inline-block text-[10px] font-medium leading-none text-slate-500 sm:text-[11px] whitespace-nowrap">
+              <span className="inline-block text-[9px] sm:text-[10px] lg:text-[11px] font-medium leading-none text-slate-500 whitespace-nowrap text-center">
                 Powered by <span className="font-bold text-navy">Gyes Property & Construction</span>
               </span>
             </NavLink>
