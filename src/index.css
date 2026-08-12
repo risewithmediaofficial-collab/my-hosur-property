@@ -604,17 +604,9 @@ footer .mx-auto {
     line-height: 1.18 !important;
   }
 
-  /* Make sure all images scale correctly */
-  img, .site-image, .home-services-image-wrap img, .home-services-image-wrap {
-    max-width: 100% !important;
-    height: auto !important;
-    display: block !important;
-  }
-
-  /* Prevent nav items from overflowing horizontally */
-  header nav, header .mx-auto nav, header nav a, header nav button {
-    white-space: normal !important;
-    word-break: break-word !important;
+  /* Make sure content images scale correctly without overriding header logo sizing */
+  .site-image, .home-services-image-wrap img, .home-services-image-wrap, main img:not(header img) {
+    max-width: 100%;
   }
 
   /* Cards: tighten vertical spacing and reduce text size a touch */
