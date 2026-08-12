@@ -93,7 +93,7 @@ const Navbar = () => {
       to={item.to}
       onClick={scrollToTop}
       className={({ isActive }) =>
-        `relative inline-flex items-center px-3 py-2 text-sm font-semibold transition ${
+        `relative inline-flex items-center px-2.5 py-1.5 text-xs xl:px-3.5 xl:py-2 xl:text-sm font-semibold whitespace-nowrap transition ${
           isActive ? "text-orange" : "text-navy hover:text-orange"
         }`
       }
@@ -184,10 +184,11 @@ const Navbar = () => {
                   <button
                     type="button"
                     onClick={onLogout}
-                    className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-navy transition hover:text-orange"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-navy transition hover:border-red-500 hover:bg-red-50 hover:text-red-600 shadow-2xs cursor-pointer"
+                    title="Logout"
+                    aria-label="Logout"
                   >
-                    <ArrowRightOnRectangleIcon className="h-4 w-4" />
-                    Logout
+                    <ArrowRightOnRectangleIcon className="h-4.5 w-4.5" />
                   </button>
 
                   <span className="h-6 w-px bg-slate-200" aria-hidden="true" />
