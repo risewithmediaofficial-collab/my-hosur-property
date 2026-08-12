@@ -22,6 +22,7 @@ import { fetchMyPayments, fetchUserPaymentRequests } from "../services/api/payme
 import { fetchSavedProperties, toggleSavedProperty } from "../services/api/userApi";
 import { buyLeadPackIntent, verifyLeadPackPayment } from "../services/api/customerRequestApi";
 import QrPaymentModal from "../components/QrPaymentModal";
+import RoleChangeModal from "../components/RoleChangeModal";
 
 import { loadExternalScript } from "../utils/loadExternalScript";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
@@ -42,6 +43,7 @@ const UserDashboardPage = () => {
   const [paymentRequests, setPaymentRequests] = useState([]);
   const [selectedPlanForPayment, setSelectedPlanForPayment] = useState(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [showRoleModal, setShowRoleModal] = useState(false);
   const [tab, setTab] = useState(searchParams.get("tab") || "overview");
   const [loading, setLoading] = useState(true);
 
@@ -213,10 +215,24 @@ const UserDashboardPage = () => {
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <p className="dashboard-kicker">Welcome back</p>
-                <h2 className="dashboard-display mt-3 text-4xl font-semibold text-slate-900">Hi, {user?.name}</h2>
+                <div className="flex flex-wrap items-center gap-3 mt-2">
+                  <h2 className="dashboard-display text-3xl font-semibold text-slate-900">Hi, {user?.name}</h2>
+                  <span className="rounded-full bg-indigo-50 border border-indigo-200/80 px-3 py-0.5 text-xs font-bold text-indigo-700 capitalize">
+                    {user?.role || "User"} Account
+                  </span>
+                </div>
                 <p className="dashboard-muted mt-2 text-sm">
                   Your dashboard gives you quick access to listings, buyer leads, payments, and saved homes.
                 </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowRoleModal(true)}
+                  className="rounded-xl border border-indigo-200 bg-indigo-50/90 px-4 py-2.5 text-xs font-bold text-indigo-800 transition hover:bg-indigo-100 shadow-xs cursor-pointer"
+                >
+                  🔄 Request Role / User Type Change
+                </button>
               </div>
             </div>
           </section>
@@ -583,6 +599,11 @@ const UserDashboardPage = () => {
         selectedPlan={selectedPlanForPayment}
         user={user}
         token={token}
+        onSuccess={loadDashboard}
+      />
+      <RoleChangeModal
+        open={showRoleModal}
+        onClose={() => setShowRoleModal(false)}
         onSuccess={loadDashboard}
       />
     </DashboardSidebar>

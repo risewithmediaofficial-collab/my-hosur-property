@@ -18,6 +18,7 @@ import { fetchMyNotifications, markNotificationRead } from "../services/api/noti
 import { fetchSavedProperties } from "../services/api/userApi";
 import { PROPERTY_REQUEST_TYPES } from "../constants/serviceRequests";
 import PropertyCard from "../components/PropertyCard";
+import RoleChangeModal from "../components/RoleChangeModal";
 import { getInquiryHistory } from "../utils/inquiryHistory";
 
 const STATUS_CONFIG = {
@@ -62,6 +63,7 @@ const CustomerDashboardPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
+  const [showRoleModal, setShowRoleModal] = useState(false);
   const [tab, setTab] = useState(searchParams.get("tab") || "overview");
 
   const loadAll = useCallback(async () => {
@@ -185,14 +187,28 @@ const CustomerDashboardPage = () => {
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <p className="dashboard-kicker">Customer activity</p>
-                <h2 className="dashboard-display mt-3 text-4xl font-semibold text-slate-900">Welcome, {user?.name}</h2>
+                <div className="flex flex-wrap items-center gap-3 mt-2">
+                  <h2 className="dashboard-display text-3xl font-semibold text-slate-900">Welcome, {user?.name}</h2>
+                  <span className="rounded-full bg-indigo-50 border border-indigo-200/80 px-3 py-0.5 text-xs font-bold text-indigo-700 capitalize">
+                    {user?.role || "Customer"} Account
+                  </span>
+                </div>
                 <p className="dashboard-muted mt-2 text-sm">
                   Post property requirements, monitor responses from property owners and agents, and stay on top of every follow-up.
                 </p>
               </div>
-              <button onClick={() => setTab("requests")} className="dashboard-primary px-6 py-3 text-sm">
-                Manage Requirements
-              </button>
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowRoleModal(true)}
+                  className="rounded-xl border border-indigo-200 bg-indigo-50/90 px-4 py-2.5 text-xs font-bold text-indigo-800 transition hover:bg-indigo-100 shadow-xs cursor-pointer"
+                >
+                  🔄 Request Role / User Type Change
+                </button>
+                <button onClick={() => setTab("requests")} className="dashboard-primary px-5 py-2.5 text-xs">
+                  Manage Requirements
+                </button>
+              </div>
             </div>
           </section>
 
@@ -593,6 +609,11 @@ const CustomerDashboardPage = () => {
           )}
         </section>
       )}
+      <RoleChangeModal
+        open={showRoleModal}
+        onClose={() => setShowRoleModal(false)}
+        onSuccess={loadAll}
+      />
     </DashboardSidebar>
   );
 };

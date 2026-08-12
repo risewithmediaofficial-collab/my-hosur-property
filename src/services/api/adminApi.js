@@ -8,6 +8,16 @@ export const updateUserPostingAccess = async (token, userId, enabled) =>
   (await apiClient.patch(`/api/admin/users/${userId}/posting-access`, { enabled }, withAuth(token))).data;
 export const toggleUserStatus = async (token, userId, status) =>
   (await apiClient.patch(`/api/admin/users/${userId}/status`, { status }, withAuth(token))).data;
+export const updateUserRole = async (token, userId, role) =>
+  (await apiClient.patch(`/api/admin/users/${userId}/role`, { role }, withAuth(token))).data;
+export const giveUserAllAccess = async (token, userId) =>
+  (await apiClient.post(`/api/admin/users/${userId}/give-all-access`, {}, withAuth(token))).data;
+export const fetchAdminRoleChangeRequests = async (token, params) =>
+  (await apiClient.get("/api/admin/role-change-requests", { ...withAuth(token), params })).data;
+export const approveAdminRoleChangeRequest = async (token, requestId, adminNotes) =>
+  (await apiClient.patch(`/api/admin/role-change-requests/${requestId}/approve`, { adminNotes }, withAuth(token))).data;
+export const rejectAdminRoleChangeRequest = async (token, requestId, adminNotes) =>
+  (await apiClient.patch(`/api/admin/role-change-requests/${requestId}/reject`, { adminNotes }, withAuth(token))).data;
 export const updateAdminUserNotes = async (token, userId, notes) =>
   (await apiClient.patch(`/api/admin/users/${userId}/notes`, { notes }, withAuth(token))).data;
 export const sendAdminEmail = async (token, payload) =>

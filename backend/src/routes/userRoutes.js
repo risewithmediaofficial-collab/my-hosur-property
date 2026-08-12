@@ -20,4 +20,16 @@ router.put(
   ctrl.updateProfile
 );
 
+router.post(
+  "/role-change-request",
+  auth,
+  [
+    body("requestedRole").isIn(["buyer", "customer", "seller", "agent", "broker", "builder"]).withMessage("Invalid requested role"),
+    body("reason").optional().isString(),
+  ],
+  validate,
+  ctrl.requestRoleChange
+);
+router.get("/role-change-requests", auth, ctrl.getMyRoleChangeRequests);
+
 module.exports = router;

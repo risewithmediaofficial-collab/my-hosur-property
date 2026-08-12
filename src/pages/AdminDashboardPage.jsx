@@ -22,6 +22,11 @@ import {
   fetchAdminPaymentRequests,
   approveAdminPaymentRequest,
   rejectAdminPaymentRequest,
+  updateUserRole,
+  giveUserAllAccess,
+  fetchAdminRoleChangeRequests,
+  approveAdminRoleChangeRequest,
+  rejectAdminRoleChangeRequest,
 } from "../services/api/adminApi";
 import toast from "react-hot-toast";
 import PropertyPostingForm from "../components/PropertyPostingForm";
@@ -76,6 +81,7 @@ const AdminDashboardPage = () => {
   const [paymentPlanFilter, setPaymentPlanFilter] = useState("all");
   const [paymentPlanOptions, setPaymentPlanOptions] = useState([]);
   const [paymentRequests, setPaymentRequests] = useState([]);
+  const [roleChangeRequests, setRoleChangeRequests] = useState([]);
   const [moderatingPaymentRequest, setModeratingPaymentRequest] = useState(null);
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
@@ -166,7 +172,7 @@ const AdminDashboardPage = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [metricsRes, usersRes, paymentsRes, propertyRes, leadsRes, customerRequestsRes, leadUnlocksRes, leadPriceRes, manualPayRes] = await Promise.allSettled([
+      const [metricsRes, usersRes, paymentsRes, propertyRes, leadsRes, customerRequestsRes, leadUnlocksRes, leadPriceRes, manualPayRes, roleReqRes] = await Promise.allSettled([
         fetchAdminMetrics(token),
         fetchAdminUsers(token),
         fetchAdminPayments(token, {
@@ -179,6 +185,7 @@ const AdminDashboardPage = () => {
         fetchAdminLeadUnlocks(token, { limit: 50 }),
         fetchAdminLeadPrice(token),
         fetchAdminPaymentRequests(token),
+        fetchAdminRoleChangeRequests(token),
       ]);
 
       if (metricsRes.status === "fulfilled") setMetrics(metricsRes.value);
@@ -193,6 +200,7 @@ const AdminDashboardPage = () => {
       if (leadUnlocksRes.status === "fulfilled") setLeadUnlocks(leadUnlocksRes.value.items || []);
       if (leadPriceRes.status === "fulfilled") setLeadPrice(Number(leadPriceRes.value.value || 200));
       if (manualPayRes.status === "fulfilled") setPaymentRequests(manualPayRes.value.items || []);
+      if (roleReqRes.status === "fulfilled") setRoleChangeRequests(roleReqRes.value.items || []);
     } finally {
       setLoading(false);
     }
@@ -376,17 +384,19 @@ const AdminDashboardPage = () => {
   const leadQueueCount = inquiryNewCount + customerRequestNewCount + leadUnlockNewCount;
 
   const pendingPaymentReqCount = paymentRequests.filter((r) => r.status === "pending").length;
+  const pendingRoleReqCount = roleChangeRequests.filter((r) => r.status === "pending").length;
   const tabs = useMemo(
     () => [
       { id: "overview", label: "Overview", icon: ChartBarIcon },
       { id: "users", label: "Users", icon: UsersIcon, badge: metrics.users || users.length || 0 },
+      { id: "role-requests", label: "User Type Requests", icon: UsersIcon, badge: pendingRoleReqCount > 0 ? `${pendingRoleReqCount} NEW` : roleChangeRequests.length },
       { id: "properties", label: "Properties", icon: HomeModernIcon, badge: propertyListings.length || metrics.properties || 0 },
       { id: "leads", label: "Requests & Leads", icon: ChatBubbleLeftRightIcon, badge: inquiryNewCount > 0 ? `${inquiryNewCount} NEW` : leadQueueCount },
       { id: "payment-requests", label: "Payment Requests", icon: TicketIcon, badge: pendingPaymentReqCount > 0 ? `${pendingPaymentReqCount} NEW` : paymentRequests.length },
       { id: "payments", label: "Payments", icon: BanknotesIcon, badge: payments.length },
       { id: "settings", label: "Settings", icon: Cog6ToothIcon },
     ],
-    [inquiryNewCount, leadQueueCount, metrics.properties, metrics.users, paymentRequests.length, payments.length, pendingPaymentReqCount, propertyListings.length, users.length]
+    [inquiryNewCount, leadQueueCount, metrics.properties, metrics.users, paymentRequests.length, payments.length, pendingPaymentReqCount, pendingRoleReqCount, propertyListings.length, roleChangeRequests.length, users.length]
   );
 
   const leadViews = useMemo(
@@ -477,6 +487,55 @@ const AdminDashboardPage = () => {
       load();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to delete user");
+    }
+  };
+
+  const onUpdateUserRole = async (user, newRole) => {
+    try {
+      await updateUserRole(token, user._id, newRole);
+      toast.success(`User role updated to ${newRole}`);
+      if (selectedUser && selectedUser._id === user._id) {
+        setSelectedUser({ ...selectedUser, role: newRole });
+      }
+      load();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update role");
+    }
+  };
+
+  const onGiveAllAccess = async (user) => {
+    if (!window.confirm(`Are you sure you want to GRANT ALL ACCESS to ${user.name}? This will grant full posting access, premium contact unlocks, 999 lead credits, and activate their account.`)) return;
+    try {
+      const res = await giveUserAllAccess(token, user._id);
+      toast.success(res.message || "Full access granted successfully!");
+      if (selectedUser && selectedUser._id === user._id) {
+        setSelectedUser({ ...selectedUser, ...res.user });
+      }
+      load();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to grant access");
+    }
+  };
+
+  const onApproveRoleRequest = async (reqId) => {
+    try {
+      const res = await approveAdminRoleChangeRequest(token, reqId);
+      toast.success(res.message || "Role change request approved!");
+      load();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to approve role change");
+    }
+  };
+
+  const onRejectRoleRequest = async (reqId) => {
+    const note = window.prompt("Optional rejection note for user:");
+    if (note === null) return;
+    try {
+      const res = await rejectAdminRoleChangeRequest(token, reqId, note);
+      toast.success(res.message || "Role change request rejected");
+      load();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to reject request");
     }
   };
 
@@ -758,31 +817,140 @@ const AdminDashboardPage = () => {
                 <thead className="whitespace-nowrap">
                   <tr>
                     <th>Name / Email</th>
-                    <th>Role</th>
+                    <th>User Type / Role</th>
                     <th>Status</th>
                     <th className="text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredUsers.map((u) => (
-                    <tr key={u._id} className="align-top transition">
+                    <tr key={u._id} className="align-middle transition">
                       <td>
                         <p className="font-semibold">{u.name}</p>
                         <p className="text-xs text-slate-500">{u.email}</p>
                       </td>
-                      <td className="capitalize">{u.role}</td>
+                      <td>
+                        <select
+                          value={u.role || "buyer"}
+                          onChange={(e) => onUpdateUserRole(u, e.target.value)}
+                          className="rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-800 shadow-sm transition hover:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 capitalize cursor-pointer"
+                        >
+                          <option value="buyer">Buyer</option>
+                          <option value="seller">Seller / Owner</option>
+                          <option value="agent">Agent / Media</option>
+                          <option value="broker">Broker / Developer</option>
+                          <option value="builder">Builder</option>
+                          <option value="customer">Customer</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                      </td>
                       <td>
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${u.status === "deactivated" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
                           {u.status || "active"}
                         </span>
                       </td>
                       <td className="text-right">
-                        <button onClick={() => openUserModal(u)} className="dashboard-secondary px-3 py-1 text-xs">
-                          View Details
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => onGiveAllAccess(u)}
+                            className="rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white shadow transition hover:bg-emerald-700 active:scale-95 flex items-center gap-1"
+                            title="Grant property posting, 9999 contact unlocks & 999 lead credits"
+                          >
+                            ⚡ Give All Access
+                          </button>
+                          <button onClick={() => openUserModal(u)} className="dashboard-secondary px-3 py-1 text-xs">
+                            View Details
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
+          </article>
+        )}
+
+        {activeTab === "role-requests" && (
+          <article className="dashboard-shell flex min-h-0 flex-1 flex-col p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">User Type / Role Change Requests ({roleChangeRequests.length})</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  Review and approve requests from users who want to change their user role (e.g. registered as Agent by mistake).
+                </p>
+              </div>
+              <div className="dashboard-chip">
+                {roleChangeRequests.filter((r) => r.status === "pending").length} pending approval
+              </div>
+            </div>
+
+            <div className="mt-5 min-h-0 flex-1 overflow-y-auto rounded-[1.5rem] border border-slate-200/70">
+              <table className="dashboard-table min-w-full text-left text-sm">
+                <thead className="whitespace-nowrap">
+                  <tr>
+                    <th>User Info</th>
+                    <th>Current Role</th>
+                    <th>Requested Role</th>
+                    <th>Reason</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th className="text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {roleChangeRequests.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="py-8 text-center text-slate-500 italic">
+                        No role change requests submitted yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    roleChangeRequests.map((req) => (
+                      <tr key={req._id} className="align-middle transition">
+                        <td>
+                          <p className="font-semibold">{req.userId?.name || "N/A"}</p>
+                          <p className="text-xs text-slate-500">{req.userId?.email || ""}</p>
+                          <p className="text-xs text-slate-500">{req.userId?.phone || ""}</p>
+                        </td>
+                        <td className="capitalize font-medium text-slate-700">{req.currentRole}</td>
+                        <td className="capitalize font-bold text-indigo-700">{req.requestedRole}</td>
+                        <td className="max-w-xs text-xs text-slate-600">{req.reason || <span className="italic text-slate-400">No reason specified</span>}</td>
+                        <td className="whitespace-nowrap text-xs text-slate-500">{formatAdminDate(req.createdAt)}</td>
+                        <td>
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                            req.status === "approved"
+                              ? "bg-green-100 text-green-700"
+                              : req.status === "rejected"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-amber-100 text-amber-800 animate-pulse"
+                          }`}>
+                            {req.status}
+                          </span>
+                        </td>
+                        <td className="text-right whitespace-nowrap">
+                          {req.status === "pending" ? (
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => onApproveRoleRequest(req._id)}
+                                className="rounded-lg bg-green-600 px-3 py-1 text-xs font-bold text-white shadow hover:bg-green-700 transition"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => onRejectRoleRequest(req._id)}
+                                className="rounded-lg bg-red-600 px-3 py-1 text-xs font-bold text-white shadow hover:bg-red-700 transition"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-slate-400 italic">Resolved</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -1511,11 +1679,38 @@ const AdminDashboardPage = () => {
                   <p className="text-sm text-ink/70">{selectedUser.email}</p>
                   <p className="text-sm text-ink/70">{selectedUser.phone || "No phone provided"}</p>
                   <p className="text-sm text-ink/70">{selectedUser.address || "No address provided"}</p>
-                  <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-slate-600">{selectedUser.role}</p>
+                  <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Current Role: {selectedUser.role}</p>
                 </div>
                 <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${selectedUser.status === "deactivated" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
                   {selectedUser.status || "active"}
                 </span>
+              </div>
+
+              {/* Admin Quick Role & Access Controls */}
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-slate-100/90 p-3.5 border border-slate-200/80">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-700">Change User Role:</span>
+                  <select
+                    value={selectedUser.role || "buyer"}
+                    onChange={(e) => onUpdateUserRole(selectedUser, e.target.value)}
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-1 text-xs font-bold text-slate-800 shadow-sm focus:outline-none capitalize cursor-pointer"
+                  >
+                    <option value="buyer">Buyer</option>
+                    <option value="seller">Seller / Owner</option>
+                    <option value="agent">Agent / Media</option>
+                    <option value="broker">Broker / Developer</option>
+                    <option value="builder">Builder</option>
+                    <option value="customer">Customer</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <button
+                  onClick={() => onGiveAllAccess(selectedUser)}
+                  className="rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700 flex items-center gap-1.5"
+                  title="Grant full posting access, premium contact unlocks & 999 lead credits"
+                >
+                  ⚡ Give All Access
+                </button>
               </div>
 
               <div className="grid grid-cols-1 gap-3 border-t border-slate-200 pt-4 text-sm sm:grid-cols-2">

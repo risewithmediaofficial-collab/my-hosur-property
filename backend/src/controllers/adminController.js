@@ -8,6 +8,7 @@ const CustomerRequest = require("../models/CustomerRequest");
 const LeadUnlock = require("../models/LeadUnlock");
 const Notification = require("../models/Notification");
 const SystemSetting = require("../models/SystemSetting");
+const RoleChangeRequest = require("../models/RoleChangeRequest");
 const buildPagination = require("../utils/paginate");
 const sendEmail = require("../utils/sendEmail");
 const { sendBulkEmail } = require("../utils/sendEmail");
@@ -693,6 +694,143 @@ const deleteLeadUnlock = async (req, res) => {
   }
 };
 
+const updateUserRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
+    const allowedRoles = ["buyer", "customer", "seller", "agent", "broker", "builder", "admin"];
+    if (!allowedRoles.includes(role)) {
+      return res.status(400).json({ message: "Invalid role specified" });
+    }
+
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.role = role;
+    await user.save();
+
+    return res.json({ message: `User role updated to ${role}`, user });
+  } catch (error) {
+    console.error("[updateUserRole] Error:", error.message);
+    return res.status(500).json({ message: "Error updating user role", error: error.message });
+  }
+};
+
+const giveAllAccess = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.canPostProperty = true;
+    user.status = "active";
+    user.contactAccess = {
+      monthlyLimit: 9999,
+      usedCount: 0,
+      isPremium: true,
+      resetAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+    };
+    user.leadCredits = Math.max(user.leadCredits || 0, 999);
+    user.customerLeadCredits = Math.max(user.customerLeadCredits || 0, 999);
+
+    const oneYear = new Date();
+    oneYear.setFullYear(oneYear.getFullYear() + 1);
+
+    user.activePlan = {
+      expiresAt: oneYear,
+      listingLimit: 999,
+      listingsUsed: 0,
+      isBoosted: true,
+      contactUnlocks: 999,
+      leadCredits: 999,
+      boostDays: 365,
+    };
+
+    await user.save();
+
+    return res.json({ message: `Full access, posting permissions, contact unlocks, and credits granted to ${user.name}`, user });
+  } catch (error) {
+    console.error("[giveAllAccess] Error:", error.message);
+    return res.status(500).json({ message: "Error granting full access", error: error.message });
+  }
+};
+
+const listRoleChangeRequests = async (req, res) => {
+  try {
+    const { page, limit, skip } = buildPagination(req.query.page, req.query.limit);
+    const query = {};
+    if (req.query.status) query.status = req.query.status;
+
+    const [total, items] = await Promise.all([
+      RoleChangeRequest.countDocuments(query),
+      RoleChangeRequest.find(query)
+        .populate("userId", "name email phone role")
+        .sort("-createdAt")
+        .skip(skip)
+        .limit(limit),
+    ]);
+
+    return res.json({
+      items,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    });
+  } catch (error) {
+    console.error("[listRoleChangeRequests] Error:", error.message);
+    return res.status(500).json({ message: "Error listing role change requests", error: error.message });
+  }
+};
+
+const approveRoleChangeRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { adminNotes } = req.body;
+
+    const request = await RoleChangeRequest.findById(id);
+    if (!request) return res.status(404).json({ message: "Role change request not found" });
+
+    if (request.status !== "pending") {
+      return res.status(400).json({ message: `Request is already ${request.status}` });
+    }
+
+    request.status = "approved";
+    if (adminNotes) request.adminNotes = adminNotes;
+    await request.save();
+
+    const user = await User.findByIdAndUpdate(
+      request.userId,
+      { role: request.requestedRole },
+      { new: true }
+    );
+
+    return res.json({ message: `Role change approved. User role updated to ${request.requestedRole}`, request, user });
+  } catch (error) {
+    console.error("[approveRoleChangeRequest] Error:", error.message);
+    return res.status(500).json({ message: "Error approving role change request", error: error.message });
+  }
+};
+
+const rejectRoleChangeRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { adminNotes } = req.body;
+
+    const request = await RoleChangeRequest.findById(id);
+    if (!request) return res.status(404).json({ message: "Role change request not found" });
+
+    request.status = "rejected";
+    if (adminNotes) request.adminNotes = adminNotes;
+    await request.save();
+
+    return res.json({ message: "Role change request rejected", request });
+  } catch (error) {
+    console.error("[rejectRoleChangeRequest] Error:", error.message);
+    return res.status(500).json({ message: "Error rejecting role change request", error: error.message });
+  }
+};
+
 module.exports = {
   getMetrics,
   getDashboardOverview,
@@ -703,6 +841,11 @@ module.exports = {
   updatePostingAccess,
   toggleUserStatus,
   updateUserNotes,
+  updateUserRole,
+  giveAllAccess,
+  listRoleChangeRequests,
+  approveRoleChangeRequest,
+  rejectRoleChangeRequest,
   listAllLeads,
   assignLeadToBroker,
   updateLeadAssignmentStatus,
@@ -718,3 +861,4 @@ module.exports = {
   deleteCustomerRequest,
   deleteLeadUnlock,
 };
+

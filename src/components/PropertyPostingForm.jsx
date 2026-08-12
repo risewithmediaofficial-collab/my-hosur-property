@@ -7,6 +7,7 @@ import useAuth from "../hooks/useAuth";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
 import { createProperty, updateProperty, uploadPropertyFiles } from "../services/api/propertyApi";
 import { updateProfile } from "../services/api/authApi";
+import RoleChangeModal from "./RoleChangeModal";
 import { INDIA_STATE_OPTIONS, searchIndiaLocationNames } from "../services/geoLocationService";
 import {
   getAreasByVillage,
@@ -765,6 +766,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
     role: "",
   });
   const [profileSaving, setProfileSaving] = useState(false);
+  const [showRoleModal, setShowRoleModal] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -2145,6 +2147,15 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
                 <option value="broker">Developer</option>
                 <option value="builder">Builder</option>
               </select>
+              <div className="mt-2 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => setShowRoleModal(true)}
+                  className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline transition"
+                >
+                  Want to change user type (e.g. registered as Agent by mistake)? Request Admin
+                </button>
+              </div>
             </div>
             <button
               type="submit"
@@ -2154,6 +2165,12 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
               {profileSaving ? "Saving..." : "Save and Proceed"}
             </button>
           </form>
+
+          <RoleChangeModal
+            open={showRoleModal}
+            onClose={() => setShowRoleModal(false)}
+            onSuccess={() => refreshProfile?.()}
+          />
         </div>
       ) : hasPostingAccess && (isAdmin || canPostForFree || initialData) && (
         <>

@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const RoleChangeRequest = require("../models/RoleChangeRequest");
 
 const toggleSavedProperty = async (req, res) => {
   const { propertyId } = req.body;
@@ -62,8 +63,67 @@ const updateProfile = async (req, res) => {
   });
 };
 
+const requestRoleChange = async (req, res) => {
+  try {
+    const { requestedRole, reason } = req.body;
+    const allowedRoles = ["buyer", "customer", "seller", "agent", "broker", "builder"];
+    if (!allowedRoles.includes(requestedRole)) {
+      return res.status(400).json({ message: "Invalid role requested" });
+    }
+
+    if (req.user.role === requestedRole) {
+      return res.status(400).json({ message: `You are already registered as ${requestedRole}` });
+    }
+
+    const existingPending = await RoleChangeRequest.findOne({
+      userId: req.user._id,
+      status: "pending",
+    });
+
+    if (existingPending) {
+      existingPending.requestedRole = requestedRole;
+      existingPending.reason = reason || existingPending.reason;
+      existingPending.currentRole = req.user.role;
+      await existingPending.save();
+      return res.json({
+        message: "Your role change request has been updated and sent to Admin for approval",
+        request: existingPending,
+      });
+    }
+
+    const request = await RoleChangeRequest.create({
+      userId: req.user._id,
+      currentRole: req.user.role,
+      requestedRole,
+      reason: reason || "",
+      status: "pending",
+    });
+
+    return res.json({
+      message: "Role change request submitted successfully. Admin will review your request.",
+      request,
+    });
+  } catch (error) {
+    console.error("[requestRoleChange] Error:", error.message);
+    return res.status(500).json({ message: "Failed to submit role change request", error: error.message });
+  }
+};
+
+const getMyRoleChangeRequests = async (req, res) => {
+  try {
+    const requests = await RoleChangeRequest.find({ userId: req.user._id }).sort("-createdAt");
+    return res.json({ items: requests });
+  } catch (error) {
+    console.error("[getMyRoleChangeRequests] Error:", error.message);
+    return res.status(500).json({ message: "Failed to fetch role change requests", error: error.message });
+  }
+};
+
 module.exports = {
   toggleSavedProperty,
   getSavedProperties,
   updateProfile,
+  requestRoleChange,
+  getMyRoleChangeRequests,
 };
+

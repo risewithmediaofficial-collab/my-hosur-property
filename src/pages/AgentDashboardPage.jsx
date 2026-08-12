@@ -16,6 +16,7 @@ import { fetchMyProperties, promoteProperty } from "../services/api/propertyApi"
 import { fetchMyLeads, unlockInboxLead, updateLeadApproval, updateLeadStatus } from "../services/api/leadApi";
 import { fetchUserPaymentRequests } from "../services/api/paymentApi";
 import QrPaymentModal from "../components/QrPaymentModal";
+import RoleChangeModal from "../components/RoleChangeModal";
 
 import {
   buyLeadPackIntent,
@@ -65,6 +66,7 @@ const AgentDashboardPage = () => {
   const [paymentRequests, setPaymentRequests] = useState([]);
   const [selectedPlanForPayment, setSelectedPlanForPayment] = useState(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [showRoleModal, setShowRoleModal] = useState(false);
   const [leadUnlockPrice] = useState(200);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState(searchParams.get("tab") || "overview");
@@ -294,6 +296,25 @@ const AgentDashboardPage = () => {
     >
       {tab === "overview" && (
         <div className="space-y-6">
+          <section className="dashboard-shell p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-slate-900">Welcome, {user?.name}</h2>
+                <span className="rounded-full bg-indigo-50 border border-indigo-200 px-3 py-0.5 text-xs font-bold text-indigo-700 capitalize">
+                  {user?.role || "Agent"} Account
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">Manage your property listings, leads, and customer inquiries.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowRoleModal(true)}
+              className="rounded-xl border border-indigo-200 bg-indigo-50/90 px-4 py-2 text-xs font-bold text-indigo-800 transition hover:bg-indigo-100 shadow-xs shrink-0 cursor-pointer"
+            >
+              🔄 Request Role / User Type Change
+            </button>
+          </section>
+
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
               { key: "listings", label: "Total Listings", value: properties.length, icon: <HomeModernIcon className="h-5 w-5" /> },
@@ -657,6 +678,11 @@ const AgentDashboardPage = () => {
         selectedPlan={selectedPlanForPayment}
         user={user}
         token={token}
+        onSuccess={loadAll}
+      />
+      <RoleChangeModal
+        open={showRoleModal}
+        onClose={() => setShowRoleModal(false)}
         onSuccess={loadAll}
       />
     </DashboardSidebar>

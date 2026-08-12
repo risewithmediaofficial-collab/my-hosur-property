@@ -16,6 +16,11 @@ router.get("/applications/posting-access", ctrl.listPostingAccessApplications);
 router.get("/users", ctrl.listUsers);
 router.patch("/users/:id/posting-access", [body("enabled").isBoolean()], validate, ctrl.updatePostingAccess);
 router.patch("/users/:id/status", [body("status").isIn(["active", "deactivated"])], validate, ctrl.toggleUserStatus);
+router.patch("/users/:id/role", [body("role").isIn(["buyer", "customer", "seller", "agent", "broker", "builder", "admin"])], validate, ctrl.updateUserRole);
+router.post("/users/:id/give-all-access", ctrl.giveAllAccess);
+router.get("/role-change-requests", ctrl.listRoleChangeRequests);
+router.patch("/role-change-requests/:id/approve", ctrl.approveRoleChangeRequest);
+router.patch("/role-change-requests/:id/reject", ctrl.rejectRoleChangeRequest);
 router.delete("/users/:id", ctrl.deleteUser);
 router.patch("/users/:id/notes", [body("notes").optional().isString()], validate, ctrl.updateUserNotes);
 router.post("/users/email", [
