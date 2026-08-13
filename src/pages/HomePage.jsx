@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SeoLocationLinks from "../components/SeoLocationLinks";
 import {
   ArrowRightIcon,
   BanknotesIcon,
@@ -1325,6 +1326,11 @@ const HomePage = () => {
           </div>
         </div>
       </MotionSection>
+
+      {/* ── SEO LOCATION & BRANDING KEYWORD MATRIX ── */}
+      <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-10 py-6">
+        <SeoLocationLinks />
+      </div>
 
       {/* ── CTA Banner ── */}
       <MotionSection

@@ -40,6 +40,7 @@ const ServiceRequestPage = lazyRoute(
   () => import("./pages/ServiceRequestPage"),
 );
 const BankLoansPage = lazyRoute(() => import("./pages/BankLoansPage"));
+const LocationSeoPage = lazyRoute(() => import("./pages/LocationSeoPage"));
 const NotFoundPage = lazyRoute(() => import("./pages/NotFoundPage"));
 
 // Pages that manage their own full-height layout (sidebars etc.)
@@ -245,6 +246,7 @@ const AppShell = () => {
                   <Route path="/services" element={<ServicesPage />} />
                   <Route path="/bank-loans" element={<BankLoansPage />} />
                   <Route path="/listings" element={<ListingPage />} />
+                  <Route path="/location/:slug" element={<LocationSeoPage />} />
                   <Route
                     path="/property/:id/:slug?"
                     element={<PropertyDetailPage />}

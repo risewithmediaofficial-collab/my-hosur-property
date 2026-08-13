@@ -178,6 +178,45 @@ const Footer = () => {
             </div>
           </div>
 
+          {/* SEO Location Links Matrix for Google Crawling */}
+          <div className="mt-10 border-t border-white/10 pt-8">
+            <h5 className="text-xs font-bold uppercase tracking-[0.18em] text-orange mb-3">
+              Popular Hosur Property Locations &amp; Guides
+            </h5>
+            <div className="flex flex-wrap gap-2 text-xs text-white/70">
+              {[
+                { name: "Anand Nagar Plots", slug: "anand-nagar-plots" },
+                { name: "Bagalur Road Property", slug: "bagalur-road-property" },
+                { name: "Mathigiri Plots", slug: "mathigiri-plots" },
+                { name: "Mookandapalli Property", slug: "mookandapalli-property" },
+                { name: "Zuzuvadi Land", slug: "zuzuvadi-land" },
+                { name: "Shoolagiri Property", slug: "shoolagiri-property" },
+                { name: "Rayakottai Road Plots", slug: "rayakottai-road-plots" },
+                { name: "Hosur SIPCOT Property", slug: "hosur-sipcot-property" },
+                { name: "TVS Nagar Plots", slug: "tvs-nagar-plots" },
+                { name: "Titan Township Property", slug: "titan-township-property" },
+                { name: "Denkanikottai Road Land", slug: "denkanikottai-road-land" },
+                { name: "Chennathur Plots", slug: "chennathur-plots" },
+                { name: "Kelamangalam Road Property", slug: "kelamangalam-road-property" },
+                { name: "Avalapalli Land", slug: "avalapalli-land" },
+                { name: "DTCP Plots Bagalur Road", slug: "dtcp-plots-bagalur-road" },
+                { name: "Villas in Mathigiri", slug: "villas-in-mathigiri" },
+                { name: "Land near SIPCOT Hosur", slug: "land-near-sipcot-hosur" },
+                { name: "Best Real Estate Company in Hosur", slug: "best-real-estate-company-in-hosur" },
+                { name: "Trusted Property Dealer in Hosur", slug: "trusted-property-dealer-in-hosur" },
+              ].map((loc) => (
+                <NavLink
+                  key={loc.slug}
+                  to={`/location/${loc.slug}`}
+                  onClick={scrollToTop}
+                  className="rounded bg-white/10 px-2.5 py-1 transition hover:bg-orange hover:text-white"
+                >
+                  {loc.name}
+                </NavLink>
+              ))}
+            </div>
+          </div>
+
           <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-white sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p>Copyright 2026 MyHosurProperty. All rights reserved.</p>

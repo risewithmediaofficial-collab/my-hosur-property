@@ -477,6 +477,10 @@ const defaultForm = {
   farmhouse: "No",
   farmhouseCount: "1",
   villaType: "Simplex",
+  solar: "No",
+  geyser: "No",
+  ebPhase: "",
+  buildAge: "",
   warehouseDetails: defaultWarehouseDetails,
 };
 
@@ -496,11 +500,11 @@ const typeFieldConfig = {
     featureFields: ["gatedCommunity", "park", "cctvCamera", "security", "balcony", "powerBackup", "hntda", "rera"],
   },
   Flat: {
-    description: "Flat details with flat area, length, width, facing, and plot type.",
+    description: "Flat details with registered land area, flat type, facing, and facilities.",
     detailTitle: "Flat Details",
     priceLabel: "Expected Sale Price",
-    detailFields: ["price", "propertyClass", "flatArea", "length", "width", "plotType", "facing"],
-    featureFields: ["park", "lift", "security", "parking", "balcony", "powerBackup", "hntda", "rera", "panchayatApproval", "rocApproval"],
+    detailFields: ["price", "flatArea", "furnishingStatus", "facing", "ebPhase"],
+    featureFields: ["park", "lift", "security", "parking", "balcony", "powerBackup", "solar", "geyser", "hntda", "rera", "panchayatApproval", "rocApproval"],
   },
   "Independent House": {
     description: "House details with rooms, land/building area, car parking, water source, and utilities.",
@@ -541,14 +545,14 @@ const typeFieldConfig = {
     description: "Warehouse & Industry details with land/build-up area, access, parking, and logistics-ready facilities.",
     detailTitle: "Warehouse / Industry Details",
     priceLabel: "Expected Warehouse / Industry Price",
-    detailFields: ["facing", "roadWidth", "roadType", "frontage", "totalFloors"],
+    detailFields: ["buildAge", "facing", "roadWidth", "roadType", "frontage", "totalFloors"],
     featureFields: ["parking", "security", "powerBackup", "roadAccess", "electricity"],
   },
   Warehouse: {
     description: "Warehouse & Industry details with land/build-up area, access, parking, and logistics-ready facilities.",
     detailTitle: "Warehouse / Industry Details",
     priceLabel: "Expected Warehouse / Industry Price",
-    detailFields: ["facing", "roadWidth", "roadType", "frontage", "totalFloors"],
+    detailFields: ["buildAge", "facing", "roadWidth", "roadType", "frontage", "totalFloors"],
     featureFields: ["parking", "security", "powerBackup", "roadAccess", "electricity"],
   },
   Farmland: {
@@ -639,6 +643,9 @@ const fieldLabels = {
   storageArea: "Storage Area",
   openYard: "Open Yard",
   solar: "Solar",
+  geyser: "Geyser",
+  ebPhase: "EB Phase",
+  buildAge: "Build Age of Warehouse / Industry",
   fireSafety: "Fire Safety",
 };
 
@@ -1259,7 +1266,8 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
   const getFieldLabel = (field, type = form.propertyType) => {
     if (type === "Flat") {
-      if (field === "plotType") return "Flat Type";
+      if (field === "flatArea") return "Registered Land Area";
+      if (field === "furnishingStatus") return "Flat Type";
     }
     if (type === "Agri Land" && field === "cropSuitable") return "Crops / Trees in Land";
     return fieldLabels[field] || field;
@@ -1389,19 +1397,39 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
       return <DropdownInput field={field} value={form[field]} options={landAreaOptions} onChange={update} placeholder="e.g. 1000 sq.ft" />;
     }
     if (field === "flatArea") {
+      if (form.propertyType === "Flat") {
+        return (
+          <input
+            className="site-input h-11"
+            value={form[field]}
+            onChange={(e) => update(field, e.target.value)}
+            placeholder="Enter registered land area / flat area (e.g. 1200 sq.ft)"
+          />
+        );
+      }
       if (form.propertyType === "Agri Land" || form.propertyType === "Farmland") {
         return <input className="site-input" value={form[field]} onChange={(e) => update(field, e.target.value)} placeholder="Enter area in Cents or Acres" />;
       }
       return <DropdownInput field={field} value={form[field]} options={landAreaOptions} onChange={update} placeholder="e.g. 1000 sq.ft" />;
     }
     if (field === "price") {
+      if (form.propertyType === "Flat") {
+        return (
+          <input
+            className="site-input h-11"
+            value={form[field]}
+            onChange={(e) => update(field, e.target.value)}
+            placeholder="Enter price manually (e.g. ₹45 Lakhs)"
+          />
+        );
+      }
       if (form.propertyType === "Plot") {
         return <DropdownInput field={field} value={form[field]} options={plotPriceOptions} onChange={update} placeholder="Select price range" />;
       }
       if (form.propertyType === "Villa" || form.propertyType === "Independent House") {
         return <DropdownInput field={field} value={form[field]} options={villaPriceOptions} onChange={update} placeholder="Select price" />;
       }
-      if (form.propertyType === "Flat" || form.propertyType === "Apartment") {
+      if (form.propertyType === "Apartment") {
         return <DropdownInput field={field} value={form[field]} options={flatPriceOptions} onChange={update} placeholder="Select price range" />;
       }
       if (form.propertyType === "Commercial Land / Building") {
@@ -1442,7 +1470,21 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
       return <Select field={field} value={form[field]} options={options} onChange={update} />;
     }
     if (field === "furnishingStatus") {
-      return <Select field={field} value={form[field]} options={["Furnished", "Semi-Furnished", "Unfurnished"]} onChange={update} />;
+      const options = ["Semi Furnished", "Unfurnished", "Furnished"];
+      return <Select field={field} value={form[field]} options={options} onChange={update} />;
+    }
+    if (field === "ebPhase") {
+      return <Select field={field} value={form[field]} options={["", "Single Phase", "Three Phase"]} onChange={update} />;
+    }
+    if (field === "buildAge") {
+      return (
+        <input
+          className="site-input h-11"
+          value={form[field]}
+          onChange={(e) => update(field, e.target.value)}
+          placeholder="Enter build age of warehouse / industry (e.g. 3 years, New)"
+        />
+      );
     }
     if (field === "sharingType") {
       return <Select field={field} value={form[field]} options={["", "Single Sharing", "Two Sharing", "Three Sharing", "Four Sharing"]} onChange={update} />;
@@ -1516,7 +1558,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
           <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
             {renderWarehouseTextField("pincode", "Pincode", "e.g. 635109")}
             {renderWarehouseTextField("googleMapsLocation", "Google Maps Location", "Paste map link")}
-            {renderWarehouseTextField("propertyAge", "Property Age", "e.g. 5 years")}
+            {renderWarehouseTextField("propertyAge", "Build Age of Warehouse / Industry", "e.g. 5 years / Under Construction")}
             {renderWarehouseTextField("constructionYear", "Construction Year", "e.g. 2021")}
             {renderWarehouseSelectField("propertyCondition", "Property Condition", propertyConditionOptions)}
           </div>
