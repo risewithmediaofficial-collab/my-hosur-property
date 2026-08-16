@@ -51,12 +51,17 @@ import {
 } from "../components/AppIcons";
 
 const formatCustomerRequestLabel = (item) => {
-  if (item.requestCategory === "loan") return "Loan";
-  if (item.requestCategory === "interior") return `${item.serviceType || "Interior"} Interior`;
-  if (item.requestCategory === "construction") return `${item.serviceType || "Construction"} Construction`;
+  if (!item) return "Request";
+  if (item.serviceType) return item.serviceType;
+  if (item.requestCategory === "loan") return "Loan Request";
+  if (item.requestCategory === "interior") return "Interior Service Request";
+  if (item.requestCategory === "construction") return "Construction Service Request";
+  if (item.requestCategory === "property_management") return "Property Management Request";
+  if (item.requestCategory === "home_office_services") return "Home & Office Service Request";
   if (item.requestCategory === "property_rent") return `${item.propertyType || "Property"} Rent`;
   if (item.requestCategory === "property_sell") return `${item.propertyType || "Property"} Sell`;
-  return item.propertyType || "Property";
+  if (item.requestCategory === "property_buy") return `${item.propertyType || "Property"} Buy`;
+  return item.propertyType || "Property Requirement";
 };
 
 const formatAdminDate = (value) => new Date(value).toLocaleDateString("en-IN");

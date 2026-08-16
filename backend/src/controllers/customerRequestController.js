@@ -7,6 +7,7 @@ const Property = require("../models/Property");
 const SystemSetting = require("../models/SystemSetting");
 const User = require("../models/User");
 const { hasRazorpayConfig, razorpay } = require("../config/razorpay");
+const sendEmail = require("../utils/sendEmail");
 
 const REQUEST_CATEGORIES = [
   "property_buy",
@@ -38,6 +39,28 @@ const PROPERTY_TYPES = [
   "House",
   "Land",
   "Industrial Shed",
+  "Farm Land",
+  "Commercial Building",
+];
+
+const RENT_PROPERTY_TYPES = [
+  "House",
+  "Home",
+  "Apartment",
+  "Flat",
+  "Villa",
+  "Independent House",
+  "Office",
+  "Commercial",
+  "Commercial Land & Building",
+  "Commercial Building",
+  "Warehouse",
+  "Industrial Shed",
+  "Land",
+  "Empty Land",
+  "Plot",
+  "Agricultural Land",
+  "Farm Land",
 ];
 
 const PROPERTY_MATCH_MAP = {
@@ -59,14 +82,40 @@ const PROPERTY_MATCH_MAP = {
 };
 
 const SERVICE_TYPE_OPTIONS = {
-  loan: ["Home Loan", "Plot Loan", "Mortgage Loan", "Private Finance"],
-  interior: ["Home Interior", "Office Interior"],
-  construction: ["House Construction", "Office Construction", "Commercial Building", "Apartment", "Industry & Warehouse"],
+  loan: [
+    "Home Loan",
+    "Plot Loan",
+    "Mortgage Loan",
+    "Commercial Loan",
+    "Agriculture Loan",
+    "Home Loan Balance Transfer",
+    "Private Finance",
+  ],
+  interior: [
+    "Home Interior",
+    "Office Interior",
+    "Interior & Carpentry Work",
+  ],
+  construction: [
+    "House Construction",
+    "Office Construction",
+    "Commercial Building",
+    "Apartment",
+    "Industry & Warehouse",
+    "Approval plans",
+    "2D Plan",
+    "3D Plan",
+    "HNTDA Approval",
+    "RERA Approval",
+    "Building Plan & Approval",
+  ],
   property_management: [
     "Home & Apartment Facility AMC Service",
     "Industry & Warehouse Facility AMC Service",
+    "Land Scaping & Garden Maintenance Property Management Service",
     "Land scaping & Garden Maintenance Property Management Service",
     "NRI Property Management Service",
+    "Property Management Service",
   ],
   home_office_services: [
     "Home & Office Cleaning Service - Deep Cleaning",
@@ -79,6 +128,23 @@ const SERVICE_TYPE_OPTIONS = {
     "Painting Work",
     "Sofa & Carpet Cleaning",
   ],
+  property_buy: [
+    "Find your property",
+    "Property guidance for buy sell and rent",
+    "Sale agreement support",
+    "Legal verification support",
+    "Patta transfer",
+    "Land survey",
+    "Sale deed registration",
+  ],
+  property_sell: [
+    "Sell your property",
+    "Property guidance for buy sell and rent",
+  ],
+  property_rent: [
+    "Rent your property",
+    "Property guidance for buy sell and rent",
+  ],
 };
 
 const isPropertyRequest = (requestCategory) => PROPERTY_REQUEST_CATEGORIES.includes(requestCategory);
@@ -87,26 +153,24 @@ const getMatchingPropertyTypes = (propertyType) => PROPERTY_MATCH_MAP[propertyTy
 
 const getRequestTitle = (request) => {
   if (isPropertyRequest(request.requestCategory)) {
-    return `${request.propertyType || "Property"} request`;
+    const categoryName = request.requestCategory.replace("property_", "");
+    return `${request.propertyType || "Property"} ${categoryName.charAt(0).toUpperCase() + categoryName.slice(1)} Request`;
   }
-  if (request.requestCategory === "loan") return "Loan request";
-  if (request.requestCategory === "interior") return `${request.serviceType || "Interior"} interior request`;
-  if (request.requestCategory === "construction") return `${request.serviceType || "Construction"} construction request`;
-  return "Service request";
+  if (request.serviceType) {
+    return `${request.serviceType} Request`;
+  }
+  if (request.requestCategory === "loan") return "Loan Request";
+  if (request.requestCategory === "interior") return "Interior Service Request";
+  if (request.requestCategory === "construction") return "Construction Service Request";
+  if (request.requestCategory === "property_management") return "Property Management Request";
+  if (request.requestCategory === "home_office_services") return "Home & Office Service Request";
+  return "Service Request";
 };
 
 const getAdminNotificationMessage = (user, request) => {
-  const locationText = `${request.location?.area || "Area"}, ${request.location?.city || "City"}`;
-
-  if (isPropertyRequest(request.requestCategory)) {
-    return `${user.name} submitted a ${request.requestCategory.replace("property_", "")} request for ${request.propertyType || "property"} in ${locationText}.`;
-  }
-
-  if (request.requestCategory === "loan") {
-    return `${user.name} requested a loan consultation in ${locationText}.`;
-  }
-
-  return `${user.name} requested ${request.serviceType || request.requestCategory} service in ${locationText}.`;
+  const locationText = `${request.location?.area || "Area"}, ${request.location?.city || "Hosur"}`;
+  const serviceName = request.serviceType || request.propertyType || request.requestCategory.replaceAll("_", " ");
+  return `${user.name} submitted a request for "${serviceName}" in ${locationText}. Phone: ${user.phone || "N/A"}, Email: ${user.email || "N/A"}.`;
 };
 
 const getPropertyNotificationMessage = (user, request) =>
@@ -124,12 +188,11 @@ exports.requestValidators = [
   body("requestCategory").isIn(REQUEST_CATEGORIES).withMessage("Invalid request category"),
   body("propertyType")
     .optional({ nullable: true, checkFalsy: true })
-    .isIn(PROPERTY_TYPES)
-    .withMessage("Invalid property type"),
+    .trim(),
   body("serviceType")
     .optional({ nullable: true, checkFalsy: true })
     .trim()
-    .isLength({ min: 2, max: 80 })
+    .isLength({ min: 2, max: 200 })
     .withMessage("Invalid service type"),
   body("budgetMin").optional({ nullable: true, checkFalsy: true }).isNumeric().withMessage("Invalid min budget"),
   body("budgetMax").optional({ nullable: true, checkFalsy: true }).isNumeric().withMessage("Invalid max budget"),
@@ -140,32 +203,17 @@ exports.requestValidators = [
       throw new Error("Property type is required for property requests");
     }
 
-    if (requestCategory === "property_rent" && !["Home", "Office", "Apartment", "Warehouse", "Commercial Land & Building", "Empty Land"].includes(value.propertyType)) {
-      throw new Error("Invalid rent property type");
+    if (requestCategory === "property_rent" && value.propertyType) {
+      const isValidRentType = RENT_PROPERTY_TYPES.some(
+        (t) => t.toLowerCase() === value.propertyType.trim().toLowerCase()
+      );
+      if (!isValidRentType) {
+        throw new Error("Invalid rent property type");
+      }
     }
 
     if (["interior", "construction", "property_management", "home_office_services"].includes(requestCategory) && !value.serviceType) {
       throw new Error("Service type is required");
-    }
-
-    if (requestCategory === "loan" && value.serviceType && !SERVICE_TYPE_OPTIONS.loan.includes(value.serviceType)) {
-      throw new Error("Invalid loan service type");
-    }
-
-    if (requestCategory === "interior" && value.serviceType && !SERVICE_TYPE_OPTIONS.interior.includes(value.serviceType)) {
-      throw new Error("Invalid interior service type");
-    }
-
-    if (requestCategory === "construction" && value.serviceType && !SERVICE_TYPE_OPTIONS.construction.includes(value.serviceType)) {
-      throw new Error("Invalid construction service type");
-    }
-
-    if (requestCategory === "property_management" && value.serviceType && !SERVICE_TYPE_OPTIONS.property_management.includes(value.serviceType)) {
-      throw new Error("Invalid property management service type");
-    }
-
-    if (requestCategory === "home_office_services" && value.serviceType && !SERVICE_TYPE_OPTIONS.home_office_services.includes(value.serviceType)) {
-      throw new Error("Invalid home & office service type");
     }
 
     return true;
@@ -192,9 +240,9 @@ exports.createCustomerRequest = async (req, res, next) => {
       budgetMin: Number(budgetMin || 0),
       budgetMax: Number(budgetMax || 0),
       requestCategory,
-      propertyType: propertyType || undefined,
-      serviceType: serviceType || "",
-      additionalRequirements,
+      propertyType: propertyType ? String(propertyType).trim() : undefined,
+      serviceType: serviceType ? String(serviceType).trim() : "",
+      additionalRequirements: additionalRequirements ? String(additionalRequirements).trim() : "",
     });
 
     await request.save();
@@ -244,7 +292,7 @@ exports.createCustomerRequest = async (req, res, next) => {
       }
     }
 
-    const admins = await User.find({ role: "admin", status: "active" }).select("_id").lean();
+    const admins = await User.find({ role: "admin", status: "active" }).select("_id email").lean();
     if (admins.length) {
       await Notification.insertMany(
         admins.map((admin) => ({
@@ -263,6 +311,63 @@ exports.createCustomerRequest = async (req, res, next) => {
           },
         }))
       );
+    }
+
+    // Try sending email notifications to admin and confirmation email to customer
+    try {
+      const adminEmails = admins.map((a) => a.email).filter(Boolean);
+      const reqTitle = getRequestTitle(request);
+      const reqLocation = `${location?.area || ""}, ${location?.city || "Hosur"}`;
+      const serviceDisplay = request.serviceType || request.propertyType || request.requestCategory.replaceAll("_", " ");
+
+      if (adminEmails.length > 0) {
+        await sendEmail({
+          to: adminEmails,
+          subject: `🔔 New Service Request: ${reqTitle} (${reqLocation})`,
+          html: `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+              <h2 style="color: #0f172a; border-bottom: 2px solid #ea580c; padding-bottom: 8px;">New Customer Service Request</h2>
+              <p>A new service request has been submitted on <strong>MyHosurProperty</strong>.</p>
+              <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+                <tr><td style="padding: 8px; font-weight: bold; color: #475569; width: 35%;">Category:</td><td style="padding: 8px;">${requestCategory.replaceAll("_", " ")}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Requirement:</td><td style="padding: 8px; font-weight: bold; color: #ea580c;">${serviceDisplay}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Customer:</td><td style="padding: 8px;">${req.user.name}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Phone:</td><td style="padding: 8px;"><a href="tel:${req.user.phone || ''}">${req.user.phone || 'N/A'}</a></td></tr>
+                <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Email:</td><td style="padding: 8px;"><a href="mailto:${req.user.email}">${req.user.email}</a></td></tr>
+                <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Location:</td><td style="padding: 8px;">${reqLocation}</td></tr>
+                ${request.budgetMax ? `<tr><td style="padding: 8px; font-weight: bold; color: #475569;">Budget:</td><td style="padding: 8px;">Rs. ${Number(request.budgetMax).toLocaleString("en-IN")}</td></tr>` : ""}
+                ${request.additionalRequirements ? `<tr><td style="padding: 8px; font-weight: bold; color: #475569;">Details:</td><td style="padding: 8px; white-space: pre-wrap;">${request.additionalRequirements}</td></tr>` : ""}
+              </table>
+              <div style="margin-top: 24px; padding: 12px; background-color: #f8fafc; border-radius: 6px; font-size: 13px; color: #64748b;">
+                Check the Admin Dashboard to view full lead information.
+              </div>
+            </div>
+          `,
+        });
+      }
+
+      if (req.user.email) {
+        await sendEmail({
+          to: req.user.email,
+          subject: `✓ Service Request Received: ${reqTitle}`,
+          html: `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+              <h2 style="color: #0f172a; border-bottom: 2px solid #ea580c; padding-bottom: 8px;">We Have Received Your Request</h2>
+              <p>Hi <strong>${req.user.name}</strong>,</p>
+              <p>Thank you for submitting your request for <strong>${serviceDisplay}</strong> in ${reqLocation}. Our team will review your requirement and get in touch with you shortly.</p>
+              <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+                <tr><td style="padding: 8px; font-weight: bold; color: #475569; width: 35%;">Service:</td><td style="padding: 8px; font-weight: bold; color: #ea580c;">${serviceDisplay}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Location:</td><td style="padding: 8px;">${reqLocation}</td></tr>
+                ${request.additionalRequirements ? `<tr><td style="padding: 8px; font-weight: bold; color: #475569;">Details:</td><td style="padding: 8px; white-space: pre-wrap;">${request.additionalRequirements}</td></tr>` : ""}
+              </table>
+              <p style="margin-top: 20px; font-size: 14px; color: #64748b;">Our admin team will use your registered phone and email to follow up.</p>
+              <p style="margin-top: 16px; font-size: 13px; color: #94a3b8;">– The MyHosurProperty Team</p>
+            </div>
+          `,
+        });
+      }
+    } catch (mailErr) {
+      console.warn("[createCustomerRequest] Email notification error:", mailErr.message);
     }
 
     res.status(201).json({
