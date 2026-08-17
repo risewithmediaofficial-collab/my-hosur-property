@@ -940,22 +940,67 @@ const AuthPage = () => {
           flex-shrink: 0;
         }
 
-        @media (max-width: 560px) {
+        @media (max-width: 640px) {
+          .auth-centered-page {
+            padding: 16px 12px 32px;
+            min-height: auto;
+          }
+          .auth-card-surface {
+            padding: 24px 18px 24px;
+            border-radius: 20px;
+          }
+          .auth-brand-logo {
+            height: 32px;
+          }
+          .auth-mode-switch {
+            margin-bottom: 18px;
+          }
+          .auth-heading-wrap {
+            margin-bottom: 18px;
+          }
+          .auth-title {
+            font-size: clamp(20px, 5.5vw, 26px);
+          }
+          .auth-subtitle {
+            font-size: 12.5px;
+          }
+          .auth-mode-btn {
+            padding: 9px 10px;
+            font-size: 13px;
+          }
+          .auth-submit {
+            min-height: 48px;
+            font-size: 15px;
+          }
           .auth-support-row {
             flex-direction: column;
             align-items: center;
             text-align: center;
+            gap: 8px;
           }
           .auth-support-actions {
             width: 100%;
             justify-content: center;
           }
-          .auth-mode-btn {
-            padding: 10px 12px;
-            font-size: 13px;
+        }
+
+        @media (max-width: 380px) {
+          .auth-centered-page {
+            padding: 10px 8px 20px;
           }
-          .auth-title {
-            font-size: 1.65rem;
+          .auth-card-surface {
+            padding: 18px 12px 20px;
+            border-radius: 16px;
+          }
+          .auth-mode-btn {
+            font-size: 12px;
+            padding: 8px 6px;
+          }
+          .auth-input-shell {
+            min-height: 46px;
+          }
+          .auth-input {
+            font-size: 14px;
           }
         }
 

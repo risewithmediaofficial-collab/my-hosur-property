@@ -51,7 +51,7 @@ function AnimatedInputOTP({
       aria-label={props["aria-label"] || "One-time password input"}
       className={cn("disabled:cursor-not-allowed", className)}
       containerClassName={cn(
-        "flex items-center gap-2 has-disabled:opacity-50",
+        "flex items-center justify-center gap-1 sm:gap-2 has-disabled:opacity-50 max-w-full overflow-x-auto py-1",
         containerClassName
       )}
       data-slot="input-otp"
@@ -119,7 +119,7 @@ function AnimatedInputOTPSlot({ index, className }) {
             }
       }
       className={cn(
-        "relative flex h-12 w-12 items-center justify-center rounded-xl border-2 border-slate-200 bg-white text-base font-bold text-navy shadow-sm outline-none transition-all data-[active=true]:z-10 data-[active=true]:border-orange data-[active=true]:ring-4 data-[active=true]:ring-orange/15",
+        "relative flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl border-2 border-slate-200 bg-white text-sm sm:text-base font-bold text-navy shadow-sm outline-none transition-all data-[active=true]:z-10 data-[active=true]:border-orange data-[active=true]:ring-4 data-[active=true]:ring-orange/15",
         className
       )}
       data-active={isActive}
