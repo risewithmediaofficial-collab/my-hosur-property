@@ -131,7 +131,7 @@ const ServiceCategoryModal = ({ category, onClose }) => {
 
           <div className="border-t border-slate-100 bg-slate-50/80 px-5 py-4 sm:px-6">
             <Link
-              to="/contact"
+              to={category.key ? `/request-service?category=${encodeURIComponent(category.key)}` : "/request-service"}
               onClick={onClose}
               className="site-button-primary inline-flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold"
             >

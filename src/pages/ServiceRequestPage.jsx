@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { CurrencyRupeeIcon } from "../components/AppIcons";
+import { ArrowTopRightOnSquareIcon, CurrencyRupeeIcon } from "../components/AppIcons";
 import SeoHead from "../components/SeoHead";
 import useAuth from "../hooks/useAuth";
 import { createCustomerRequest } from "../services/api/customerRequestApi";
 import { BANK_OPTIONS, SERVICE_REQUEST_CATEGORY_LIST, SERVICE_REQUEST_OPTIONS } from "../constants/serviceRequests";
+import oneClickLogo from "../assets/one click logo.png";
 
 // Import service images from assets
 import buyGuidanceImg from "../assets/property buy guideance.jpg";
@@ -322,6 +323,46 @@ const ServiceRequestPage = () => {
               </div>
             </div>
           </div>
+
+          {requestCategory === "home_office_services" && (
+            <div className="rounded-2xl border-2 border-orange/30 bg-gradient-to-br from-orange/5 via-white to-amber-50/60 p-5 shadow-sm transition hover:border-orange hover:shadow-md">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-2xs flex items-center justify-center">
+                    <img
+                      src={oneClickLogo}
+                      alt="OneClick 2 Serve"
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-orange">
+                      Official Service Partner
+                    </span>
+                    <h4 className="text-base font-extrabold text-navy leading-tight">
+                      OneClick 2 Serve
+                    </h4>
+                    <p className="text-xs text-slate-600 mt-0.5">
+                      Office &amp; Home Services in Hosur
+                    </p>
+                  </div>
+                </div>
+
+                <a
+                  href="https://oneclick2serve.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-orange/90 hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto shrink-0"
+                >
+                  <span>Visit oneclick2serve.com</span>
+                  <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+                </a>
+              </div>
+              <p className="mt-3 text-xs leading-relaxed text-slate-600 border-t border-orange/10 pt-2.5">
+                Need on-demand services? Visit our dedicated OneClick 2 Serve portal for instant booking of cleaning, shifting, plumbing, electrical, and appliance repair in Hosur.
+              </p>
+            </div>
+          )}
         </div>
 
         <form onSubmit={onSubmit} className="marketing-card p-6 md:p-8">

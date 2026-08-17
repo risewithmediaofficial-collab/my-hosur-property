@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -59,6 +59,7 @@ const formatDateSafe = (dateVal) => {
 
 const PropertyDetailPage = () => {
   const { id } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const { token, user } = useAuth();
 
@@ -142,7 +143,8 @@ const PropertyDetailPage = () => {
 
   const handleSubmitInquiry = async () => {
     if (!token) {
-      toast.error("Please login to contact the owner.");
+      toast.success("Sign in to contact the owner and request property details.");
+      navigate("/auth", { state: { from: location } });
       return;
     }
 
@@ -633,6 +635,11 @@ const PropertyDetailPage = () => {
                 <button
                   type="button"
                   onClick={() => {
+                    if (!token) {
+                      toast.success("Sign in to contact the owner and request property details.");
+                      navigate("/auth", { state: { from: location } });
+                      return;
+                    }
                     setIntentType("contact");
                     setModalOpen(true);
                   }}

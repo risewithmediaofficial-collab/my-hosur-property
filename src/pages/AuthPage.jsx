@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheckIcon, EnvelopeIcon, LockClosedIcon, PhoneIcon, MapPinIcon, UserIcon, UserCircleIcon, EyeIcon, EyeSlashIcon } from "../components/AppIcons";
+import { ShieldCheckIcon, EnvelopeIcon, LockClosedIcon, PhoneIcon, MapPinIcon, UserIcon, UserCircleIcon, EyeIcon, EyeSlashIcon, SparklesIcon } from "../components/AppIcons";
 import BrandLogo from "../components/BrandLogo";
 import { loginUser, resendOtp, signupUser, verifyOtp as verifyOtpApi, verifyWidgetToken, forgotPassword, resetPassword } from "../services/api/authApi";
 import useAuth from "../hooks/useAuth";
@@ -163,7 +163,16 @@ const AuthPage = () => {
   const scrollToTop = useScrollToTop();
   const location = useLocation();
   const { login } = useAuth();
-  const redirectTo = location.state?.from?.pathname || "/dashboard";
+  const fromState = location.state?.from;
+  const redirectTo = useMemo(() => {
+    if (!fromState) {
+      return new URLSearchParams(location.search).get("redirect") || "/dashboard";
+    }
+    if (typeof fromState === "string") {
+      return fromState;
+    }
+    return (fromState.pathname || "/dashboard") + (fromState.search || "") + (fromState.hash || "");
+  }, [fromState, location.search]);
 
   const [mode, setMode] = useState("login");
   const [step, setStep] = useState("credentials");
@@ -562,8 +571,8 @@ const AuthPage = () => {
       : isForgot
         ? "Forgot password?"
         : isSignup
-          ? "Create your account"
-          : "Welcome back";
+          ? "Sign Up for Requesting & Posting"
+          : "Sign In for Requesting & Posting";
 
   const subText = step === "forgot_otp"
     ? `Enter the one-time password sent to your registered WhatsApp number and choose a new password.`
@@ -572,8 +581,8 @@ const AuthPage = () => {
       : isForgot
         ? "Enter your registered email address or WhatsApp number. We'll send an OTP to your registered WhatsApp number to reset your password."
         : isSignup
-          ? "Create a simple profile to browse listings, connect with sellers, and manage your property activity."
-          : "Sign in to access saved listings, leads, and account activity in one place.";
+          ? "Create a free account to submit property requirements, request loans & services, and post free property listings."
+          : "Sign in to manage your property requests, post free property listings, and connect with genuine buyers and owners.";
 
   const statusText = isForgot ? "Recovery mode" : isSignup ? "New account" : "Secure access";
 
@@ -764,12 +773,12 @@ const AuthPage = () => {
         .auth-mode-switch {
           display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 8px;
-          padding: 4px;
+          gap: 6px;
+          padding: 5px;
           border: 1px solid #e2e8f0;
           border-radius: 16px;
-          background: #f5f5f5;
-          margin-bottom: 22px;
+          background: #f1f5f9;
+          margin-bottom: 20px;
         }
         .auth-mode-btn {
           border: none;
@@ -777,34 +786,61 @@ const AuthPage = () => {
           background: transparent;
           color: #475569;
           font-size: 14px;
-          font-weight: 700;
-          padding: 12px 16px;
+          font-weight: 800;
+          padding: 11px 16px;
           cursor: pointer;
-          transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+          transition: all 0.2s ease;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
         }
         .auth-mode-btn.is-active {
-          background: #ffffff;
-          color: #111111;
-          box-shadow: 0 8px 18px rgba(17, 17, 17, 0.06);
+          background: #0042a2;
+          color: #ffffff;
+          box-shadow: 0 4px 14px rgba(0, 66, 162, 0.22);
         }
 
         .auth-heading-wrap {
-          margin-bottom: 18px;
+          margin-bottom: 20px;
+        }
+        .auth-highlight-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #fff7ed;
+          border: 1px solid #fed7aa;
+          color: #ea580c;
+          border-radius: 9999px;
+          padding: 4px 12px;
+          font-size: 11px;
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: 0.8px;
+          margin-bottom: 10px;
+          box-shadow: 0 2px 6px rgba(234, 88, 12, 0.08);
         }
         .auth-title {
           margin: 0;
-          font-size: clamp(28px, 2.6vw, 36px);
-          line-height: 1.1;
-          font-weight: 800;
-          color: #0f172a;
+          font-size: clamp(28px, 3.2vw, 38px);
+          line-height: 1.14;
+          font-weight: 900;
+          color: #0042a2;
           letter-spacing: -0.9px;
         }
+        .auth-title-highlight {
+          color: #ff9914;
+          background: linear-gradient(135deg, #ff9914 0%, #ea580c 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          display: inline;
+        }
         .auth-subtitle {
-          margin: 12px 0 0;
-          font-size: 15px;
+          margin: 10px 0 0;
+          font-size: 14.5px;
           line-height: 1.55;
-          color: #64748b;
-          max-width: 420px;
+          color: #475569;
+          max-width: 440px;
         }
 
         .auth-fields {
@@ -1059,8 +1095,15 @@ const AuthPage = () => {
           </div>
 
           <div className="auth-left-content">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-orange/10 border border-orange/30 px-3 py-1 text-xs font-black text-orange uppercase tracking-wider mb-3">
+              <SparklesIcon className="h-3.5 w-3.5 text-orange" />
+              <span>Hosur Real Estate Marketplace</span>
+            </div>
+            <h2 className="text-2xl lg:text-3xl font-extrabold text-navy leading-tight mb-3">
+              Property Requests &amp; Free Property Posting
+            </h2>
             <p className="auth-left-sub" style={{ margin: "0 0 24px" }}>
-              Browse verified listings, connect with genuine sellers, and manage your property journey with less friction.
+              Submit buyer, seller, rental &amp; loan requests directly to admin, get verified owner contacts, and post free property listings in Hosur with zero brokerage.
             </p>
             <div className="auth-stats" style={{ marginTop: 0 }}>
               {[
@@ -1105,7 +1148,7 @@ const AuthPage = () => {
                       switchMode("signup");
                     }}
                   >
-                    Create Account
+                    Sign Up
                   </button>
                 </div>
               )}
@@ -1113,7 +1156,25 @@ const AuthPage = () => {
               <AnimatePresence mode="wait">
                 <motion.div key={mode} variants={fade} initial="hidden" animate="show" exit="exit">
                   <div className="auth-heading-wrap">
-                    <h1 className="auth-title">{headingText}</h1>
+                    {!isOtpStep && !isForgot && (
+                      <div className="auth-highlight-pill">
+                        <SparklesIcon className="h-3.5 w-3.5 text-orange shrink-0" />
+                        <span>Property Requests &amp; Free Posting</span>
+                      </div>
+                    )}
+                    <h1 className="auth-title">
+                      {isForgot || isOtpStep ? (
+                        headingText
+                      ) : isSignup ? (
+                        <>
+                          Sign Up for <span className="auth-title-highlight">Requesting &amp; Posting</span>
+                        </>
+                      ) : (
+                        <>
+                          Sign In for <span className="auth-title-highlight">Requesting &amp; Posting</span>
+                        </>
+                      )}
+                    </h1>
                     <p className="auth-subtitle">{subText}</p>
                   </div>
 
