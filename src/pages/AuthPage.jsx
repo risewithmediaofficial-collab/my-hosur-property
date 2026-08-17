@@ -589,185 +589,75 @@ const AuthPage = () => {
   return (
     <>
       <style>{`
-        .auth-page {
-          min-height: calc(100vh - 178px);
-          max-height: calc(100vh - 178px);
-          display: grid;
-          grid-template-columns: minmax(520px, 1fr) minmax(420px, 500px);
-          grid-template-areas: "hero form";
-          gap: clamp(28px, 4vw, 72px);
-          background: #ffffff;
-          font-family: 'Inter', sans-serif;
-          overflow: hidden;
-          padding: 0 clamp(36px, 5vw, 72px);
-        }
-        @media (max-width: 900px) {
-          .auth-page {
-            grid-template-columns: 1fr;
-            grid-template-areas: "form";
-            gap: 0;
-            min-height: auto;
-            max-height: none;
-            overflow: visible;
-            padding: 0;
-          }
-          .auth-left { display: none !important; }
-        }
-        .auth-left {
-          grid-area: hero;
-          height: 100%;
-          overflow: hidden;
-          background: #ffffff;
-          border-right: 1px solid #e5e7eb;
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-end;
-          align-items: center;
-          padding: 40px clamp(24px, 4vw, 48px) 48px;
-        }
-        .auth-left-illustration-container {
-          flex: 1;
+        .auth-centered-page {
+          min-height: calc(100vh - 130px);
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 100%;
-          margin-bottom: 32px;
-        }
-        .auth-left-illustration {
-          width: 100%;
-          max-width: 440px;
-          height: auto;
-          max-height: 420px;
-          object-fit: contain;
-        }
-        .auth-left-content {
-          width: 100%;
-          max-width: 460px;
-          text-align: left;
-        }
-        .auth-left-heading {
-          margin: 0 0 14px;
-          font-size: clamp(30px, 3.4vw, 48px);
-          font-weight: 800;
-          color: #111111;
-          line-height: 1.08;
-          letter-spacing: -1.2px;
-        }
-        .auth-left-sub {
-          margin: 0 0 32px;
-          font-size: 15px;
-          line-height: 1.65;
-          color: #555555;
-        }
-        .auth-right {
-          grid-area: form;
+          padding: 40px 16px 60px;
+          background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
           position: relative;
-          z-index: 3;
-          display: flex;
-          align-items: flex-start;
-          justify-content: flex-start;
-          padding: clamp(28px, 4vh, 48px) clamp(16px, 3vw, 48px) 32px;
-          overflow: visible;
-          background: #ffffff;
-          height: 100%;
-          min-width: 0;
+          overflow: hidden;
+          font-family: 'Inter', sans-serif;
+        }
+        .auth-bg-glow {
+          position: absolute;
+          border-radius: 9999px;
+          filter: blur(90px);
+          pointer-events: none;
+          z-index: 1;
+        }
+        .auth-bg-glow-1 {
+          width: 420px;
+          height: 420px;
+          background: rgba(0, 66, 162, 0.07);
+          top: -60px;
+          left: 15%;
+        }
+        .auth-bg-glow-2 {
+          width: 380px;
+          height: 380px;
+          background: rgba(255, 153, 20, 0.08);
+          bottom: -40px;
+          right: 15%;
+        }
+        .auth-container {
+          position: relative;
+          z-index: 2;
+          width: 100%;
+          max-width: 480px;
+          margin: 0 auto;
         }
         .auth-card {
-          position: relative;
-          z-index: 4;
           width: 100%;
-          max-width: 460px;
-          flex: 0 0 min(460px, 100%);
         }
         .auth-card-signup {
-          margin-top: -8px;
+          max-width: 520px;
+          margin: 0 auto;
         }
         .auth-card-surface {
-          padding: 24px 30px 28px;
-          border: 1px solid #e2e8f0;
-          border-radius: 24px;
           background: #ffffff;
-          box-shadow: 0 16px 32px rgba(17, 17, 17, 0.04);
-          max-height: calc(100vh - 220px);
-          overflow-y: auto;
-          overflow-x: hidden;
+          border: 1px solid #e2e8f0;
+          border-radius: 28px;
+          padding: 32px 36px 36px;
+          box-shadow: 0 20px 50px -10px rgba(0, 66, 162, 0.1), 0 0 1px 1px rgba(0, 0, 0, 0.02);
         }
-        .auth-card-surface::-webkit-scrollbar {
-          width: 8px;
-        }
-        .auth-card-surface::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .auth-card-surface::-webkit-scrollbar-thumb {
-          background: #cbd5e1;
-          border-radius: 4px;
-          transition: background 0.2s ease;
-        }
-        .auth-card-surface::-webkit-scrollbar-thumb:hover {
-          background: #94a3b8;
-        }
-        @media (min-width: 1024px) {
-          .auth-card-surface {
-            padding: 30px;
-          }
-        }
-        @media (max-width: 900px) {
-          .auth-right {
-            padding: 18px 18px 32px;
-            justify-content: center;
-            overflow: visible;
-            height: auto;
+        @media (max-width: 640px) {
+          .auth-centered-page {
+            padding: 20px 12px 40px;
+            min-height: auto;
           }
           .auth-card-surface {
-            padding: 20px 22px 22px;
-            border-radius: 22px;
-            max-height: calc(100vh - 150px);
-          }
-          .auth-card-signup {
-            margin-top: 0;
+            padding: 24px 20px 28px;
+            border-radius: 24px;
           }
         }
 
-        .auth-brand-mobile {
-          display: none;
-          margin-bottom: 18px;
-        }
-        .auth-brand-mobile-img {
-          width: 220px;
-          max-width: 100%;
-        }
-        @media (max-width: 900px) {
-          .auth-brand-mobile {
-            display: block;
-          }
-        }
-
-        .auth-topbar {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-          margin-bottom: 18px;
-        }
-        .auth-badge {
-          display: inline-flex;
-          align-items: center;
-          padding: 0;
-        }
-        .auth-badge-logo {
-          width: 180px;
-          max-width: 40vw;
-        }
-        .auth-badge-icon {
-          width: 14px;
-          height: 14px;
-        }
-        .auth-status {
-          font-size: 11px;
-          font-weight: 700;
-          color: #64748b;
-          text-transform: uppercase;
-          letter-spacing: 1px;
+        .auth-brand-logo {
+          height: 36px;
+          max-width: 160px;
+          object-fit: contain;
+          margin: 0 auto;
         }
 
         .auth-mode-switch {
@@ -778,7 +668,7 @@ const AuthPage = () => {
           border: 1px solid #e2e8f0;
           border-radius: 16px;
           background: #f1f5f9;
-          margin-bottom: 20px;
+          margin-bottom: 22px;
         }
         .auth-mode-btn {
           border: none;
@@ -787,7 +677,7 @@ const AuthPage = () => {
           color: #475569;
           font-size: 14px;
           font-weight: 800;
-          padding: 11px 16px;
+          padding: 10px 16px;
           cursor: pointer;
           transition: all 0.2s ease;
           display: inline-flex;
@@ -802,7 +692,7 @@ const AuthPage = () => {
         }
 
         .auth-heading-wrap {
-          margin-bottom: 20px;
+          margin-bottom: 22px;
         }
         .auth-highlight-pill {
           display: inline-flex;
@@ -818,15 +708,15 @@ const AuthPage = () => {
           text-transform: uppercase;
           letter-spacing: 0.8px;
           margin-bottom: 10px;
-          box-shadow: 0 2px 6px rgba(234, 88, 12, 0.08);
+          box-shadow: 0 2px 6px rgba(234, 88, 12, 0.06);
         }
         .auth-title {
           margin: 0;
-          font-size: clamp(28px, 3.2vw, 38px);
-          line-height: 1.14;
+          font-size: clamp(24px, 2.6vw, 32px);
+          line-height: 1.2;
           font-weight: 900;
           color: #0042a2;
-          letter-spacing: -0.9px;
+          letter-spacing: -0.8px;
         }
         .auth-title-highlight {
           color: #ff9914;
@@ -836,11 +726,11 @@ const AuthPage = () => {
           display: inline;
         }
         .auth-subtitle {
-          margin: 10px 0 0;
-          font-size: 14.5px;
+          margin: 8px auto 0;
+          font-size: 13.5px;
           line-height: 1.55;
-          color: #475569;
-          max-width: 440px;
+          color: #64748b;
+          max-width: 390px;
         }
 
         .auth-fields {
@@ -871,8 +761,8 @@ const AuthPage = () => {
           transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
         .auth-input-shell:focus-within {
-          border-color: #111111;
-          box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+          border-color: #0042a2;
+          box-shadow: 0 0 0 3px rgba(0, 66, 162, 0.1);
         }
         .auth-input-icon {
           position: absolute;
@@ -915,13 +805,13 @@ const AuthPage = () => {
           display: flex;
           align-items: flex-start;
           gap: 10px;
-          padding: 14px 16px;
+          padding: 12px 14px;
           border: 1px solid #e2e8f0;
-          border-radius: 16px;
+          border-radius: 14px;
           background: #fafafa;
           color: #475569;
-          font-size: 13px;
-          line-height: 1.6;
+          font-size: 12.5px;
+          line-height: 1.5;
         }
         .auth-free-badge-icon {
           width: 16px;
@@ -933,13 +823,13 @@ const AuthPage = () => {
 
         .auth-submit {
           width: 100%;
-          min-height: 54px;
+          min-height: 52px;
           border: none;
-          border-radius: 10px;
+          border-radius: 12px;
           background: #f79e26;
           color: #ffffff;
-          font-size: 16px;
-          font-weight: 700;
+          font-size: 15.5px;
+          font-weight: 800;
           font-family: inherit;
           letter-spacing: 0.2px;
           cursor: pointer;
@@ -960,9 +850,9 @@ const AuthPage = () => {
           background: #ffffff;
           color: #0f172a;
           border-radius: 10px;
-          min-height: 48px;
+          min-height: 44px;
           padding: 0 16px;
-          font-size: 14px;
+          font-size: 13.5px;
           font-weight: 700;
           cursor: pointer;
           transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease;
@@ -980,13 +870,13 @@ const AuthPage = () => {
           display: flex;
           align-items: flex-start;
           gap: 10px;
-          padding: 14px 16px;
-          border-radius: 16px;
+          padding: 12px 14px;
+          border-radius: 14px;
           border: 1px solid #cbd5e1;
           background: #f8fafc;
           color: #475569;
-          font-size: 13px;
-          line-height: 1.6;
+          font-size: 12.5px;
+          line-height: 1.5;
         }
         .auth-otp-note strong {
           color: #0f172a;
@@ -1010,7 +900,7 @@ const AuthPage = () => {
           color: #64748b;
         }
         .auth-support-copy strong {
-          color: #0f172a;
+          color: #0042a2;
         }
         .auth-support-actions {
           display: flex;
@@ -1021,48 +911,51 @@ const AuthPage = () => {
           border: none;
           background: transparent;
           padding: 0;
-          color: #111111;
+          color: #ff9914;
           font-size: 13px;
-          font-weight: 700;
+          font-weight: 800;
           cursor: pointer;
         }
         .auth-toggle-btn:hover {
           text-decoration: underline;
+          color: #ea580c;
         }
         .auth-security-note {
           display: flex;
           align-items: center;
-          gap: 10px;
-          margin-top: 20px;
-          padding-top: 18px;
-          border-top: 1px solid #e2e8f0;
+          justify-content: center;
+          gap: 8px;
+          margin-top: 22px;
+          padding-top: 16px;
+          border-top: 1px solid #f1f5f9;
           color: #64748b;
-          font-size: 12px;
-          line-height: 1.6;
+          font-size: 11.5px;
+          line-height: 1.5;
+          text-align: center;
         }
         .auth-security-icon {
-          width: 16px;
-          height: 16px;
-          color: #111111;
+          width: 15px;
+          height: 15px;
+          color: #0042a2;
           flex-shrink: 0;
         }
 
         @media (max-width: 560px) {
-          .auth-topbar,
           .auth-support-row {
             flex-direction: column;
-            align-items: flex-start;
+            align-items: center;
+            text-align: center;
           }
           .auth-support-actions {
             width: 100%;
-            justify-content: space-between;
+            justify-content: center;
           }
           .auth-mode-btn {
-            padding: 11px 12px;
+            padding: 10px 12px;
             font-size: 13px;
           }
           .auth-title {
-            font-size: 2rem;
+            font-size: 1.65rem;
           }
         }
 
@@ -1084,50 +977,18 @@ const AuthPage = () => {
         }
       `}</style>
 
-      <div className="auth-page">
-        <div className="auth-left">
-          <div className="auth-left-illustration-container">
-            <img
-              className="auth-left-illustration"
-              src={loginIllustration}
-              alt="Hosur Property Marketplace Illustration"
-            />
-          </div>
+      <div className="auth-centered-page">
+        <div className="auth-bg-glow auth-bg-glow-1" />
+        <div className="auth-bg-glow auth-bg-glow-2" />
 
-          <div className="auth-left-content">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-orange/10 border border-orange/30 px-3 py-1 text-xs font-black text-orange uppercase tracking-wider mb-3">
-              <SparklesIcon className="h-3.5 w-3.5 text-orange" />
-              <span>Hosur Real Estate Marketplace</span>
-            </div>
-            <h2 className="text-2xl lg:text-3xl font-extrabold text-navy leading-tight mb-3">
-              Property Requests &amp; Free Property Posting
-            </h2>
-            <p className="auth-left-sub" style={{ margin: "0 0 24px" }}>
-              Submit buyer, seller, rental &amp; loan requests directly to admin, get verified owner contacts, and post free property listings in Hosur with zero brokerage.
-            </p>
-            <div className="auth-stats" style={{ marginTop: 0 }}>
-              {[
-                ["2,400+", "Listings"],
-                ["1,200+", "Buyers"],
-                ["98%", "Satisfaction"],
-              ].map(([num, label]) => (
-                <div className="auth-stat-item" key={label}>
-                  <div className="auth-stat-num">{num}</div>
-                  <div className="auth-stat-label">{label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="auth-right">
+        <div className="auth-container">
           <motion.div className={`auth-card ${isSignup ? "auth-card-signup" : ""}`} initial="hidden" animate="show" variants={fade}>
             <div className="auth-card-surface">
-              <div className="auth-topbar">
-                <div className="auth-badge">
-                  <BrandLogo className="auth-badge-logo" />
-                </div>
-                <div className="auth-status">{statusText}</div>
+              <div className="auth-card-header text-center mb-5">
+                <BrandLogo className="auth-brand-logo mx-auto" />
+                <p className="mt-1.5 text-[11px] font-semibold text-slate-400">
+                  Powered by <span className="font-bold text-navy">Gyes Property &amp; Construction</span>
+                </p>
               </div>
 
               {!isOtpStep && !isForgot && (
@@ -1155,9 +1016,9 @@ const AuthPage = () => {
 
               <AnimatePresence mode="wait">
                 <motion.div key={mode} variants={fade} initial="hidden" animate="show" exit="exit">
-                  <div className="auth-heading-wrap">
+                  <div className="auth-heading-wrap text-center">
                     {!isOtpStep && !isForgot && (
-                      <div className="auth-highlight-pill">
+                      <div className="auth-highlight-pill mx-auto">
                         <SparklesIcon className="h-3.5 w-3.5 text-orange shrink-0" />
                         <span>Property Requests &amp; Free Posting</span>
                       </div>
@@ -1175,7 +1036,7 @@ const AuthPage = () => {
                         </>
                       )}
                     </h1>
-                    <p className="auth-subtitle">{subText}</p>
+                    <p className="auth-subtitle mx-auto">{subText}</p>
                   </div>
 
                   <form onSubmit={submit} noValidate>
