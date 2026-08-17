@@ -189,6 +189,17 @@ const PropertyDetailPage = () => {
     return p.images.filter(Boolean);
   }, [p]);
 
+  const propertyVideos = useMemo(() => {
+    if (!p) return [];
+    const list = [];
+    if (Array.isArray(p.videos)) list.push(...p.videos.filter(Boolean));
+    if (Array.isArray(p.media?.videos)) list.push(...p.media.videos.filter(Boolean));
+    if (p.videoUrl && typeof p.videoUrl === "string" && p.videoUrl.trim()) list.push(p.videoUrl.trim());
+    if (p.virtualTourUrl && typeof p.virtualTourUrl === "string" && p.virtualTourUrl.trim()) list.push(p.virtualTourUrl.trim());
+    if (p.video && typeof p.video === "string" && p.video.trim()) list.push(p.video.trim());
+    return [...new Set(list)];
+  }, [p]);
+
   const activeImage = safeImages[activeImageIndex] || safeImages[0];
 
   const pricePerSqft = useMemo(() => {
@@ -356,26 +367,47 @@ const PropertyDetailPage = () => {
       {/* ── 2. PROPERTY PRICE & HEADER CARD ── */}
       <section className="bg-white border-b border-slate-200 px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
         <div className="mx-auto max-w-[1440px]">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div>
-              {/* Price & EMI */}
-              <div className="flex flex-wrap items-baseline gap-3">
-                <h1 className="text-3xl font-extrabold text-navy sm:text-4xl lg:text-5xl">
-                  {currency(p?.price || 0)}
-                </h1>
-                <span className="text-sm font-semibold text-slate-500 sm:text-base">
-                  @ ₹{pricePerSqft.toLocaleString("en-IN")} per sqft
-                </span>
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+            <div className="flex-1 min-w-0">
+              {/* Category / Type Pill */}
+              <div className="inline-flex items-center gap-2 rounded-full bg-orange/10 border border-orange/20 px-3 py-1 text-xs font-black text-orange uppercase tracking-wider mb-2.5">
+                <span>{p.propertyType || "Residential"}</span>
+                <span className="h-1 w-1 rounded-full bg-orange" />
+                <span>For {p.listingType === "rent" ? "Rent" : "Sale"}</span>
               </div>
 
-              {/* Title & Location */}
-              <h2 className="mt-2 text-lg font-bold text-navy sm:text-xl">
-                {p.bhk ? `${p.bhk} BHK ` : ""}{p.propertyType || "Residential Land/Plot"} for {p.listingType === "rent" ? "Rent" : "Sale"}
-                <span className="font-normal text-slate-600"> in {p.location?.area || "Mathigiri"}, {p.location?.city || "Hosur"}</span>
-              </h2>
+              {/* Big Highlighted Property Title */}
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] font-black text-navy leading-tight tracking-tight">
+                <span className="text-navy">
+                  {p.bhk ? `${p.bhk} BHK ` : ""}{p.propertyType || "Residential Property"}
+                </span>{" "}
+                <span className="text-orange bg-gradient-to-r from-orange via-amber-500 to-orange bg-clip-text text-transparent">
+                  for {p.listingType === "rent" ? "Rent" : "Sale"}
+                </span>{" "}
+                <span className="font-bold text-slate-800">
+                  in {p.location?.area || "Mathigiri"}, {p.location?.city || "Hosur"}
+                </span>
+              </h1>
+
+              {/* Price & Rate Per Sqft */}
+              <div className="mt-4 flex flex-wrap items-baseline gap-3">
+                <span className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold text-navy leading-none">
+                  {currency(p?.price || 0)}
+                </span>
+                {pricePerSqft > 0 && (
+                  <span className="text-sm sm:text-base font-bold text-slate-500">
+                    @ ₹{pricePerSqft.toLocaleString("en-IN")} per sqft
+                  </span>
+                )}
+                {p.carpetArea || p.builtupArea ? (
+                  <span className="inline-flex items-center rounded-lg bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">
+                    📏 {p.carpetArea || p.builtupArea} {p.areaUnit || "sqft"}
+                  </span>
+                ) : null}
+              </div>
 
               {/* RERA & Status Badges */}
-              <div className="mt-3 flex flex-wrap items-center gap-2">
+              <div className="mt-3.5 flex flex-wrap items-center gap-2">
                 {p.verification?.reraId ? (
                   <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-xs font-bold text-emerald-700">
                     <CheckBadgeIcon className="h-4 w-4 text-emerald-600" />
@@ -387,11 +419,16 @@ const PropertyDetailPage = () => {
                     VERIFIED LISTING
                   </span>
                 ) : null}
+                {p.possessionStatus ? (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-blue-50 border border-blue-200 px-2.5 py-1 text-xs font-bold text-blue-700">
+                    🔑 {p.possessionStatus}
+                  </span>
+                ) : null}
               </div>
             </div>
 
             {/* Action buttons */}
-            <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <div className="flex flex-wrap items-center gap-3 shrink-0 lg:pt-2">
               {canEdit && (
                 <button
                   type="button"
@@ -441,60 +478,98 @@ const PropertyDetailPage = () => {
           
           {/* Left Column: Media Gallery Box */}
           <div className="min-w-0 flex flex-col gap-3">
-            {/* Gallery Tabs Header */}
-            <div className="flex items-center gap-4 border-b border-slate-200 pb-2">
-              <button
-                type="button"
-                onClick={() => setActiveMediaTab("photos")}
-                className={`text-sm font-bold transition pb-1 border-b-2 ${
-                  activeMediaTab === "photos"
-                    ? "border-orange text-orange"
-                    : "border-transparent text-slate-500 hover:text-navy"
-                }`}
-              >
-                Property ({safeImages.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveMediaTab("videos")}
-                className={`text-sm font-bold transition pb-1 border-b-2 ${
-                  activeMediaTab === "videos"
-                    ? "border-orange text-orange"
-                    : "border-transparent text-slate-500 hover:text-navy"
-                }`}
-              >
-                Videos ({p.virtualTourUrl ? "1" : "0"})
-              </button>
-            </div>
-
-            {/* Main Image Box */}
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-slate-900 shadow-md group">
-              <img
-                src={activeImage}
-                alt={p.title}
-                className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-              />
-
-              {/* Bottom-left: Eyeball Views Overlay Badge */}
-              <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2 rounded-full bg-slate-900/80 backdrop-blur-md px-3.5 py-1.5 text-xs font-bold text-white shadow-lg border border-white/10">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-white">
-                  <EyeIcon className="h-3 w-3" />
-                </span>
-                <span>{propertyViewLabel}</span>
+            {/* Gallery Tabs Header - ONLY show if property has videos */}
+            {propertyVideos.length > 0 ? (
+              <div className="flex items-center gap-4 border-b border-slate-200 pb-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveMediaTab("photos")}
+                  className={`text-sm font-bold transition pb-1 border-b-2 ${
+                    activeMediaTab === "photos"
+                      ? "border-orange text-orange"
+                      : "border-transparent text-slate-500 hover:text-navy"
+                  }`}
+                >
+                  Photos ({safeImages.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveMediaTab("videos")}
+                  className={`text-sm font-bold transition pb-1 border-b-2 ${
+                    activeMediaTab === "videos"
+                      ? "border-orange text-orange"
+                      : "border-transparent text-slate-500 hover:text-navy"
+                  }`}
+                >
+                  Videos ({propertyVideos.length})
+                </button>
               </div>
+            ) : (
+              <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                <span className="text-sm font-bold text-navy pb-1 border-b-2 border-orange">
+                  Property Photos ({safeImages.length})
+                </span>
+                <span className="text-xs font-semibold text-slate-400">
+                  {activeImageIndex + 1} of {safeImages.length}
+                </span>
+              </div>
+            )}
 
-              {/* Bottom-right: Zoom Fullscreen Button */}
-              <button
-                type="button"
-                onClick={() => setIsFullscreenImage(true)}
-                className="absolute bottom-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-slate-900/80 text-white backdrop-blur-md transition hover:bg-orange shadow-lg"
-                title="View Fullscreen"
-              >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                </svg>
-              </button>
-            </div>
+            {/* Main Media Box: Image or Video */}
+            {activeMediaTab === "videos" && propertyVideos.length > 0 ? (
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-black shadow-md">
+                {propertyVideos[0].includes("youtube.com") || propertyVideos[0].includes("youtu.be") ? (
+                  <iframe
+                    src={
+                      propertyVideos[0].includes("watch?v=")
+                        ? propertyVideos[0].replace("watch?v=", "embed/")
+                        : propertyVideos[0].includes("youtu.be/")
+                        ? propertyVideos[0].replace("youtu.be/", "www.youtube.com/embed/")
+                        : propertyVideos[0]
+                    }
+                    title={`${p.title} Video`}
+                    className="h-full w-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video
+                    src={propertyVideos[0]}
+                    controls
+                    autoPlay
+                    className="h-full w-full object-contain"
+                  />
+                )}
+              </div>
+            ) : (
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-slate-900 shadow-md group">
+                <img
+                  src={activeImage}
+                  alt={p.title}
+                  className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                />
+
+                {/* Bottom-left: Eyeball Views Overlay Badge */}
+                <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2 rounded-full bg-slate-900/80 backdrop-blur-md px-3.5 py-1.5 text-xs font-bold text-white shadow-lg border border-white/10">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-white">
+                    <EyeIcon className="h-3 w-3" />
+                  </span>
+                  <span>{propertyViewLabel}</span>
+                </div>
+
+                {/* Bottom-right: Zoom Fullscreen Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsFullscreenImage(true)}
+                  className="absolute bottom-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-slate-900/80 text-white backdrop-blur-md transition hover:bg-orange shadow-lg"
+                  title="View Fullscreen"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                  </svg>
+                </button>
+              </div>
+            )}
 
             {/* Thumbnail Strip */}
             {safeImages.length > 1 && (
