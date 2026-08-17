@@ -9,7 +9,7 @@ const planSchema = new mongoose.Schema(
     ctaLabel: { type: String, default: "Get Started" },
     recommended: { type: Boolean, default: false },
     features: [{ type: String }],
-    listingLimit: { type: Number, required: true, min: 1 },
+    listingLimit: { type: Number, required: true, min: 0, default: 0 },
     durationDays: { type: Number, required: true, min: 1 },
     featuredBoost: { type: Boolean, default: false },
     category: {

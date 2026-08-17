@@ -472,6 +472,8 @@ const createProperty = async (req, res) => {
           </td>
         </tr>
       </table>
+      `
+    );
     cache.flushAll();
 
     // Respond immediately to the user (< 100ms)
