@@ -511,7 +511,14 @@ const AuthPage = () => {
         }
       }
     } catch (error) {
-      const msg = error?.response?.data?.message || error?.message || "Authentication failed";
+      let msg = error?.response?.data?.message;
+      if (!msg || typeof msg !== "string" || msg.includes("<html") || msg.includes("502 Bad Gateway")) {
+        if (error?.response?.status === 502 || error?.response?.status === 503) {
+          msg = "Server is temporarily unavailable (502 Bad Gateway). Please ensure the backend service is running.";
+        } else {
+          msg = (typeof error?.response?.data?.message === "string" ? error.response.data.message : null) || error?.message || "Authentication failed";
+        }
+      }
       console.error("[OTP] submit() caught error:", msg, error?.response?.data || "");
       toast.error(msg);
       setLoading(false);
