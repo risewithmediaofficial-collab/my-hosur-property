@@ -46,7 +46,7 @@ const ContactPage = () => {
       setSubmitting(false);
       toast.success("Thank you! We'll connect with you shortly.");
       setForm({ name: "", email: "", phone: "", message: "" });
-    }, 1200);
+    }, 250);
   };
 
   return (

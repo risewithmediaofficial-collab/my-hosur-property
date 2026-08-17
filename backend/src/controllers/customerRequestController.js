@@ -313,69 +313,72 @@ exports.createCustomerRequest = async (req, res, next) => {
       );
     }
 
-    // Try sending email notifications to admin and confirmation email to customer
-    try {
-      const adminEmails = admins.map((a) => a.email).filter(Boolean);
-      const reqTitle = getRequestTitle(request);
-      const reqLocation = `${location?.area || ""}, ${location?.city || "Hosur"}`;
-      const serviceDisplay = request.serviceType || request.propertyType || request.requestCategory.replaceAll("_", " ");
-
-      if (adminEmails.length > 0) {
-        await sendEmail({
-          to: adminEmails,
-          subject: `🔔 New Service Request: ${reqTitle} (${reqLocation})`,
-          html: `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
-              <h2 style="color: #0f172a; border-bottom: 2px solid #ea580c; padding-bottom: 8px;">New Customer Service Request</h2>
-              <p>A new service request has been submitted on <strong>MyHosurProperty</strong>.</p>
-              <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
-                <tr><td style="padding: 8px; font-weight: bold; color: #475569; width: 35%;">Category:</td><td style="padding: 8px;">${requestCategory.replaceAll("_", " ")}</td></tr>
-                <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Requirement:</td><td style="padding: 8px; font-weight: bold; color: #ea580c;">${serviceDisplay}</td></tr>
-                <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Customer:</td><td style="padding: 8px;">${req.user.name}</td></tr>
-                <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Phone:</td><td style="padding: 8px;"><a href="tel:${req.user.phone || ''}">${req.user.phone || 'N/A'}</a></td></tr>
-                <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Email:</td><td style="padding: 8px;"><a href="mailto:${req.user.email}">${req.user.email}</a></td></tr>
-                <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Location:</td><td style="padding: 8px;">${reqLocation}</td></tr>
-                ${request.budgetMax ? `<tr><td style="padding: 8px; font-weight: bold; color: #475569;">Budget:</td><td style="padding: 8px;">Rs. ${Number(request.budgetMax).toLocaleString("en-IN")}</td></tr>` : ""}
-                ${request.additionalRequirements ? `<tr><td style="padding: 8px; font-weight: bold; color: #475569;">Details:</td><td style="padding: 8px; white-space: pre-wrap;">${request.additionalRequirements}</td></tr>` : ""}
-              </table>
-              <div style="margin-top: 24px; padding: 12px; background-color: #f8fafc; border-radius: 6px; font-size: 13px; color: #64748b;">
-                Check the Admin Dashboard to view full lead information.
-              </div>
-            </div>
-          `,
-        });
-      }
-
-      if (req.user.email) {
-        await sendEmail({
-          to: req.user.email,
-          subject: `✓ Service Request Received: ${reqTitle}`,
-          html: `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
-              <h2 style="color: #0f172a; border-bottom: 2px solid #ea580c; padding-bottom: 8px;">We Have Received Your Request</h2>
-              <p>Hi <strong>${req.user.name}</strong>,</p>
-              <p>Thank you for submitting your request for <strong>${serviceDisplay}</strong> in ${reqLocation}. Our team will review your requirement and get in touch with you shortly.</p>
-              <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
-                <tr><td style="padding: 8px; font-weight: bold; color: #475569; width: 35%;">Service:</td><td style="padding: 8px; font-weight: bold; color: #ea580c;">${serviceDisplay}</td></tr>
-                <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Location:</td><td style="padding: 8px;">${reqLocation}</td></tr>
-                ${request.additionalRequirements ? `<tr><td style="padding: 8px; font-weight: bold; color: #475569;">Details:</td><td style="padding: 8px; white-space: pre-wrap;">${request.additionalRequirements}</td></tr>` : ""}
-              </table>
-              <p style="margin-top: 20px; font-size: 14px; color: #64748b;">Our admin team will use your registered phone and email to follow up.</p>
-              <p style="margin-top: 16px; font-size: 13px; color: #94a3b8;">– The MyHosurProperty Team</p>
-            </div>
-          `,
-        });
-      }
-    } catch (mailErr) {
-      console.warn("[createCustomerRequest] Email notification error:", mailErr.message);
-    }
-
+    // Return success response immediately to customer (< 100ms)
     res.status(201).json({
       message: isPropertyRequest(requestCategory)
         ? "Requirement submitted and shared with matching owners while also notifying admin."
         : "Service request submitted successfully. Our admin team will contact you soon.",
       item: request,
       matchedRecipients,
+    });
+
+    // Send email notifications to admin and confirmation email to customer asynchronously in background
+    setImmediate(async () => {
+      try {
+        const adminEmails = admins.map((a) => a.email).filter(Boolean);
+        const reqTitle = getRequestTitle(request);
+        const reqLocation = `${location?.area || ""}, ${location?.city || "Hosur"}`;
+        const serviceDisplay = request.serviceType || request.propertyType || request.requestCategory.replaceAll("_", " ");
+
+        if (adminEmails.length > 0) {
+          await sendEmail({
+            to: adminEmails,
+            subject: `🔔 New Service Request: ${reqTitle} (${reqLocation})`,
+            html: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <h2 style="color: #0f172a; border-bottom: 2px solid #ea580c; padding-bottom: 8px;">New Customer Service Request</h2>
+                <p>A new service request has been submitted on <strong>MyHosurProperty</strong>.</p>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+                  <tr><td style="padding: 8px; font-weight: bold; color: #475569; width: 35%;">Category:</td><td style="padding: 8px;">${requestCategory.replaceAll("_", " ")}</td></tr>
+                  <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Requirement:</td><td style="padding: 8px; font-weight: bold; color: #ea580c;">${serviceDisplay}</td></tr>
+                  <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Customer:</td><td style="padding: 8px;">${req.user.name}</td></tr>
+                  <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Phone:</td><td style="padding: 8px;"><a href="tel:${req.user.phone || ''}">${req.user.phone || 'N/A'}</a></td></tr>
+                  <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Email:</td><td style="padding: 8px;"><a href="mailto:${req.user.email}">${req.user.email}</a></td></tr>
+                  <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Location:</td><td style="padding: 8px;">${reqLocation}</td></tr>
+                  ${request.budgetMax ? `<tr><td style="padding: 8px; font-weight: bold; color: #475569;">Budget:</td><td style="padding: 8px;">Rs. ${Number(request.budgetMax).toLocaleString("en-IN")}</td></tr>` : ""}
+                  ${request.additionalRequirements ? `<tr><td style="padding: 8px; font-weight: bold; color: #475569;">Details:</td><td style="padding: 8px; white-space: pre-wrap;">${request.additionalRequirements}</td></tr>` : ""}
+                </table>
+                <div style="margin-top: 24px; padding: 12px; background-color: #f8fafc; border-radius: 6px; font-size: 13px; color: #64748b;">
+                  Check the Admin Dashboard to view full lead information.
+                </div>
+              </div>
+            `,
+          });
+        }
+
+        if (req.user && req.user.email) {
+          await sendEmail({
+            to: req.user.email,
+            subject: `✓ Service Request Received: ${reqTitle}`,
+            html: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <h2 style="color: #0f172a; border-bottom: 2px solid #ea580c; padding-bottom: 8px;">We Have Received Your Request</h2>
+                <p>Hi <strong>${req.user.name}</strong>,</p>
+                <p>Thank you for submitting your request for <strong>${serviceDisplay}</strong> in ${reqLocation}. Our team will review your requirement and get in touch with you shortly.</p>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+                  <tr><td style="padding: 8px; font-weight: bold; color: #475569; width: 35%;">Service:</td><td style="padding: 8px; font-weight: bold; color: #ea580c;">${serviceDisplay}</td></tr>
+                  <tr><td style="padding: 8px; font-weight: bold; color: #475569;">Location:</td><td style="padding: 8px;">${reqLocation}</td></tr>
+                  ${request.additionalRequirements ? `<tr><td style="padding: 8px; font-weight: bold; color: #475569;">Details:</td><td style="padding: 8px; white-space: pre-wrap;">${request.additionalRequirements}</td></tr>` : ""}
+                </table>
+                <p style="margin-top: 20px; font-size: 14px; color: #64748b;">Our admin team will use your registered phone and email to follow up.</p>
+                <p style="margin-top: 16px; font-size: 13px; color: #94a3b8;">– The MyHosurProperty Team</p>
+              </div>
+            `,
+          });
+        }
+      } catch (mailErr) {
+        console.warn("[createCustomerRequest] Background email notification error:", mailErr.message);
+      }
     });
   } catch (error) {
     next(error);

@@ -149,27 +149,38 @@ const createLead = async (req, res) => {
       `📨 New Inquiry`
     );
 
-    await sendEmail({
-      to: property.ownerId.email,
-      subject: `📨 ${intentLabel} - ${property.title}`,
-      html: ownerEmailHtml,
+    // Respond immediately to the user (< 100ms)
+    res.status(201).json({ lead, message: "Lead captured and owner notified" });
+
+    // Send emails asynchronously in background
+    setImmediate(async () => {
+      try {
+        await sendEmail({
+          to: property.ownerId.email,
+          subject: `📨 ${intentLabel} - ${property.title}`,
+          html: ownerEmailHtml,
+        });
+
+        // ── Email to Buyer (Confirmation) ──
+        const buyerEmailHtml = inquiryConfirmationEmail(req.user, property, lead._id);
+
+        if (req.user && req.user.email) {
+          await sendEmail({
+            to: req.user.email,
+            subject: `✓ Your inquiry was sent - ${property.title}`,
+            html: buyerEmailHtml,
+          });
+        }
+
+        console.log(`[createLead] Confirmation emails sent for lead ${lead._id}`);
+      } catch (err) {
+        console.error("[createLead] Background email failed:", err.message);
+      }
     });
-
-    // ── Email to Buyer (Confirmation) ──
-    const buyerEmailHtml = inquiryConfirmationEmail(req.user, property, lead._id);
-
-    await sendEmail({
-      to: req.user.email,
-      subject: `✓ Your inquiry was sent - ${property.title}`,
-      html: buyerEmailHtml,
-    });
-
-    console.log(`[createLead] Confirmation emails sent for lead ${lead._id}`);
   } catch (err) {
-    console.error("[createLead] Email failed:", err.message);
+    console.error("[createLead] Error:", err.message);
+    return res.status(500).json({ message: "Failed to create inquiry" });
   }
-
-  return res.status(201).json({ lead, message: "Lead captured and owner notified" });
 };
 
 const myLeads = async (req, res) => {
@@ -317,45 +328,53 @@ const updateLeadStatus = async (req, res) => {
         `,
         "✓ Contact Request Approved"
       );
-      await sendEmail({
-        to: lead.ownerId.email,
-        subject: `✓ Buyer Contact Request Approved - ${lead.propertyId?.title || "Property"}`,
-        html: ownerEmailHtml,
-      });
+        setImmediate(async () => {
+          try {
+            if (lead.ownerId?.email && status === "approved") {
+              await sendEmail({
+                to: lead.ownerId.email,
+                subject: `✓ Buyer Contact Request Approved - ${lead.propertyId?.title || "Property"}`,
+                html: ownerEmailHtml,
+              });
+            }
+
+            if (lead.userId?.email && status === "approved") {
+              const buyerEmailHtml = baseEmailLayout(
+                `
+                <h2 style="margin:0 0 4px;font-size:20px;font-weight:700;color:#1E293B;">
+                  Contact Details Unlocked! ✓
+                </h2>
+                <div style="width:40px;height:3px;background:#10B981;border-radius:2px;margin:12px 0 20px;"></div>
+
+                <p style="margin:0 0 16px;color:#64748B;">
+                  Your request to view contact details for <strong>"${lead.propertyId?.title || "Property"}"</strong> has been approved by Admin.
+                </p>
+
+                <div style="background:#ECFDF5;padding:16px;border-radius:8px;margin:20px 0;border-left:4px solid #10B981;">
+                  <p style="margin:0;color:#065F46;font-weight:600;">Property Owner Contact:</p>
+                  <p style="margin:8px 0 0;color:#065F46;font-size:14px;"><strong>Name:</strong> ${lead.ownerId?.name || "Owner"}</p>
+                  <p style="margin:4px 0 0;color:#065F46;font-size:14px;"><strong>Phone:</strong> ${lead.ownerId?.phone || "N/A"}</p>
+                  <p style="margin:4px 0 0;color:#065F46;font-size:14px;"><strong>Email:</strong> ${lead.ownerId?.email || "N/A"}</p>
+                </div>
+                `,
+                "✓ Contact Details Approved"
+              );
+              await sendEmail({
+                to: lead.userId.email,
+                subject: `✓ Contact Request Approved - ${lead.propertyId?.title || "Property"}`,
+                html: buyerEmailHtml,
+              });
+            }
+          } catch (err) {
+            console.error("[updateLeadStatus] Background email error:", err.message);
+          }
+        });
+      }
+    } catch (err) {
+      console.error("[updateLeadStatus] Error:", err.message);
     }
 
-    if (lead.userId?.email && status === "approved") {
-      const buyerEmailHtml = baseEmailLayout(
-        `
-        <h2 style="margin:0 0 4px;font-size:20px;font-weight:700;color:#1E293B;">
-          Contact Details Unlocked! ✓
-        </h2>
-        <div style="width:40px;height:3px;background:#10B981;border-radius:2px;margin:12px 0 20px;"></div>
-
-        <p style="margin:0 0 16px;color:#64748B;">
-          Your request to view contact details for <strong>"${lead.propertyId?.title || "Property"}"</strong> has been approved by Admin.
-        </p>
-
-        <div style="background:#ECFDF5;padding:16px;border-radius:8px;margin:20px 0;border-left:4px solid #10B981;">
-          <p style="margin:0;color:#065F46;font-weight:600;">Property Owner Contact:</p>
-          <p style="margin:8px 0 0;color:#065F46;font-size:14px;"><strong>Name:</strong> ${lead.ownerId?.name || "Owner"}</p>
-          <p style="margin:4px 0 0;color:#065F46;font-size:14px;"><strong>Phone:</strong> ${lead.ownerId?.phone || "N/A"}</p>
-          <p style="margin:4px 0 0;color:#065F46;font-size:14px;"><strong>Email:</strong> ${lead.ownerId?.email || "N/A"}</p>
-        </div>
-        `,
-        "✓ Contact Details Approved"
-      );
-      await sendEmail({
-        to: lead.userId.email,
-        subject: `✓ Contact Request Approved - ${lead.propertyId?.title || "Property"}`,
-        html: buyerEmailHtml,
-      });
-    }
-  } catch (err) {
-    console.error("[updateLeadStatus] Email error:", err.message);
-  }
-
-  return res.json({ message: `Lead ${status} successfully`, lead });
+    return res.json({ message: `Lead ${status} successfully`, lead });
 };
 
 const checkMyLeadStatus = async (req, res) => {

@@ -205,22 +205,25 @@ const createPaymentRequest = async (req, res, next) => {
       });
     }
 
-    try {
-      await sendEmail({
-        to: email,
-        subject: "Payment Request Received - MyHosurProperty",
-        html: `<h3>Payment Request Submitted</h3>
-               <p>Hello ${name},</p>
-               <p>We have received your payment request of <b>Rs. ${amountPaid}</b> for the plan <b>${selectedPlan}</b>.</p>
-               <p>Your transaction ID is <b>${transactionId}</b>.</p>
-               <p>Our admin team is verifying your payment. Your subscription will be activated upon approval.</p>
-               <br/><p>Thank you,<br/>MyHosurProperty Team</p>`,
-      });
-    } catch (e) {
-      console.error("Email notification failed: ", e.message);
-    }
+    // Respond immediately to the user (< 100ms)
+    res.status(201).json({ paymentRequest, message: "Payment request submitted successfully." });
 
-    return res.status(201).json({ paymentRequest, message: "Payment request submitted successfully." });
+    setImmediate(async () => {
+      try {
+        await sendEmail({
+          to: email,
+          subject: "Payment Request Received - MyHosurProperty",
+          html: `<h3>Payment Request Submitted</h3>
+                 <p>Hello ${name},</p>
+                 <p>We have received your payment request of <b>Rs. ${amountPaid}</b> for the plan <b>${selectedPlan}</b>.</p>
+                 <p>Your transaction ID is <b>${transactionId}</b>.</p>
+                 <p>Our admin team is verifying your payment. Your subscription will be activated upon approval.</p>
+                 <br/><p>Thank you,<br/>MyHosurProperty Team</p>`,
+        });
+      } catch (e) {
+        console.error("[submitManualPayment] Background email failed: ", e.message);
+      }
+    });
   } catch (error) {
     next(error);
   }
@@ -300,22 +303,25 @@ const approvePaymentRequest = async (req, res, next) => {
       payload: { paymentRequestId: paymentRequest._id },
     });
 
-    try {
-      await sendEmail({
-        to: paymentRequest.email,
-        subject: "Payment Request Approved - MyHosurProperty",
-        html: `<h3>Payment Request Approved!</h3>
-               <p>Hello ${paymentRequest.name},</p>
-               <p>Great news! Your manual payment request for plan <b>${approvedPlan}</b> has been approved.</p>
-               <p>Your subscription is active until <b>${new Date(finalExpiryDate).toLocaleDateString("en-IN")}</b>.</p>
-               ${adminNotes ? `<p><b>Admin Notes:</b> ${adminNotes}</p>` : ""}
-               <br/><p>Thank you,<br/>MyHosurProperty Team</p>`,
-      });
-    } catch (e) {
-      console.error("Email notification failed: ", e.message);
-    }
+    // Respond immediately to the admin
+    res.json({ paymentRequest, message: "Payment request approved and subscription activated." });
 
-    return res.json({ paymentRequest, message: "Payment request approved and subscription activated." });
+    setImmediate(async () => {
+      try {
+        await sendEmail({
+          to: paymentRequest.email,
+          subject: "Payment Request Approved - MyHosurProperty",
+          html: `<h3>Payment Request Approved!</h3>
+                 <p>Hello ${paymentRequest.name},</p>
+                 <p>Great news! Your manual payment request for plan <b>${approvedPlan}</b> has been approved.</p>
+                 <p>Your subscription is active until <b>${new Date(finalExpiryDate).toLocaleDateString("en-IN")}</b>.</p>
+                 ${adminNotes ? `<p><b>Admin Notes:</b> ${adminNotes}</p>` : ""}
+                 <br/><p>Thank you,<br/>MyHosurProperty Team</p>`,
+        });
+      } catch (e) {
+        console.error("[approvePaymentRequest] Background email failed: ", e.message);
+      }
+    });
   } catch (error) {
     next(error);
   }
@@ -348,22 +354,25 @@ const rejectPaymentRequest = async (req, res, next) => {
       payload: { paymentRequestId: paymentRequest._id },
     });
 
-    try {
-      await sendEmail({
-        to: paymentRequest.email,
-        subject: "Payment Request Rejected - MyHosurProperty",
-        html: `<h3>Payment Request Rejected</h3>
-               <p>Hello ${paymentRequest.name},</p>
-               <p>Your manual payment request has been rejected.</p>
-               <p><b>Reason:</b> ${reason}</p>
-               <p>If you believe this is an error, please verify your transaction details and submit a new request or contact support.</p>
-               <br/><p>Thank you,<br/>MyHosurProperty Team</p>`,
-      });
-    } catch (e) {
-      console.error("Email notification failed: ", e.message);
-    }
+    // Respond immediately to the admin
+    res.json({ paymentRequest, message: "Payment request rejected." });
 
-    return res.json({ paymentRequest, message: "Payment request rejected." });
+    setImmediate(async () => {
+      try {
+        await sendEmail({
+          to: paymentRequest.email,
+          subject: "Payment Request Rejected - MyHosurProperty",
+          html: `<h3>Payment Request Rejected</h3>
+                 <p>Hello ${paymentRequest.name},</p>
+                 <p>Your manual payment request has been rejected.</p>
+                 <p><b>Reason:</b> ${reason}</p>
+                 <p>If you believe this is an error, please verify your transaction details and submit a new request or contact support.</p>
+                 <br/><p>Thank you,<br/>MyHosurProperty Team</p>`,
+        });
+      } catch (e) {
+        console.error("[rejectPaymentRequest] Background email failed: ", e.message);
+      }
+    });
   } catch (error) {
     next(error);
   }

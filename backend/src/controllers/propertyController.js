@@ -472,70 +472,77 @@ const createProperty = async (req, res) => {
           </td>
         </tr>
       </table>
-      `,
-      "✓ Property Live"
-    );
+    cache.flushAll();
 
-    await sendEmail({
-      to: user.email,
-      subject: `✓ Your property "${property.title}" is now live on MyHosurProperty!`,
-      html: ownerEmailHtml,
+    // Respond immediately to the user (< 100ms)
+    res.status(201).json({
+      ...property.toObject(),
+      message: "Property published successfully and is now live on home/listings",
     });
-    console.log(`[createProperty] Confirmation email sent to ${user.email}`);
-  } catch (err) {
-    console.error("[createProperty] Owner notification failed:", err.message);
-  }
 
-  try {
-    const adminEmails = (await User.find({ role: "admin" }).select("email")).map((a) => a.email);
-    if (adminEmails.length > 0) {
-      const adminNotifHtml = adminPropertyNotificationEmail(property, user);
-      await sendEmail({
-        to: adminEmails[0],
-        subject: `[LIVE] New Property: ${property.title}`,
-        html: adminNotifHtml,
-        bcc: adminEmails.slice(1),
-      });
-      console.log("[createProperty] Admin notification sent to admins");
-    }
-  } catch (err) {
-    console.error("[createProperty] Admin notification failed:", err.message);
-  }
-
-  // Notify Relevant Buyers About New Property (async, non-blocking)
-  try {
-    const relevantBuyers = await User.find({
-      role: "buyer",
-      "recentSearches": {
-        $elemMatch: {
-          city: property.location?.city,
-        },
-      },
-    }).limit(50);
-
-    if (relevantBuyers.length > 0) {
-      for (const buyer of relevantBuyers) {
-        try {
-          const buyerEmailHtml = newPropertyEmail(buyer, property, 0);
+    // Send emails to owner, admin, and buyers asynchronously in background
+    setImmediate(async () => {
+      try {
+        if (user && user.email) {
           await sendEmail({
-            to: buyer.email,
-            subject: `🏠 New ${property.propertyType} Available in ${property.location?.city}!`,
-            html: buyerEmailHtml,
+            to: user.email,
+            subject: `✓ Your property "${property.title}" is now live on MyHosurProperty!`,
+            html: ownerEmailHtml,
           });
-        } catch (e) {
-          console.error(`Failed to send new property notification to ${buyer.email}:`, e.message);
+          console.log(`[createProperty] Confirmation email sent to ${user.email}`);
         }
+      } catch (err) {
+        console.error("[createProperty] Owner notification failed:", err.message);
       }
-    }
-  } catch (err) {
-    console.error("[createProperty] Buyer notifications failed:", err.message);
-  }
 
-  cache.flushAll();
-  return res.status(201).json({
-    ...property.toObject(),
-    message: "Property published successfully and is now live on home/listings",
-  });
+      try {
+        const adminEmails = (await User.find({ role: "admin" }).select("email")).map((a) => a.email);
+        if (adminEmails.length > 0) {
+          const adminNotifHtml = adminPropertyNotificationEmail(property, user);
+          await sendEmail({
+            to: adminEmails[0],
+            subject: `[LIVE] New Property: ${property.title}`,
+            html: adminNotifHtml,
+            bcc: adminEmails.slice(1),
+          });
+          console.log("[createProperty] Admin notification sent to admins");
+        }
+      } catch (err) {
+        console.error("[createProperty] Admin notification failed:", err.message);
+      }
+
+      // Notify Relevant Buyers About New Property (async, non-blocking)
+      try {
+        const relevantBuyers = await User.find({
+          role: "buyer",
+          "recentSearches": {
+            $elemMatch: {
+              city: property.location?.city,
+            },
+          },
+        }).limit(50);
+
+        if (relevantBuyers.length > 0) {
+          for (const buyer of relevantBuyers) {
+            try {
+              const buyerEmailHtml = newPropertyEmail(buyer, property, 0);
+              await sendEmail({
+                to: buyer.email,
+                subject: `🏠 New ${property.propertyType} Available in ${property.location?.city}!`,
+                html: buyerEmailHtml,
+              });
+            } catch (e) {
+              console.error(`Failed to send new property notification to ${buyer.email}:`, e.message);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("[createProperty] Buyer notifications failed:", err.message);
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const updateProperty = async (req, res) => {
