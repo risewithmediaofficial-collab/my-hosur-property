@@ -10,51 +10,59 @@ export const useScrollAnimation = (triggerDeps = []) => {
     if (reduceMotion) return undefined;
 
     const ctx = gsap.context(() => {
-      // 1. Fast hero element entry
-      gsap.from(".gsap-hero-item", {
-        opacity: 0,
-        y: 12,
-        duration: 0.3,
-        ease: "power2.out",
-        clearProps: "all",
-      });
+      // 1. Smooth hero entrance
+      const heroItems = document.querySelectorAll(".gsap-hero-item");
+      if (heroItems.length > 0) {
+        gsap.fromTo(
+          heroItems,
+          { opacity: 0, y: 16 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            stagger: 0.05,
+            ease: "power2.out",
+            overwrite: "auto",
+          }
+        );
+      }
 
-      // 2. Ultra-smooth batch scroll trigger for cards (60fps performance)
+      // 2. Ultra-smooth batch scroll trigger for cards (hardware accelerated)
       ScrollTrigger.batch(".gsap-card", {
-        start: "top 98%",
+        start: "top 92%",
         once: true,
+        interval: 0.05,
         onEnter: (batch) => {
           gsap.fromTo(
             batch,
-            { opacity: 0, y: 14 },
+            { opacity: 0, y: 18, force3D: true },
             {
               opacity: 1,
               y: 0,
-              duration: 0.3,
-              stagger: 0.03,
+              duration: 0.45,
+              stagger: 0.04,
               ease: "power2.out",
-              clearProps: "all",
               overwrite: "auto",
             }
           );
         },
       });
 
-      // 3. Fast section reveal on scroll
+      // 3. Fast & clean section reveal on scroll
       ScrollTrigger.batch(".gsap-section", {
-        start: "top 98%",
+        start: "top 94%",
         once: true,
+        interval: 0.05,
         onEnter: (batch) => {
           gsap.fromTo(
             batch,
-            { opacity: 0, y: 10 },
+            { opacity: 0, y: 14, force3D: true },
             {
               opacity: 1,
               y: 0,
-              duration: 0.25,
-              stagger: 0.04,
+              duration: 0.4,
+              stagger: 0.05,
               ease: "power2.out",
-              clearProps: "all",
               overwrite: "auto",
             }
           );
@@ -64,7 +72,7 @@ export const useScrollAnimation = (triggerDeps = []) => {
 
     const timer = setTimeout(() => {
       ScrollTrigger.refresh();
-    }, 50);
+    }, 100);
 
     return () => {
       clearTimeout(timer);
@@ -74,5 +82,6 @@ export const useScrollAnimation = (triggerDeps = []) => {
 };
 
 export default useScrollAnimation;
+
 
 

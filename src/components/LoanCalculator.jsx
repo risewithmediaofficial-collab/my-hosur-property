@@ -126,7 +126,8 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        viewport={{ once: true, amount: 0.1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
         className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200"
       >
         {/* Bank Selection */}
@@ -358,7 +359,8 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
             className="bg-slate-50 p-6 rounded-xl space-y-4 border border-slate-200"
           >
             <h4 className="text-lg font-semibold text-slate-900 mb-4">Year-wise Payment Breakdown</h4>

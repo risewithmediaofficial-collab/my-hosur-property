@@ -3196,3 +3196,15 @@ body {
     clip-path: none;
   }
 }
+
+/* GPU hardware-accelerated smooth transitions */
+.gsap-card,
+.home-gsap-card,
+.gsap-section,
+.home-gsap-section,
+.gsap-hero-item,
+.home-gsap-hero-item {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}

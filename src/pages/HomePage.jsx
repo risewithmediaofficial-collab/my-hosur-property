@@ -70,25 +70,6 @@ import {
 gsap.config({ nullTargetWarn: false });
 gsap.registerPlugin(ScrollTrigger);
 
-const MotionSection = motion.section;
-
-const reveal = {
-  hidden: { opacity: 0, y: 28 },
-  show: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay },
-  }),
-};
-
-const cardReveal = {
-  hidden: { opacity: 0, y: 18 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
-  },
-};
 
 const propertyTypeOptions = [
   { label: "All types", value: "" },
@@ -357,112 +338,81 @@ const HomePage = () => {
     };
   }, []);
 
-  // GSAP animations — run ONCE on mount only.
-  // Do NOT include featured.length here; that would revert + rebuild all
-  // ScrollTriggers whenever the API response arrives, causing a scroll-position jump.
+  // GSAP animations — ultra-smooth, lightweight, and hardware-accelerated.
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduceMotion) return undefined;
 
     const ctx = gsap.context(() => {
-      gsap.from(".home-gsap-hero-item", {
-        autoAlpha: 0,
-        y: 28,
-        duration: 0.8,
-        ease: "power3.out",
-        stagger: 0.08,
-        delay: 0.1,
+      // 1. Smooth hero entrance
+      gsap.fromTo(
+        ".home-gsap-hero-item",
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.55,
+          ease: "power2.out",
+          stagger: 0.05,
+          delay: 0.05,
+          force3D: true,
+          overwrite: "auto",
+        }
+      );
+
+      // 2. High-performance batch scroll trigger for sections
+      ScrollTrigger.batch(".home-gsap-section", {
+        start: "top 92%",
+        once: true,
+        interval: 0.05,
+        onEnter: (batch) => {
+          gsap.fromTo(
+            batch,
+            { opacity: 0, y: 16, force3D: true },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.45,
+              stagger: 0.06,
+              ease: "power2.out",
+              overwrite: "auto",
+            }
+          );
+        },
       });
 
-      if (heroBgRef.current && heroRef.current) {
-        gsap.to(heroBgRef.current, {
-          yPercent: 14,
-          scale: 1.08,
-          ease: "none",
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
-          },
-        });
-      }
-
-      if (heroContentRef.current && heroRef.current) {
-        gsap.to(heroContentRef.current, {
-          yPercent: -7,
-          ease: "none",
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
-          },
-        });
-      }
-
-      gsap.utils.toArray(".home-gsap-section").forEach((section) => {
-        gsap.from(section.querySelectorAll(".section-tag, h2, .home-gsap-copy"), {
-          y: 24,
-          duration: 0.7,
-          ease: "power3.out",
-          stagger: 0.08,
-          scrollTrigger: {
-            trigger: section,
-            start: "top 82%",
-            once: true,
-          },
-        });
-      });
-
-      gsap.utils.toArray(".home-gsap-card").forEach((card, index) => {
-        gsap.from(card, {
-          y: 34,
-          scale: 0.97,
-          duration: 0.65,
-          delay: (index % 6) * 0.035,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: card,
-            start: "top 88%",
-            once: true,
-          },
-        });
-      });
-
-      gsap.utils.toArray(".home-scroll-track").forEach((track) => {
-        gsap.fromTo(
-          track,
-          { xPercent: 2 },
-          {
-            xPercent: -2,
-            ease: "none",
-            scrollTrigger: {
-              trigger: track,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: 1,
-            },
-          }
-        );
-      });
-
-      gsap.utils.toArray(".home-parallax-soft").forEach((item) => {
-        gsap.to(item, {
-          y: -30,
-          ease: "none",
-          scrollTrigger: {
-            trigger: item,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1,
-          },
-        });
+      // 3. High-performance batch scroll trigger for cards
+      ScrollTrigger.batch(".home-gsap-card", {
+        start: "top 92%",
+        once: true,
+        interval: 0.05,
+        onEnter: (batch) => {
+          gsap.fromTo(
+            batch,
+            { opacity: 0, y: 18, force3D: true },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.45,
+              stagger: 0.04,
+              ease: "power2.out",
+              overwrite: "auto",
+            }
+          );
+        },
       });
     }, homeRootRef);
 
-    return () => ctx.revert();
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      ctx.revert();
+    };
   }, []);
+
 
   // When featured properties load, recalculate ScrollTrigger positions
   // WITHOUT reverting/rebuilding the entire GSAP context (which would jump scroll)
@@ -813,11 +763,7 @@ const HomePage = () => {
       </MotionSection>
 
       {/* ── Property Types ── */}
-      <MotionSection
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.18 }}
-        variants={reveal}
+      <section
         className="home-property-types-section home-modern-section home-gsap-section px-5 py-14 sm:px-8 sm:py-20 lg:px-10"
       >
         <div className="mx-auto max-w-[1440px]">
@@ -857,14 +803,10 @@ const HomePage = () => {
               })}
           </div>
         </div>
-      </MotionSection>
+      </section>
 
       {/* ── Our Services ── */}
-      <MotionSection
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.05 }}
-        variants={reveal}
+      <section
         className="home-modern-section home-gsap-section bg-white px-5 py-16 sm:px-8 lg:px-10"
       >
         <div className="mx-auto max-w-[1440px] home-services-grid">
@@ -886,12 +828,8 @@ const HomePage = () => {
             {servicePreview.map((item) => {
               const Icon = item.icon;
               return (
-                <motion.article
+                <article
                   key={item.title}
-                  variants={cardReveal}
-                  initial="hidden"
-                  whileInView="show"
-                  viewport={{ once: true, amount: 0.01 }}
                   className="home-gsap-card home-service-row"
                 >
                   <div className="home-service-icon">
@@ -905,7 +843,7 @@ const HomePage = () => {
                       <ArrowRightIcon className="h-3.5 w-3.5" />
                     </Link>
                   </div>
-                </motion.article>
+                </article>
               );
             })}
           </div>
@@ -914,14 +852,14 @@ const HomePage = () => {
             <img src={servicesHeroImage} alt="Modern villa property in Hosur" loading="lazy" />
           </div>
         </div>
-      </MotionSection>
+      </section>
 
       {/* ── Hosur Coverage & Localities Section ── */}
-      <MotionSection
-        initial="hidden"
         whileInView="show"
         viewport={{ once: true, amount: 0.1 }}
         variants={reveal}
+      {/* ── Hosur Coverage & Localities Section ── */}
+      <section
         className="home-gsap-section bg-white px-5 py-12 sm:px-8 lg:px-10"
       >
         <div className="mx-auto max-w-[1440px] text-center">
@@ -943,14 +881,10 @@ const HomePage = () => {
             decoding="async"
           />
         </div>
-      </MotionSection>
+      </section>
 
       {/* ── Property Showcase carousel ── */}
-      <MotionSection
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={reveal}
+      <section
         className="home-modern-section home-gsap-section bg-white px-5 py-16 sm:px-8 lg:px-10"
       >
         <div className="mx-auto max-w-[1440px]">
@@ -1010,14 +944,10 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-      </MotionSection>
+      </section>
 
       {/* ── Trust stats bar ── */}
-      <MotionSection
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={reveal}
+      <section
         className="home-modern-section home-gsap-section bg-white px-5 pb-16 sm:px-8 lg:px-10"
       >
         <div className="mx-auto max-w-[1440px] home-trust-stats">
@@ -1036,14 +966,10 @@ const HomePage = () => {
             );
           })}
         </div>
-      </MotionSection>
+      </section>
 
       {/* ── Featured Properties ── */}
-      <MotionSection
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.1 }}
-        variants={reveal}
+      <section
         className="home-gsap-section bg-white px-5 py-16 sm:px-8 lg:px-10"
       >
         {/* Adissia header layout */}
@@ -1142,14 +1068,10 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-      </MotionSection>
+      </section>
 
       {/* ── Partners ── */}
-      <MotionSection
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={reveal}
+      <section
         className="home-gsap-section bg-white px-5 py-16 sm:px-8 lg:px-10"
       >
         <div className="mx-auto max-w-[1440px] text-center">
@@ -1241,14 +1163,10 @@ const HomePage = () => {
             <p className="mt-0.5 text-[11px] text-slate-500">Real Estate Consulting</p>
           </div>
         </div>
-      </MotionSection>
+      </section>
 
       {/* ── TESTIMONIALS placeholder ── */}
-      <MotionSection
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.15 }}
-        variants={reveal}
+      <section
         className="home-gsap-section bg-[#eef4fb] px-5 py-16 sm:px-8 lg:px-10"
       >
         <div className="mx-auto max-w-[1440px] text-center">
@@ -1324,16 +1242,12 @@ const HomePage = () => {
             </button>
           </div>
         </div>
-      </MotionSection>
+      </section>
 
       {/* SEO location matrix removed from homepage per request */}
 
       {/* ── CTA Banner ── */}
-      <MotionSection
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={reveal}
+      <section
         className="home-gsap-section bg-navy px-5 py-16 text-white sm:px-8 lg:px-10"
       >
         <div className="mx-auto grid max-w-[1440px] gap-5 text-center lg:grid-cols-[1fr_auto] lg:items-center lg:text-left">
@@ -1353,7 +1267,8 @@ const HomePage = () => {
             </Link>
           </div>
         </div>
-      </MotionSection>
+      </section>
+
     </main>
   );
 };
