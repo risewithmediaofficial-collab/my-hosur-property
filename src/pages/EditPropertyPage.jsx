@@ -44,6 +44,8 @@ const parseDescription = (fullDescription) => {
       extracted.roadWidth = trimmed.replace("Road Width:", "").trim();
     } else if (trimmed.startsWith("Road Type:")) {
       extracted.roadType = trimmed.replace("Road Type:", "").trim();
+    } else if (trimmed.startsWith("Facing:")) {
+      extracted.facing = trimmed.replace("Facing:", "").trim();
     } else if (trimmed.startsWith("Corners:")) {
       extracted.corner = trimmed.replace("Corners:", "").trim();
     } else if (trimmed.startsWith("Water Source:")) {
@@ -131,7 +133,7 @@ const EditPropertyPage = () => {
           builtupArea: String(p.builtupArea || ""),
           areaUnit: p.areaUnit || "sqft",
           possessionStatus: p.possessionStatus || "Ready to Move",
-          facing: p.facing || "",
+          facing: p.facing || parsedDesc.facing || "",
           monthlyMaintenance: p.monthlyMaintenance ? String(p.monthlyMaintenance) : "",
           maintenanceType: p.maintenanceType || "",
           waterSourceType: p.waterSourceType || "",

@@ -505,7 +505,7 @@ const typeFieldConfig = {
     description: "Land-only details. No BHK, floor, or furnishing fields.",
     detailTitle: "Plot Details",
     priceLabel: "Expected Plot Price",
-    detailFields: ["propertyClass", "length", "width", "plotType", "facing"],
+    detailFields: ["propertyClass", "length", "width", "plotType", "facing", "roadWidth", "roadType"],
     featureFields: ["gatedCommunity", "park", "cctvCamera", "security", "dtcp", "hntda", "rera", "panchayatApproval", "rocApproval"],
   },
   Villa: {
@@ -519,14 +519,14 @@ const typeFieldConfig = {
     description: "Flat details with registered land area, flat type, facing, and facilities.",
     detailTitle: "Flat Details",
     priceLabel: "Expected Sale Price",
-    detailFields: ["price", "flatArea", "furnishingStatus", "facing", "ebPhase"],
+    detailFields: ["price", "flatArea", "furnishingStatus", "facing", "ebPhase", "roadWidth", "roadType"],
     featureFields: ["park", "lift", "security", "parking", "balcony", "powerBackup", "solar", "geyser", "hntda", "rera", "panchayatApproval", "rocApproval"],
   },
   "Independent House": {
     description: "House details with rooms, land/building area, car parking, water source, and utilities.",
     detailTitle: "Individual House Details",
     priceLabel: "Expected Sale Price",
-    detailFields: ["price", "propertyClass", "bhk", "bathrooms", "builtupArea", "furnishingStatus", "facing", "carParking", "waterSourceType"],
+    detailFields: ["price", "propertyClass", "bhk", "bathrooms", "builtupArea", "furnishingStatus", "facing", "carParking", "waterSourceType", "roadWidth", "roadType"],
     featureFields: ["security", "cctvCamera", "dtcp", "hntda", "rera"],
   },
   Rent: {
@@ -540,7 +540,7 @@ const typeFieldConfig = {
     description: "Apartment details with floor, rooms, land area, and common facilities.",
     detailTitle: "Apartment Details",
     priceLabel: "Expected Sale Price",
-    detailFields: ["price", "propertyClass", "bhk", "bathrooms", "builtupArea", "floorNumber", "totalFloors", "furnishingStatus", "facing"],
+    detailFields: ["price", "propertyClass", "bhk", "bathrooms", "builtupArea", "floorNumber", "totalFloors", "furnishingStatus", "facing", "roadWidth", "roadType"],
     featureFields: ["park", "lift", "security", "parking", "balcony", "powerBackup", "hntda", "rera"],
   },
   PG: {
@@ -554,14 +554,14 @@ const typeFieldConfig = {
     description: "Commercial land & building — choose sub-type: Commercial Land (cents/acres + expected price) or Commercial Building (detailed price structure).",
     detailTitle: "Commercial Details",
     priceLabel: "Expected Commercial Price",
-    detailFields: ["builtupArea", "length", "width", "frontage", "roadWidth", "roadType", "corner"],
+    detailFields: ["builtupArea", "length", "width", "frontage", "facing", "roadWidth", "roadType"],
     featureFields: ["dtcp", "hntda", "rera", "roadAccess", "parking", "security", "cctvCamera"],
   },
   "Rental Income Building": {
     description: "Rental income building — commercial or residential building generating rental income. Includes sale price, monthly rental income, building details, and facilities.",
     detailTitle: "Rental Income Building Details",
     priceLabel: "Expected Sale Price / Rental Income",
-    detailFields: ["builtupArea", "bhk", "bathrooms", "furnishingStatus", "facing", "carParking", "waterSourceType", "frontage", "roadWidth", "roadType", "corner"],
+    detailFields: ["builtupArea", "bhk", "bathrooms", "furnishingStatus", "facing", "carParking", "waterSourceType", "frontage", "roadWidth", "roadType"],
     featureFields: ["security", "cctvCamera", "dtcp", "hntda", "rera", "roadAccess", "parking", "lift", "powerBackup"],
   },
   "Warehouse / Industry": {
@@ -582,14 +582,14 @@ const typeFieldConfig = {
     description: "Farmland details with land area, soil type, borewell, well, and crop suitability.",
     detailTitle: "Farmland Details",
     priceLabel: "Expected Farmland Price",
-    detailFields: ["propertyClass", "roadWidth", "roadType", "waterSource", "soilType", "cropSuitable"],
+    detailFields: ["propertyClass", "facing", "roadWidth", "roadType", "waterSource", "soilType", "cropSuitable"],
     featureFields: ["borewell", "well", "farmhouse", "roadAccess", "waterSupply", "electricity", "boundaryWall"],
   },
   "Agri Land": {
     description: "Agricultural land details — land area in cents or acres. No HNTDA or RERA fields.",
     detailTitle: "Agricultural Land Details",
     priceLabel: "Expected Land Price",
-    detailFields: ["propertyClass", "roadWidth", "waterSource", "soilType", "cropSuitable"],
+    detailFields: ["propertyClass", "facing", "roadWidth", "roadType", "waterSource", "soilType", "cropSuitable"],
     featureFields: ["borewell", "well", "farmhouse", "roadAccess", "waterSupply", "electricity", "boundaryWall"],
   },
 };
@@ -967,8 +967,8 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         if (!form.price) return "Please enter the expected price for the commercial land.";
         return "";
       }
-      // Commercial Building — require corner
-      if (!form.corner) return "Please select the commercial building corners.";
+      // Commercial Building — require facing
+      if (!form.facing) return "Please select the commercial building facing direction.";
     }
 
     // Rental Income Building
@@ -1184,9 +1184,9 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         form.length ? `Length: ${form.length}` : "",
         form.width ? `Width: ${form.width}` : "",
         form.frontage ? `Frontage: ${form.frontage}` : "",
+        form.facing ? `Facing: ${form.facing}` : "",
         form.roadWidth ? `Road Width: ${form.roadWidth}` : "",
         form.roadType ? `Road Type: ${form.roadType}` : "",
-        form.corner ? `Corners: ${form.corner}` : "",
         form.cropSuitable ? `Crop Suitable: ${form.cropSuitable}` : "",
         form.soilType ? `Soil Type: ${form.soilType}` : "",
         form.farmhouse === "Yes" ? `Farmhouses: ${form.farmhouseCount || 1}` : "",
@@ -1316,8 +1316,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   };
 
   const isRequiredDetailField = (field) => (
-    (form.propertyType === "Commercial Land / Building" && form.commercialSubType === "Commercial Building" && field === "corner") ||
-    (form.propertyType === "Rental Income Building" && field === "corner")
+    (form.propertyType === "Commercial Land / Building" && form.commercialSubType === "Commercial Building" && field === "facing")
   );
 
   const renderInput = (field) => {
@@ -1364,11 +1363,18 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
     if (field === "soilType") {
       return <Select field={field} value={form[field]} options={soilTypeOptions} onChange={update} />;
     }
-    if (field === "corner") {
-      return <Select field={field} value={form[field]} options={["", ...cornerOptions]} onChange={update} />;
-    }
     if (field === "roadType") {
       return <Select field={field} value={form[field]} options={["", ...roadTypeOptions]} onChange={update} />;
+    }
+    if (field === "roadWidth") {
+      return (
+        <input
+          className="site-input h-11"
+          value={form[field]}
+          onChange={(e) => update(field, e.target.value)}
+          placeholder="e.g. 30 ft / 40 ft"
+        />
+      );
     }
     if (field === "cropSuitable" && form.propertyType === "Agri Land") {
       return (

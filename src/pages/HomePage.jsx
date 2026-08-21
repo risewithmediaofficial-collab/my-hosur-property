@@ -739,10 +739,17 @@ const HomePage = () => {
                 scrollToTop();
                 navigate(`/listings${queryString ? `?${queryString}` : ""}`);
               }}
-              className="inline-flex items-center justify-center rounded-xl border-2 border-navy px-8 py-3 text-sm font-bold text-navy transition hover:bg-navy hover:text-white w-full sm:w-auto shadow-sm"
+              className="inline-flex items-center justify-center rounded-xl border-2 border-navy px-7 py-3 text-sm font-bold text-navy transition hover:bg-navy hover:text-white w-full sm:w-auto shadow-sm"
             >
               Find Your Property
             </button>
+            <Link
+              to="/request-service?category=property_buy&type=Find%20your%20property"
+              onClick={scrollToTop}
+              className="inline-flex items-center justify-center rounded-xl border-2 border-orange bg-orange/10 px-7 py-3 text-sm font-bold text-orange hover:bg-orange hover:text-white transition duration-200 w-full sm:w-auto shadow-sm"
+            >
+              Request for New Property
+            </Link>
           </div>
 
           {/* ── 4. STATS COUNTERS ── */}
@@ -1078,7 +1085,10 @@ const HomePage = () => {
         {/* Partner Brand Cards Display */}
         <div className="mx-auto mt-12 grid max-w-[1200px] grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {/* Card: Gyes Property & Construction */}
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
+          <div className="group relative flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition duration-200 hover:border-orange hover:shadow-md home-gsap-card">
+            <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 transition duration-200 group-hover:bg-orange group-hover:text-white group-hover:shadow-xs">
+              Click Here ↗
+            </span>
             <a
               href="https://gyesproperty.com/"
               target="_blank"
@@ -1088,16 +1098,26 @@ const HomePage = () => {
               <img
                 src={gyesLogo}
                 alt="Gyes Property & Construction"
-                className="h-full w-full object-contain"
+                className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
                 decoding="async"
               />
             </a>
-            <p className="mt-3 text-xs font-bold text-navy">Gyes Property &amp; Construction</p>
+            <a
+              href="https://gyesproperty.com/"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="mt-3 text-xs font-bold text-navy transition group-hover:text-orange"
+            >
+              Gyes Property &amp; Construction
+            </a>
           </div>
 
           {/* Card: Gyes Traders */}
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
+          <div className="group relative flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition duration-200 hover:border-orange hover:shadow-md home-gsap-card">
+            <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 transition duration-200 group-hover:bg-orange group-hover:text-white group-hover:shadow-xs">
+              Click Here ↗
+            </span>
             <a
               href="https://www.gyestraders.com/"
               target="_blank"
@@ -1107,17 +1127,27 @@ const HomePage = () => {
               <img
                 src={gyesLogo}
                 alt="Gyes Traders"
-                className="h-full w-full object-contain"
+                className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
                 decoding="async"
               />
             </a>
-            <p className="mt-3 text-xs font-bold text-navy">Gyes Traders</p>
+            <a
+              href="https://www.gyestraders.com/"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="mt-3 text-xs font-bold text-navy transition group-hover:text-orange"
+            >
+              Gyes Traders
+            </a>
             <p className="mt-0.5 text-[11px] text-slate-500">Trading &amp; Supply</p>
           </div>
 
           {/* Card: OneClick */}
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
+          <div className="group relative flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition duration-200 hover:border-orange hover:shadow-md home-gsap-card">
+            <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 transition duration-200 group-hover:bg-orange group-hover:text-white group-hover:shadow-xs">
+              Click Here ↗
+            </span>
             <a
               href="https://oneclick2serve.com/"
               target="_blank"
@@ -1127,17 +1157,27 @@ const HomePage = () => {
               <img
                 src={oneClickLogo}
                 alt="OneClick Office & Home Service"
-                className="h-full w-full object-contain"
+                className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
                 decoding="async"
               />
             </a>
-            <p className="mt-3 text-xs font-bold text-navy">OneClick</p>
+            <a
+              href="https://oneclick2serve.com/"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="mt-3 text-xs font-bold text-navy transition group-hover:text-orange"
+            >
+              OneClick
+            </a>
             <p className="mt-0.5 text-[11px] text-slate-500">Office &amp; Home Services</p>
           </div>
 
           {/* Card: Alluring Realty */}
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition hover:border-orange hover:shadow-md home-gsap-card">
+          <div className="group relative flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition duration-200 hover:border-orange hover:shadow-md home-gsap-card">
+            <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 transition duration-200 group-hover:bg-orange group-hover:text-white group-hover:shadow-xs">
+              Click Here ↗
+            </span>
             <a
               href="https://alluringrealty.com/"
               target="_blank"
@@ -1147,12 +1187,19 @@ const HomePage = () => {
               <img
                 src={alluringRealityImg}
                 alt="Alluring Realty"
-                className="h-full w-full object-contain"
+                className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
                 decoding="async"
               />
             </a>
-            <p className="mt-3 text-xs font-bold text-navy">Alluring Realty</p>
+            <a
+              href="https://alluringrealty.com/"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="mt-3 text-xs font-bold text-navy transition group-hover:text-orange"
+            >
+              Alluring Realty
+            </a>
             <p className="mt-0.5 text-[11px] text-slate-500">Real Estate Consulting</p>
           </div>
         </div>

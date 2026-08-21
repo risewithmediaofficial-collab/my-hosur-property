@@ -261,7 +261,7 @@ const ListingPage = () => {
                   title="Can't find what you are looking for? Request your custom property requirement"
                 >
                   <PropertySearchIcon className="h-4 w-4 flex-shrink-0" />
-                  <span className="whitespace-nowrap">Request for Property</span>
+                  <span className="whitespace-nowrap">Request for New Property</span>
                 </Link>
 
                 <button
