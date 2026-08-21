@@ -115,6 +115,8 @@ const DotField = memo(({
       observer.observe(canvas.parentElement);
     }
 
+    let frameCount = 0;
+
     function tick() {
       if (!isVisible) {
         rafRef.current = null;
