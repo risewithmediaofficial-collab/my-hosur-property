@@ -28,6 +28,7 @@ const propertyTypes = [
   "Warehouse / Industry",
   "PG",
   "Commercial Land / Building",
+  "Rental Income Building",
   "Farmland",
   "Agri Land",
 ];
@@ -210,6 +211,17 @@ const agriLandAreaOptions = [
   "4 Acres",
   "5 Acres & Above",
 ];
+const commercialLandAreaUnitOptions = ["Cents", "Acres"];
+const rentalIncomePriceOptions = [
+  "₹5,000 to ₹10,000",
+  "₹10,000 to ₹20,000",
+  "₹20,000 to ₹30,000",
+  "₹30,000 to ₹50,000",
+  "₹50,000 to ₹75,000",
+  "₹75,000 to ₹1 Lakh",
+  "₹1 Lakh to ₹2 Lakhs",
+  "₹2 Lakhs & Above",
+];
 const houseRentOptions = [
   "₹4,000 to ₹6,000",
   "₹6,000 to ₹8,000",
@@ -291,7 +303,7 @@ const priceOptions = ["7.00 L", "10.00 L", "12.00 L", "15.00 L", "25.00 L", "50.
 const facingOptions = ["East", "West", "North", "South", "North East", "North West", "South East", "South West"];
 const yesNoOptions = ["Yes", "No"];
 const propertyClassOptions = ["General", "AD Condition"];
-const hidePropertyClassTypes = ["Rent", "PG", "Commercial Land / Building", "Warehouse", "Warehouse / Industry"];
+const hidePropertyClassTypes = ["Rent", "PG", "Commercial Land / Building", "Rental Income Building", "Warehouse", "Warehouse / Industry"];
 const soilTypeOptions = ["Red Soil", "Black Soil", "Clay Soil", "Alluvial Soil", "Sandy Soil", "Loam Soil"];
 
 const defaultWarehouseDetails = {
@@ -482,6 +494,10 @@ const defaultForm = {
   ebPhase: "",
   buildAge: "",
   warehouseDetails: defaultWarehouseDetails,
+  commercialSubType: "",
+  rentalPrice: "",
+  commercialLandArea: "",
+  commercialLandAreaUnit: "Cents",
 };
 
 const typeFieldConfig = {
@@ -535,11 +551,18 @@ const typeFieldConfig = {
     featureFields: ["foodIncluded", "tv", "wifi", "gym", "washingMachine", "hotWater", "security", "cctvCamera", "waterSupply", "powerBackup", "hntda", "rera"],
   },
   "Commercial Land / Building": {
-    description: "Commercial land & building details with length, width, and approvals.",
+    description: "Commercial land & building — choose sub-type: Commercial Land (cents/acres + expected price) or Commercial Building (detailed price structure).",
     detailTitle: "Commercial Details",
     priceLabel: "Expected Commercial Price",
     detailFields: ["builtupArea", "length", "width", "frontage", "roadWidth", "roadType", "corner"],
     featureFields: ["dtcp", "hntda", "rera", "roadAccess", "parking", "security", "cctvCamera"],
+  },
+  "Rental Income Building": {
+    description: "Rental income building — commercial or residential building generating rental income. Includes sale price, monthly rental income, building details, and facilities.",
+    detailTitle: "Rental Income Building Details",
+    priceLabel: "Expected Sale Price / Rental Income",
+    detailFields: ["builtupArea", "bhk", "bathrooms", "furnishingStatus", "facing", "carParking", "waterSourceType", "frontage", "roadWidth", "roadType", "corner"],
+    featureFields: ["security", "cctvCamera", "dtcp", "hntda", "rera", "roadAccess", "parking", "lift", "powerBackup"],
   },
   "Warehouse / Industry": {
     description: "Warehouse & Industry details with land/build-up area, access, parking, and logistics-ready facilities.",
@@ -936,8 +959,22 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
 
     if (required.some((value) => !value)) return "Please fill location and price details.";
 
-    if (form.propertyType === "Commercial Land / Building" && !form.corner) {
-      return "Please select the commercial building corners.";
+    // Commercial Land / Building — require sub-type selection
+    if (form.propertyType === "Commercial Land / Building") {
+      if (!form.commercialSubType) return "Please select the commercial sub-type: Commercial Land or Commercial Building.";
+      if (form.commercialSubType === "Commercial Land") {
+        if (!form.commercialLandArea) return "Please enter the land area (in cents or acres).";
+        if (!form.price) return "Please enter the expected price for the commercial land.";
+        return "";
+      }
+      // Commercial Building — require corner
+      if (!form.corner) return "Please select the commercial building corners.";
+    }
+
+    // Rental Income Building
+    if (form.propertyType === "Rental Income Building") {
+      if (!form.price && !form.rentalPrice) return "Please enter the expected sale price or the monthly rental income.";
+      return "";
     }
 
     const isWarehouse = form.propertyType === "Warehouse" || form.propertyType === "Warehouse / Industry";
@@ -1107,14 +1144,17 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         warehouseSellingPrice > 0 && warehouseBuiltupArea > 0 ? Math.round(warehouseSellingPrice / warehouseBuiltupArea) : ""
       );
       const isWarehouse = form.propertyType === "Warehouse" || form.propertyType === "Warehouse / Industry";
-      const isExpectedPriceOnly = ["Villa", "Independent House", "Flat", "Apartment"].includes(form.propertyType);
+      const isExpectedPriceOnly = ["Villa", "Independent House", "Flat", "Apartment", "Rental Income Building"].includes(form.propertyType);
       const isRentListing = getListingType(form.propertyType) === "rent";
+      const isCommercialLand = form.propertyType === "Commercial Land / Building" && form.commercialSubType === "Commercial Land";
 
       const amount = isWarehouse
         ? (warehouseSellingPrice || priceFieldValue || totalAmount)
         : isRentListing ? (monthlyRent || priceFieldValue)
         : isExpectedPriceOnly ? (priceFieldValue || totalAmount)
+        : isCommercialLand ? priceFieldValue
         : (totalAmount || priceFieldValue);
+
       const title = form.title.trim() || `${form.propertyType} in ${form.area || form.village || form.city}, ${form.city || "Hosur"}`;
       const activeConfig = typeFieldConfig[form.propertyType] || { detailFields: [], featureFields: [] };
       const showPropertyClass = !hidePropertyClassTypes.includes(form.propertyType);
@@ -1167,13 +1207,15 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         description: detailLines.join("\n"),
         price: amount,
         monthlyRent: monthlyRent || (isRentListing ? amount : undefined),
+        rentalPrice: form.rentalPrice ? toNumber(form.rentalPrice) || form.rentalPrice : undefined,
         advance: form.advance || "",
-        totalAmount: (isWarehouse || isExpectedPriceOnly) ? (warehouseSellingPrice || priceFieldValue || totalAmount || undefined) : (totalAmount || undefined),
+        totalAmount: (isWarehouse || isExpectedPriceOnly || isCommercialLand) ? (warehouseSellingPrice || priceFieldValue || totalAmount || undefined) : (totalAmount || undefined),
         propertyType: apiPropertyType,
         propertyClass: showPropertyClass ? (form.propertyClass || "General") : undefined,
-        measurementType: form.measurementType || (form.propertyType === "Agri Land" || form.propertyType === "Farmland" ? "Cent" : "Square Feet"),
+        commercialSubType: form.commercialSubType || undefined,
+        measurementType: isCommercialLand ? (form.commercialLandAreaUnit || "Cents") : (form.measurementType || (form.propertyType === "Agri Land" || form.propertyType === "Farmland" ? "Cent" : "Square Feet")),
         ratePerUnit: form.ratePerUnit ? toNumber(form.ratePerUnit) : undefined,
-        landArea: isWarehouse ? (warehouseDetails.totalLandArea || form.landArea || "") : (form.landArea || ""),
+        landArea: isWarehouse ? (warehouseDetails.totalLandArea || form.landArea || "") : isCommercialLand ? (form.commercialLandArea || "") : (form.landArea || ""),
         flatArea: form.flatArea || "",
         plotType: form.plotType || "",
         villaType: form.villaType || "",
@@ -1274,7 +1316,8 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   };
 
   const isRequiredDetailField = (field) => (
-    form.propertyType === "Commercial Land / Building" && field === "corner"
+    (form.propertyType === "Commercial Land / Building" && form.commercialSubType === "Commercial Building" && field === "corner") ||
+    (form.propertyType === "Rental Income Building" && field === "corner")
   );
 
   const renderInput = (field) => {
@@ -1848,7 +1891,92 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
           </div>
         </FormSection>
 
-        {!["Warehouse", "Warehouse / Industry", "Rent", "PG", "Villa", "Independent House", "Flat", "Apartment"].includes(form.propertyType) ? (
+        {/* ── Commercial Land / Building — Sub-type selector ── */}
+        {form.propertyType === "Commercial Land / Building" && (
+          <FormSection title="Commercial Sub-Type">
+            <div className="space-y-4">
+              <p className="text-sm text-slate-600 leading-6">
+                Select whether you are posting a <strong>Commercial Land</strong> (bare land for sale in cents / acres) or a <strong>Commercial Building</strong> (constructed property with built-up area).
+              </p>
+              <div className="flex flex-wrap gap-3">
+                {["Commercial Land", "Commercial Building"].map((subType) => (
+                  <button
+                    key={subType}
+                    type="button"
+                    onClick={() => update("commercialSubType", subType)}
+                    className={`rounded-xl border-2 px-5 py-3 text-sm font-bold transition-all duration-200 ${
+                      form.commercialSubType === subType
+                        ? "border-orange bg-orange text-white shadow-md scale-[1.02]"
+                        : "border-slate-200 bg-white text-slate-700 hover:border-orange/50 hover:bg-orange/5"
+                    }`}
+                  >
+                    {subType}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </FormSection>
+        )}
+
+        {/* ── Price Details ── */}
+        {form.propertyType === "Commercial Land / Building" && form.commercialSubType === "Commercial Land" ? (
+          <FormSection title="Price Details — Commercial Land">
+            <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
+              <Field label="Land Area Unit" required>
+                <Select
+                  field="commercialLandAreaUnit"
+                  value={form.commercialLandAreaUnit}
+                  options={commercialLandAreaUnitOptions}
+                  onChange={update}
+                />
+              </Field>
+              <Field label={`Land Area (${form.commercialLandAreaUnit || "Cents"})`} required>
+                <input
+                  className="site-input h-11"
+                  value={form.commercialLandArea}
+                  onChange={(e) => update("commercialLandArea", e.target.value)}
+                  placeholder={form.commercialLandAreaUnit === "Acres" ? "e.g. 1.5 Acres" : "e.g. 25 Cents"}
+                />
+              </Field>
+              <Field label="Expected Price" required>
+                <DropdownInput
+                  field="price"
+                  value={form.price}
+                  options={commercialPriceOptions}
+                  onChange={update}
+                  placeholder="Select or enter price"
+                />
+              </Field>
+            </div>
+          </FormSection>
+        ) : form.propertyType === "Rental Income Building" ? (
+          <FormSection title="Price Details — Rental Income Building">
+            <div className="rounded-xl border border-indigo-100 bg-indigo-50/40 p-4 mb-4">
+              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 mb-1">Pricing Information</p>
+              <p className="text-sm text-slate-600 leading-6">Enter the <strong>expected sale price</strong> of the building and/or the <strong>current monthly rental income</strong> it generates.</p>
+            </div>
+            <div className="grid gap-x-5 gap-y-5 md:grid-cols-2">
+              <Field label="Expected Sale Price">
+                <DropdownInput
+                  field="price"
+                  value={form.price}
+                  options={commercialPriceOptions}
+                  onChange={update}
+                  placeholder="Select or enter sale price"
+                />
+              </Field>
+              <Field label="Monthly Rental Income" required>
+                <DropdownInput
+                  field="rentalPrice"
+                  value={form.rentalPrice}
+                  options={rentalIncomePriceOptions}
+                  onChange={update}
+                  placeholder="Select or enter monthly rental"
+                />
+              </Field>
+            </div>
+          </FormSection>
+        ) : !["Warehouse", "Warehouse / Industry", "Rent", "PG", "Villa", "Independent House", "Flat", "Apartment"].includes(form.propertyType) ? (
           <FormSection title="Price Details">
             <div className="grid gap-x-5 gap-y-5 md:grid-cols-2">
               <Field label="Measurement" required>
@@ -1867,15 +1995,18 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
           </FormSection>
         ) : null}
 
-        <FormSection title={config.detailTitle}>
-          <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
-            {config.detailFields.map((field) => (
-              <Field key={field} label={getFieldLabel(field, form.propertyType)} required={isRequiredDetailField(field)}>
-                {renderInput(field)}
-              </Field>
-            ))}
-          </div>
-        </FormSection>
+        {/* Skip detail fields for Commercial Land (land-only doesn't need building details) */}
+        {!(form.propertyType === "Commercial Land / Building" && form.commercialSubType === "Commercial Land") && (
+          <FormSection title={config.detailTitle}>
+            <div className="grid gap-x-5 gap-y-5 md:grid-cols-3">
+              {config.detailFields.map((field) => (
+                <Field key={field} label={getFieldLabel(field, form.propertyType)} required={isRequiredDetailField(field)}>
+                  {renderInput(field)}
+                </Field>
+              ))}
+            </div>
+          </FormSection>
+        )}
 
         {renderWarehouseSections()}
 

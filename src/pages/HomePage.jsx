@@ -1168,7 +1168,7 @@ const HomePage = () => {
               href="https://gyesproperty.com/"
               target="_blank"
               rel="noreferrer noopener"
-              className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
+              className="flex h-28 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
             >
               <img
                 src={gyesLogo}
@@ -1187,7 +1187,7 @@ const HomePage = () => {
               href="https://www.gyestraders.com/"
               target="_blank"
               rel="noreferrer noopener"
-              className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
+              className="flex h-28 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
             >
               <img
                 src={gyesLogo}
@@ -1227,7 +1227,7 @@ const HomePage = () => {
               href="https://alluringrealty.com/"
               target="_blank"
               rel="noreferrer noopener"
-              className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
+              className="flex h-28 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
             >
               <img
                 src={alluringRealityImg}
