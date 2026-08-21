@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { AdjustmentsHorizontalIcon, XMarkIcon } from "../components/AppIcons";
+import { AdjustmentsHorizontalIcon, PropertySearchIcon, XMarkIcon } from "../components/AppIcons";
 import PropertyCard from "../components/PropertyCard";
 import PropertySearchFilterPanel from "../components/PropertySearchFilterPanel";
 import SeoHead from "../components/SeoHead";
@@ -243,7 +243,7 @@ const ListingPage = () => {
         {/* Right: properties — own scrollbar, independent from filters */}
         <section className="listing-results flex min-h-0 flex-1 flex-col gsap-section" aria-label="Property results">
           <div className="listing-results-header">
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="listing-results-intro gsap-hero-item">
                 <p className="section-tag">Property listings</p>
                 <h1 className="mt-1.5 text-2xl font-bold text-navy sm:text-3xl">Search your property in Hosur</h1>
@@ -253,8 +253,17 @@ const ListingPage = () => {
                 </p>
               </div>
 
-              {/* Filter Icon Button (No text, professional icon toggle) */}
-              <div className="flex items-center gap-2 pt-1">
+              {/* Action Buttons: Request Property + Filter Icon */}
+              <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                <Link
+                  to="/request-service?category=property_buy&type=Find%20your%20property"
+                  className="inline-flex h-[2.65rem] items-center gap-2 rounded-xl border border-orange bg-orange/10 px-4 text-xs font-bold text-orange shadow-xs transition-all duration-200 hover:bg-orange hover:text-white sm:text-sm hover:shadow-md hover:-translate-y-0.5"
+                  title="Can't find what you are looking for? Request your custom property requirement"
+                >
+                  <PropertySearchIcon className="h-4 w-4 flex-shrink-0" />
+                  <span className="whitespace-nowrap">Request for Property</span>
+                </Link>
+
                 <button
                   type="button"
                   onClick={openDesktopFilters}
@@ -316,11 +325,20 @@ const ListingPage = () => {
                 <div className="rounded-xl bg-surface px-6 py-16 text-center">
                   <h3 className="text-xl font-bold text-navy">No properties found</h3>
                   <p className="mx-auto mt-3 max-w-md text-sm leading-7 text-slate-600">
-                    No properties found. Try changing your filters.
+                    Didn't find what you're looking for? Submit your property requirement and our Hosur team will help you find the right match.
                   </p>
-                  <button type="button" onClick={resetAll} className="site-button-primary mt-6 px-5 py-3 text-sm">
-                    Reset all filters
-                  </button>
+                  <div className="mt-6 flex flex-wrap justify-center gap-3">
+                    <Link
+                      to="/request-service?category=property_buy&type=Find%20your%20property"
+                      className="site-button-primary inline-flex items-center gap-2 px-5 py-3 text-sm font-bold"
+                    >
+                      <PropertySearchIcon className="h-4 w-4" />
+                      <span>Request for Property</span>
+                    </Link>
+                    <button type="button" onClick={resetAll} className="site-button-secondary px-5 py-3 text-sm font-bold">
+                      Reset all filters
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
