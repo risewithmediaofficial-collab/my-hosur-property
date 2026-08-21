@@ -506,11 +506,8 @@ const HomePage = () => {
 
       {/* ── HERO SECTION ── */}
       {/* NOTE: overflow is on the bg wrapper only, NOT on the section — so dropdowns can escape */}
-      <MotionSection
+      <section
         ref={heroRef}
-        initial="hidden"
-        animate="show"
-        variants={reveal}
         className="relative min-h-[380px] sm:min-h-[460px] lg:min-h-[500px]"
         style={{ zIndex: 1 }}
       >
@@ -760,7 +757,7 @@ const HomePage = () => {
             ))}
           </div>
         </div>
-      </MotionSection>
+      </section>
 
       {/* ── Property Types ── */}
       <section
