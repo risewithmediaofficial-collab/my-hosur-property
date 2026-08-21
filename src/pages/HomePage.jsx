@@ -852,10 +852,6 @@ const HomePage = () => {
       </section>
 
       {/* ── Hosur Coverage & Localities Section ── */}
-        whileInView="show"
-        viewport={{ once: true, amount: 0.1 }}
-        variants={reveal}
-      {/* ── Hosur Coverage & Localities Section ── */}
       <section
         className="home-gsap-section bg-white px-5 py-12 sm:px-8 lg:px-10"
       >
