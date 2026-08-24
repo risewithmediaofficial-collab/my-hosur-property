@@ -64,7 +64,24 @@ const formatCustomerRequestLabel = (item) => {
   return item.propertyType || "Property Requirement";
 };
 
-const formatAdminDate = (value) => new Date(value).toLocaleDateString("en-IN");
+const formatAdminDate = (value) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  return isNaN(date.getTime()) ? "-" : date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+};
+
+const formatAdminTime = (value) => {
+  if (!value) return "";
+  const date = new Date(value);
+  return isNaN(date.getTime()) ? "" : date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+};
+
+const formatAdminDateTime = (value) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return "-";
+  return `${date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}, ${date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true })}`;
+};
 
 const AdminDashboardPage = () => {
   const { token } = useAuth();
@@ -250,7 +267,26 @@ const AdminDashboardPage = () => {
         (p.ownerId?.phone || "").includes(q) ||
         (p.propertyType || "").toLowerCase().includes(q);
 
-      const matchesType = propertyTypeFilter === "all" || (p.propertyType || "").toLowerCase() === propertyTypeFilter.toLowerCase();
+      const matchesType =
+        propertyTypeFilter === "all" ||
+        (() => {
+          const selected = propertyTypeFilter.toLowerCase();
+          const current = (p.propertyType || "").toLowerCase();
+          if (current === selected) return true;
+          if (selected === "plot" && (current === "plot" || current === "empty land" || current === "land" || current === "plot for rent")) return true;
+          if (selected === "villa" && current === "villa") return true;
+          if (selected === "flat" && (current === "flat" || current === "apartment")) return true;
+          if (selected === "apartment" && (current === "apartment" || current === "flat")) return true;
+          if ((selected === "independent house" || selected === "house" || selected === "individual house") && (current.includes("house") || current === "independent house" || current === "individual house")) return true;
+          if (selected.includes("commercial") && (current.includes("commercial") || current === "office")) return true;
+          if (selected.includes("rental income") && current.includes("rental income")) return true;
+          if ((selected === "farmland" || selected === "farm land") && (current === "farmland" || current === "farm land")) return true;
+          if ((selected === "agri land" || selected === "agricultural land" || selected === "agricultural") && (current.includes("agri") || current.includes("agricultural"))) return true;
+          if ((selected.includes("warehouse") || selected.includes("industry")) && (current.includes("warehouse") || current.includes("industry") || current.includes("industrial") || current.includes("industrial shed"))) return true;
+          if (selected === "rent" && current.includes("rent")) return true;
+          if (selected === "pg" && current === "pg") return true;
+          return current === selected;
+        })();
       const matchesStatus = propertyStatusFilter === "all" || (p.status || "approved") === propertyStatusFilter;
 
       const matchesIntent =
@@ -824,6 +860,7 @@ const AdminDashboardPage = () => {
                     <th>Name / Email</th>
                     <th>User Type / Role</th>
                     <th>Status</th>
+                    <th>Joined Date & Time</th>
                     <th className="text-right">Action</th>
                   </tr>
                 </thead>
@@ -833,6 +870,7 @@ const AdminDashboardPage = () => {
                       <td>
                         <p className="font-semibold">{u.name}</p>
                         <p className="text-xs text-slate-500">{u.email}</p>
+                        {u.phone && <p className="text-xs text-slate-400">{u.phone}</p>}
                       </td>
                       <td>
                         <select
@@ -854,15 +892,12 @@ const AdminDashboardPage = () => {
                           {u.status || "active"}
                         </span>
                       </td>
+                      <td className="whitespace-nowrap text-xs text-slate-600">
+                        <p className="font-semibold text-slate-800">{formatAdminDate(u.createdAt)}</p>
+                        <p className="text-[11px] text-slate-400">{formatAdminTime(u.createdAt)}</p>
+                      </td>
                       <td className="text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => onGiveAllAccess(u)}
-                            className="rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white shadow transition hover:bg-emerald-700 active:scale-95 flex items-center gap-1"
-                            title="Grant property posting, 9999 contact unlocks & 999 lead credits"
-                          >
-                            ⚡ Give All Access
-                          </button>
                           <button onClick={() => openUserModal(u)} className="dashboard-secondary px-3 py-1 text-xs">
                             View Details
                           </button>
@@ -1233,20 +1268,23 @@ const AdminDashboardPage = () => {
 
               <div className="flex flex-wrap items-center gap-3">
                 <select
-                  className="dashboard-control w-full sm:w-40 text-sm"
+                  className="dashboard-control w-full sm:w-48 text-sm"
                   value={propertyTypeFilter}
                   onChange={(e) => setPropertyTypeFilter(e.target.value)}
                 >
-                  <option value="all">All Types</option>
+                  <option value="all">All Property Types</option>
                   <option value="plot">Plot</option>
                   <option value="villa">Villa</option>
                   <option value="flat">Flat</option>
-                  <option value="independent house">House</option>
                   <option value="apartment">Apartment</option>
-                  <option value="commercial land / building">Commercial</option>
-                  <option value="farmland">Farmland</option>
-                  <option value="agri land">Agri Land</option>
+                  <option value="independent house">Independent House</option>
+                  <option value="commercial land / building">Commercial Land / Building</option>
+                  <option value="rental income building">Rental Income Building</option>
+                  <option value="farmland">Farm Land</option>
+                  <option value="agricultural land">Agricultural Land</option>
                   <option value="warehouse / industry">Warehouse / Industry</option>
+                  <option value="rent">House / Property for Rent</option>
+                  <option value="pg">PG</option>
                 </select>
 
                 <select
@@ -1330,6 +1368,7 @@ const AdminDashboardPage = () => {
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Property</th>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Location</th>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Posted By</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Posted Date & Time</th>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Status</th>
                     <th className="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Action</th>
                   </tr>
@@ -1354,7 +1393,9 @@ const AdminDashboardPage = () => {
                           <p className="text-xs font-semibold text-slate-500 mt-0.5">
                             Rs. {Number(p.price || 0).toLocaleString("en-IN")} · {p.propertyType || "Property"} · {p.listingType || "sale"}
                           </p>
-                          <p className="text-[11px] text-slate-400 mt-0.5">Posted {new Date(p.createdAt).toLocaleDateString("en-IN")}</p>
+                          <p className="text-[11px] text-slate-400 mt-0.5">
+                            Posted {formatAdminDate(p.createdAt)} at {formatAdminTime(p.createdAt)}
+                          </p>
                         </button>
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-slate-700">
@@ -1366,6 +1407,10 @@ const AdminDashboardPage = () => {
                         <p className="text-xs text-slate-500">{p.ownerId?.email || "No email"}</p>
                         {p.ownerId?.phone ? <p className="text-xs font-bold text-orange-600">{p.ownerId.phone}</p> : null}
                         <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{p.ownerType || p.ownerId?.role || "user"}</p>
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-700">
+                        <p className="font-semibold text-slate-900 text-xs">{formatAdminDate(p.createdAt)}</p>
+                        <p className="text-[11px] text-slate-500">{formatAdminTime(p.createdAt)}</p>
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap">
                         <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-extrabold uppercase tracking-wider whitespace-nowrap ${
@@ -1401,7 +1446,7 @@ const AdminDashboardPage = () => {
                   ))}
                   {filteredPropertyListings.length === 0 && (
                     <tr>
-                      <td colSpan="6" className="py-12 text-center text-slate-400 text-sm">
+                      <td colSpan="7" className="py-12 text-center text-slate-400 text-sm">
                         No properties found matching your search.
                       </td>
                     </tr>
@@ -1685,13 +1730,16 @@ const AdminDashboardPage = () => {
                   <p className="text-sm text-ink/70">{selectedUser.phone || "No phone provided"}</p>
                   <p className="text-sm text-ink/70">{selectedUser.address || "No address provided"}</p>
                   <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Current Role: {selectedUser.role}</p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    <span className="font-semibold text-slate-700">Joined:</span> {formatAdminDateTime(selectedUser.createdAt)}
+                  </p>
                 </div>
                 <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${selectedUser.status === "deactivated" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
                   {selectedUser.status || "active"}
                 </span>
               </div>
 
-              {/* Admin Quick Role & Access Controls */}
+              {/* Admin Quick Role Controls */}
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-slate-100/90 p-3.5 border border-slate-200/80">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-slate-700">Change User Role:</span>
@@ -1709,13 +1757,6 @@ const AdminDashboardPage = () => {
                     <option value="admin">Admin</option>
                   </select>
                 </div>
-                <button
-                  onClick={() => onGiveAllAccess(selectedUser)}
-                  className="rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700 flex items-center gap-1.5"
-                  title="Grant full posting access, premium contact unlocks & 999 lead credits"
-                >
-                  ⚡ Give All Access
-                </button>
               </div>
 
               <div className="grid grid-cols-1 gap-3 border-t border-slate-200 pt-4 text-sm sm:grid-cols-2">
@@ -1775,7 +1816,7 @@ const AdminDashboardPage = () => {
                         <div>
                           <p className="max-w-[180px] truncate text-xs font-bold">{p.title}</p>
                           <p className="text-[10px] text-ink/50">Rs. {Number(p.price || 0).toLocaleString("en-IN")}</p>
-                          <p className="text-[10px] text-ink/60">{p.location?.city} - {p.status}</p>
+                          <p className="text-[10px] text-ink/60">{p.location?.city || "Hosur"} - {p.status} · Posted {formatAdminDate(p.createdAt)}</p>
                         </div>
                         <div className="flex gap-2">
                           <button onClick={() => { setSelectedUser(null); openProperty(p); }} className="dashboard-secondary px-2 py-1 text-[10px]">
