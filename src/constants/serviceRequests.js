@@ -11,7 +11,7 @@ export const PROPERTY_REQUEST_TYPES = [
   "Industrial Shed",
 ];
 
-export const RENT_REQUEST_TYPES = ["House", "Office", "Commercial", "Warehouse", "Land", "Industrial Shed"];
+export const RENT_REQUEST_TYPES = ["House", "Apartment", "Villa", "Office", "Commercial", "Warehouse", "Land", "Industrial Shed"];
 
 export const BANK_OPTIONS = [
   "SBI (State Bank of India)",
@@ -25,6 +25,176 @@ export const BANK_OPTIONS = [
   "Union Bank of India",
   "IDFC FIRST Bank",
   "Other / Partner Bank",
+];
+
+export const BHK_OPTIONS = ["1 BHK", "2 BHK", "3 BHK", "4 BHK", "5+ BHK"];
+export const BATHROOM_OPTIONS = ["1", "2", "3", "4", "5+"];
+export const FURNISHING_OPTIONS = ["Unfurnished", "Semi-Furnished", "Fully Furnished"];
+export const FACING_OPTIONS = [
+  "East",
+  "North",
+  "West",
+  "South",
+  "North East",
+  "North West",
+  "South East",
+  "South West",
+  "Any Facing",
+];
+export const POSSESSION_OPTIONS = [
+  "Ready to Move",
+  "Under Construction",
+  "Within 3 Months",
+  "Within 6 Months",
+  "Any",
+];
+export const CAR_PARKING_OPTIONS = [
+  "1 Car",
+  "2 Cars",
+  "3+ Cars",
+  "Bike Only",
+  "No Parking",
+  "Any",
+];
+export const WATER_SOURCE_OPTIONS = [
+  "Borewell",
+  "Corporation Water",
+  "Layout Water",
+  "Both Borewell & Corporation",
+  "Any",
+];
+export const PLOT_UNIT_OPTIONS = ["sq.ft", "Cents", "Acres", "Gunthas"];
+export const ROAD_WIDTH_OPTIONS = [
+  "20 Feet",
+  "25 Feet",
+  "30 Feet",
+  "40 Feet",
+  "60 Feet Main Road",
+  "Highway Facing",
+  "Any",
+];
+export const ROAD_TYPE_OPTIONS = [
+  "Tar Road",
+  "Concrete Road",
+  "Mud / Gravel Road",
+  "Main Road",
+  "Any",
+];
+export const APPROVAL_OPTIONS = [
+  "DTCP Approved",
+  "HNTDA Approved",
+  "RERA Approved",
+  "Panchayat Approved",
+  "Patta Land",
+  "Any Approved",
+];
+export const CORNER_OPTIONS = ["Not Corner", "One Side Corner", "Two Side Corner", "Any"];
+export const COMMERCIAL_SPACE_TYPES = [
+  "Office Space",
+  "Retail Shop",
+  "Commercial Building",
+  "Showroom",
+  "Warehouse / Godown",
+  "Industrial Shed",
+  "Commercial Land",
+];
+export const WAREHOUSE_TYPES = [
+  "Industrial",
+  "Commercial",
+  "Logistics",
+  "Godown",
+  "Cold Storage",
+  "Manufacturing",
+  "Distribution",
+];
+export const VEHICLE_ACCESS_OPTIONS = [
+  "Container Truck",
+  "32-ft Truck",
+  "Truck",
+  "LCV / Van",
+  "Car / Bike",
+  "Any",
+];
+export const TENANT_PREFERENCE_OPTIONS = [
+  "Family",
+  "Bachelors",
+  "Company Lease",
+  "Any",
+];
+export const EMPLOYMENT_TYPE_OPTIONS = [
+  "Salaried (Private / MNC)",
+  "Salaried (Govt / PSU)",
+  "Self-Employed Professional",
+  "Business Owner / Self-Employed",
+  "Farmer / Agriculture",
+];
+export const MONTHLY_INCOME_OPTIONS = [
+  "Under ₹30,000",
+  "₹30,000 to ₹60,000",
+  "₹60,000 to ₹1 Lakh",
+  "₹1 Lakh to ₹2 Lakhs",
+  "₹2 Lakhs & Above",
+];
+export const CONSTRUCTION_CONTRACT_OPTIONS = [
+  "Turnkey (Material + Labour)",
+  "Labour Contract Only",
+  "Architectural & 2D/3D Design Only",
+  "Approval & Plan Support Only",
+];
+export const CONSTRUCTION_FLOOR_OPTIONS = [
+  "Ground Floor (G)",
+  "G + 1 Floor",
+  "G + 2 Floors",
+  "G + 3 Floors",
+  "Multi-Storey",
+];
+export const INTERIOR_SCOPE_OPTIONS = [
+  "Full Home Interior",
+  "Modular Kitchen",
+  "Living Room & TV Unit",
+  "Bedroom & Wardrobes",
+  "False Ceiling & Lighting",
+  "Office / Commercial Interior",
+];
+export const INTERIOR_STYLE_OPTIONS = [
+  "Modern & Minimalist",
+  "Contemporary",
+  "Luxury Premium",
+  "Traditional / Classic",
+  "Budget Friendly",
+];
+export const TIMELINE_OPTIONS = [
+  "Immediate (Within 15-30 days)",
+  "1 - 3 Months",
+  "Planning Phase (3+ Months)",
+];
+export const MANAGEMENT_FREQUENCY_OPTIONS = [
+  "Monthly AMC",
+  "Quarterly",
+  "Annual Contract",
+  "One-Time Service",
+];
+export const POPULAR_HOSUR_AREAS = [
+  "Bagalur Road",
+  "Avalapalli Road",
+  "Mathigiri",
+  "Nallur Road",
+  "SIPCOT Phase 1",
+  "SIPCOT Phase 2",
+  "Attibele Road",
+  "Rayakottai Road",
+  "Kelamangalam Road",
+  "Denkanikottai Road",
+  "Chennathur",
+  "Alasanatham Road",
+  "Bathalapalli",
+  "Zuzuvadi",
+  "Perandapalli",
+  "Belagondapalli",
+  "Thally Road",
+  "Kamaraj Nagar",
+  "Anthivadi",
+  "Shoolagiri",
 ];
 
 export const SERVICE_REQUEST_OPTIONS = {
@@ -41,7 +211,8 @@ export const SERVICE_REQUEST_OPTIONS = {
       "Land survey",
       "Sale deed registration",
     ],
-    budgetLabel: "Budget",
+    budgetLabel: "Budget (Max)",
+    budgetMinLabel: "Budget (Min)",
     showBudget: true,
   },
   property_sell: {
@@ -52,7 +223,8 @@ export const SERVICE_REQUEST_OPTIONS = {
       "Sell your property",
       "Property guidance for buy sell and rent",
     ],
-    budgetLabel: "Expected Price",
+    budgetLabel: "Expected Selling Price",
+    budgetMinLabel: "Minimum Expected Price",
     showBudget: true,
   },
   property_rent: {
@@ -63,7 +235,8 @@ export const SERVICE_REQUEST_OPTIONS = {
       "Rent your property",
       "Property guidance for buy sell and rent",
     ],
-    budgetLabel: "Monthly Rent Budget",
+    budgetLabel: "Monthly Rent Budget (Max)",
+    budgetMinLabel: "Monthly Rent (Min)",
     showBudget: true,
   },
   loan: {
@@ -78,7 +251,7 @@ export const SERVICE_REQUEST_OPTIONS = {
       "Home Loan Balance Transfer",
       "Private Finance",
     ],
-    budgetLabel: "Loan Amount",
+    budgetLabel: "Required Loan Amount",
     showBankDropdown: true,
     showBudget: true,
   },
@@ -86,8 +259,8 @@ export const SERVICE_REQUEST_OPTIONS = {
     label: "Interior",
     requestCategory: "interior",
     serviceTypes: ["Home Interior", "Office Interior"],
-    budgetLabel: "Project Budget",
-    showBudget: false,
+    budgetLabel: "Estimated Interior Budget",
+    showBudget: true,
   },
   construction: {
     label: "Construction",
@@ -105,7 +278,7 @@ export const SERVICE_REQUEST_OPTIONS = {
       "RERA Approval",
       "Building Plan & Approval",
     ],
-    budgetLabel: "Project Budget",
+    budgetLabel: "Estimated Construction Budget",
     showBudget: true,
   },
   property_management: {
@@ -118,8 +291,8 @@ export const SERVICE_REQUEST_OPTIONS = {
       "NRI Property Management Service",
       "Property Management Service",
     ],
-    budgetLabel: "Annual Budget",
-    showBudget: false,
+    budgetLabel: "Expected Budget / Annual AMC",
+    showBudget: true,
   },
   home_office_services: {
     label: "Home & Office Services",
@@ -135,9 +308,10 @@ export const SERVICE_REQUEST_OPTIONS = {
       "Painting Work",
       "Sofa & Carpet Cleaning",
     ],
-    budgetLabel: "Service Budget",
-    showBudget: false,
+    budgetLabel: "Expected Budget",
+    showBudget: true,
   },
 };
 
 export const SERVICE_REQUEST_CATEGORY_LIST = Object.values(SERVICE_REQUEST_OPTIONS);
+

@@ -230,6 +230,7 @@ exports.createCustomerRequest = async (req, res, next) => {
       propertyType,
       serviceType,
       additionalRequirements,
+      propertyDetails,
     } = req.body;
 
     const request = new CustomerRequest({
@@ -243,6 +244,7 @@ exports.createCustomerRequest = async (req, res, next) => {
       propertyType: propertyType ? String(propertyType).trim() : undefined,
       serviceType: serviceType ? String(serviceType).trim() : "",
       additionalRequirements: additionalRequirements ? String(additionalRequirements).trim() : "",
+      propertyDetails: propertyDetails && typeof propertyDetails === "object" ? propertyDetails : undefined,
     });
 
     await request.save();

@@ -40,6 +40,7 @@ const customerRequestSchema = new mongoose.Schema(
       default: "",
     },
     additionalRequirements: { type: String, trim: true, default: "" },
+    propertyDetails: { type: mongoose.Schema.Types.Mixed, default: undefined },
     status: { type: String, enum: ["open", "matched", "closed"], default: "open" },
     matchedAgents: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
