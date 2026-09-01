@@ -21,12 +21,15 @@ import {
 } from "../constants/contactInfo";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
 import useScrollAnimation from "../hooks/useScrollAnimation";
+import { useAppLanguage } from "../context/LanguageContext";
+import { localizeCatalogText } from "../utils/i18nCatalog";
 
 const ContactPage = () => {
+  const { t, currentLanguage } = useAppLanguage();
   useScrollAnimation();
   const breadcrumbs = [
-    { label: "Home", to: "/" },
-    { label: "Contact", to: "/contact" },
+    { label: t("nav.home") || "Home", to: "/" },
+    { label: t("nav.contact") || "Contact", to: "/contact" },
   ];
 
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
@@ -38,13 +41,13 @@ const ContactPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.phone) {
-      toast.error("Please fill in all required fields.");
+      toast.error(t("contactPage.fillRequired") || "Please fill in all required fields.");
       return;
     }
     setSubmitting(true);
     setTimeout(() => {
       setSubmitting(false);
-      toast.success("Thank you! We'll connect with you shortly.");
+      toast.success(t("contactPage.thankYou") || "Thank you! We'll connect with you shortly.");
       setForm({ name: "", email: "", phone: "", message: "" });
     }, 250);
   };
@@ -60,9 +63,9 @@ const ContactPage = () => {
       />
 
       <PageHero
-        tag="Contact us"
-        title="Talk to My Hosur Property."
-        description="Reach our team for property discovery, buying and selling support, registration help, loans, construction coordination, and local real-estate services."
+        tag={t("contactPage.tag") || "Contact us"}
+        title={t("contactPage.title") || "Talk to My Hosur Property."}
+        description={t("contactPage.description") || "Reach our team for property discovery, buying and selling support, registration help, loans, construction coordination, and local real-estate services."}
         className="gsap-section"
       />
 
@@ -75,13 +78,13 @@ const ContactPage = () => {
             <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-card gsap-card">
               <h2 className="text-2xl font-bold text-navy mb-6 flex items-center gap-2">
                 <span className="h-4 w-1 rounded-full bg-orange block" />
-                Send Us A Message
+                {t("contactPage.formTitle") || "Send Us A Message"}
               </h2>
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 {/* Name */}
                 <div>
                   <label htmlFor="contact-name" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-600">
-                    Name <span className="text-orange">*</span>
+                    {t("contactPage.fullName") || "Name"} <span className="text-orange">*</span>
                   </label>
                   <input
                     id="contact-name"
@@ -89,7 +92,7 @@ const ContactPage = () => {
                     name="name"
                     value={form.name}
                     onChange={handleChange}
-                    placeholder="Enter your full name"
+                    placeholder={t("contactPage.namePlaceholder") || "Enter your full name"}
                     required
                     className="site-input h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-navy shadow-xs focus:border-orange focus:ring-2 focus:ring-orange/20 transition-all"
                   />
@@ -98,7 +101,7 @@ const ContactPage = () => {
                 {/* Email */}
                 <div>
                   <label htmlFor="contact-email" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-600">
-                    E-Mail <span className="text-orange">*</span>
+                    {t("contactPage.email") || "E-Mail"} <span className="text-orange">*</span>
                   </label>
                   <input
                     id="contact-email"
@@ -106,7 +109,7 @@ const ContactPage = () => {
                     name="email"
                     value={form.email}
                     onChange={handleChange}
-                    placeholder="Enter your email address"
+                    placeholder={t("contactPage.emailPlaceholder") || "Enter your email address"}
                     required
                     className="site-input h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-navy shadow-xs focus:border-orange focus:ring-2 focus:ring-orange/20 transition-all"
                   />
@@ -115,7 +118,7 @@ const ContactPage = () => {
                 {/* Phone */}
                 <div>
                   <label htmlFor="contact-phone" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-600">
-                    Phone Number <span className="text-orange">*</span>
+                    {t("contactPage.phone") || "Phone Number"} <span className="text-orange">*</span>
                   </label>
                   <div className="flex items-center rounded-xl border border-slate-200 bg-white px-3.5 py-2 shadow-xs focus-within:border-orange focus-within:ring-2 focus-within:ring-orange/20 transition-all">
                     <span className="text-sm font-bold text-slate-500 mr-2 flex-shrink-0">🇮🇳 +91 •</span>
@@ -125,7 +128,7 @@ const ContactPage = () => {
                       name="phone"
                       value={form.phone}
                       onChange={handleChange}
-                      placeholder="Enter 10-digit phone number"
+                      placeholder={t("contactPage.phonePlaceholder") || "Enter 10-digit phone number"}
                       required
                       className="w-full border-0 bg-transparent py-1 text-sm font-medium text-navy outline-none placeholder:text-slate-400"
                     />
@@ -135,7 +138,7 @@ const ContactPage = () => {
                 {/* Message */}
                 <div>
                   <label htmlFor="contact-message" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-600">
-                    Message
+                    {t("contactPage.message") || "Message"}
                   </label>
                   <textarea
                     id="contact-message"
@@ -143,13 +146,13 @@ const ContactPage = () => {
                     value={form.message}
                     onChange={handleChange}
                     rows={4}
-                    placeholder="Type your message or enquiry details..."
+                    placeholder={t("contactPage.messagePlaceholder") || "Type your message or enquiry details..."}
                     className="site-input w-full min-h-[110px] rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-navy shadow-xs focus:border-orange focus:ring-2 focus:ring-orange/20 transition-all resize-none"
                   />
                 </div>
 
                 <p className="text-xs text-slate-500 leading-5">
-                  By submitting this form, I authorize MyHosurProperty and its representatives to contact me via Email, SMS, WhatsApp, or Call with updates and offers.
+                  {localizeCatalogText("By submitting this form, I authorize MyHosurProperty and its representatives to contact me via Email, SMS, WhatsApp, or Call with updates and offers.", currentLanguage)}
                 </p>
 
                 <button
@@ -157,7 +160,7 @@ const ContactPage = () => {
                   disabled={submitting}
                   className="site-button-primary mt-2 w-full sm:w-fit rounded-xl px-8 py-3 text-sm font-bold disabled:opacity-60"
                 >
-                  {submitting ? "Sending…" : "Let's Connect"}
+                  {submitting ? (t("contactPage.submitting") || "Sending…") : (t("contactPage.sendMessage") || "Let's Connect")}
                 </button>
               </form>
             </div>
@@ -166,18 +169,22 @@ const ContactPage = () => {
             <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-8 shadow-card flex flex-col gap-5 lg:max-h-[640px] lg:overflow-y-auto custom-scrollbar">
               {/* Header */}
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange">For enquiries</p>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange">
+                  {t("contactPage.forEnquiries") || "For enquiries"}
+                </p>
                 <h2 className="text-3xl font-bold text-navy leading-tight">
-                  Get In Touch<br />With Us
+                  {t("contactPage.getInTouch") || "Get In Touch With Us"}
                 </h2>
                 <p className="mt-3 text-sm leading-7 text-slate-600">
-                  Our team is here to assist you with clarity and care. Reach out via call, email, or by filling out the form. Let's make your property journey smooth and hassle-free.
+                  {localizeCatalogText("Our team is here to assist you with clarity and care. Reach out via call, email, or by filling out the form. Let's make your property journey smooth and hassle-free.", currentLanguage)}
                 </p>
               </div>
 
               {/* Enquiry contacts */}
               <div className="space-y-3">
-                <p className="text-sm font-semibold text-navy">Enquiry Contacts</p>
+                <p className="text-sm font-semibold text-navy">
+                  {t("contactPage.enquiryContacts") || "Enquiry Contacts"}
+                </p>
                 <div className="grid gap-3">
                   {CONTACT_PHONE_NUMBERS.map((phone) => (
                     <a
@@ -186,7 +193,7 @@ const ContactPage = () => {
                       className="group block rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-orange hover:bg-white"
                     >
                       <span className="block text-xs uppercase tracking-[0.24em] text-slate-500 mb-2">
-                        {phone.role}
+                        {localizeCatalogText(phone.role, currentLanguage)}
                       </span>
                       <span className="inline-flex items-center gap-2 text-sm font-semibold text-navy">
                         <PhoneIcon className="h-4 w-4 text-orange flex-shrink-0" />
@@ -199,7 +206,9 @@ const ContactPage = () => {
                   href={`mailto:${CONTACT_EMAIL}`}
                   className="group block rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-orange hover:bg-white"
                 >
-                  <span className="block text-xs uppercase tracking-[0.24em] text-slate-500 mb-2">Email</span>
+                  <span className="block text-xs uppercase tracking-[0.24em] text-slate-500 mb-2">
+                    {t("contactPage.email") || "Email"}
+                  </span>
                   <span className="inline-flex items-center gap-2 text-sm font-semibold text-navy">
                     <EnvelopeIcon className="h-4 w-4 text-orange flex-shrink-0" />
                     {CONTACT_EMAIL}
@@ -209,7 +218,9 @@ const ContactPage = () => {
 
               {/* Social Media Links */}
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-xs">
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Connect On Social Media</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+                  {t("contactPage.connectSocial") || "Connect On Social Media"}
+                </p>
                 <div className="flex flex-wrap gap-3">
                   <a
                     href={SOCIAL_LINKS.instagram}

@@ -1,52 +1,44 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRightIcon, CheckCircleIcon, ShieldCheckIcon, UsersIcon, CheckBadgeIcon, ChartBarIcon, HomeModernIcon, GardenIcon } from "../components/AppIcons";
+import {
+  ArrowRightIcon,
+  ChartBarIcon,
+  CheckBadgeIcon,
+  CheckCircleIcon,
+  GardenIcon,
+  HomeModernIcon,
+  ShieldCheckIcon,
+  SparklesIcon,
+  UsersIcon,
+} from "../components/AppIcons";
 import CountUpNumber from "../components/CountUpNumber";
 import MarketingCard, { IconCircle } from "../components/MarketingCard";
-import PageHero from "../components/PageHero";
 import PageSection from "../components/PageSection";
 import SeoHead from "../components/SeoHead";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
+import { useAppLanguage } from "../context/LanguageContext";
+import { localizeCatalogText } from "../utils/i18nCatalog";
+import useScrollAnimation from "../hooks/useScrollAnimation";
 import founderImage from "../assets/myhosurproperty vijay kumar founder.jpeg";
 import directorImage from "../assets/director 1.jpeg";
-import useScrollAnimation from "../hooks/useScrollAnimation";
 
-const principles = [
-  {
-    title: "Trust-first moderation",
-    description: "Listings are reviewed before they go live so the marketplace stays more reliable and professional.",
-    icon: ShieldCheckIcon,
-  },
-  {
-    title: "Real local context",
-    description: "The platform is built around Hosur demand, neighbourhood needs, and practical property decisions.",
-    icon: UsersIcon,
-  },
-  {
-    title: "Cleaner experience",
-    description: "Discovery, posting, and lead handling are structured to feel simple, calm, and decision-ready.",
-    icon: CheckCircleIcon,
-  },
-];
-
-/* ── Vision / Mission / Core Values ── */
 const VisionIcon = () => (
   <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-8 w-8">
-    <circle cx="24" cy="24" r="14" stroke="currentColor" strokeWidth="2.5" fill="none"/>
-    <circle cx="24" cy="24" r="6" stroke="currentColor" strokeWidth="2" fill="none"/>
-    <circle cx="24" cy="24" r="2" fill="#f79e26"/>
-    <line x1="24" y1="6" x2="24" y2="11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-    <line x1="24" y1="37" x2="24" y2="42" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-    <line x1="6" y1="24" x2="11" y2="24" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-    <line x1="37" y1="24" x2="42" y2="24" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    <circle cx="24" cy="24" r="18" stroke="currentColor" strokeWidth="2.2" fill="none" opacity="0.4"/>
+    <path d="M6 24 C13 14 35 14 42 24 C35 34 13 34 6 24 Z" stroke="currentColor" strokeWidth="2.2" fill="none"/>
+    <circle cx="24" cy="24" r="6" stroke="#f79e26" strokeWidth="2.2" fill="none"/>
+    <circle cx="24" cy="24" r="2.5" fill="#f79e26"/>
+    <path d="M24 6 L24 10 M24 38 L24 42 M6 24 L10 24 M38 24 L42 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.6"/>
   </svg>
 );
 
 const MissionIcon = () => (
   <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-8 w-8">
-    <circle cx="24" cy="24" r="16" stroke="currentColor" strokeWidth="2.5" fill="none"/>
-    <circle cx="24" cy="24" r="9" stroke="currentColor" strokeWidth="1.8" fill="none" strokeDasharray="3 2.5"/>
-    <circle cx="24" cy="24" r="4" stroke="currentColor" strokeWidth="2" fill="none"/>
-    <path d="M24 7 L27 14 L35 11 L30 19" stroke="#f79e26" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <circle cx="24" cy="24" r="18" stroke="currentColor" strokeWidth="2.2" fill="none" opacity="0.3"/>
+    <circle cx="24" cy="24" r="12" stroke="currentColor" strokeWidth="1.8" fill="none" opacity="0.6"/>
+    <circle cx="24" cy="24" r="6" stroke="#f79e26" strokeWidth="2" fill="none"/>
+    <path d="M33 15 L24 24" stroke="#f79e26" strokeWidth="2.2" strokeLinecap="round"/>
+    <path d="M31 13 L35 17 L37 11 Z" fill="#f79e26"/>
     <circle cx="24" cy="24" r="2" fill="#f79e26"/>
   </svg>
 );
@@ -68,41 +60,62 @@ const coreValueItems = [
   { label: "Transparency", emoji: "🔍" },
 ];
 
-const vmcData = [
-  {
-    Icon: VisionIcon,
-    accent: "from-blue-600 to-navy",
-    title: "Vision",
-    paragraph:
-      "To become Hosur's most trusted real estate platform — offering verified listings, clear titles, and local property support that empowers every buyer, seller, and owner to make decisions with confidence and clarity.",
-  },
-  {
-    Icon: MissionIcon,
-    accent: "from-orange to-amber-500",
-    title: "Mission",
-    bullets: [
-      "Hosur's trusted and verified real estate marketplace, delivering lasting value and secure property transactions.",
-      "Ensuring clear titles and transparent listings for every property seeker.",
-      "Delivering customer-centric real estate solutions built on local knowledge.",
-      "Leveraging technology to streamline property discovery and transactions.",
-      "Expanding offerings across plots, villas, apartments, and commercial spaces.",
-      "Building long-term relationships with clients, agents, and stakeholders.",
-    ],
-  },
-  {
-    Icon: CoreValuesIcon,
-    accent: "from-emerald-500 to-teal-600",
-    title: "Core Values",
-    coreValues: coreValueItems,
-  },
-];
-
 const AboutPage = () => {
+  const { t, currentLanguage } = useAppLanguage();
   useScrollAnimation();
   const breadcrumbs = [
-    { label: "Home", to: "/" },
-    { label: "About", to: "/about" },
+    { label: t("nav.home") || "Home", to: "/" },
+    { label: t("nav.aboutUs") || "About", to: "/about" },
   ];
+
+  const vmcData = useMemo(() => [
+    {
+      Icon: VisionIcon,
+      accent: "from-blue-600 to-navy",
+      title: t("about.visionTitle") || "Vision",
+      paragraph:
+        t("about.visionDesc") ||
+        "To become Hosur's most trusted real estate platform — offering verified listings, clear titles, and local property support that empowers every buyer, seller, and owner to make decisions with confidence and clarity.",
+    },
+    {
+      Icon: MissionIcon,
+      accent: "from-orange to-amber-500",
+      title: t("about.missionTitle") || "Mission",
+      paragraph:
+        t("about.missionDesc") ||
+        "Hosur's trusted and verified real estate marketplace, delivering lasting value, transparent listings, and secure property transactions built on local knowledge and modern technology.",
+    },
+    {
+      Icon: CoreValuesIcon,
+      accent: "from-emerald-500 to-teal-600",
+      title: t("about.coreValuesTitle") || "Core Values",
+      coreValues: coreValueItems,
+    },
+  ], [t]);
+
+  const principles = useMemo(() => [
+    {
+      icon: ShieldCheckIcon,
+      title: t("about.trustTitle") || "Trust-first moderation",
+      description:
+        t("about.trustDesc") ||
+        "Listings are reviewed before they go live so the marketplace stays more reliable and professional.",
+    },
+    {
+      icon: SparklesIcon,
+      title: t("about.localTitle") || "Real local context",
+      description:
+        t("about.localDesc") ||
+        "The platform is built around Hosur demand, neighbourhood needs, and practical property decisions.",
+    },
+    {
+      icon: UsersIcon,
+      title: t("about.cleanTitle") || "Cleaner experience",
+      description:
+        t("about.cleanDesc") ||
+        "Discovery, posting, and lead handling are structured to feel simple, calm, and decision-ready.",
+    },
+  ], [t]);
 
   return (
     <main className="page-shell w-full">
@@ -114,25 +127,28 @@ const AboutPage = () => {
         schema={[buildRealEstateAgentSchema(), buildBreadcrumbSchema(breadcrumbs)]}
       />
       {/* Our Story */}
-      <PageSection tag="Our Story" title="Built on Trust. Driven by Purpose." tone="surface" className="!pt-6 sm:!pt-8 !pb-14">
+      <PageSection 
+        tag={t("about.ourStoryTag") || "Our Story"} 
+        title={t("about.ourStoryTitle") || "Built on Trust. Driven by Purpose."} 
+        tone="surface" 
+        className="!pt-6 sm:!pt-8 !pb-14"
+      >
         <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center">
-          {/* Left Column: Story Content */}
           <div className="flex flex-col gap-6">
             <div className="border-l-4 border-orange pl-4">
               <p className="text-base leading-7 text-slate-700 font-semibold">
-                What began as a small vision to create honest and quality real estate experiences has grown into a trusted platform for thousands of families and investors in Hosur.
+                {t("about.ourStoryHighlight") || "What began as a small vision to create honest and quality real estate experiences has grown into a trusted platform for thousands of families and investors in Hosur."}
               </p>
             </div>
             <p className="text-sm leading-7 text-slate-600">
-              We believe every property holds potential – not just in value, but in the life it helps build. That's why we combine local expertise with modern technology to help you find spaces that truly fit your dreams and future.
+              {t("about.ourStoryDesc") || "We believe every property holds potential – not just in value, but in the life it helps build. That's why we combine local expertise with modern technology to help you find spaces that truly fit your dreams and future."}
             </p>
             
-            {/* Story Metrics */}
             <div className="grid grid-cols-3 gap-4 mt-4 border-t border-slate-100 pt-6">
               {[
-                { value: 100, suffix: "+", label: "Verified Listings" },
-                { value: 100, suffix: "+", label: "Happy Clients" },
-                { value: 8, suffix: "+", label: "Years of Trust" }
+                { value: 100, suffix: "+", label: t("home.stats.verifiedListings") || "Verified Listings" },
+                { value: 100, suffix: "+", label: t("home.trustStats.happyClients") || "Happy Clients" },
+                { value: 8, suffix: "+", label: t("about.yearsOfTrust") || "Years of Trust" }
               ].map((item) => (
                 <div key={item.label} className="text-left">
                   <p className="text-2xl font-bold text-navy sm:text-3xl">
@@ -144,7 +160,6 @@ const AboutPage = () => {
             </div>
           </div>
 
-          {/* Right Column: Image with Overlay */}
           <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card gsap-card">
             <img
               src="https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=1200&q=80"
@@ -161,7 +176,7 @@ const AboutPage = () => {
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-orange">My Hosur Property</p>
                 <p className="text-xs leading-relaxed text-white/90 font-medium mt-0.5">
-                  Building more than properties, we build trust.
+                  {localizeCatalogText("Building more than properties, we build trust.", currentLanguage)}
                 </p>
               </div>
             </div>
@@ -189,8 +204,8 @@ const AboutPage = () => {
                     <Icon className="h-5 w-5 text-orange" />
                   </div>
                   <div className="mt-3 text-sm font-bold text-orange">{item.year}</div>
-                  <h4 className="mt-1 text-sm font-bold text-navy">{item.title}</h4>
-                  <p className="mt-2 text-xs leading-5 text-slate-500 max-w-[190px]">{item.desc}</p>
+                  <h4 className="mt-1 text-sm font-bold text-navy">{localizeCatalogText(item.title, currentLanguage)}</h4>
+                  <p className="mt-2 text-xs leading-5 text-slate-500 max-w-[190px]">{localizeCatalogText(item.desc, currentLanguage)}</p>
                 </div>
               );
             })}
@@ -202,12 +217,12 @@ const AboutPage = () => {
           <div className="flex items-start gap-4">
             <span className="text-4xl text-orange font-serif leading-none select-none">“</span>
             <p className="text-sm sm:text-base font-medium text-navy leading-relaxed italic">
-              Our story is not just about buildings. It's about people, dreams, and the future we build together.
+              {localizeCatalogText("Our story is not just about buildings. It's about people, dreams, and the future we build together.", currentLanguage)}
             </p>
           </div>
           <div className="flex-shrink-0 text-center md:text-right border-t md:border-t-0 md:border-l border-slate-200 pt-4 md:pt-0 md:pl-6">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">With Gratitude</p>
-            <p className="text-sm font-bold text-navy mt-1 font-philosopher italic">Thank you for being part of our journey.</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{localizeCatalogText("With Gratitude", currentLanguage)}</p>
+            <p className="text-sm font-bold text-navy mt-1 font-philosopher italic">{localizeCatalogText("Thank you for being part of our journey.", currentLanguage)}</p>
           </div>
         </div>
       </PageSection>
@@ -217,8 +232,8 @@ const AboutPage = () => {
         <div className="mx-auto max-w-[1440px]">
           {/* Section header */}
           <div className="text-center mb-12">
-            <span className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">Our Foundation</span>
-            <h2 className="mt-3 text-2xl font-bold text-navy sm:text-3xl">Vision, Mission &amp; Core Values</h2>
+            <span className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">{localizeCatalogText("Our Foundation", currentLanguage)}</span>
+            <h2 className="mt-3 text-2xl font-bold text-navy sm:text-3xl">{localizeCatalogText("Vision, Mission & Core Values", currentLanguage)}</h2>
             <div className="mx-auto mt-4 h-0.5 w-16 rounded-full bg-orange" />
           </div>
 
@@ -270,7 +285,7 @@ const AboutPage = () => {
                         className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5"
                       >
                         <span className="text-lg leading-none">{emoji}</span>
-                        <span className="text-xs font-semibold text-navy">{label}</span>
+                        <span className="text-xs font-semibold text-navy">{localizeCatalogText(label, currentLanguage)}</span>
                       </div>
                     ))}
                   </div>
@@ -306,7 +321,7 @@ const AboutPage = () => {
           {/* Section label */}
           <div className="flex items-center gap-4 mb-10">
             <span className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">
-              OUR FOUNDER
+              {t("about.founderTag") || "OUR FOUNDER"}
             </span>
             <div className="flex-1 border-t border-slate-200" />
           </div>
@@ -319,7 +334,7 @@ const AboutPage = () => {
                 Mr. Vijaykumar
               </h2>
               <p className="mt-1 text-base font-semibold text-slate-500">
-                Founder &amp; Managing Director
+                {t("about.founderTitle") || "Founder & Managing Director"}
               </p>
               <p className="mt-1 text-xs font-medium text-slate-400 uppercase tracking-wide">B.Tech</p>
 
@@ -336,17 +351,10 @@ const AboutPage = () => {
               </div>
 
               <p className="mt-6 text-sm leading-8 text-slate-600">
-                A first-generation entrepreneur and visionary leader, Mr. Vijaykumar is a dedicated
-                contributor who began his entrepreneurial journey with an unwavering commitment to
-                transforming Hosur's real estate landscape. Over the years, he has built a trusted
-                name across property transactions, construction, and community-focused development.
+                {localizeCatalogText("A first-generation entrepreneur and visionary leader, Mr. Vijaykumar is a dedicated contributor who began his entrepreneurial journey with an unwavering commitment to transforming Hosur's real estate landscape. Over the years, he has built a trusted name across property transactions, construction, and community-focused development.", currentLanguage)}
               </p>
               <p className="mt-4 text-sm leading-8 text-slate-600">
-                Under his leadership, My Hosur Property was founded with the goal of creating a
-                transparent, verified, and accessible property platform for buyers, sellers, and
-                investors in Hosur. He is deeply passionate about building communities, empowering
-                local professionals, and ensuring every property seeker gets the honest guidance
-                they deserve.
+                {localizeCatalogText("Under his leadership, My Hosur Property was founded with the goal of creating a transparent, verified, and accessible property platform for buyers, sellers, and investors in Hosur. He is deeply passionate about building communities, empowering local professionals, and ensuring every property seeker gets the honest guidance they deserve.", currentLanguage)}
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -354,7 +362,7 @@ const AboutPage = () => {
                   to="/contact"
                   className="site-button-primary inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-bold"
                 >
-                  Get In Touch
+                  {t("contactPage.getInTouch") || "Get In Touch"}
                   <ArrowRightIcon className="h-4 w-4" />
                 </Link>
               </div>
@@ -379,7 +387,7 @@ const AboutPage = () => {
           {/* Section label */}
           <div className="flex items-center gap-4 mb-10">
             <span className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">
-              OUR DIRECTOR
+              {t("about.directorTag") || "OUR DIRECTOR"}
             </span>
             <div className="flex-1 border-t border-slate-200" />
           </div>
@@ -403,15 +411,15 @@ const AboutPage = () => {
                 Mr. Raja
               </h2>
               <p className="mt-1 text-base font-semibold text-slate-500">
-                Director, My Hosur Property
+                {t("about.directorTitle") || "Director, My Hosur Property"}
               </p>
               <p className="mt-1 text-xs font-medium text-slate-400 uppercase tracking-wide">B.Sc</p>
 
               <p className="mt-6 text-sm leading-8 text-slate-600">
-                Raja is a dynamic leader and key strategist at MyHosurProperty, bringing 7 years of experience in marketing and property ecosystem growth. He plays an active role in driving our vision of a trusted real estate platform, with strong experience in client coordination, property valuation, and local operations.
+                {localizeCatalogText("Raja is a dynamic leader and key strategist at MyHosurProperty, bringing 7 years of experience in marketing and property ecosystem growth. He plays an active role in driving our vision of a trusted real estate platform, with strong experience in client coordination, property valuation, and local operations.", currentLanguage)}
               </p>
               <p className="mt-4 text-sm leading-8 text-slate-600">
-                Focused on delivering high-value opportunities to buyers and investors, Raja coordinates closely with verified partners to maintain the highest quality standards on the platform. He is deeply committed to client satisfaction, direct communications, and building long-term relationships based on honesty and professional excellence.
+                {localizeCatalogText("Focused on delivering high-value opportunities to buyers and investors, Raja coordinates closely with verified partners to maintain the highest quality standards on the platform. He is deeply committed to client satisfaction, direct communications, and building long-term relationships based on honesty and professional excellence.", currentLanguage)}
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -419,7 +427,7 @@ const AboutPage = () => {
                   to="/contact"
                   className="site-button-primary inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-bold"
                 >
-                  Contact Office
+                  {t("about.contactOffice") || "Contact Office"}
                   <ArrowRightIcon className="h-4 w-4" />
                 </Link>
               </div>
@@ -430,16 +438,16 @@ const AboutPage = () => {
 
       <PageSection tone="white" innerClassName="lg:flex lg:items-center lg:justify-between lg:gap-8 border border-slate-200/60 rounded-2xl bg-white p-8 sm:p-10 shadow-soft" className="gsap-section">
         <div className="text-center lg:text-left">
-          <p className="section-tag !text-orange">Built for clarity</p>
+          <p className="section-tag !text-orange">{localizeCatalogText("Built for clarity", currentLanguage)}</p>
           <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl lg:text-4xl">
-            A local real-estate platform that feels simple, premium, and trustworthy.
+            {localizeCatalogText("A local real-estate platform that feels simple, premium, and trustworthy.", currentLanguage)}
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-8 text-slate-600 sm:text-base lg:mx-0">
-            We combine property discovery, documentation support, service assistance, and local market knowledge into one structured platform for Hosur.
+            {localizeCatalogText("We combine property discovery, documentation support, service assistance, and local market knowledge into one structured platform for Hosur.", currentLanguage)}
           </p>
         </div>
         <Link to="/services" className="site-button-primary mt-6 inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-bold lg:mt-0">
-          Explore Our Services
+          {t("about.exploreServices") || t("home.cta.exploreServices") || "Explore Our Services"}
           <ArrowRightIcon className="h-4 w-4" />
         </Link>
       </PageSection>

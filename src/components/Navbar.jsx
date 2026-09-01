@@ -4,9 +4,10 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import useAuth from "../hooks/useAuth";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
+import { useAppLanguage } from "../context/LanguageContext";
 import { CONTACT_EMAIL, CONTACT_PHONE_NUMBERS } from "../constants/contactInfo";
-import { primaryNavLinks } from "../constants/navigation";
 import BrandLogo, { logoSrc } from "./BrandLogo";
+import LanguageSelector from "./LanguageSelector";
 import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
@@ -26,15 +27,32 @@ import {
 } from "./AppIcons";
 
 const navIconMap = {
-  "Our Services": BriefcaseIcon,
-  Plans: LoanIcon,
-  "About Us": InformationCircleIcon,
-  Contact: PhoneIcon,
-  "List My Property": PlusCircleIcon,
+  "/": HomeIcon,
+  "/services": BriefcaseIcon,
+  "/bank-loans": LoanIcon,
+  "/plans": LoanIcon,
+  "/about": InformationCircleIcon,
+  "/contact": PhoneIcon,
+  "/post-property": PlusCircleIcon,
 };
+
+const desktopNavLinks = [
+  { labelKey: "nav.home", defaultLabel: "Home", to: "/" },
+  { labelKey: "nav.services", defaultLabel: "Our Services", to: "/services" },
+  { labelKey: "nav.bankLoans", defaultLabel: "Bank Loans", to: "/bank-loans" },
+  { labelKey: "nav.plans", defaultLabel: "Plans", to: "/plans" },
+  { labelKey: "nav.aboutUs", defaultLabel: "About Us", to: "/about" },
+  { labelKey: "nav.contact", defaultLabel: "Contact", to: "/contact" },
+];
+
+const mobileNavLinks = [
+  ...desktopNavLinks,
+  { labelKey: "nav.listProperty", defaultLabel: "List My Property", to: "/post-property" },
+];
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
+  const { t } = useAppLanguage();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
@@ -85,25 +103,25 @@ const Navbar = () => {
     navigate("/auth", { state: { from: { pathname: "/post-property" } } });
   };
 
-  const navLinks = useMemo(() => primaryNavLinks, []);
-
   const renderDesktopLink = (item) => (
     <NavLink
       key={item.to}
       to={item.to}
       onClick={scrollToTop}
       className={({ isActive }) =>
-        `relative inline-flex items-center px-2.5 py-1.5 text-xs xl:px-3.5 xl:py-2 xl:text-sm font-semibold whitespace-nowrap transition ${
-          isActive ? "text-orange" : "text-navy hover:text-orange"
+        `relative inline-flex items-center px-2 py-1.5 text-xs xl:px-3 xl:py-2 xl:text-sm font-semibold whitespace-nowrap rounded-lg transition-colors ${
+          isActive
+            ? "text-orange bg-orange/5 font-bold"
+            : "text-navy hover:text-orange hover:bg-slate-50"
         }`
       }
     >
-      {item.label}
+      {t(item.labelKey) || item.defaultLabel}
     </NavLink>
   );
 
   const renderMobileLink = (item) => {
-    const Icon = navIconMap[item.label] || HomeIcon;
+    const Icon = navIconMap[item.to] || HomeIcon;
     return (
       <NavLink
         key={item.to}
@@ -114,12 +132,12 @@ const Navbar = () => {
         }}
         className={({ isActive }) =>
           `flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold transition ${
-            isActive ? "bg-orange/10 text-orange" : "text-navy hover:bg-surface"
+            isActive ? "bg-orange/10 text-orange font-bold" : "text-navy hover:bg-surface"
           }`
         }
       >
         <Icon className="h-5 w-5" />
-        <span>{item.label}</span>
+        <span>{t(item.labelKey) || item.defaultLabel}</span>
       </NavLink>
     );
   };
@@ -135,28 +153,54 @@ const Navbar = () => {
           animation: free-blink 1.2s ease-in-out infinite;
         }
       `}</style>
-      <div className="bg-navy text-white py-1 hidden sm:block">
-        <div className="mx-auto flex max-w-[1440px] items-center px-5 text-xs sm:px-8 lg:px-10">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
-            <div className="inline-flex flex-wrap items-center gap-x-4 gap-y-1">
+
+      {/* Top Bar with Contacts and Language Switcher */}
+      <div className="bg-navy text-white py-1 block">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between px-3.5 sm:px-8 lg:px-10 text-xs">
+          <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-1">
+            <div className="hidden sm:inline-flex flex-wrap items-center gap-x-4 gap-y-1">
               {CONTACT_PHONE_NUMBERS.map((phone) => (
-                <a key={phone.tel} href={`tel:${phone.tel}`} className="inline-flex items-center gap-2 transition hover:text-orange">
+                <a
+                  key={phone.tel}
+                  href={`tel:${phone.tel}`}
+                  className="inline-flex items-center gap-2 transition hover:text-orange"
+                >
                   <PhoneIcon className="h-3.5 w-3.5 flex-shrink-0 text-orange" />
                   {phone.display}
                 </a>
               ))}
             </div>
-            <a href={`mailto:${CONTACT_EMAIL}`} className="inline-flex items-center gap-2 transition hover:text-orange">
+            <a
+              href={`tel:${CONTACT_PHONE_NUMBERS[0]?.tel}`}
+              className="sm:hidden inline-flex items-center gap-1.5 transition hover:text-orange text-[11px]"
+            >
+              <PhoneIcon className="h-3.5 w-3.5 flex-shrink-0 text-orange" />
+              {CONTACT_PHONE_NUMBERS[0]?.display}
+            </a>
+            <a
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="hidden md:inline-flex items-center gap-2 transition hover:text-orange"
+            >
               <EnvelopeIcon className="h-3.5 w-3.5 flex-shrink-0 text-orange" />
               {CONTACT_EMAIL}
             </a>
           </div>
+
+          <div className="flex items-center gap-4">
+            <LanguageSelector variant="topbar" />
+          </div>
         </div>
       </div>
 
-      <div className={`border-b border-slate-200 bg-white/95 backdrop-blur-md transition-shadow duration-300 ${isSticky ? "shadow-md" : "shadow-sm"}`}>
+      {/* Main Navigation Bar */}
+      <div
+        className={`border-b border-slate-200 bg-white/95 backdrop-blur-md transition-shadow duration-300 ${
+          isSticky ? "shadow-md" : "shadow-sm"
+        }`}
+      >
         <div className="px-3 sm:px-8 lg:px-10 py-0.5 sm:py-1.5 lg:py-2">
-          <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-2">
+          <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-2 xl:gap-4">
+            {/* Logo */}
             <NavLink
               to="/"
               onClick={() => {
@@ -168,25 +212,32 @@ const Navbar = () => {
               <img
                 src={logoSrc}
                 alt="MyHosurProperty"
-                className="block h-10 sm:h-12 lg:h-14 w-auto max-w-[140px] sm:max-w-[180px] lg:max-w-[210px] object-contain mx-auto transition-all"
+                className="block h-10 sm:h-12 lg:h-14 w-auto max-w-[130px] sm:max-w-[170px] lg:max-w-[190px] object-contain mx-auto transition-all"
                 style={{ maxHeight: "56px", width: "auto" }}
               />
               <span className="hidden sm:inline-block text-[10px] lg:text-[11px] font-medium leading-none text-slate-500 whitespace-nowrap text-center">
-                Powered by <span className="font-bold text-navy">Gyes Property & Construction</span>
+                {t("nav.poweredBy") || "Powered by"}{" "}
+                <span className="font-bold text-navy">
+                  {t("nav.companyName") || "Gyes Property & Construction"}
+                </span>
               </span>
             </NavLink>
 
-            <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex">{navLinks.map(renderDesktopLink)}</nav>
+            {/* Desktop Navigation Links */}
+            <nav className="hidden flex-1 items-center justify-center gap-0.5 xl:gap-1.5 lg:flex min-w-0 px-1">
+              {desktopNavLinks.map(renderDesktopLink)}
+            </nav>
 
-            <div className="hidden items-center gap-3 lg:flex">
+            {/* Desktop Actions */}
+            <div className="hidden items-center gap-2.5 xl:gap-3 lg:flex shrink-0">
               {isAuthenticated ? (
                 <>
                   <button
                     type="button"
                     onClick={onLogout}
                     className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-navy transition hover:border-red-500 hover:bg-red-50 hover:text-red-600 shadow-2xs cursor-pointer"
-                    title="Logout"
-                    aria-label="Logout"
+                    title={t("nav.logout") || "Logout"}
+                    aria-label={t("nav.logout") || "Logout"}
                   >
                     <ArrowRightOnRectangleIcon className="h-4.5 w-4.5" />
                   </button>
@@ -197,7 +248,7 @@ const Navbar = () => {
                     to={dashboardPath}
                     onClick={scrollToTop}
                     className={({ isActive }) =>
-                      `inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                      `inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition ${
                         isActive ? "text-orange" : "text-navy hover:text-orange"
                       }`
                     }
@@ -207,40 +258,40 @@ const Navbar = () => {
                       return (
                         <>
                           <DashboardIcon className="h-4 w-4" />
-                          Dashboard
+                          {t("nav.dashboard") || "Dashboard"}
                         </>
                       );
                     }}
                   </NavLink>
 
                   {canShowSavedShortcut ? (
-                  <NavLink
-                    to="/dashboard?tab=saved"
-                    onClick={scrollToTop}
-                    className={({ isActive }) =>
-                      `inline-flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-semibold transition ${
-                        isActive
-                          ? "border-orange bg-orange/10 text-orange"
-                          : "border-slate-200 text-navy hover:border-orange hover:text-orange"
-                      }`
-                    }
-                    aria-label="Saved properties"
-                    title="Saved properties"
-                  >
-                    <BookmarkIcon className="h-4 w-4" />
-                  </NavLink>
+                    <NavLink
+                      to="/dashboard?tab=saved"
+                      onClick={scrollToTop}
+                      className={({ isActive }) =>
+                        `inline-flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-semibold transition ${
+                          isActive
+                            ? "border-orange bg-orange/10 text-orange"
+                            : "border-slate-200 text-navy hover:border-orange hover:text-orange"
+                        }`
+                      }
+                      aria-label={t("nav.savedProperties") || "Saved properties"}
+                      title={t("nav.savedProperties") || "Saved properties"}
+                    >
+                      <BookmarkIcon className="h-4 w-4" />
+                    </NavLink>
                   ) : null}
 
                   <button
                     type="button"
                     onClick={handlePostFreeProperty}
-                    className="header-btn-adissia px-5 py-2 rounded-lg text-sm transition-all duration-300 font-bold flex items-center gap-2 relative"
+                    className="header-btn-adissia px-4 xl:px-5 py-2 rounded-lg text-xs xl:text-sm transition-all duration-300 font-bold flex items-center gap-2 relative shrink-0"
                   >
                     <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white free-blink-badge pointer-events-none uppercase tracking-wider shadow-md">
-                      Free
+                      {t("common.free") || "Free"}
                     </span>
                     <FlagIcon className="h-4 w-4" />
-                    <span>Post property</span>
+                    <span>{t("nav.postFreeProperty") || "Post property"}</span>
                   </button>
                 </>
               ) : (
@@ -249,14 +300,16 @@ const Navbar = () => {
                     <button
                       type="button"
                       onClick={() => setLoginDropdownOpen(!loginDropdownOpen)}
-                      className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                      className={`inline-flex items-center gap-1.5 rounded-lg px-3 xl:px-4 py-2 text-xs xl:text-sm font-semibold transition ${
                         loginDropdownOpen
                           ? "bg-orange text-white"
                           : "bg-slate-100 text-navy hover:bg-orange/10 hover:text-orange"
                       }`}
                     >
-                      Login
-                      <ChevronDownIcon className={`h-4 w-4 transition ${loginDropdownOpen ? "rotate-180" : ""}`} />
+                      {t("nav.login") || "Login"}
+                      <ChevronDownIcon
+                        className={`h-4 w-4 transition ${loginDropdownOpen ? "rotate-180" : ""}`}
+                      />
                     </button>
 
                     {loginDropdownOpen && (
@@ -276,7 +329,7 @@ const Navbar = () => {
                           className="flex items-center gap-3 rounded-t-lg px-4 py-3 text-sm font-semibold text-navy transition hover:bg-orange/5 hover:text-orange"
                         >
                           <ArrowRightOnRectangleIcon className="h-4 w-4" />
-                          Login
+                          {t("nav.login") || "Login"}
                         </NavLink>
                         <div className="border-t border-slate-200" />
                         <NavLink
@@ -288,7 +341,7 @@ const Navbar = () => {
                           className="flex items-center gap-3 rounded-b-lg px-4 py-3 text-sm font-semibold text-navy transition hover:bg-orange/5 hover:text-orange"
                         >
                           <PlusCircleIcon className="h-4 w-4" />
-                          Create Account
+                          {t("nav.createAccount") || "Create Account"}
                         </NavLink>
                       </motion.div>
                     )}
@@ -297,19 +350,21 @@ const Navbar = () => {
                   <button
                     type="button"
                     onClick={handlePostFreeProperty}
-                    className="header-btn-adissia px-5 py-2 rounded-lg text-sm transition-all duration-300 font-bold flex items-center gap-2 relative"
+                    className="header-btn-adissia px-4 xl:px-5 py-2 rounded-lg text-xs xl:text-sm transition-all duration-300 font-bold flex items-center gap-2 relative shrink-0"
                   >
                     <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white free-blink-badge pointer-events-none uppercase tracking-wider shadow-md">
-                      Free
+                      {t("common.free") || "Free"}
                     </span>
                     <FlagIcon className="h-4 w-4" />
-                    <span>Post property</span>
+                    <span>{t("nav.postFreeProperty") || "Post property"}</span>
                   </button>
                 </>
               )}
             </div>
 
+            {/* Mobile Header Actions */}
             <div className="flex items-center gap-1.5 lg:hidden">
+              <LanguageSelector variant="topbar" className="sm:hidden" />
               {canShowSavedShortcut ? (
                 <NavLink
                   to="/dashboard?tab=saved"
@@ -331,7 +386,7 @@ const Navbar = () => {
                   onClick={scrollToTop}
                   className="hidden items-center rounded-lg px-2.5 py-1.5 text-xs font-semibold text-navy transition hover:text-orange xs:inline-flex sm:text-sm"
                 >
-                  Login
+                  {t("nav.login") || "Login"}
                 </NavLink>
               ) : null}
               <button
@@ -342,9 +397,21 @@ const Navbar = () => {
                 aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               >
                 <div className="relative w-5 h-4 flex flex-col justify-between items-center">
-                  <span className={`block h-[2px] w-full bg-navy rounded-full transform transition-all duration-300 ${mobileMenuOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
-                  <span className={`block h-[2px] w-full bg-navy rounded-full transition-all duration-300 ${mobileMenuOpen ? "opacity-0" : ""}`} />
-                  <span className={`block h-[2px] w-full bg-navy rounded-full transform transition-all duration-300 ${mobileMenuOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
+                  <span
+                    className={`block h-[2px] w-full bg-navy rounded-full transform transition-all duration-300 ${
+                      mobileMenuOpen ? "rotate-45 translate-y-[7px]" : ""
+                    }`}
+                  />
+                  <span
+                    className={`block h-[2px] w-full bg-navy rounded-full transition-all duration-300 ${
+                      mobileMenuOpen ? "opacity-0" : ""
+                    }`}
+                  />
+                  <span
+                    className={`block h-[2px] w-full bg-navy rounded-full transform transition-all duration-300 ${
+                      mobileMenuOpen ? "-rotate-45 -translate-y-[7px]" : ""
+                    }`}
+                  />
                 </div>
               </button>
             </div>
@@ -352,11 +419,18 @@ const Navbar = () => {
         </div>
       </div>
 
+      {/* Mobile Drawer Menu */}
       {mobileMenuOpen ? (
         <div className="border-b border-slate-200 bg-white px-4 pb-4 lg:hidden">
-          <div className="mx-auto max-h-[calc(100dvh-5rem)] max-w-[1440px] overflow-y-auto py-3">
-            <nav className="flex flex-col gap-1">{navLinks.map(renderMobileLink)}</nav>
-            <div className="mt-4 flex flex-col gap-2 border-t border-slate-200 pt-4">
+          <div className="mx-auto max-h-[calc(100dvh-5rem)] max-w-[1440px] overflow-y-auto py-3 space-y-4">
+            {/* Mobile Language Selector */}
+            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
+              <LanguageSelector variant="mobile" />
+            </div>
+
+            <nav className="flex flex-col gap-1">{mobileNavLinks.map(renderMobileLink)}</nav>
+
+            <div className="flex flex-col gap-2 border-t border-slate-200 pt-4">
               <NavLink
                 to={dashboardPath}
                 onClick={() => {
@@ -366,7 +440,7 @@ const Navbar = () => {
                 className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-navy"
               >
                 <Squares2X2Icon className="h-5 w-5" />
-                Dashboard
+                {t("nav.dashboard") || "Dashboard"}
               </NavLink>
               {canShowSavedShortcut ? (
                 <NavLink
@@ -378,7 +452,7 @@ const Navbar = () => {
                   className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-navy"
                 >
                   <BookmarkIcon className="h-5 w-5" />
-                  Saved Properties
+                  {t("nav.savedProperties") || "Saved Properties"}
                 </NavLink>
               ) : null}
               <button
@@ -390,10 +464,10 @@ const Navbar = () => {
                 className="header-btn-adissia flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-bold text-white shadow-lg relative"
               >
                 <span className="absolute -top-2.5 right-4 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white free-blink-badge pointer-events-none uppercase tracking-wider shadow-md">
-                  Free
+                  {t("common.free") || "Free"}
                 </span>
                 <FlagIcon className="h-5 w-5" />
-                <span>Post your free property</span>
+                <span>{t("nav.postFreePropertyFull") || "Post your free property"}</span>
               </button>
               {!isAuthenticated ? (
                 <div className="flex flex-col gap-2">
@@ -406,7 +480,7 @@ const Navbar = () => {
                     className="flex items-center justify-center gap-2 rounded-lg bg-navy px-4 py-3 text-sm font-semibold text-white"
                   >
                     <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                    Login
+                    {t("nav.login") || "Login"}
                   </NavLink>
                   <NavLink
                     to="/auth"
@@ -417,7 +491,7 @@ const Navbar = () => {
                     className="flex items-center justify-center gap-2 rounded-lg border border-navy bg-white px-4 py-3 text-sm font-semibold text-navy"
                   >
                     <PlusCircleIcon className="h-5 w-5" />
-                    Create Account
+                    {t("nav.createAccount") || "Create Account"}
                   </NavLink>
                 </div>
               ) : (
@@ -427,7 +501,7 @@ const Navbar = () => {
                   className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-navy"
                 >
                   <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                  Logout
+                  {t("nav.logout") || "Logout"}
                 </button>
               )}
             </div>

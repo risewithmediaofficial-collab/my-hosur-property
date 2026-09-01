@@ -8,6 +8,8 @@ import { fetchMyPayments } from "../services/api/paymentApi";
 import { currency } from "../utils/format";
 import useScrollAnimation from "../hooks/useScrollAnimation";
 import QrPaymentModal from "../components/QrPaymentModal";
+import { useAppLanguage } from "../context/LanguageContext";
+import { localizeCatalogText } from "../utils/i18nCatalog";
 
 const fallbackPlans = [
   {
@@ -138,6 +140,7 @@ const normalizePlan = (plan) => {
 };
 
 const PlansPage = () => {
+  const { t, currentLanguage } = useAppLanguage();
   useScrollAnimation();
   const navigate = useNavigate();
   const { token, user, refreshProfile } = useAuth();
@@ -176,25 +179,25 @@ const PlansPage = () => {
   const purchasedPlanIds = useMemo(
     () =>
       new Set(
-        (payments || [])
-          .filter((payment) => payment.status === "paid" && payment.planId?._id)
-          .map((payment) => String(payment.planId._id))
+        payments
+          .filter((p) => p.status === "completed" || p.status === "verified")
+          .map((p) => String(p.planId || p.plan?._id || ""))
+          .filter(Boolean)
       ),
     [payments]
   );
 
   const onBuy = async (plan) => {
-    if (!token || !user) {
-      toast.error("Please login or create an account to choose or purchase a plan");
-      navigate("/auth?redirect=/plans");
+    if (!token) {
+      toast.error("Please sign in to choose a plan.");
+      navigate("/auth", { state: { from: { pathname: "/plans" } } });
       return;
     }
 
-    const planKey = plan._id || plan.name;
-    setBuyingPlanId(planKey);
+    setBuyingPlanId(plan._id || plan.name);
 
     try {
-      if (!plan || plan.price === 0) {
+      if (Number(plan.price || 0) === 0) {
         const payload = { planName: plan?.name };
         await activateFreePlan(token, payload);
         await refreshProfile();
@@ -238,20 +241,26 @@ const PlansPage = () => {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className={`text-[11px] font-bold uppercase tracking-[0.22em] ${isRecommended ? "text-slate-400" : "text-slate-500"}`}>
-              {isDbPack ? "Database package" : "Subscription plan"}
+              {isDbPack
+                ? localizeCatalogText("Database package", currentLanguage)
+                : localizeCatalogText("Subscription plan", currentLanguage)}
             </p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight">{plan.name}</h2>
-            <p className={`mt-2 text-sm leading-6 ${isRecommended ? "text-slate-300" : "text-slate-600"}`}>{plan.subtitle}</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight">
+              {localizeCatalogText(plan.name, currentLanguage)}
+            </h2>
+            <p className={`mt-2 text-sm leading-6 ${isRecommended ? "text-slate-300" : "text-slate-600"}`}>
+              {localizeCatalogText(plan.subtitle, currentLanguage)}
+            </p>
           </div>
           {isRecommended ? (
             <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-white">
-              Recommended
+              {localizeCatalogText("Recommended", currentLanguage)}
             </span>
           ) : null}
         </div>
 
         <div className="mt-8 flex items-end gap-2">
-          <span className="text-5xl font-extrabold tracking-tight">{plan.price > 0 ? currency(plan.price) : "Free"}</span>
+          <span className="text-5xl font-extrabold tracking-tight">{plan.price > 0 ? currency(plan.price) : (t("common.free") || "Free")}</span>
           {plan.billingLabel ? <span className={`pb-2 text-base font-semibold ${isRecommended ? "text-slate-300" : "text-slate-500"}`}>{plan.billingLabel}</span> : null}
         </div>
 
@@ -279,7 +288,9 @@ const PlansPage = () => {
           {plan.features.map((feature) => (
             <li key={feature} className="flex items-start gap-3">
               <CheckCircleIcon className={`mt-0.5 h-5 w-5 flex-shrink-0 ${isRecommended ? "text-slate-200" : "text-slate-500"}`} />
-              <span className={`text-sm leading-6 ${isRecommended ? "text-slate-200" : "text-slate-600"}`}>{feature}</span>
+              <span className={`text-sm leading-6 ${isRecommended ? "text-slate-200" : "text-slate-600"}`}>
+                {localizeCatalogText(feature, currentLanguage)}
+              </span>
             </li>
           ))}
         </ul>
@@ -287,7 +298,7 @@ const PlansPage = () => {
         <div className="mt-8 flex items-center gap-2">
           {isActive && !needsRenewal && !isDbPack ? (
             <span className={`rounded-full px-3 py-1 text-xs font-semibold ${isRecommended ? "bg-white/10 text-white" : "bg-slate-100 text-slate-700"}`}>
-              Current plan
+              {localizeCatalogText("Current plan", currentLanguage)}
             </span>
           ) : null}
           {isPurchased && !isActive ? (
@@ -308,14 +319,14 @@ const PlansPage = () => {
           }`}
         >
           {buyingPlanId === plan._id
-            ? "Processing..."
+            ? (t("common.loading") || "Processing...")
             : isDbPack
-              ? "Purchase package"
+              ? localizeCatalogText("Purchase package", currentLanguage)
               : needsRenewal
-                ? "Renew or upgrade"
+                ? localizeCatalogText("Renew or upgrade", currentLanguage)
                 : isActive
-                  ? "Current plan"
-                  : plan.ctaLabel || "Buy now"}
+                  ? localizeCatalogText("Current plan", currentLanguage)
+                  : localizeCatalogText(plan.ctaLabel || "Buy now", currentLanguage)}
         </button>
       </article>
     );
@@ -324,29 +335,39 @@ const PlansPage = () => {
   return (
     <main className="page-shell w-full space-y-10 px-4 py-8 sm:px-5 md:py-12 lg:px-6">
       <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] gsap-section">
-        <div className="marketing-hero rounded-xl p-8 md:p-10 gsap-hero-item">
-          <p className="section-tag">Pricing and access</p>
-          <h1 className="mt-4 text-3xl font-bold md:text-4xl lg:text-5xl">Choose the plan that matches your property activity.</h1>
-          <p className="mt-5 max-w-2xl text-base leading-8">
-            Upgrade when you need more listings, more lead access, or higher contact capacity. Plans are available for all logged-in users.
+        <div className="marketing-hero bg-white rounded-xl p-8 md:p-10 gsap-hero-item">
+          <p className="section-tag">{t("plans.badge") || "Pricing and access"}</p>
+          <h1 className="mt-4 text-3xl font-bold md:text-4xl lg:text-5xl text-[#0042a2]">
+            {t("plans.title") || "Choose the plan that matches your property activity."}
+          </h1>
+          <p className="mt-5 max-w-2xl text-base leading-8 text-slate-700">
+            {t("plans.subtitle") || "Choose the right plan to get maximum visibility for your property listings in Hosur."}
           </p>
         </div>
 
         <div className="marketing-card p-8 md:p-10 gsap-card">
-          <p className="section-tag">Membership benefits</p>
-          <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl">More visibility, stronger lead access, and simpler plan control.</h2>
+          <p className="section-tag">{t("plans.benefitsTag") || "Membership benefits"}</p>
+          <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl">
+            {t("plans.benefitsHeading") || "More visibility, stronger lead access, and simpler plan control."}
+          </h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             <div className="stat-card">
-              <p className="text-lg font-bold text-navy">Role-aware</p>
-              <p className="mt-2 text-sm text-slate-600">Plans adapt to how each user works on the platform.</p>
+              <p className="text-lg font-bold text-navy">{localizeCatalogText("Role-aware", currentLanguage)}</p>
+              <p className="mt-2 text-sm text-slate-600">
+                {localizeCatalogText("Plans adapt to how each user works on the platform.", currentLanguage)}
+              </p>
             </div>
             <div className="stat-card">
-              <p className="text-lg font-bold text-navy">Secure</p>
-              <p className="mt-2 text-sm text-slate-600">Payments and activation follow a verified checkout flow.</p>
+              <p className="text-lg font-bold text-navy">{localizeCatalogText("Secure", currentLanguage)}</p>
+              <p className="mt-2 text-sm text-slate-600">
+                {localizeCatalogText("Payments and activation follow a verified checkout flow.", currentLanguage)}
+              </p>
             </div>
             <div className="stat-card">
-              <p className="text-lg font-bold text-navy">Flexible</p>
-              <p className="mt-2 text-sm text-slate-600">Renew, upgrade, or buy special database packages as needed.</p>
+              <p className="text-lg font-bold text-navy">{localizeCatalogText("Flexible", currentLanguage)}</p>
+              <p className="mt-2 text-sm text-slate-600">
+                {localizeCatalogText("Renew, upgrade, or buy special database packages as needed.", currentLanguage)}
+              </p>
             </div>
           </div>
         </div>

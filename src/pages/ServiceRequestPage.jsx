@@ -33,7 +33,6 @@ import {
   COMMERCIAL_SPACE_TYPES,
   CONSTRUCTION_CONTRACT_OPTIONS,
   CONSTRUCTION_FLOOR_OPTIONS,
-  CORNER_OPTIONS,
   EMPLOYMENT_TYPE_OPTIONS,
   FACING_OPTIONS,
   FURNISHING_OPTIONS,
@@ -41,6 +40,9 @@ import {
   INTERIOR_STYLE_OPTIONS,
   MANAGEMENT_FREQUENCY_OPTIONS,
   MONTHLY_INCOME_OPTIONS,
+  PG_FOOD_OPTIONS,
+  PG_SHARING_OPTIONS,
+  PG_TYPE_OPTIONS,
   PLOT_UNIT_OPTIONS,
   POPULAR_HOSUR_AREAS,
   POSSESSION_OPTIONS,
@@ -478,17 +480,21 @@ const initialSpecs = {
   tenantPreference: "Family",
   advanceDeposit: "",
 
-  // Plot / Land
+  // PG
+  pgType: "Gents",
+  pgSharing: "2 Sharing",
+  pgFood: "With Food Included",
+
+  // Plot / Land / Farmland / Agri Land
   plotArea: "",
   plotUnit: "sq.ft",
   plotType: "Layout / Gated Plot",
   roadWidth: "30 Feet",
   roadType: "Tar Road",
-  corner: "Not Corner",
   approvals: "DTCP Approved",
   fencing: "Compound Wall",
 
-  // Commercial / Warehouse
+  // Commercial / Warehouse / Rental Income
   commercialType: "Office Space",
   ceilingHeight: "",
   powerLoad: "3-Phase",
@@ -567,10 +573,14 @@ const ServiceRequestPage = () => {
     requestCategory
   );
 
-  // Property sub-grouping
+  // Property sub-grouping matching List My Property categories
   const pTypeLower = (propertyType || "").toLowerCase();
+
+  const isPG = isPropertyReq && (pTypeLower === "pg" || pTypeLower.includes("pg"));
+
   const isPlotOrLand =
     isPropertyReq &&
+    !isPG &&
     (pTypeLower.includes("plot") ||
       pTypeLower.includes("land") ||
       pTypeLower.includes("agri") ||
@@ -578,13 +588,17 @@ const ServiceRequestPage = () => {
 
   const isCommercialOrWarehouse =
     isPropertyReq &&
+    !isPG &&
+    !isPlotOrLand &&
     (pTypeLower.includes("commercial") ||
       pTypeLower.includes("office") ||
       pTypeLower.includes("warehouse") ||
-      pTypeLower.includes("industrial"));
+      pTypeLower.includes("industry") ||
+      pTypeLower.includes("rental income"));
 
   const isResidential =
     isPropertyReq &&
+    !isPG &&
     !isPlotOrLand &&
     !isCommercialOrWarehouse;
 
@@ -621,7 +635,11 @@ const ServiceRequestPage = () => {
       // Build structured, clean specification notes
       const detailsSummary = [];
 
-      if (isResidential) {
+      if (isPG) {
+        if (specs.pgType && specs.pgType !== "Any") detailsSummary.push(`• PG Type: ${specs.pgType}`);
+        if (specs.pgSharing && specs.pgSharing !== "Any") detailsSummary.push(`• Room Sharing: ${specs.pgSharing}`);
+        if (specs.pgFood && specs.pgFood !== "Any") detailsSummary.push(`• Food Facility: ${specs.pgFood}`);
+      } else if (isResidential) {
         if (specs.bhk) detailsSummary.push(`• Configuration: ${specs.bhk}`);
         if (specs.bathrooms) detailsSummary.push(`• Bathrooms: ${specs.bathrooms}`);
         if (specs.builtupArea) detailsSummary.push(`• Built-up / Carpet Area: ${specs.builtupArea} sq.ft`);
@@ -639,14 +657,13 @@ const ServiceRequestPage = () => {
       } else if (isPlotOrLand) {
         if (specs.plotArea) detailsSummary.push(`• Land / Plot Area: ${specs.plotArea} ${specs.plotUnit || "sq.ft"}`);
         if (specs.plotType && specs.plotType !== "Any") detailsSummary.push(`• Plot Type: ${specs.plotType}`);
-        if (specs.facing && specs.facing !== "Any Facing") detailsSummary.push(`• Facing: ${specs.facing}`);
+        if (specs.facing && specs.facing !== "Any Facing") detailsSummary.push(`• Facing Direction: ${specs.facing}`);
         if (specs.roadWidth && specs.roadWidth !== "Any") detailsSummary.push(`• Road Width: ${specs.roadWidth}`);
         if (specs.roadType && specs.roadType !== "Any") detailsSummary.push(`• Road Type: ${specs.roadType}`);
-        if (specs.corner && specs.corner !== "Any") detailsSummary.push(`• Corner Plot: ${specs.corner}`);
         if (specs.approvals && specs.approvals !== "Any Approved") detailsSummary.push(`• Approval Preference: ${specs.approvals}`);
         if (specs.fencing && specs.fencing !== "Any") detailsSummary.push(`• Boundary / Fencing: ${specs.fencing}`);
       } else if (isCommercialOrWarehouse) {
-        if (specs.commercialType) detailsSummary.push(`• Commercial Type: ${specs.commercialType}`);
+        if (specs.commercialType) detailsSummary.push(`• Space Type: ${specs.commercialType}`);
         if (specs.builtupArea) detailsSummary.push(`• Area / Floor Space: ${specs.builtupArea} sq.ft`);
         if (specs.ceilingHeight) detailsSummary.push(`• Clear Height: ${specs.ceilingHeight} ft`);
         if (specs.powerLoad) detailsSummary.push(`• Power Load / Electricity: ${specs.powerLoad}`);
@@ -732,7 +749,7 @@ const ServiceRequestPage = () => {
                 <SparklesIcon className="h-3.5 w-3.5" />
                 <span>Verified Requirement Desk</span>
               </div>
-              <h1 className="mt-2.5 text-2xl font-black text-navy sm:text-3xl leading-tight">
+              <h1 className="mt-2.5 text-2xl font-black font-sans tracking-tight text-navy sm:text-3xl leading-tight">
                 {categoryTitle} Request
               </h1>
               <p className="mt-2 text-xs sm:text-sm leading-relaxed text-slate-600">
@@ -754,7 +771,7 @@ const ServiceRequestPage = () => {
                   <span className="inline-block rounded-md bg-orange px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white shadow-sm mb-1.5 w-fit">
                     {imageDetails.badge}
                   </span>
-                  <h3 className="text-sm sm:text-base font-bold leading-snug text-white drop-shadow-sm">
+                  <h3 className="text-sm sm:text-base font-bold font-sans leading-snug text-white drop-shadow-sm">
                     {imageDetails.caption}
                   </h3>
                 </div>
@@ -819,7 +836,7 @@ const ServiceRequestPage = () => {
         <div className="marketing-card p-5 sm:p-6 md:p-7 flex flex-col h-full min-h-0 overflow-hidden">
           {/* Category Navigation Pills - Fixed at Top */}
           <div className="shrink-0 pb-3.5 border-b border-slate-100">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">
               Select Requirement Category
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -852,18 +869,20 @@ const ServiceRequestPage = () => {
           {/* Form Content - Inline Scrollable Body */}
           <form
             onSubmit={onSubmit}
-            className="flex-1 min-h-0 overflow-y-auto service-request-scroll space-y-6 pt-4 pr-1.5 sm:pr-2.5"
+            className="flex-1 min-h-0 overflow-y-auto service-request-scroll space-y-5 pt-4 pr-1.5 sm:pr-2.5"
           >
             {/* Section 1: Location & Sub-Type */}
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4 sm:p-5 space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5 space-y-4">
               <div className="flex items-center gap-2 border-b border-slate-200/80 pb-2.5">
                 <MapPinIcon className="h-4 w-4 text-orange" />
-                <h2 className="text-sm sm:text-base font-bold text-navy">1. Location &amp; Category Type</h2>
+                <h2 className="text-sm sm:text-base font-bold font-sans tracking-tight text-navy">
+                  1. Location &amp; Category Type
+                </h2>
               </div>
 
-              <div className="grid gap-3.5 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                     City <span className="text-red-500">*</span>
                   </span>
                   <select
@@ -880,7 +899,7 @@ const ServiceRequestPage = () => {
                 </label>
 
                 <label className="block">
-                  <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                     Area / Locality <span className="text-red-500">*</span>
                   </span>
                   <input
@@ -892,7 +911,7 @@ const ServiceRequestPage = () => {
                 </label>
 
                 {/* Popular Area Suggestion Chips */}
-                <div className="sm:col-span-2 -mt-0.5">
+                <div className="sm:col-span-2 -mt-1">
                   <p className="text-[11px] font-semibold text-slate-500 mb-1.5">
                     Popular Hosur Localities:
                   </p>
@@ -916,7 +935,7 @@ const ServiceRequestPage = () => {
 
                 {showPropertyType && (
                   <label className="block">
-                    <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                    <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                       Property Type <span className="text-red-500">*</span>
                     </span>
                     <select
@@ -935,7 +954,7 @@ const ServiceRequestPage = () => {
 
                 {showServiceType && (
                   <label className={`block ${showPropertyType ? "" : "sm:col-span-2"}`}>
-                    <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                    <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                       Service Requirement <span className="text-red-500">*</span>
                     </span>
                     <select
@@ -954,7 +973,7 @@ const ServiceRequestPage = () => {
 
                 {currentOption.showBankDropdown && (
                   <label className="block sm:col-span-2">
-                    <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                    <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                       Preferred Bank <span className="text-red-500">*</span>
                     </span>
                     <select
@@ -978,20 +997,78 @@ const ServiceRequestPage = () => {
               <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                 <div className="flex items-center gap-2">
                   <BuildingOffice2Icon className="h-4 w-4 text-orange" />
-                  <h2 className="text-sm sm:text-base font-bold text-navy">
-                    2. {categoryTitle} Specifications
+                  <h2 className="text-sm sm:text-base font-bold font-sans tracking-tight text-navy">
+                    2. {propertyType || categoryTitle} Specifications
                   </h2>
                 </div>
-                <span className="text-[11px] font-medium text-slate-500 hidden sm:inline">
+                <span className="text-[11px] font-medium text-slate-400 hidden sm:inline">
                   Detailed requirements for best match
                 </span>
               </div>
 
-              {/* A. Residential Property Details (House / Villa / Apartment / Flat) */}
+              {/* A. PG (Paying Guest) Specific Details */}
+              {isPG && (
+                <div className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <label className="block">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                        PG Type
+                      </span>
+                      <select
+                        className="site-input"
+                        value={specs.pgType}
+                        onChange={(e) => handleSpecChange("pgType", e.target.value)}
+                      >
+                        {PG_TYPE_OPTIONS.map((t) => (
+                          <option key={t} value={t}>
+                            {t}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label className="block">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                        Room Sharing
+                      </span>
+                      <select
+                        className="site-input"
+                        value={specs.pgSharing}
+                        onChange={(e) => handleSpecChange("pgSharing", e.target.value)}
+                      >
+                        {PG_SHARING_OPTIONS.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label className="block sm:col-span-2 lg:col-span-1">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                        Food Facility
+                      </span>
+                      <select
+                        className="site-input"
+                        value={specs.pgFood}
+                        onChange={(e) => handleSpecChange("pgFood", e.target.value)}
+                      >
+                        {PG_FOOD_OPTIONS.map((f) => (
+                          <option key={f} value={f}>
+                            {f}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {/* B. Residential Property Details (House / Villa / Apartment / Flat / Independent House) */}
               {isResidential && (
-                <div className="space-y-3.5">
+                <div className="space-y-4">
                   <div>
-                    <span className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                    <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                       Configuration (BHK)
                     </span>
                     <div className="flex flex-wrap gap-2">
@@ -1012,9 +1089,9 @@ const ServiceRequestPage = () => {
                     </div>
                   </div>
 
-                  <div className="grid gap-3.5 sm:grid-cols-3">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Bathrooms
                       </span>
                       <select
@@ -1031,7 +1108,7 @@ const ServiceRequestPage = () => {
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Furnishing Status
                       </span>
                       <select
@@ -1048,7 +1125,7 @@ const ServiceRequestPage = () => {
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Facing Direction
                       </span>
                       <select
@@ -1065,21 +1142,21 @@ const ServiceRequestPage = () => {
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Built-up Area (Sq.Ft)
                       </span>
                       <input
                         type="number"
                         min="0"
-                        className="site-input"
+                        className="site-input font-semibold text-navy"
                         value={specs.builtupArea}
                         onChange={(e) => handleSpecChange("builtupArea", e.target.value)}
-                        placeholder="e.g. 1200"
+                        placeholder="1200"
                       />
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Car Parking
                       </span>
                       <select
@@ -1096,7 +1173,7 @@ const ServiceRequestPage = () => {
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Water Supply
                       </span>
                       <select
@@ -1113,7 +1190,7 @@ const ServiceRequestPage = () => {
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Possession Status
                       </span>
                       <select
@@ -1130,7 +1207,7 @@ const ServiceRequestPage = () => {
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Gated Community
                       </span>
                       <select
@@ -1146,7 +1223,7 @@ const ServiceRequestPage = () => {
 
                     {requestCategory === "property_rent" && (
                       <label className="block">
-                        <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                           Preferred Tenant
                         </span>
                         <select
@@ -1164,43 +1241,50 @@ const ServiceRequestPage = () => {
                     )}
 
                     {requestCategory === "property_rent" && (
-                      <label className="block">
-                        <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
-                          Advance Budget (₹)
+                      <div className="sm:col-span-2 lg:col-span-1">
+                        <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                          Advance Budget
                         </span>
-                        <input
-                          type="number"
-                          min="0"
-                          className="site-input"
-                          value={specs.advanceDeposit}
-                          onChange={(e) => handleSpecChange("advanceDeposit", e.target.value)}
-                          placeholder="e.g. 50000"
-                        />
-                      </label>
+                        <div className="flex items-center rounded-xl border border-slate-300 bg-white overflow-hidden focus-within:border-orange focus-within:ring-2 focus-within:ring-orange/20 transition-all h-[42px]">
+                          <div className="flex h-full items-center justify-center bg-slate-50 border-r border-slate-200 px-3 text-xs font-bold text-slate-600 shrink-0">
+                            ₹
+                          </div>
+                          <input
+                            type="number"
+                            min="0"
+                            className="w-full min-w-0 bg-transparent px-3 py-2 text-sm font-semibold text-navy placeholder:text-slate-400 placeholder:font-normal focus:outline-none"
+                            value={specs.advanceDeposit}
+                            onChange={(e) => handleSpecChange("advanceDeposit", e.target.value)}
+                            placeholder="50,000"
+                          />
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
               )}
 
-              {/* B. Plot / Land / Farmland Details */}
+              {/* C. Plot / Land / Farmland / Agri Land Details */}
               {isPlotOrLand && (
-                <div className="space-y-3.5">
-                  <div className="grid gap-3.5 sm:grid-cols-3">
-                    <div className="sm:col-span-2">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
-                        Plot / Land Area
+                <div className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {/* Plot / Land Area with Integrated Unit Dropdown */}
+                    <div>
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                        Plot / Land Area <span className="text-red-500">*</span>
                       </span>
-                      <div className="flex gap-2">
+                      <div className="flex items-center rounded-xl border border-slate-300 bg-white overflow-hidden focus-within:border-orange focus-within:ring-2 focus-within:ring-orange/20 transition-all h-[42px]">
                         <input
                           type="number"
                           min="0"
-                          className="site-input flex-1"
+                          className="w-full min-w-0 bg-transparent px-3 py-2 text-sm font-semibold text-navy placeholder:text-slate-400 placeholder:font-normal focus:outline-none"
                           value={specs.plotArea}
                           onChange={(e) => handleSpecChange("plotArea", e.target.value)}
-                          placeholder="e.g. 1200 or 25"
+                          placeholder="1200"
                         />
+                        <div className="h-5 w-[1px] bg-slate-200 shrink-0" />
                         <select
-                          className="site-input w-28 shrink-0 font-bold text-navy"
+                          className="w-24 shrink-0 bg-slate-50/80 hover:bg-slate-100 px-2 py-2 text-xs font-bold text-navy focus:outline-none cursor-pointer pr-6 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 20 20\' fill=\'%2364748b\'%3e%3cpath fill-rule=\'evenodd\' d=\'M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z\' clip-rule=\'evenodd\'/%3e%3c/svg%3e')] bg-[length:1rem_1rem] bg-[right_0.35rem_center] bg-no-repeat transition"
                           value={specs.plotUnit}
                           onChange={(e) => handleSpecChange("plotUnit", e.target.value)}
                         >
@@ -1213,8 +1297,9 @@ const ServiceRequestPage = () => {
                       </div>
                     </div>
 
+                    {/* Facing Direction */}
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Facing Direction
                       </span>
                       <select
@@ -1230,8 +1315,9 @@ const ServiceRequestPage = () => {
                       </select>
                     </label>
 
+                    {/* Approval Preference */}
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Approval Preference
                       </span>
                       <select
@@ -1247,8 +1333,9 @@ const ServiceRequestPage = () => {
                       </select>
                     </label>
 
+                    {/* Road Width */}
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Road Width
                       </span>
                       <select
@@ -1264,8 +1351,9 @@ const ServiceRequestPage = () => {
                       </select>
                     </label>
 
+                    {/* Road Type */}
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Road Type
                       </span>
                       <select
@@ -1281,25 +1369,9 @@ const ServiceRequestPage = () => {
                       </select>
                     </label>
 
+                    {/* Boundary / Fencing */}
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
-                        Corner Plot
-                      </span>
-                      <select
-                        className="site-input"
-                        value={specs.corner}
-                        onChange={(e) => handleSpecChange("corner", e.target.value)}
-                      >
-                        {CORNER_OPTIONS.map((c) => (
-                          <option key={c} value={c}>
-                            {c}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-
-                    <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Boundary / Fencing
                       </span>
                       <select
@@ -1316,12 +1388,12 @@ const ServiceRequestPage = () => {
                 </div>
               )}
 
-              {/* C. Commercial / Office / Warehouse Details */}
+              {/* D. Commercial / Office / Warehouse / Rental Income Building */}
               {isCommercialOrWarehouse && (
-                <div className="space-y-3.5">
-                  <div className="grid gap-3.5 sm:grid-cols-3">
+                <div className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Space Type
                       </span>
                       <select
@@ -1338,35 +1410,35 @@ const ServiceRequestPage = () => {
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Floor Space (Sq.Ft)
                       </span>
                       <input
                         type="number"
                         min="0"
-                        className="site-input"
+                        className="site-input font-semibold text-navy"
                         value={specs.builtupArea}
                         onChange={(e) => handleSpecChange("builtupArea", e.target.value)}
-                        placeholder="e.g. 5000"
+                        placeholder="5000"
                       />
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Clear Height (Feet)
                       </span>
                       <input
                         type="number"
                         min="0"
-                        className="site-input"
+                        className="site-input font-semibold text-navy"
                         value={specs.ceilingHeight}
                         onChange={(e) => handleSpecChange("ceilingHeight", e.target.value)}
-                        placeholder="e.g. 18"
+                        placeholder="18"
                       />
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Power Sanction
                       </span>
                       <select
@@ -1384,7 +1456,7 @@ const ServiceRequestPage = () => {
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Vehicle Access
                       </span>
                       <select
@@ -1401,7 +1473,7 @@ const ServiceRequestPage = () => {
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Dedicated Parking
                       </span>
                       <select
@@ -1421,12 +1493,12 @@ const ServiceRequestPage = () => {
                 </div>
               )}
 
-              {/* D. Loan Details */}
+              {/* E. Loan Details */}
               {requestCategory === "loan" && (
-                <div className="space-y-3.5">
-                  <div className="grid gap-3.5 sm:grid-cols-2">
+                <div className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Employment Profile
                       </span>
                       <select
@@ -1443,7 +1515,7 @@ const ServiceRequestPage = () => {
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Monthly Income Range
                       </span>
                       <select
@@ -1459,57 +1531,77 @@ const ServiceRequestPage = () => {
                       </select>
                     </label>
 
-                    <label className="block sm:col-span-2">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
-                        Estimated Property Value (₹)
+                    <div className="sm:col-span-2">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                        Estimated Property Value
                       </span>
-                      <input
-                        type="number"
-                        min="0"
-                        className="site-input"
-                        value={specs.propertyValue}
-                        onChange={(e) => handleSpecChange("propertyValue", e.target.value)}
-                        placeholder="e.g. 5000000"
-                      />
-                    </label>
+                      <div className="flex items-center rounded-xl border border-slate-300 bg-white overflow-hidden focus-within:border-orange focus-within:ring-2 focus-within:ring-orange/20 transition-all h-[42px]">
+                        <div className="flex h-full items-center justify-center bg-slate-50 border-r border-slate-200 px-3 text-xs font-bold text-slate-600 shrink-0">
+                          ₹
+                        </div>
+                        <input
+                          type="number"
+                          min="0"
+                          className="w-full min-w-0 bg-transparent px-3 py-2 text-sm font-semibold text-navy placeholder:text-slate-400 placeholder:font-normal focus:outline-none"
+                          value={specs.propertyValue}
+                          onChange={(e) => handleSpecChange("propertyValue", e.target.value)}
+                          placeholder="50,00,000"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* E. Construction Details */}
+              {/* F. Construction Details */}
               {requestCategory === "construction" && (
-                <div className="space-y-3.5">
-                  <div className="grid gap-3.5 sm:grid-cols-3">
-                    <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
-                        Plot Area (Sq.Ft)
+                <div className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {/* Plot Area with Integrated Unit Dropdown */}
+                    <div>
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                        Land / Plot Size <span className="text-red-500">*</span>
                       </span>
-                      <input
-                        type="number"
-                        min="0"
-                        className="site-input"
-                        value={specs.plotArea}
-                        onChange={(e) => handleSpecChange("plotArea", e.target.value)}
-                        placeholder="e.g. 1200"
-                      />
-                    </label>
+                      <div className="flex items-center rounded-xl border border-slate-300 bg-white overflow-hidden focus-within:border-orange focus-within:ring-2 focus-within:ring-orange/20 transition-all h-[42px]">
+                        <input
+                          type="number"
+                          min="0"
+                          className="w-full min-w-0 bg-transparent px-3 py-2 text-sm font-semibold text-navy placeholder:text-slate-400 placeholder:font-normal focus:outline-none"
+                          value={specs.plotArea}
+                          onChange={(e) => handleSpecChange("plotArea", e.target.value)}
+                          placeholder="1200"
+                        />
+                        <div className="h-5 w-[1px] bg-slate-200 shrink-0" />
+                        <select
+                          className="w-24 shrink-0 bg-slate-50/80 hover:bg-slate-100 px-2 py-2 text-xs font-bold text-navy focus:outline-none cursor-pointer pr-6 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 20 20\' fill=\'%2364748b\'%3e%3cpath fill-rule=\'evenodd\' d=\'M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z\' clip-rule=\'evenodd\'/%3e%3c/svg%3e')] bg-[length:1rem_1rem] bg-[right_0.35rem_center] bg-no-repeat transition"
+                          value={specs.plotUnit}
+                          onChange={(e) => handleSpecChange("plotUnit", e.target.value)}
+                        >
+                          {PLOT_UNIT_OPTIONS.map((unit) => (
+                            <option key={unit} value={unit}>
+                              {unit}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
-                        Built-up Area (Sq.Ft)
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                        Planned Built-up Area (Sq.Ft)
                       </span>
                       <input
                         type="number"
                         min="0"
-                        className="site-input"
+                        className="site-input font-semibold text-navy"
                         value={specs.builtupArea}
                         onChange={(e) => handleSpecChange("builtupArea", e.target.value)}
-                        placeholder="e.g. 2000"
+                        placeholder="2000"
                       />
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Planned Floors
                       </span>
                       <select
@@ -1526,7 +1618,7 @@ const ServiceRequestPage = () => {
                     </label>
 
                     <label className="block sm:col-span-2">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Contract Preference
                       </span>
                       <select
@@ -1542,8 +1634,8 @@ const ServiceRequestPage = () => {
                       </select>
                     </label>
 
-                    <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                    <label className="block sm:col-span-2 lg:col-span-1">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Start Timeline
                       </span>
                       <select
@@ -1562,12 +1654,12 @@ const ServiceRequestPage = () => {
                 </div>
               )}
 
-              {/* F. Interior Details */}
+              {/* G. Interior Details */}
               {requestCategory === "interior" && (
-                <div className="space-y-3.5">
-                  <div className="grid gap-3.5 sm:grid-cols-2">
+                <div className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Interior Scope
                       </span>
                       <select
@@ -1584,7 +1676,7 @@ const ServiceRequestPage = () => {
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Property Size / BHK
                       </span>
                       <select
@@ -1602,7 +1694,7 @@ const ServiceRequestPage = () => {
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Design Style
                       </span>
                       <select
@@ -1619,7 +1711,7 @@ const ServiceRequestPage = () => {
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Execution Timeline
                       </span>
                       <select
@@ -1638,12 +1730,12 @@ const ServiceRequestPage = () => {
                 </div>
               )}
 
-              {/* G. Property Management */}
+              {/* H. Property Management */}
               {requestCategory === "property_management" && (
-                <div className="space-y-3.5">
-                  <div className="grid gap-3.5 sm:grid-cols-2">
+                <div className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Service Frequency
                       </span>
                       <select
@@ -1660,11 +1752,11 @@ const ServiceRequestPage = () => {
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Property Type &amp; Size
                       </span>
                       <input
-                        className="site-input"
+                        className="site-input font-semibold text-navy"
                         value={specs.propertyConfig}
                         onChange={(e) => handleSpecChange("propertyConfig", e.target.value)}
                         placeholder="e.g. 3BHK Villa or 2400 sq.ft Vacant Plot"
@@ -1674,16 +1766,16 @@ const ServiceRequestPage = () => {
                 </div>
               )}
 
-              {/* H. Home & Office Services */}
+              {/* I. Home & Office Services */}
               {requestCategory === "home_office_services" && (
-                <div className="space-y-3.5">
-                  <div className="grid gap-3.5 sm:grid-cols-2">
+                <div className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Property / Space Size
                       </span>
                       <input
-                        className="site-input"
+                        className="site-input font-semibold text-navy"
                         value={specs.propertyConfig}
                         onChange={(e) => handleSpecChange("propertyConfig", e.target.value)}
                         placeholder="e.g. 2 BHK House, 1500 sq.ft Office, 1 Sump"
@@ -1691,7 +1783,7 @@ const ServiceRequestPage = () => {
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                         Urgency / Preferred Date
                       </span>
                       <select
@@ -1710,61 +1802,65 @@ const ServiceRequestPage = () => {
             </div>
 
             {/* Section 3: Budget & Pricing */}
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4 sm:p-5 space-y-3.5">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5 space-y-4">
               <div className="flex items-center gap-2 border-b border-slate-200/80 pb-2.5">
                 <CurrencyRupeeIcon className="h-4 w-4 text-orange" />
-                <h2 className="text-sm sm:text-base font-bold text-navy">
+                <h2 className="text-sm sm:text-base font-bold font-sans tracking-tight text-navy">
                   3. Budget &amp; Price Range
                 </h2>
               </div>
 
-              <div className="grid gap-3.5 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2">
                 {currentOption.budgetMinLabel && (
-                  <label className="block">
-                    <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  <div>
+                    <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                       {currentOption.budgetMinLabel}
                     </span>
-                    <div className="relative">
-                      <CurrencyRupeeIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <div className="flex items-center rounded-xl border border-slate-300 bg-white overflow-hidden focus-within:border-orange focus-within:ring-2 focus-within:ring-orange/20 transition-all h-[42px]">
+                      <div className="flex h-full items-center justify-center bg-slate-50 border-r border-slate-200 px-3 text-xs font-bold text-slate-600 shrink-0">
+                        ₹
+                      </div>
                       <input
-                        className="site-input pl-10"
                         type="number"
                         min="0"
+                        className="w-full min-w-0 bg-transparent px-3 py-2 text-sm font-semibold text-navy placeholder:text-slate-400 placeholder:font-normal focus:outline-none"
                         value={form.budgetMin}
                         onChange={(e) => setForm((prev) => ({ ...prev, budgetMin: e.target.value }))}
-                        placeholder="e.g. 2500000"
+                        placeholder="25,00,000 (Min)"
                       />
                     </div>
-                  </label>
+                  </div>
                 )}
 
-                <label className={`block ${currentOption.budgetMinLabel ? "" : "sm:col-span-2"}`}>
-                  <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                <div className={currentOption.budgetMinLabel ? "" : "sm:col-span-2"}>
+                  <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                     {currentOption.budgetLabel || "Budget"}
                   </span>
-                  <div className="relative">
-                    <CurrencyRupeeIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <div className="flex items-center rounded-xl border border-slate-300 bg-white overflow-hidden focus-within:border-orange focus-within:ring-2 focus-within:ring-orange/20 transition-all h-[42px]">
+                    <div className="flex h-full items-center justify-center bg-slate-50 border-r border-slate-200 px-3 text-xs font-bold text-slate-600 shrink-0">
+                      ₹
+                    </div>
                     <input
-                      className="site-input pl-10 font-bold text-navy"
                       type="number"
                       min="0"
+                      className="w-full min-w-0 bg-transparent px-3 py-2 text-sm font-bold text-navy placeholder:text-slate-400 placeholder:font-normal focus:outline-none"
                       value={form.budget}
                       onChange={(e) => setForm((prev) => ({ ...prev, budget: e.target.value }))}
-                      placeholder="e.g. 4500000"
+                      placeholder="45,00,000 (Max)"
                     />
                   </div>
-                </label>
+                </div>
               </div>
             </div>
 
             {/* Section 4: Additional Requirements */}
             <div className="space-y-1.5">
               <label className="block">
-                <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">
+                <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
                   Additional Notes / Specific Preferences
                 </span>
                 <textarea
-                  className="site-input min-h-[100px] text-sm"
+                  className="site-input min-h-[90px] text-sm"
                   value={form.additionalRequirements}
                   onChange={(e) =>
                     setForm((prev) => ({ ...prev, additionalRequirements: e.target.value }))

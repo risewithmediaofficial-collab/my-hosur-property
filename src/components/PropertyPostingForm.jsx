@@ -298,7 +298,7 @@ const warehouseApprovalFields = [
   "ecAvailable",
 ];
 const cornerOptions = ["Not Corner", "One Side Corner", "Two Side Corner"];
-const roadTypeOptions = ["Tar Road", "Concrete Road", "Mud Road", "Gravel Road", "Highway", "Main Road", "Layout Road", "Other"];
+const roadTypeOptions = ["Thar Road", "Concrete Road", "Mud Road", "Gravel Road", "Highway", "Main Road", "Layout Road", "Other"];
 const priceOptions = ["7.00 L", "10.00 L", "12.00 L", "15.00 L", "25.00 L", "50.00 L", "75.00 L", "1.00 Cr"];
 const facingOptions = ["East", "West", "North", "South", "North East", "North West", "South East", "South West"];
 const yesNoOptions = ["Yes", "No"];

@@ -53,10 +53,10 @@ export default {
         card: "12px",
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica", "Arial", "sans-serif"],
-        body: ["Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica", "Arial", "sans-serif"],
-        heading: ["Philosopher", "sans-serif"],
-        philosopher: ["Philosopher", "sans-serif"],
+        sans: ["inherit"],
+        body: ["inherit"],
+        heading: ["inherit"],
+        philosopher: ["Philosopher", "inherit"],
       },
       screens: {
         xs: "320px",

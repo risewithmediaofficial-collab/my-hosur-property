@@ -40,6 +40,7 @@ import SeoHead from "../components/SeoHead";
 import useDebounce from "../hooks/useDebounce";
 import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
+import { useAppLanguage } from "../context/LanguageContext";
 import servicesHeroImage from "../assets/house.png";
 import alluringRealityImg from "../assets/alluring reality.jpeg";
 import chatGptBannerImage from "../assets/ChatGPT Image Aug 4, 2026, 10_37_17 AM.png";
@@ -72,13 +73,13 @@ gsap.registerPlugin(ScrollTrigger);
 
 
 const propertyTypeOptions = [
-  { label: "All types", value: "" },
-  { label: "Plot", value: "Plot" },
-  { label: "Villa / Flat", value: "Villa,Flat" },
-  { label: "Independent House", value: "Independent House" },
-  { label: "Commercial Land / Building", value: "Commercial Land,Commercial Building" },
-  { label: "Farm Land", value: "Farm Land" },
-  { label: "Agricultural Land", value: "Agricultural Land" },
+  { label: "All types", labelKey: "search.allTypes", value: "" },
+  { label: "Plot", labelKey: "shortcuts.items.plot", value: "Plot" },
+  { label: "Villa / Flat", labelKey: "shortcuts.items.villaFlat", value: "Villa,Flat" },
+  { label: "Independent House", labelKey: "shortcuts.items.independentHouse", value: "Independent House" },
+  { label: "Commercial Land / Building", labelKey: "shortcuts.items.commercial", value: "Commercial Land,Commercial Building" },
+  { label: "Farm Land", labelKey: "shortcuts.items.farmLand", value: "Farm Land" },
+  { label: "Agricultural Land", labelKey: "shortcuts.items.agriculturalLand", value: "Agricultural Land" },
 ];
 
 const propertyTypeIcons = {
@@ -105,68 +106,75 @@ const propertyTypeDescriptions = {
 
 const shortcutGroups = [
   {
+    key: "shortcuts.buy",
     label: "Buy",
     icon: BuyCategoryMulticolorIcon,
     items: [
-      { label: "Plot", to: "/listings?intent=buy&propertyType=Plot" },
-      { label: "Villa / Flat", to: "/listings?intent=buy&propertyType=Villa,Flat" },
-      { label: "Independent House", to: "/listings?intent=buy&propertyType=Independent House" },
-      { label: "Commercial Land / Building", to: "/listings?intent=buy&propertyType=Commercial Land,Commercial Building" },
-      { label: "Farm Land", to: "/listings?intent=buy&propertyType=Farm Land" },
-      { label: "Agricultural Land", to: "/listings?intent=buy&propertyType=Agricultural Land" },
+      { label: "Plot", labelKey: "shortcuts.items.plot", to: "/listings?intent=buy&propertyType=Plot" },
+      { label: "Villa / Flat", labelKey: "shortcuts.items.villaFlat", to: "/listings?intent=buy&propertyType=Villa,Flat" },
+      { label: "Independent House", labelKey: "shortcuts.items.independentHouse", to: "/listings?intent=buy&propertyType=Independent House" },
+      { label: "Commercial Land / Building", labelKey: "shortcuts.items.commercial", to: "/listings?intent=buy&propertyType=Commercial Land,Commercial Building" },
+      { label: "Farm Land", labelKey: "shortcuts.items.farmLand", to: "/listings?intent=buy&propertyType=Farm Land" },
+      { label: "Agricultural Land", labelKey: "shortcuts.items.agriculturalLand", to: "/listings?intent=buy&propertyType=Agricultural Land" },
     ],
   },
   {
+    key: "shortcuts.sell",
     label: "Sell",
     icon: SellCategoryMulticolorIcon,
     items: [
-      { label: "Posted Properties", to: "/listings?intent=buy" },
-      { label: "List Property", to: "/post-property" },
-      { label: "Selling Support", to: "/request-service?category=property_sell" },
+      { label: "Posted Properties", labelKey: "shortcuts.items.postedProperties", to: "/listings?intent=buy" },
+      { label: "List Property", labelKey: "shortcuts.items.listProperty", to: "/post-property" },
+      { label: "Selling Support", labelKey: "shortcuts.items.sellingSupport", to: "/request-service?category=property_sell" },
     ],
   },
   {
+    key: "shortcuts.rent",
     label: "Rent",
     icon: RentCategoryMulticolorIcon,
     items: [
-      { label: "Home", to: "/listings?intent=rent&propertyType=Home" },
-      { label: "Office", to: "/listings?intent=rent&propertyType=Office" },
-      { label: "Apartment", to: "/listings?intent=rent&propertyType=Apartment" },
-      { label: "Warehouse", to: "/listings?intent=rent&propertyType=Warehouse" },
-      { label: "Commercial Land & Building", to: "/listings?intent=rent&propertyType=Commercial Land & Building" },
-      { label: "Empty Land", to: "/listings?intent=rent&propertyType=Empty Land" },
+      { label: "Home", labelKey: "shortcuts.items.home", to: "/listings?intent=rent&propertyType=Home" },
+      { label: "Office", labelKey: "shortcuts.items.office", to: "/listings?intent=rent&propertyType=Office" },
+      { label: "Apartment", labelKey: "shortcuts.items.apartment", to: "/listings?intent=rent&propertyType=Apartment" },
+      { label: "Warehouse", labelKey: "shortcuts.items.warehouse", to: "/listings?intent=rent&propertyType=Warehouse" },
+      { label: "Commercial Land & Building", labelKey: "shortcuts.items.commercialLandBuilding", to: "/listings?intent=rent&propertyType=Commercial Land & Building" },
+      { label: "Empty Land", labelKey: "shortcuts.items.emptyLand", to: "/listings?intent=rent&propertyType=Empty Land" },
     ],
   },
   {
+    key: "shortcuts.loan",
     label: "Loan",
     icon: LoanCategoryMulticolorIcon,
     items: [
-      { label: "Home Loan", to: "/request-service?category=loan&type=Home%20Loan" },
-      { label: "Plot Loan", to: "/request-service?category=loan&type=Plot%20Loan" },
-      { label: "Mortgage Loan", to: "/request-service?category=loan&type=Mortgage%20Loan" },
-      { label: "Private Finance", to: "/request-service?category=loan&type=Private%20Finance" },
+      { label: "Home Loan", labelKey: "shortcuts.items.homeLoan", to: "/request-service?category=loan&type=Home%20Loan" },
+      { label: "Plot Loan", labelKey: "shortcuts.items.plotLoan", to: "/request-service?category=loan&type=Plot%20Loan" },
+      { label: "Mortgage Loan", labelKey: "shortcuts.items.mortgageLoan", to: "/request-service?category=loan&type=Mortgage%20Loan" },
+      { label: "Private Finance", labelKey: "shortcuts.items.privateFinance", to: "/request-service?category=loan&type=Private%20Finance" },
     ],
   },
   {
+    key: "shortcuts.construction",
     label: "Construction",
     icon: ConstructionCategoryMulticolorIcon,
     items: [
-      { label: "House Construction", to: "/request-service?category=construction&type=House Construction" },
-      { label: "Office Construction", to: "/request-service?category=construction&type=Office Construction" },
-      { label: "Commercial Building", to: "/request-service?category=construction&type=Commercial Building" },
-      { label: "Apartment", to: "/request-service?category=construction&type=Apartment" },
-      { label: "Industry & Warehouse", to: "/request-service?category=construction&type=Industry & Warehouse" },
+      { label: "House Construction", labelKey: "shortcuts.items.houseConstruction", to: "/request-service?category=construction&type=House Construction" },
+      { label: "Office Construction", labelKey: "shortcuts.items.officeConstruction", to: "/request-service?category=construction&type=Office Construction" },
+      { label: "Commercial Building", labelKey: "shortcuts.items.commercialBuilding", to: "/request-service?category=construction&type=Commercial Building" },
+      { label: "Apartment", labelKey: "shortcuts.items.apartment", to: "/request-service?category=construction&type=Apartment" },
+      { label: "Industry & Warehouse", labelKey: "shortcuts.items.industryWarehouse", to: "/request-service?category=construction&type=Industry & Warehouse" },
     ],
   },
   {
+    key: "shortcuts.interior",
     label: "Interior",
     icon: InteriorCategoryMulticolorIcon,
     items: [
-      { label: "Home Interior", to: "/request-service?category=interior&type=Home Interior" },
-      { label: "Office Interior", to: "/request-service?category=interior&type=Office Interior" },
+      { label: "Home Interior", labelKey: "shortcuts.items.homeInterior", to: "/request-service?category=interior&type=Home Interior" },
+      { label: "Office Interior", labelKey: "shortcuts.items.officeInterior", to: "/request-service?category=interior&type=Office Interior" },
     ],
   },
   {
+    key: "shortcuts.homeOffice",
     label: "Home & Office Services",
     icon: HomeOfficeServicesMulticolorIcon,
     items: HOME_OFFICE_SERVICE_SHORTCUTS.map((item) => ({
@@ -175,6 +183,7 @@ const shortcutGroups = [
     })),
   },
   {
+    key: "shortcuts.propertyManagement",
     label: "Property Management Service",
     icon: PropertyManagementMulticolorIcon,
     items: PROPERTY_MANAGEMENT_SHORTCUTS.map((item) => ({
@@ -184,73 +193,15 @@ const shortcutGroups = [
   },
 ];
 
-const homeStats = [
-  { value: 100, suffix: "+", label: "Verified listings" },
-  { value: 200, suffix: "+", label: "Buyer enquiries" },
-  { value: 50, suffix: "+", label: "Local partners" },
-];
-
-const servicePreview = [
-  {
-    title: "Property Transactions Support",
-    description: "Buying, selling, rental guidance, and documentation support tailored for Hosur buyers and owners.",
-    icon: BuyCategoryMulticolorIcon,
-  },
-  {
-    title: "Legal & Registration Support",
-    description: "Agreement support, sale deed registration, patta transfer, and property legal coordination in one place.",
-    icon: PropertyManagementMulticolorIcon,
-  },
-  {
-    title: "Construction & Interior Support",
-    description: "Interior planning, construction services, electrical, plumbing, and trusted contractor support.",
-    icon: ConstructionCategoryMulticolorIcon,
-  },
-];
-
-const showcaseItems = [
-  {
-    title: "Sell Property",
-    description: "Quick and verified sales",
-    icon: SellCategoryMulticolorIcon,
-    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80",
-    to: "/post-property",
-  },
-  {
-    title: "Rent Property",
-    description: "Lease verified homes",
-    icon: RentCategoryMulticolorIcon,
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
-    to: "/listings?intent=rent",
-  },
-  {
-    title: "Commercial",
-    description: "Office & retail spaces",
-    icon: CommercialMulticolorIcon,
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
-    to: "/listings?intent=buy&propertyType=Commercial%20Land",
-  },
-  {
-    title: "Land Sale",
-    description: "Agricultural & residential land",
-    icon: PlotMulticolorIcon,
-    image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
-    to: "/listings?intent=buy&propertyType=Plot",
-  },
-  {
-    title: "Interior Design",
-    description: "Customized interiors",
-    icon: InteriorCategoryMulticolorIcon,
-    image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80",
-    to: "/request-service?category=interior",
-  },
-];
-
-const trustStats = [
-  { value: 500, suffix: "+", label: "Happy Clients", icon: UserGroupIcon },
-  { value: 150, suffix: "+", label: "Properties Sold", icon: HomeIcon },
-  { value: 15, suffix: "+", label: "Years Experience", icon: CheckBadgeIcon },
-  { value: 100, suffix: "%", label: "Satisfaction Rate", icon: HandshakeIcon },
+const propertyTypeConfigs = [
+  { value: "Plot", iconKey: "Plot", titleKey: "home.propertyTypes.plot", desc1Key: "home.propertyTypes.plotDesc1", desc2Key: "home.propertyTypes.plotDesc2" },
+  { value: "Villa,Flat", iconKey: "Villa / Flat", titleKey: "home.propertyTypes.villaFlat", desc1Key: "home.propertyTypes.villaFlatDesc1", desc2Key: "home.propertyTypes.villaFlatDesc2" },
+  { value: "Villa", iconKey: "Villa", titleKey: "home.propertyTypes.villa", desc1Key: "home.propertyTypes.villaDesc1", desc2Key: "home.propertyTypes.villaDesc2" },
+  { value: "Independent House", iconKey: "Independent House", titleKey: "home.propertyTypes.house", desc1Key: "home.propertyTypes.houseDesc1", desc2Key: "home.propertyTypes.houseDesc2" },
+  { value: "Flat", iconKey: "Flat", titleKey: "home.propertyTypes.flat", desc1Key: "home.propertyTypes.flatDesc1", desc2Key: "home.propertyTypes.flatDesc2" },
+  { value: "Commercial Land,Commercial Building", iconKey: "Commercial Land / Building", titleKey: "home.propertyTypes.commercial", desc1Key: "home.propertyTypes.commercialDesc1", desc2Key: "home.propertyTypes.commercialDesc2" },
+  { value: "Farm Land", iconKey: "Farm Land", titleKey: "home.propertyTypes.farmLand", desc1Key: "home.propertyTypes.farmLandDesc1", desc2Key: "home.propertyTypes.farmLandDesc2" },
+  { value: "Agricultural Land", iconKey: "Agricultural Land", titleKey: "home.propertyTypes.agriculture", desc1Key: "home.propertyTypes.agricultureDesc1", desc2Key: "home.propertyTypes.agricultureDesc2" },
 ];
 
 /* Testimonial placeholder data */
@@ -261,6 +212,7 @@ const testimonialPlaceholders = [
 ];
 
 const HomePage = () => {
+  const { t } = useAppLanguage();
   const navigate = useNavigate();
   const scrollToTop = useScrollToTop();
   const { isAuthenticated } = useAuth();
@@ -268,6 +220,75 @@ const HomePage = () => {
   const [featuredLoading, setFeaturedLoading] = useState(true);
   const [openShortcutMenu, setOpenShortcutMenu] = useState("");
   const [propertyTypeMenuOpen, setPropertyTypeMenuOpen] = useState(false);
+
+  const homeStats = useMemo(() => [
+    { value: 100, suffix: "+", label: t("home.stats.verifiedListings") || "Verified listings" },
+    { value: 200, suffix: "+", label: t("home.stats.buyerEnquiries") || "Buyer enquiries" },
+    { value: 50, suffix: "+", label: t("home.stats.localPartners") || "Local partners" },
+  ], [t]);
+
+  const servicePreview = useMemo(() => [
+    {
+      title: t("home.services.card1Title") || "Property Transactions Support",
+      description: t("home.services.card1Desc") || "Buying, selling, rental guidance, and documentation support tailored for Hosur buyers and owners.",
+      icon: BuyCategoryMulticolorIcon,
+    },
+    {
+      title: t("home.services.card2Title") || "Legal & Registration Support",
+      description: t("home.services.card2Desc") || "Agreement support, sale deed registration, patta transfer, and property legal coordination in one place.",
+      icon: PropertyManagementMulticolorIcon,
+    },
+    {
+      title: t("home.services.card3Title") || "Construction & Interior Support",
+      description: t("home.services.card3Desc") || "Interior planning, construction services, electrical, plumbing, and trusted contractor support.",
+      icon: ConstructionCategoryMulticolorIcon,
+    },
+  ], [t]);
+
+  const showcaseItems = useMemo(() => [
+    {
+      title: t("home.showcase.sellTitle") || "Sell Property",
+      description: t("home.showcase.sellDesc") || "Quick and verified sales",
+      icon: SellCategoryMulticolorIcon,
+      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80",
+      to: "/post-property",
+    },
+    {
+      title: t("home.showcase.rentTitle") || "Rent Property",
+      description: t("home.showcase.rentDesc") || "Lease verified homes",
+      icon: RentCategoryMulticolorIcon,
+      image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+      to: "/listings?intent=rent",
+    },
+    {
+      title: t("home.showcase.commercialTitle") || "Commercial",
+      description: t("home.showcase.commercialDesc") || "Office & retail spaces",
+      icon: CommercialMulticolorIcon,
+      image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+      to: "/listings?intent=buy&propertyType=Commercial%20Land",
+    },
+    {
+      title: t("home.showcase.landTitle") || "Land Sale",
+      description: t("home.showcase.landDesc") || "Agricultural & residential land",
+      icon: PlotMulticolorIcon,
+      image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
+      to: "/listings?intent=buy&propertyType=Plot",
+    },
+    {
+      title: t("home.showcase.interiorTitle") || "Interior Design",
+      description: t("home.showcase.interiorDesc") || "Customized interiors",
+      icon: InteriorCategoryMulticolorIcon,
+      image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80",
+      to: "/request-service?category=interior",
+    },
+  ], [t]);
+
+  const trustStats = useMemo(() => [
+    { value: 500, suffix: "+", label: t("home.trustStats.happyClients") || "Happy Clients", icon: UserGroupIcon },
+    { value: 150, suffix: "+", label: t("home.trustStats.propertiesListed") || "Properties Listed", icon: HomeIcon },
+    { value: 50, suffix: "+", label: t("home.trustStats.trustedPartners") || "Trusted Partners", icon: CheckBadgeIcon },
+    { value: 100, suffix: "%", label: t("home.trustStats.verifiedDeals") || "Verified Deals", icon: HandshakeIcon },
+  ], [t]);
   const [localityDropdownOpen, setLocalityDropdownOpen] = useState(false);
   const homeRootRef = useRef(null);
   const heroRef = useRef(null);
@@ -436,7 +457,11 @@ const HomePage = () => {
   }, [debouncedSearch, search.city, search.intent, search.propertyType]);
 
   const selectedPropertyTypeLabel =
-    propertyTypeOptions.find((option) => option.value === search.propertyType)?.label || "All types";
+    (() => {
+      const found = propertyTypeOptions.find((option) => option.value === search.propertyType);
+      if (!found) return t("search.allTypes") || "All types";
+      return found.labelKey ? (t(found.labelKey) || found.label) : found.label;
+    })();
   const openShortcutGroup = shortcutGroups.find((group) => group.label === openShortcutMenu);
 
   const handlePostFreeProperty = () => {
@@ -527,19 +552,24 @@ const HomePage = () => {
         </div>
 
         <div ref={heroContentRef} className="relative mx-auto flex max-w-[1440px] flex-col items-center px-5 py-10 text-center will-change-transform sm:px-8 sm:py-14 lg:px-10 lg:py-16" style={{ zIndex: 20 }}>
-          <p className="home-gsap-hero-item section-tag !text-navy">Verified real estate platform</p>
-          <h1 className="home-gsap-hero-item hero-title mt-3 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-navy">
-            Verified property listings in <span className="text-orange">Hosur</span>
+          <p className="home-gsap-hero-item section-tag !text-navy">
+            {t("nav.tagline") || "Verified real estate platform"}
+          </p>
+          <h1 className="home-gsap-hero-item hero-title mt-3 w-full max-w-4xl text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-navy break-words" style={{ lineHeight: 1.2 }}>
+            {t("hero.homeTitlePrefix") || "Verified property listings in"}{" "}
+            <span className="text-orange">{t("hero.homeTitleCity") || "Hosur"}</span>
           </h1>
 
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-            Find verified properties for sale and rent across Hosur. Search apartments, villas, plots, and houses with clearer tools and local support.
+            {t("hero.subheading") ||
+              "Find verified properties for sale and rent across Hosur. Search apartments, villas, plots, and houses with clearer tools and local support."}
           </p>
 
           {/* ── 1. SHORTCUT CATEGORY DROPDOWNS BAR (TOP LEVEL CATEGORY NAVIGATION) ── */}
           <div ref={shortcutBarRef} className="home-gsap-hero-item relative z-30 mt-6 flex flex-wrap justify-center gap-2.5 sm:gap-3 w-full max-w-5xl">
             {shortcutGroups.map((group) => {
               const CategoryIcon = group.icon;
+              const groupLabel = t(group.key) || group.label;
               return (
                 <div
                   key={group.label}
@@ -558,7 +588,7 @@ const HomePage = () => {
                     }`}
                   >
                     {CategoryIcon && <CategoryIcon className="h-6 w-6 flex-shrink-0" />}
-                    <span>{group.label}</span>
+                    <span>{groupLabel}</span>
                     <ChevronDownIcon className={`h-4 w-4 transition duration-300 max-sm:!hidden sm:block ${openShortcutMenu === group.label ? "rotate-180" : ""}`} />
                   </button>
 
@@ -585,7 +615,7 @@ const HomePage = () => {
                               onClick={() => setOpenShortcutMenu("")}
                             >
                               <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-orange" />
-                              <span className={`min-w-0 flex-1 ${isLongShortcutLabel ? "whitespace-normal" : "whitespace-nowrap"}`}>{item.label}</span>
+                              <span className={`min-w-0 flex-1 ${(item.labelKey ? (t(item.labelKey) || item.label) : item.label).length > 34 ? "whitespace-normal" : "whitespace-nowrap"}`}>{item.labelKey ? (t(item.labelKey) || item.label) : item.label}</span>
                             </Link>
                           );
                         })}
@@ -613,7 +643,7 @@ const HomePage = () => {
                       className="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 text-slate-800 transition duration-150 hover:bg-orange hover:text-white"
                       onClick={() => setOpenShortcutMenu("")}
                     >
-                      {item.label}
+                      {item.labelKey ? (t(item.labelKey) || item.label) : item.label}
                     </Link>
                   ))}
                 </div>
@@ -628,7 +658,9 @@ const HomePage = () => {
                 localityDropdownOpen ? "pb-[22rem] sm:pb-[26rem]" : ""
               }`}
             >
-              <p className="mb-4 text-xs font-bold uppercase tracking-wider text-navy sm:text-sm">Search properties in Hosur</p>
+              <p className="mb-4 text-xs font-bold uppercase tracking-wider text-navy sm:text-sm">
+                {t("search.searchPlaceholder") || "Search properties in Hosur"}
+              </p>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.8fr_0.9fr_auto] lg:items-stretch">
                 <LocalityDropdown
                   value={search.search}
@@ -646,9 +678,9 @@ const HomePage = () => {
                   className="site-input min-h-[52px] w-full rounded-xl text-sm font-semibold border-slate-300 text-navy focus:border-navy"
                   aria-label="Listing intent"
                 >
-                  <option value="buy">Buy</option>
-                  <option value="rent">Rent</option>
-                  <option value="new-project">New Project</option>
+                  <option value="buy">{t("search.tabBuy") || "Buy"}</option>
+                  <option value="rent">{t("search.tabRent") || "Rent"}</option>
+                  <option value="new-project">{t("search.tabProjects") || "New Project"}</option>
                 </select>
 
                 {/* Property type custom dropdown */}
@@ -682,7 +714,7 @@ const HomePage = () => {
                           >
                             <span className="flex items-center gap-2.5">
                               {IconComponent ? <IconComponent className="h-6 w-6 flex-shrink-0" /> : null}
-                              <span>{option.label}</span>
+                              <span>{option.labelKey ? (t(option.labelKey) || option.label) : option.label}</span>
                             </span>
                             {option.value === search.propertyType ? <CheckIcon className="h-4 w-4 text-orange" /> : null}
                           </button>
@@ -700,7 +732,7 @@ const HomePage = () => {
                   }}
                   className="site-button-primary min-h-[52px] w-full rounded-xl px-8 text-sm font-bold shadow-md hover:shadow-lg transition lg:w-auto"
                 >
-                  Search
+                  {t("search.searchButton") || "Search"}
                 </button>
               </div>
             </div>
@@ -730,7 +762,7 @@ const HomePage = () => {
               `}</style>
               <div className="shine-effect"></div>
               <FlagIcon className="wave-icon h-5 w-5 transition-transform duration-300 relative z-10" />
-              <span className="relative z-10">Post your free property</span>
+              <span className="relative z-10">{t("nav.postFreePropertyFull") || "Post your free property"}</span>
               <div className="boom-button absolute inset-0 -z-10 rounded-xl bg-gradient-to-r from-orange to-orange-600" />
             </motion.button>
             <button
@@ -741,14 +773,14 @@ const HomePage = () => {
               }}
               className="inline-flex items-center justify-center rounded-xl border-2 border-navy px-7 py-3 text-sm font-bold text-navy transition hover:bg-navy hover:text-white w-full sm:w-auto shadow-sm"
             >
-              Find Your Property
+              {t("hero.exploreProperties") || "Find Your Property"}
             </button>
             <Link
               to="/request-service?category=property_buy&type=Find%20your%20property"
               onClick={scrollToTop}
               className="inline-flex items-center justify-center rounded-xl border-2 border-orange bg-orange/10 px-7 py-3 text-sm font-bold text-orange hover:bg-orange hover:text-white transition duration-200 w-full sm:w-auto shadow-sm"
             >
-              Request for New Property
+              {t("services.requestService") || "Request for New Property"}
             </Link>
           </div>
 
@@ -772,39 +804,39 @@ const HomePage = () => {
       >
         <div className="mx-auto max-w-[1440px]">
           <div className="home-property-types-intro">
-            <p className="section-tag">Property types</p>
-            <h2 className="mt-3">Explore property categories in Hosur</h2>
-            <p>Browse verified listings across plots, villas, flats, and commercial properties.</p>
+            <p className="section-tag">{t("home.propertyTypes.tag") || "Property types"}</p>
+            <h2 className="mt-3">{t("home.propertyTypes.title") || "Explore property categories in Hosur"}</h2>
+            <p>{t("home.propertyTypes.subtitle") || "Browse verified listings across plots, villas, flats, and commercial properties."}</p>
           </div>
 
           <div className="home-property-types-grid">
-            {propertyTypeOptions
-              .filter((option) => option.value)
-              .map((option) => {
-                const Icon = propertyTypeIcons[option.value] || BuildingOffice2Icon;
-                const desc = propertyTypeDescriptions[option.value] || ["Browse verified", "listings in Hosur"];
-                return (
-                  <Link
-                    key={option.value}
-                    to={`/listings?intent=buy&propertyType=${encodeURIComponent(option.value)}`}
-                    className="home-gsap-card home-property-type-card group"
-                  >
-                    <div className="home-type-icon">
-                      <Icon className="h-7 w-7" />
-                    </div>
-                    <h3 className="home-type-title">{option.label}</h3>
-                    <p className="home-type-desc">
-                      {desc[0]}
-                      <br />
-                      {desc[1]}
-                    </p>
-                    <span className="home-type-link">
-                      Browse listings
-                      <ArrowRightIcon className="h-4 w-4" />
-                    </span>
-                  </Link>
-                );
-              })}
+            {propertyTypeConfigs.map((cfg) => {
+              const Icon = propertyTypeIcons[cfg.iconKey] || BuildingOffice2Icon;
+              const label = t(cfg.titleKey) || cfg.value;
+              const desc1 = t(cfg.desc1Key) || "Residential & commercial";
+              const desc2 = t(cfg.desc2Key) || "plots across Hosur";
+              return (
+                <Link
+                  key={cfg.value}
+                  to={`/listings?intent=buy&propertyType=${encodeURIComponent(cfg.value)}`}
+                  className="home-gsap-card home-property-type-card group"
+                >
+                  <div className="home-type-icon">
+                    <Icon className="h-7 w-7" />
+                  </div>
+                  <h3 className="home-type-title">{label}</h3>
+                  <p className="home-type-desc">
+                    {desc1}
+                    <br />
+                    {desc2}
+                  </p>
+                  <span className="home-type-link">
+                    {t("home.propertyTypes.browseListings") || "Browse listings"}
+                    <ArrowRightIcon className="h-4 w-4" />
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -815,16 +847,17 @@ const HomePage = () => {
       >
         <div className="mx-auto max-w-[1440px] home-services-grid">
           <div className="text-left">
-            <p className="section-tag">Our services</p>
-            <h2 className="home-section-heading mt-3">Complete property support for Hosur</h2>
+            <p className="section-tag">{t("home.services.tag") || "Our services"}</p>
+            <h2 className="home-section-heading mt-3">{t("home.services.title") || "Complete property support for Hosur"}</h2>
             <p className="mt-4 max-w-sm text-slate-600">
-              From buying and selling to legal registration and construction — we provide end-to-end property support tailored for Hosur.
+              {t("home.services.description") ||
+                "From buying and selling to legal registration and construction — we provide end-to-end property support tailored for Hosur."}
             </p>
             <Link
               to="/services"
               className="site-button-primary mt-6 inline-flex min-h-[44px] items-center justify-center rounded-xl px-6 py-2.5 text-sm font-bold"
             >
-              Explore all services
+              {t("home.services.exploreAll") || "Explore all services"}
             </Link>
           </div>
 
@@ -843,7 +876,7 @@ const HomePage = () => {
                     <h3>{item.title}</h3>
                     <p>{item.description}</p>
                     <Link to="/services" className="home-service-link">
-                      Learn more
+                      {t("services.learnMore") || "Learn more"}
                       <ArrowRightIcon className="h-3.5 w-3.5" />
                     </Link>
                   </div>
@@ -863,12 +896,14 @@ const HomePage = () => {
         className="home-gsap-section bg-white px-5 py-12 sm:px-8 lg:px-10"
       >
         <div className="mx-auto max-w-[1440px] text-center">
-          <p className="section-tag">Hosur Coverage &amp; Localities</p>
+          <p className="section-tag">{t("home.coverage.tag") || "Hosur Coverage & Localities"}</p>
           <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">
-            Serving Every Prime Growth Corridor in <span className="text-orange">Hosur</span>
+            {t("home.coverage.title") || "Serving Every Prime Growth Corridor in"}{" "}
+            <span className="text-orange">{t("home.coverage.titleCity") || "Hosur"}</span>
           </h2>
           <p className="home-gsap-copy mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-            From Hosur Town &amp; Attibele Road to Mathigiri, Begapalli, Kelamangalam, and Denkanikottai Road — we provide verified listings and complete service coverage across all major areas.
+            {t("home.coverage.description") ||
+              "From Hosur Town & Attibele Road to Mathigiri, Begapalli, Kelamangalam, and Denkanikottai Road — we provide verified listings and complete service coverage across all major areas."}
           </p>
         </div>
 
@@ -890,10 +925,10 @@ const HomePage = () => {
         <div className="mx-auto max-w-[1440px]">
           <div className="home-showcase-header">
             <div>
-              <p className="section-tag">Property Showcase</p>
-              <h2 className="home-section-heading mt-3">Services &amp; Property Types</h2>
+              <p className="section-tag">{t("home.showcase.tag") || "Property Showcase"}</p>
+              <h2 className="home-section-heading mt-3">{t("home.showcase.title") || "Services & Property Types"}</h2>
               <p className="home-gsap-copy mt-3 max-w-xl text-slate-600">
-                Explore the diverse range of properties and services we provide in Hosur
+                {t("home.showcase.description") || "Explore the diverse range of properties and services we provide in Hosur"}
               </p>
             </div>
             <div className="home-showcase-nav">
@@ -975,14 +1010,18 @@ const HomePage = () => {
         {/* Adissia header layout */}
         <div className="mx-auto flex max-w-[1440px] flex-col gap-4 border-b border-slate-100 pb-4 mb-10 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-4">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest border-r border-slate-300 pr-4">FEATURED PROPERTIES</span>
-            <span className="text-xs font-bold text-orange uppercase tracking-wider">HOSUR'S PREMIUM SELECTION</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest border-r border-slate-300 pr-4">
+              {t("home.featured.tag") || "FEATURED PROPERTIES"}
+            </span>
+            <span className="text-xs font-bold text-orange uppercase tracking-wider">
+              {t("home.featured.subtag") || "HOSUR'S PREMIUM SELECTION"}
+            </span>
           </div>
           <Link
             to="/listings"
             className="inline-flex w-fit items-center gap-2 rounded-lg border border-navy bg-white px-4 py-2 text-sm font-bold text-navy transition hover:border-orange hover:bg-orange hover:text-white"
           >
-            <span>View All Properties</span>
+            <span>{t("home.featured.viewAll") || "View All Properties"}</span>
             <ArrowRightIcon className="h-4 w-4" />
           </Link>
         </div>
@@ -1016,22 +1055,26 @@ const HomePage = () => {
 
             <div className="relative z-10">
               <h2 className="text-5xl sm:text-6xl font-black text-navy leading-tight tracking-tight">
-                Discover Properties
+                {t("home.featured.discoverTitle") || "Discover Properties"}
               </h2>
 
               {/* Navigation Tabs */}
               <div className="flex border-b border-slate-200 mt-6 gap-6 text-sm font-semibold">
-                {["Ongoing", "Upcoming", "Completed"].map((tab) => (
+                {[
+                  { key: "Ongoing", label: t("home.featured.tabOngoing") || "Ongoing" },
+                  { key: "Upcoming", label: t("home.featured.tabUpcoming") || "Upcoming" },
+                  { key: "Completed", label: t("home.featured.tabCompleted") || "Completed" },
+                ].map(({ key, label }) => (
                   <button
-                    key={tab}
+                    key={key}
                     type="button"
-                    onClick={() => setDiscoverTab(tab)}
+                    onClick={() => setDiscoverTab(key)}
                     className={`pb-3 relative transition-colors duration-200 ${
-                      discoverTab === tab ? "text-navy" : "text-slate-400 hover:text-slate-600"
+                      discoverTab === key ? "text-navy" : "text-slate-400 hover:text-slate-600"
                     }`}
                   >
-                    {tab}
-                    {discoverTab === tab && (
+                    {label}
+                    {discoverTab === key && (
                       <motion.div
                         layoutId="activeTabUnderline"
                         className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange"
@@ -1045,13 +1088,13 @@ const HomePage = () => {
               {/* Tab Descriptions */}
               <p className="mt-6 text-sm leading-7 text-slate-600 font-medium">
                 {discoverTab === "Ongoing" && (
-                  "Explore active verified plots, villas, and apartments in Hosur's high-growth corridors."
+                  t("home.featured.descOngoing") || "Explore active verified plots, villas, and apartments in Hosur's high-growth corridors."
                 )}
                 {discoverTab === "Upcoming" && (
-                  "Secure early-stage properties coming soon in Hosur's key expansion zones."
+                  t("home.featured.descUpcoming") || "Secure early-stage properties coming soon in Hosur's key expansion zones."
                 )}
                 {discoverTab === "Completed" && (
-                  "Recently sold-out premium layouts and successful real estate listings."
+                  t("home.featured.descCompleted") || "Recently sold-out premium layouts and successful real estate listings."
                 )}
               </p>
             </div>
@@ -1062,7 +1105,7 @@ const HomePage = () => {
                 to="/listings"
                 className="inline-flex items-center justify-between w-full bg-navy text-white hover:bg-orange px-6 py-4 rounded-xl font-bold transition-all duration-300 shadow-md group"
               >
-                <span>Explore All Listings</span>
+                <span>{t("home.featured.exploreAllListings") || "Explore All Listings"}</span>
                 <ArrowRightIcon className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
@@ -1075,10 +1118,10 @@ const HomePage = () => {
         className="home-gsap-section bg-white px-5 py-16 sm:px-8 lg:px-10"
       >
         <div className="mx-auto max-w-[1440px] text-center">
-          <p className="section-tag">Trusted partnerships</p>
-          <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">Our Partners &amp; Associated Businesses</h2>
+          <p className="section-tag">{t("home.partners.tag") || "Trusted partnerships"}</p>
+          <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl">{t("home.partners.title") || "Our Partners & Associated Businesses"}</h2>
           <p className="home-gsap-copy mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-            Working with industry leaders to provide comprehensive real estate, construction, and home service solutions across Hosur.
+            {t("home.partners.subtitle") || "Working with industry leaders to provide comprehensive real estate, construction, and home service solutions across Hosur."}
           </p>
         </div>
 
@@ -1087,7 +1130,7 @@ const HomePage = () => {
           {/* Card: Gyes Property & Construction */}
           <div className="group relative flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition duration-200 hover:border-orange hover:shadow-md home-gsap-card">
             <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 transition duration-200 group-hover:bg-orange group-hover:text-white group-hover:shadow-xs">
-              Click Here ↗
+              {t("home.partners.clickHere") || "Click Here ↗"}
             </span>
             <a
               href="https://gyesproperty.com/"
@@ -1109,14 +1152,14 @@ const HomePage = () => {
               rel="noreferrer noopener"
               className="mt-3 text-xs font-bold text-navy transition group-hover:text-orange"
             >
-              Gyes Property &amp; Construction
+              {t("nav.companyName") || "Gyes Property & Construction"}
             </a>
           </div>
 
           {/* Card: Gyes Traders */}
           <div className="group relative flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition duration-200 hover:border-orange hover:shadow-md home-gsap-card">
             <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 transition duration-200 group-hover:bg-orange group-hover:text-white group-hover:shadow-xs">
-              Click Here ↗
+              {t("home.partners.clickHere") || "Click Here ↗"}
             </span>
             <a
               href="https://www.gyestraders.com/"
@@ -1140,13 +1183,13 @@ const HomePage = () => {
             >
               Gyes Traders
             </a>
-            <p className="mt-0.5 text-[11px] text-slate-500">Trading &amp; Supply</p>
+            <p className="mt-0.5 text-[11px] text-slate-500">{t("home.partners.tradingSupply") || "Trading & Supply"}</p>
           </div>
 
           {/* Card: OneClick */}
           <div className="group relative flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition duration-200 hover:border-orange hover:shadow-md home-gsap-card">
             <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 transition duration-200 group-hover:bg-orange group-hover:text-white group-hover:shadow-xs">
-              Click Here ↗
+              {t("home.partners.clickHere") || "Click Here ↗"}
             </span>
             <a
               href="https://oneclick2serve.com/"
@@ -1170,13 +1213,13 @@ const HomePage = () => {
             >
               OneClick
             </a>
-            <p className="mt-0.5 text-[11px] text-slate-500">Office &amp; Home Services</p>
+            <p className="mt-0.5 text-[11px] text-slate-500">{t("home.partners.officeHomeServices") || "Office & Home Services"}</p>
           </div>
 
           {/* Card: Alluring Realty */}
           <div className="group relative flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition duration-200 hover:border-orange hover:shadow-md home-gsap-card">
             <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 transition duration-200 group-hover:bg-orange group-hover:text-white group-hover:shadow-xs">
-              Click Here ↗
+              {t("home.partners.clickHere") || "Click Here ↗"}
             </span>
             <a
               href="https://alluringrealty.com/"
@@ -1200,37 +1243,36 @@ const HomePage = () => {
             >
               Alluring Realty
             </a>
-            <p className="mt-0.5 text-[11px] text-slate-500">Real Estate Consulting</p>
+            <p className="mt-0.5 text-[11px] text-slate-500">{t("home.partners.realEstateConsulting") || "Real Estate Consulting"}</p>
           </div>
         </div>
       </section>
 
-      {/* ── TESTIMONIALS placeholder ── */}
+      {/* ── TESTIMONIALS ── */}
       <section
         className="home-gsap-section bg-[#eef4fb] px-5 py-16 sm:px-8 lg:px-10"
       >
         <div className="mx-auto max-w-[1440px] text-center">
-          <p className="section-tag">Testimonials</p>
+          <p className="section-tag">{t("home.testimonials.tag") || "Testimonials"}</p>
           <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl lg:text-5xl">
-            Stories That Inspire{" "}
-            <span className="text-orange">Confidence</span> !!
+            {t("home.testimonials.title") || "Stories That Inspire"}{" "}
+            <span className="text-orange">{t("home.testimonials.titleHighlight") || "Confidence"}</span> !!
           </h2>
           <p className="home-gsap-copy mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-600">
-            Hear from our happy customers who found their perfect property through MyHosurProperty.
+            {t("home.testimonials.subtitle") || "Hear from our happy customers who found their perfect property through MyHosurProperty."}
           </p>
         </div>
 
-        {/* Testimonial cards — placeholder layout matching reference carousel style */}
+        {/* Testimonial cards */}
         <div className="mx-auto mt-12 max-w-[1440px]">
           <div className="grid gap-6 md:grid-cols-3">
-            {testimonialPlaceholders.map((t, idx) => (
+            {testimonialPlaceholders.map((item, idx) => (
               <div
-                key={t.id}
+                key={item.id}
                 className={`group relative flex flex-col items-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-xl ${idx === 1 ? "md:-translate-y-4 md:scale-105 ring-2 ring-navy/20" : ""}`}
               >
                 {/* Play button area */}
                 <div className="relative flex h-52 w-full items-center justify-center bg-gradient-to-br from-navy to-navy-light">
-                  {/* Decorative building silhouette */}
                   <div className="absolute inset-0 opacity-10">
                     <svg viewBox="0 0 400 200" className="h-full w-full" fill="white">
                       <rect x="50" y="60" width="60" height="140" />
@@ -1239,29 +1281,26 @@ const HomePage = () => {
                       <rect x="320" y="70" width="50" height="130" />
                     </svg>
                   </div>
-                  {/* Play button */}
                   <button
                     type="button"
-                    aria-label={`Play testimonial from ${t.name}`}
+                    aria-label={`Play testimonial from ${item.name}`}
                     className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm border-2 border-white text-white transition hover:bg-white hover:text-navy"
                   >
                     <svg className="h-7 w-7 translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M8 5v14l11-7z" />
                     </svg>
                   </button>
-                  {/* Customer badge */}
                   <div className="absolute bottom-3 left-3 rounded-md bg-orange px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
-                    {t.name}
+                    {item.name}
                   </div>
                 </div>
 
                 <div className="p-5 text-center w-full">
-                  <p className="font-bold text-navy">{t.name}</p>
-                  <p className="mt-1 text-sm text-slate-500">{t.role}</p>
+                  <p className="font-bold text-navy">{item.name}</p>
+                  <p className="mt-1 text-sm text-slate-500">{item.role}</p>
                   <p className="mt-3 text-sm leading-6 text-slate-600 italic">
-                    "An excellent experience. The team at MyHosurProperty guided us through the entire process."
+                    "{t("home.testimonials.quote") || "An excellent experience. The team at MyHosurProperty guided us through the entire process."}"
                   </p>
-                  {/* Stars */}
                   <div className="mt-3 flex justify-center gap-1 text-orange">
                     {[1,2,3,4,5].map((s) => (
                       <svg key={s} className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
@@ -1273,18 +1312,8 @@ const HomePage = () => {
               </div>
             ))}
           </div>
-          <div className="mt-8 flex justify-center gap-3">
-            <button type="button" className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition hover:border-navy hover:text-navy" aria-label="Previous testimonial">
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-            </button>
-            <button type="button" className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition hover:border-navy hover:text-navy" aria-label="Next testimonial">
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-            </button>
-          </div>
         </div>
       </section>
-
-      {/* SEO location matrix removed from homepage per request */}
 
       {/* ── CTA Banner ── */}
       <section
@@ -1292,18 +1321,19 @@ const HomePage = () => {
       >
         <div className="mx-auto grid max-w-[1440px] gap-5 text-center lg:grid-cols-[1fr_auto] lg:items-center lg:text-left">
           <div>
-            <p className="section-tag text-orange">Need expert help</p>
-            <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">Complete property support beyond listings.</h2>
+            <p className="section-tag text-orange">{t("home.cta.tag") || "Need expert help"}</p>
+            <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">{t("home.cta.title") || "Complete property support beyond listings."}</h2>
             <p className="mt-4 max-w-2xl text-sm leading-8 text-white sm:text-base">
-              From property search and loans to documentation, registration, construction, and local service coordination, our team helps you move with clarity.
+              {t("home.cta.description") ||
+                "From property search and loans to documentation, registration, construction, and local service coordination, our team helps you move with clarity."}
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link to="/services" className="inline-flex items-center justify-center rounded-lg border-2 border-white px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10">
-              Explore Services
+              {t("home.cta.exploreServices") || "Explore Services"}
             </Link>
             <Link to="/contact" className="site-button-primary rounded-lg px-6 py-3 text-sm font-bold">
-              Contact Us
+              {t("home.cta.contactUs") || "Contact Us"}
             </Link>
           </div>
         </div>

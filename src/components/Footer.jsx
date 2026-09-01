@@ -6,6 +6,8 @@ import {
   SOCIAL_LINKS,
 } from "../constants/contactInfo";
 import BrandLogo from "./BrandLogo";
+import LanguageSelector from "./LanguageSelector";
+import { useAppLanguage } from "../context/LanguageContext";
 import {
   EnvelopeIcon,
   FacebookIcon,
@@ -14,7 +16,9 @@ import {
   PhoneIcon,
   ThreadsIcon,
   WhatsAppIcon,
-  XIcon,  YouTubeIcon,} from "./AppIcons";
+  XIcon,
+  YouTubeIcon,
+} from "./AppIcons";
 
 const scrollToTop = () => {
   const htmlElement = document.documentElement;
@@ -28,6 +32,8 @@ const scrollToTop = () => {
 };
 
 const Footer = () => {
+  const { t } = useAppLanguage();
+
   return (
     <footer className="bg-navy text-white">
       <div className="px-5 py-12 sm:px-8 lg:px-10">
@@ -38,17 +44,25 @@ const Footer = () => {
               <div className="flex flex-col items-start text-left gap-1">
                 <BrandLogo className="w-24 sm:w-36 max-w-[100px] sm:max-w-[150px] h-auto object-contain object-left block" />
                 <span className="text-[11px] font-medium leading-none text-white/60 text-left">
-                  Powered by <span className="font-bold text-white">Gyes Property &amp; Construction</span>
+                  {t("nav.poweredBy") || "Powered by"}{" "}
+                  <span className="font-bold text-white">
+                    {t("nav.companyName") || "Gyes Property & Construction"}
+                  </span>
                 </span>
               </div>
               <p className="max-w-sm text-sm leading-7 text-white/80">
-                A refined property platform for verified listings, clearer property discovery, and reliable buyer-owner communication in Hosur.
+                {t("footer.brandBio") ||
+                  "A refined property platform for verified listings, clearer property discovery, and reliable buyer-owner communication in Hosur."}
               </p>
-              <p className="text-sm font-semibold text-orange">My Hosur Property - Trusted Real Estate Partner</p>
+              <p className="text-sm font-semibold text-orange">
+                {t("footer.partnerText") || "My Hosur Property - Trusted Real Estate Partner"}
+              </p>
 
               {/* Social Media Links */}
               <div className="pt-2">
-                <p className="mb-2.5 text-xs font-bold uppercase tracking-[0.18em] text-white/60">Follow Us</p>
+                <p className="mb-2.5 text-xs font-bold uppercase tracking-[0.18em] text-white/60">
+                  {t("footer.followUs") || "Follow Us"}
+                </p>
                 <div className="flex flex-wrap items-center gap-2">
                   <a
                     href={SOCIAL_LINKS.instagram}
@@ -116,21 +130,28 @@ const Footer = () => {
 
             {/* Column 2: Quick Links */}
             <div className="space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">Quick links</h4>
+              <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">
+                {t("footer.quickLinks") || "Quick links"}
+              </h4>
               <nav className="grid grid-cols-2 gap-x-4 gap-y-3" aria-label="Footer navigation">
                 {[
-                  { label: "Home", to: "/" },
-                  { label: "Our Services", to: "/services" },
-                  { label: "Bank Loans", to: "/bank-loans" },
-                  { label: "Plans", to: "/plans" },
-                  { label: "About Us", to: "/about" },
-                  { label: "Contact Us", to: "/contact" },
-                  { label: "Post Property", to: "/post-property" },
-                  { label: "Buy Property", to: "/listings?intent=buy" },
-                  { label: "Rent Property", to: "/listings?intent=rent" },
-                  { label: "New Projects", to: "/listings?intent=new-project" },
+                  { label: t("nav.home") || "Home", to: "/" },
+                  { label: t("nav.services") || "Our Services", to: "/services" },
+                  { label: t("nav.bankLoans") || "Bank Loans", to: "/bank-loans" },
+                  { label: t("nav.plans") || "Plans", to: "/plans" },
+                  { label: t("nav.aboutUs") || "About Us", to: "/about" },
+                  { label: t("nav.contact") || "Contact Us", to: "/contact" },
+                  { label: t("nav.postFreeProperty") || "Post Property", to: "/post-property" },
+                  { label: t("search.tabBuy") || "Buy Property", to: "/listings?intent=buy" },
+                  { label: t("search.tabRent") || "Rent Property", to: "/listings?intent=rent" },
+                  { label: t("search.tabProjects") || "New Projects", to: "/listings?intent=new-project" },
                 ].map((link) => (
-                  <NavLink key={link.to + link.label} to={link.to} onClick={scrollToTop} className="text-sm text-white/80 transition hover:text-orange">
+                  <NavLink
+                    key={link.to + link.label}
+                    to={link.to}
+                    onClick={scrollToTop}
+                    className="text-sm text-white/80 transition hover:text-orange"
+                  >
                     {link.label}
                   </NavLink>
                 ))}
@@ -139,7 +160,9 @@ const Footer = () => {
 
             {/* Column 3: Contact */}
             <div className="space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">Contact</h4>
+              <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">
+                {t("footer.contactInfo") || "Contact"}
+              </h4>
               <div className="space-y-3.5 text-sm text-white/90">
                 <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center gap-3 transition hover:text-orange">
                   <EnvelopeIcon className="h-4 w-4 flex-shrink-0 text-orange" />
@@ -158,9 +181,11 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Column 4: WhatsApp Support */}
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">Connect on WhatsApp</h4>
+            {/* Column 4: WhatsApp Support & Language Selector */}
+            <div className="space-y-4">
+              <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">
+                {t("common.whatsApp") || "WhatsApp Support"}
+              </h4>
               <div className="rounded-xl border border-white/15 bg-white/5 p-4 text-center">
                 <p className="text-xs font-medium text-white/80 mb-2.5">
                   Chat with our team directly on WhatsApp for quick support.
@@ -172,7 +197,7 @@ const Footer = () => {
                   className="mt-3 inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white transition hover:bg-emerald-500 w-full justify-center"
                 >
                   <WhatsAppIcon className="h-4 w-4" />
-                  Direct WhatsApp Chat
+                  {t("common.whatsApp") || "Direct WhatsApp Chat"}
                 </a>
               </div>
             </div>
@@ -217,9 +242,17 @@ const Footer = () => {
             </div>
           </div>
 
-          <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-white sm:flex-row sm:items-center sm:justify-between">
+          {/* Footer Bottom Language Picker & Copyright */}
+          <div className="mt-10 border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <LanguageSelector variant="footer" />
+            <p className="text-xs text-white/60 text-center md:text-right">
+              {t("footer.serving") || "Serving Hosur, Bangalore Border, Krishnagiri & surrounding regions."}
+            </p>
+          </div>
+
+          <div className="mt-6 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-white sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p>Copyright 2026 MyHosurProperty. All rights reserved.</p>
+              <p>Copyright 2026 MyHosurProperty. {t("footer.allRightsReserved") || "All rights reserved."}</p>
               <p className="mt-1 text-[11px] text-white/70">
                 Developed with{" "}
                 <a
@@ -234,22 +267,21 @@ const Footer = () => {
             </div>
             <div className="flex flex-wrap gap-4">
               <NavLink to="/about" onClick={scrollToTop} className="transition hover:text-orange">
-                About Us
+                {t("nav.aboutUs") || "About Us"}
               </NavLink>
               <NavLink to="/contact" onClick={scrollToTop} className="transition hover:text-orange">
-                Contact
+                {t("nav.contact") || "Contact"}
               </NavLink>
               <NavLink to="/listings" onClick={scrollToTop} className="transition hover:text-orange">
-                Browse Listings
+                {t("hero.exploreProperties") || "Browse Listings"}
               </NavLink>
               <NavLink to="/auth" onClick={scrollToTop} className="transition hover:text-orange">
-                Sign In
+                {t("nav.login") || "Sign In"}
               </NavLink>
             </div>
           </div>
         </div>
       </div>
-
     </footer>
   );
 };

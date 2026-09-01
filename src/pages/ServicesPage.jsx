@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRightIcon, MagnifyingGlassIcon, SparklesIcon } from "../components/AppIcons";
 import ServiceCategoryModal from "../components/ServiceCategoryModal";
@@ -6,6 +6,8 @@ import SeoHead from "../components/SeoHead";
 import { serviceCategories, serviceQuickLinks } from "../constants/serviceCatalog";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
 import useScrollAnimation from "../hooks/useScrollAnimation";
+import { useAppLanguage } from "../context/LanguageContext";
+import { localizeCatalogText } from "../utils/i18nCatalog";
 
 import buySellImg from "../assets/property buy guideance.jpg";
 import loanImg from "../assets/Home loan.jpg";
@@ -14,92 +16,100 @@ import searchImg from "../assets/plot search.jpg";
 import interiorImg from "../assets/interiros.jpg";
 import constHouseImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.03 AM (1).jpeg";
 
-const serviceHighlights = [
-  {
-    id: 1,
-    title: "Buy, Sell & Rent Properties",
-    description: "Whether you're looking to buy your dream property, sell an existing one, or rent space for your needs, we provide complete guidance through every step of the process. Our experienced team handles all legal documentation and ensures smooth transactions.",
-    image: buySellImg,
-    highlights: [
-      "Expert legal support",
-      "Safe & transparent deals",
-      "Complete guidance",
-      "Fast processing"
-    ],
-    imagePosition: "right"
-  },
-  {
-    id: 2,
-    title: "Loan & Finance Solutions",
-    description: "Access competitive home loans, plot loans, commercial loans, and balance transfers with our trusted finance partners. We simplify the application process and help you secure the best rates and terms for your property investment.",
-    image: loanImg,
-    highlights: [
-      "Competitive rates",
-      "Easy documentation",
-      "Fast approval",
-      "Multiple loan options"
-    ],
-    imagePosition: "left"
-  },
-  {
-    id: 3,
-    title: "Registration & Legal Services",
-    description: "Complete documentation, sale deed registration, patta transfers, and land surveys—all handled by our expert team. We ensure all your property transactions are legally compliant and registered correctly.",
-    image: registrationImg,
-    highlights: [
-      "Legal compliance",
-      "Error-free registration",
-      "Fast processing",
-      "Complete documentation"
-    ],
-    imagePosition: "right"
-  },
-  {
-    id: 4,
-    title: "Find Your Perfect Property",
-    description: "Looking for a specific property? Our advanced search tools and local expertise help you find plots, commercial properties, and agricultural land that match your requirements and budget perfectly.",
-    image: searchImg,
-    highlights: [
-      "Verified properties",
-      "Best deals",
-      "Local expertise",
-      "Personalized search"
-    ],
-    imagePosition: "left"
-  },
-  {
-    id: 5,
-    title: "Interior & Construction Services",
-    description: "Transform your vision into reality with our professional interior design and construction services. From residential homes to commercial offices, we deliver quality results on time and within budget.",
-    image: constHouseImg,
-    highlights: [
-      "Professional team",
-      "Quality materials",
-      "On-time delivery",
-      "Budget-friendly"
-    ],
-    imagePosition: "right"
-  }
-];
-
 const ServicesPage = () => {
+  const { t, currentLanguage } = useAppLanguage();
   const [search, setSearch] = useState("");
   const [activeCategoryKey, setActiveCategoryKey] = useState(null);
+
+  const serviceHighlights = useMemo(() => [
+    {
+      id: 1,
+      title: t("servicesPage.service1Title") || "Buy, Sell & Rent Properties",
+      description: t("servicesPage.service1Desc") || "Whether you're looking to buy your dream property, sell an existing one, or rent space for your needs, we provide complete guidance through every step of the process. Our experienced team handles all legal documentation and ensures smooth transactions.",
+      image: buySellImg,
+      highlights: [
+        t("services.legalTitle") || "Expert legal support",
+        t("propertyCard.verified") || "Safe & transparent deals",
+        t("servicesPage.heroSubtitle") || "Complete guidance",
+        t("common.loading") || "Fast processing"
+      ],
+      imagePosition: "right"
+    },
+    {
+      id: 2,
+      title: t("servicesPage.service2Title") || "Loan & Finance Solutions",
+      description: t("servicesPage.service2Desc") || "Access competitive home loans, plot loans, commercial loans, and balance transfers with our trusted finance partners. We simplify the application process and help you secure the best rates and terms for your property investment.",
+      image: loanImg,
+      highlights: [
+        "Competitive rates",
+        "Easy documentation",
+        "Fast approval",
+        "Multiple loan options"
+      ],
+      imagePosition: "left"
+    },
+    {
+      id: 3,
+      title: t("servicesPage.service3Title") || "Registration & Legal Services",
+      description: t("servicesPage.service3Desc") || "Complete documentation, sale deed registration, patta transfers, and land surveys—all handled by our expert team. We ensure all your property transactions are legally compliant and registered correctly.",
+      image: registrationImg,
+      highlights: [
+        "Legal compliance",
+        "Error-free registration",
+        "Fast processing",
+        "Complete documentation"
+      ],
+      imagePosition: "right"
+    },
+    {
+      id: 4,
+      title: t("servicesPage.service4Title") || "Find Your Perfect Property",
+      description: t("servicesPage.service4Desc") || "Looking for a specific property? Our advanced search tools and local expertise help you find plots, commercial properties, and agricultural land that match your requirements and budget perfectly.",
+      image: searchImg,
+      highlights: [
+        "Verified properties",
+        "Best deals",
+        "Local expertise",
+        "Personalized search"
+      ],
+      imagePosition: "left"
+    },
+    {
+      id: 5,
+      title: t("servicesPage.service5Title") || "Interior & Construction Services",
+      description: t("servicesPage.service5Desc") || "Transform your vision into reality with our professional interior design and construction services. From residential homes to commercial offices, we deliver quality results on time and within budget.",
+      image: constHouseImg,
+      highlights: [
+        "Professional team",
+        "Quality materials",
+        "On-time delivery",
+        "Budget-friendly"
+      ],
+      imagePosition: "right"
+    }
+  ], [t]);
 
   const activeCategory = serviceCategories.find((category) => category.key === activeCategoryKey) || null;
 
   const breadcrumbs = [
-    { label: "Home", to: "/" },
-    { label: "Our Services", to: "/services" },
+    { label: t("nav.home") || "Home", to: "/" },
+    { label: t("nav.services") || "Our Services", to: "/services" },
   ];
 
   const term = search.trim().toLowerCase();
   const filteredServices = term
     ? serviceCategories.filter((category) => {
+        const transTitle = localizeCatalogText(category.title, currentLanguage).toLowerCase();
+        const transDesc = localizeCatalogText(category.description, currentLanguage).toLowerCase();
         return (
+          transTitle.includes(term) ||
+          transDesc.includes(term) ||
           category.title.toLowerCase().includes(term) ||
           category.description.toLowerCase().includes(term) ||
-          category.services.some((item) => item.label.toLowerCase().includes(term))
+          category.services.some((item) => {
+            const transLabel = localizeCatalogText(item.label, currentLanguage).toLowerCase();
+            return transLabel.includes(term) || item.label.toLowerCase().includes(term);
+          })
         );
       })
     : serviceCategories;
@@ -116,27 +126,34 @@ const ServicesPage = () => {
       />
 
       {/* Hero section with load transitions */}
-      <section className="marketing-hero px-6 py-10 sm:px-8 lg:px-10 lg:py-14 gsap-section">
+      <section className="marketing-hero bg-white px-6 py-10 sm:px-8 lg:px-10 lg:py-14 gsap-section">
         <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center gsap-hero-item">
           <div className="max-w-3xl">
             <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-orange">
               <span className="h-0.5 w-6 bg-orange rounded-full inline-block" />
-              My Hosur Property · Services
+              {t("servicesPage.heroTag") || "My Hosur Property · Services"}
             </p>
-            <h1 className="mt-4 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl" style={{ color: '#0042a2' }}>
-              Complete property solutions for every stage of your{" "}
-              <span style={{ color: '#FF9914' }}>real-estate journey.</span>
+            <h1 className="mt-4 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl text-[#0042a2]">
+              <span className="text-[#0042a2] inline-block">
+                {t("servicesPage.heroTitlePrefix") || "Complete property solutions for every stage of your"}
+              </span>{" "}
+              <span className="text-orange inline-block">
+                {t("servicesPage.heroTitleHighlight") || "real-estate journey."}
+              </span>
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-8" style={{ color: '#274F9A' }}>
-              From Buying &amp; Selling to Loans, Registration, Construction, and Legal Support — we cover it all in Hosur.
+            <p className="mt-5 max-w-2xl text-base leading-8 text-slate-700">
+              {t("servicesPage.heroSubtitle") || "From Buying & Selling to Loans, Registration, Construction, and Legal Support — we cover it all in Hosur."}
             </p>
           </div>
 
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange">Quick service links</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange">
+              {t("servicesPage.quickLinksTag") || "Quick service links"}
+            </p>
             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {serviceQuickLinks.map((item) => {
                 const Icon = item.icon;
+                const translatedTitle = localizeCatalogText(item.title, currentLanguage);
                 return (
                   <button
                     key={item.key}
@@ -147,7 +164,7 @@ const ServicesPage = () => {
                     <span className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-orange/10 text-orange transition group-hover:bg-orange group-hover:text-white">
                       <Icon className="h-4 w-4" />
                     </span>
-                    <span className="leading-snug">{item.title}</span>
+                    <span className="leading-snug">{translatedTitle}</span>
                   </button>
                 );
               })}
@@ -163,8 +180,10 @@ const ServicesPage = () => {
         <div className="mx-auto max-w-[1440px]">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="section-tag">Search services</p>
-              <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl lg:text-4xl">Find the service that matches your property need.</h2>
+              <p className="section-tag">{t("servicesPage.searchServicesTag") || "Search services"}</p>
+              <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl lg:text-4xl">
+                {t("servicesPage.searchServicesTitle") || "Find the service that matches your property need."}
+              </h2>
             </div>
             <div className="w-full max-w-md">
               <div className="flex min-h-[52px] items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-card">
@@ -172,7 +191,7 @@ const ServicesPage = () => {
                 <input
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder=" "
+                  placeholder={t("servicesPage.searchPlaceholder") || "Search services by name or keyword..."}
                   className="w-full bg-transparent text-sm font-medium text-slate-700 outline-none placeholder:text-slate-400"
                 />
               </div>
@@ -201,8 +220,12 @@ const ServicesPage = () => {
                         </span>
                         <span className="h-px flex-1 bg-slate-200" />
                       </div>
-                      <h3 className="mt-2 text-xl font-bold leading-tight text-navy">{category.title}</h3>
-                      <p className="mt-2 text-sm leading-6 text-slate-600">{category.description}</p>
+                      <h3 className="mt-2 text-xl font-bold leading-tight text-navy">
+                        {localizeCatalogText(category.title, currentLanguage)}
+                      </h3>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">
+                        {localizeCatalogText(category.description, currentLanguage)}
+                      </p>
                     </div>
                   </div>
 
@@ -218,7 +241,9 @@ const ServicesPage = () => {
                             <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-orange/10 text-orange">
                               <ServiceIcon className="h-4 w-4" />
                             </div>
-                            <p className="min-w-0 flex-1 text-sm font-semibold leading-snug text-navy">{service.label}</p>
+                            <p className="min-w-0 flex-1 text-sm font-semibold leading-snug text-navy">
+                              {localizeCatalogText(service.label, currentLanguage)}
+                            </p>
                           </div>
                         );
                       })}
@@ -230,7 +255,7 @@ const ServicesPage = () => {
                       to="/contact"
                       className="inline-flex w-full items-center justify-between rounded-lg bg-white px-4 py-3 text-sm font-bold text-navy ring-1 ring-slate-200 transition hover:bg-orange hover:text-white hover:ring-orange"
                     >
-                      <span>Request this service</span>
+                      <span>{t("servicesPage.requestServiceBtn") || "Request this service"}</span>
                       <ArrowRightIcon className="h-4 w-4" />
                     </Link>
                   </div>
@@ -244,9 +269,9 @@ const ServicesPage = () => {
       {/* Core Expertise section */}
       <div className="space-y-8 bg-white px-5 py-12 sm:px-8 md:space-y-10 lg:px-10 gsap-section">
         <div className="mx-auto max-w-[1440px] text-center">
-          <p className="section-tag">Our Core Expertise</p>
+          <p className="section-tag">{t("servicesPage.coreExpertiseTag") || "Our Core Expertise"}</p>
           <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl lg:text-4xl">
-            Comprehensive Services with Professional Excellence
+            {t("servicesPage.coreExpertiseTitle") || "Comprehensive Services with Professional Excellence"}
           </h2>
         </div>
 
@@ -290,7 +315,7 @@ const ServicesPage = () => {
                         to="/contact"
                         className="site-button-primary inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-bold"
                       >
-                        Contact Us
+                        {t("nav.contact") || "Contact Us"}
                         <SparklesIcon className="h-4 w-4" />
                       </Link>
                     </div>
@@ -318,15 +343,20 @@ const ServicesPage = () => {
       <section className="bg-navy px-5 py-12 text-white sm:px-8 lg:px-10 gsap-section">
         <div className="mx-auto grid max-w-[1440px] gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div className="text-center lg:text-left">
-            <p className="section-tag !text-orange">Need support</p>
-            <h2 className="mt-2 text-2xl font-bold sm:text-3xl lg:text-4xl">Need Help Finding Your Property Solution?</h2>
+            <p className="section-tag !text-orange">{t("servicesPage.needSupportTag") || "Need support"}</p>
+            <h2 className="mt-2 text-2xl font-bold sm:text-3xl lg:text-4xl">
+              {t("servicesPage.needSupportTitle") || "Need Help Finding Your Property Solution?"}
+            </h2>
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-8 text-white sm:text-base lg:mx-0">
-              Connect with My Hosur Property for help across buying, selling, registration, finance, construction, and local property support.
+              {t("servicesPage.needSupportDesc") ||
+                "Connect with My Hosur Property for help across buying, selling, registration, finance, construction, and local property support."}
             </p>
-            <p className="mt-5 text-sm font-semibold text-orange">My Hosur Property - Trusted Real Estate Partner</p>
+            <p className="mt-5 text-sm font-semibold text-orange">
+              {t("servicesPage.trustedPartnerText") || "My Hosur Property - Trusted Real Estate Partner"}
+            </p>
           </div>
           <Link to="/contact" className="site-button-primary inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-bold">
-            Contact Us
+            {t("nav.contact") || "Contact Us"}
           </Link>
         </div>
       </section>

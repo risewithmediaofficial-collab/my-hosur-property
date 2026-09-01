@@ -24,6 +24,7 @@ import {
   serializeFiltersToSearchParams,
 } from "../utils/propertyFilters";
 import { buildCanonicalListingQuery } from "../utils/seo";
+import { useAppLanguage } from "../context/LanguageContext";
 
 const ListingSkeleton = ({ isSidebarOpen }) => (
   <div className={`grid gap-6 ${isSidebarOpen ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"}`}>
@@ -39,6 +40,7 @@ const ListingSkeleton = ({ isSidebarOpen }) => (
 );
 
 const ListingPage = () => {
+  const { t } = useAppLanguage();
   const [params, setParams] = useSearchParams();
   const { token, isAuthenticated } = useAuth();
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
@@ -245,10 +247,12 @@ const ListingPage = () => {
           <div className="listing-results-header">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="listing-results-intro gsap-hero-item">
-                <p className="section-tag">Property listings</p>
-                <h1 className="mt-1.5 text-2xl font-bold text-navy sm:text-3xl">Search your property in Hosur</h1>
+                <p className="section-tag">{t("search.propertyCategory") || "Property listings"}</p>
+                <h1 className="mt-1.5 text-2xl font-bold text-navy sm:text-3xl">
+                  {t("hero.homeTitlePrefix") || "Search your property in"} {t("hero.homeTitleCity") || "Hosur"}
+                </h1>
                 <p className="mt-1 text-sm text-slate-600">
-                  {loading ? "Searching properties..." : `${data.total || data.items.length} properties found`}
+                  {loading ? (t("common.loading") || "Searching properties...") : `${data.total || data.items.length} ${t("search.resultsFound", { count: data.total || data.items.length }) || "properties found"}`}
                   {applied.category ? ` · ${getCategoryLabel(applied.category)}` : ""}
                 </p>
               </div>
@@ -261,7 +265,7 @@ const ListingPage = () => {
                   title="Can't find what you are looking for? Request your custom property requirement"
                 >
                   <PropertySearchIcon className="h-4 w-4 flex-shrink-0" />
-                  <span className="whitespace-nowrap">Request for New Property</span>
+                  <span className="whitespace-nowrap">{t("hero.requestNewProperty") || "Request for New Property"}</span>
                 </Link>
 
                 <button

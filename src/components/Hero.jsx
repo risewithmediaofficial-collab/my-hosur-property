@@ -1,9 +1,11 @@
 import { useRef, useEffect, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useAppLanguage } from "../context/LanguageContext";
 import backgroundLines from "../assets/background-lines.svg";
 import houseImage from "../assets/house.png";
 
 const Hero = () => {
+  const { t } = useAppLanguage();
   const containerRef = useRef(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
@@ -140,17 +142,18 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
           >
-            Premium Showcase
+            {t("hero.badge") || "Premium Showcase"}
           </motion.p>
 
           {/* Luxury Real Estate Heading */}
           <motion.h1
-            className="font-philosopher text-4xl sm:text-5xl lg:text-7xl font-extrabold leading-tight text-[#274F9A] mb-6 tracking-tight"
+            className="hero-title font-philosopher text-4xl sm:text-5xl lg:text-7xl font-extrabold text-[#274F9A] mb-6 tracking-tight break-words"
+            style={{ lineHeight: 1.15, overflowWrap: "break-word", wordBreak: "normal" }}
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
           >
-            Experience Space,<br />Redefined.
+            {t("hero.title") || "Experience Space, Redefined."}
           </motion.h1>
 
           {/* Premium Blue Rounded Rectangle Card */}
@@ -160,9 +163,12 @@ const Hero = () => {
             animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
           >
-            <h2 className="text-xl font-bold text-white m-0">Luxury Architectural Villa</h2>
+            <h2 className="text-xl font-bold text-white m-0">
+              {t("hero.villaTitle") || "Luxury Architectural Villa"}
+            </h2>
             <p className="text-sm leading-relaxed text-white/85 m-0">
-              Designed with bespoke glass facades, seamless indoor-outdoor layout, and signature landscaping inside Hosur's high-potential development zone. Built by Gyes Construction.
+              {t("hero.villaDesc") ||
+                "Designed with bespoke glass facades, seamless indoor-outdoor layout, and signature landscaping inside Hosur's high-potential development zone. Built by Gyes Construction."}
             </p>
           </motion.div>
         </motion.div>

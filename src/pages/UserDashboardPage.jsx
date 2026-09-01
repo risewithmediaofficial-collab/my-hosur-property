@@ -23,6 +23,7 @@ import { fetchSavedProperties, toggleSavedProperty } from "../services/api/userA
 import { buyLeadPackIntent, verifyLeadPackPayment } from "../services/api/customerRequestApi";
 import QrPaymentModal from "../components/QrPaymentModal";
 import RoleChangeModal from "../components/RoleChangeModal";
+import { useAppLanguage } from "../context/LanguageContext";
 
 import { loadExternalScript } from "../utils/loadExternalScript";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
@@ -32,6 +33,7 @@ import { getInquiryHistory } from "../utils/inquiryHistory";
 const SELLER_ROLES = ["seller", "agent", "broker", "builder", "admin"];
 
 const UserDashboardPage = () => {
+  const { t } = useAppLanguage();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user, token, logout } = useAuth();
@@ -171,12 +173,12 @@ const UserDashboardPage = () => {
 
   const pendingLeadsCount = incomingLeads.filter((l) => l.status === "pending").length;
   const navItems = [
-    { key: "overview", label: "Overview", icon: <Squares2X2Icon className="h-4 w-4" /> },
-    { key: "listings", label: "My Listings", icon: <HomeModernIcon className="h-4 w-4" />, badge: myProperties.length },
-    { key: "leads", label: "My Leads", icon: <UserGroupIcon className="h-4 w-4" />, badge: pendingLeadsCount > 0 ? `${pendingLeadsCount} NEW` : incomingLeads.length },
+    { key: "overview", label: t("dashboard.title") || "Overview", icon: <Squares2X2Icon className="h-4 w-4" /> },
+    { key: "listings", label: t("dashboard.myListings") || "My Listings", icon: <HomeModernIcon className="h-4 w-4" />, badge: myProperties.length },
+    { key: "leads", label: t("dashboard.inquiries") || "My Leads", icon: <UserGroupIcon className="h-4 w-4" />, badge: pendingLeadsCount > 0 ? `${pendingLeadsCount} NEW` : incomingLeads.length },
     { key: "inquiries", label: "My Inquiries", icon: <ChatBubbleLeftRightIcon className="h-4 w-4" />, badge: inquiryHistory.length },
-    { key: "payments", label: "Payments", icon: <CreditCardIcon className="h-4 w-4" />, badge: payments.length },
-    { key: "saved", label: "Saved Properties", icon: <BookmarkIcon className="h-4 w-4" />, badge: saved.length },
+    { key: "payments", label: t("dashboard.payments") || "Payments", icon: <CreditCardIcon className="h-4 w-4" />, badge: payments.length },
+    { key: "saved", label: t("dashboard.savedProperties") || "Saved Properties", icon: <BookmarkIcon className="h-4 w-4" />, badge: saved.length },
   ].map((item) => ({
     ...item,
     active: tab === item.key,

@@ -93,3 +93,8 @@ export const ThreadsIcon = (props) => (
   </svg>
 );
 
+export { default as GlobeAltIcon } from "@mui/icons-material/LanguageOutlined";
+export { default as TranslateIcon } from "@mui/icons-material/TranslateOutlined";
+
+
+

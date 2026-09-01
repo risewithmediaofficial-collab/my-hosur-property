@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDownIcon } from "./AppIcons";
 import { bankLoans } from "../constants/bankLoans";
+import { useAppLanguage } from "../context/LanguageContext";
 
 const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
+  const { t } = useAppLanguage();
   const [loanAmount, setLoanAmount] = useState(25); // in lakhs
   const [interestRate, setInterestRate] = useState((bank.minRate + bank.maxRate) / 2);
   const [tenure, setTenure] = useState(180); // 15 years in months
@@ -165,7 +167,9 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
           {/* Loan Amount Slider */}
           <div className="space-y-4">
             <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-end">
-              <label className="text-lg font-semibold text-slate-900">Loan Amount</label>
+              <label className="text-lg font-semibold text-slate-900">
+                {t("bankLoans.loanAmount") || "Loan Amount"}
+              </label>
               <span className="text-2xl sm:text-3xl font-bold text-blue-600 break-words">{formatCurrency(loanAmount * 100000)}</span>
             </div>
             <input
@@ -190,7 +194,9 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
           {/* Interest Rate Slider */}
           <div className="space-y-4">
             <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-end">
-              <label className="text-lg font-semibold text-slate-900">Interest Rate (%)</label>
+              <label className="text-lg font-semibold text-slate-900">
+                {t("bankLoans.interestRatePercent") || "Interest Rate (%)"}
+              </label>
               <span className="text-2xl sm:text-3xl font-bold text-green-600">{interestRate.toFixed(2)}%</span>
             </div>
             <input
@@ -217,21 +223,23 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
 
           {/* Tenure Selection */}
           <div className="space-y-4">
-            <label className="text-lg font-semibold text-slate-900 block">Loan Tenure</label>
+            <label className="text-lg font-semibold text-slate-900 block">
+              {t("bankLoans.loanTenure") || "Loan Tenure"}
+            </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {tenures.map((t) => (
+              {tenures.map((tItem) => (
                 <motion.button
-                  key={t.value}
-                  onClick={() => setTenure(t.value)}
+                  key={tItem.value}
+                  onClick={() => setTenure(tItem.value)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.98 }}
                   className={`py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
-                    tenure === t.value
+                    tenure === tItem.value
                       ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg"
                       : "bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
                   }`}
                 >
-                  {t.label}
+                  {tItem.label}
                 </motion.button>
               ))}
             </div>
@@ -240,7 +248,9 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
           {/* Processing Fee Slider */}
           <div className="space-y-4">
             <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-end">
-              <label className="text-lg font-semibold text-slate-900">Processing Fee</label>
+              <label className="text-lg font-semibold text-slate-900">
+                {t("bankLoans.processingFee") || "Processing Fee"}
+              </label>
               <span className="text-xl sm:text-2xl font-bold text-orange-600 break-words">{processingFeePercent.toFixed(2)}% ({formatCurrency(calculations.processingFee)})</span>
             </div>
             <input
@@ -269,7 +279,7 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
               whileHover={{ y: -5 }}
               className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200"
             >
-              <p className="text-slate-600 text-sm mb-2">Monthly EMI</p>
+              <p className="text-slate-600 text-sm mb-2">{t("bankLoans.monthlyEmi") || "Monthly EMI"}</p>
               <p className="text-xl sm:text-2xl font-bold text-blue-700 break-words">
                 {formatCurrency(calculations.emi)}
               </p>
@@ -279,7 +289,7 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
               whileHover={{ y: -5 }}
               className="bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-xl border border-amber-200"
             >
-              <p className="text-slate-600 text-sm mb-2">Total Interest</p>
+              <p className="text-slate-600 text-sm mb-2">{t("bankLoans.totalInterest") || "Total Interest"}</p>
               <p className="text-xl sm:text-2xl font-bold text-amber-700 break-words">
                 {formatCurrency(calculations.totalInterest)}
               </p>
@@ -289,7 +299,7 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
               whileHover={{ y: -5 }}
               className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200"
             >
-              <p className="text-slate-600 text-sm mb-2">Total Amount</p>
+              <p className="text-slate-600 text-sm mb-2">{t("bankLoans.totalAmount") || "Total Amount"}</p>
               <p className="text-xl sm:text-2xl font-bold text-green-700 break-words">
                 {formatCurrency(calculations.totalAmount)}
               </p>
@@ -299,7 +309,7 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
               whileHover={{ y: -5 }}
               className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl border border-orange-200"
             >
-              <p className="text-slate-600 text-sm mb-2">Processing Fee</p>
+              <p className="text-slate-600 text-sm mb-2">{t("bankLoans.processingFee") || "Processing Fee"}</p>
               <p className="text-xl sm:text-2xl font-bold text-orange-700 break-words">
                 {formatCurrency(calculations.processingFee)}
               </p>
@@ -309,7 +319,7 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
               whileHover={{ y: -5 }}
               className="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-xl border border-red-200"
             >
-              <p className="text-slate-600 text-sm mb-2">Total Outgo</p>
+              <p className="text-slate-600 text-sm mb-2">{t("bankLoans.totalOutgo") || "Total Outgo"}</p>
               <p className="text-xl sm:text-2xl font-bold text-red-700 break-words">
                 {formatCurrency(calculations.totalWithProcessingFee)}
               </p>
@@ -318,38 +328,38 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
 
           {/* Loan Summary */}
           <div className="bg-slate-50 p-6 rounded-xl space-y-3 border border-slate-200">
-            <h4 className="text-lg font-semibold text-slate-900 mb-4">Loan Summary</h4>
+            <h4 className="text-lg font-semibold text-slate-900 mb-4">{t("bankLoans.loanSummary") || "Loan Summary"}</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <p className="text-slate-600 mb-1">Principal Amount</p>
+                <p className="text-slate-600 mb-1">{t("bankLoans.principalAmount") || "Principal Amount"}</p>
                 <p className="text-slate-900 font-semibold">{formatCurrency(calculations.principal)}</p>
               </div>
               <div>
-                <p className="text-slate-600 mb-1">Loan Tenure</p>
+                <p className="text-slate-600 mb-1">{t("bankLoans.loanTenure") || "Loan Tenure"}</p>
                 <p className="text-slate-900 font-semibold">{tenure} months ({(tenure / 12).toFixed(1)} years)</p>
               </div>
               <div>
-                <p className="text-slate-600 mb-1">Interest Rate</p>
+                <p className="text-slate-600 mb-1">{t("bankLoans.interestRate") || "Interest Rate"}</p>
                 <p className="text-slate-900 font-semibold">{interestRate.toFixed(2)}% p.a.</p>
               </div>
               <div>
-                <p className="text-slate-600 mb-1">Total Interest</p>
+                <p className="text-slate-600 mb-1">{t("bankLoans.totalInterest") || "Total Interest"}</p>
                 <p className="text-amber-700 font-semibold">{formatCurrency(calculations.totalInterest)}</p>
               </div>
               <div>
-                <p className="text-slate-600 mb-1">Processing Fee</p>
+                <p className="text-slate-600 mb-1">{t("bankLoans.processingFee") || "Processing Fee"}</p>
                 <p className="text-orange-700 font-semibold">{formatCurrency(calculations.processingFee)}</p>
               </div>
               <div>
-                <p className="text-slate-600 mb-1">Monthly EMI</p>
+                <p className="text-slate-600 mb-1">{t("bankLoans.monthlyEmi") || "Monthly EMI"}</p>
                 <p className="text-blue-700 font-semibold">{formatCurrency(calculations.emi)}</p>
               </div>
               <div>
-                <p className="text-slate-600 mb-1">Total Payable</p>
+                <p className="text-slate-600 mb-1">{t("bankLoans.totalPayable") || "Total Payable"}</p>
                 <p className="text-green-700 font-semibold">{formatCurrency(calculations.totalAmount)}</p>
               </div>
               <div>
-                <p className="text-slate-600 mb-1">Total Outgo</p>
+                <p className="text-slate-600 mb-1">{t("bankLoans.totalOutgo") || "Total Outgo"}</p>
                 <p className="text-red-700 font-semibold">{formatCurrency(calculations.totalWithProcessingFee)}</p>
               </div>
             </div>

@@ -1,17 +1,32 @@
 export const PROPERTY_REQUEST_TYPES = [
-  "Apartment",
-  "Villa",
-  "Independent House",
   "Plot",
-  "Commercial",
-  "House",
-  "Office",
-  "Warehouse",
-  "Land",
-  "Industrial Shed",
+  "Villa",
+  "Flat",
+  "Independent House",
+  "Rent",
+  "Apartment",
+  "Warehouse / Industry",
+  "PG",
+  "Commercial Land / Building",
+  "Rental Income Building",
+  "Farmland",
+  "Agri Land",
 ];
 
-export const RENT_REQUEST_TYPES = ["House", "Apartment", "Villa", "Office", "Commercial", "Warehouse", "Land", "Industrial Shed"];
+export const RENT_REQUEST_TYPES = [
+  "Plot",
+  "Villa",
+  "Flat",
+  "Independent House",
+  "Rent",
+  "Apartment",
+  "Warehouse / Industry",
+  "PG",
+  "Commercial Land / Building",
+  "Rental Income Building",
+  "Farmland",
+  "Agri Land",
+];
 
 export const BANK_OPTIONS = [
   "SBI (State Bank of India)",
@@ -26,6 +41,10 @@ export const BANK_OPTIONS = [
   "IDFC FIRST Bank",
   "Other / Partner Bank",
 ];
+
+export const PG_TYPE_OPTIONS = ["Gents", "Ladies", "Co-living", "Any"];
+export const PG_SHARING_OPTIONS = ["Single Room", "2 Sharing", "3 Sharing", "4 Sharing", "Any"];
+export const PG_FOOD_OPTIONS = ["With Food Included", "Without Food", "Optional / Self Cooking", "Any"];
 
 export const BHK_OPTIONS = ["1 BHK", "2 BHK", "3 BHK", "4 BHK", "5+ BHK"];
 export const BATHROOM_OPTIONS = ["1", "2", "3", "4", "5+"];
@@ -74,7 +93,7 @@ export const ROAD_WIDTH_OPTIONS = [
   "Any",
 ];
 export const ROAD_TYPE_OPTIONS = [
-  "Tar Road",
+  "Thar Road",
   "Concrete Road",
   "Mud / Gravel Road",
   "Main Road",

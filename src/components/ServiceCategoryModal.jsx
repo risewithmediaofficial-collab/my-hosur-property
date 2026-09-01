@@ -3,8 +3,11 @@ import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { Link } from "react-router-dom";
 import { ArrowRightIcon, ChevronDownIcon, XMarkIcon } from "./AppIcons";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
+import { useAppLanguage } from "../context/LanguageContext";
+import { localizeCatalogText } from "../utils/i18nCatalog";
 
 const ServiceCategoryModal = ({ category, onClose }) => {
+  const { t, currentLanguage } = useAppLanguage();
   useBodyScrollLock(Boolean(category));
   const [expandedService, setExpandedService] = useState(null);
 
@@ -28,9 +31,15 @@ const ServiceCategoryModal = ({ category, onClose }) => {
                 <CategoryIcon className="h-5 w-5" />
               </div>
               <div className="min-w-0">
-                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-orange">Service details</p>
-                <DialogTitle className="mt-1 text-lg font-bold leading-tight text-navy sm:text-xl">{category.title}</DialogTitle>
-                <p className="mt-1 text-sm leading-6 text-slate-600">{category.description}</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-orange">
+                  {t("servicesPage.quickLinksTag") || "Service details"}
+                </p>
+                <DialogTitle className="mt-1 text-lg font-bold leading-tight text-navy sm:text-xl">
+                  {localizeCatalogText(category.title, currentLanguage)}
+                </DialogTitle>
+                <p className="mt-1 text-sm leading-6 text-slate-600">
+                  {localizeCatalogText(category.description, currentLanguage)}
+                </p>
               </div>
             </div>
             <button
@@ -61,7 +70,7 @@ const ServiceCategoryModal = ({ category, onClose }) => {
                           <ServiceIcon className="h-4 w-4" />
                         </div>
                         <span className="min-w-0 flex-1 text-sm font-extrabold leading-snug text-navy">
-                          {service.label} <span className="text-xs font-bold text-orange">(Click to view plans)</span>
+                          {localizeCatalogText(service.label, currentLanguage)}
                         </span>
                         <ChevronDownIcon className={`h-4 w-4 text-orange transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
                       </button>
@@ -82,7 +91,7 @@ const ServiceCategoryModal = ({ category, onClose }) => {
                                   <div className="flex h-6 w-6 items-center justify-center rounded bg-orange/10 text-orange">
                                     <SubIcon className="h-3.5 w-3.5" />
                                   </div>
-                                  <span>{subItem.label}</span>
+                                  <span>{localizeCatalogText(subItem.label, currentLanguage)}</span>
                                 </span>
                                 <ArrowRightIcon className="h-3.5 w-3.5 text-slate-400" />
                               </Link>
@@ -99,7 +108,9 @@ const ServiceCategoryModal = ({ category, onClose }) => {
                     <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-orange/10 text-orange">
                       <ServiceIcon className="h-4 w-4" />
                     </div>
-                    <span className="min-w-0 flex-1 text-sm font-semibold leading-snug text-navy">{service.label}</span>
+                    <span className="min-w-0 flex-1 text-sm font-semibold leading-snug text-navy">
+                      {localizeCatalogText(service.label, currentLanguage)}
+                    </span>
                     {service.requestPath ? <ArrowRightIcon className="h-4 w-4 flex-shrink-0 text-slate-400" /> : null}
                   </>
                 );
@@ -135,7 +146,7 @@ const ServiceCategoryModal = ({ category, onClose }) => {
               onClick={onClose}
               className="site-button-primary inline-flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold"
             >
-              Request this service
+              {t("servicesPage.requestServiceBtn") || "Request this service"}
               <ArrowRightIcon className="h-4 w-4" />
             </Link>
           </div>

@@ -8,6 +8,8 @@ import {
   splitValues,
   toggleCheckboxValue,
 } from "../utils/propertyFilters";
+import { useAppLanguage } from "../context/LanguageContext";
+import { localizeCatalogText } from "../utils/i18nCatalog";
 
 const PropertySearchFilterPanel = ({
   category,
@@ -16,6 +18,7 @@ const PropertySearchFilterPanel = ({
   onFieldChange,
   showCategoryPicker = true,
 }) => {
+  const { t, currentLanguage } = useAppLanguage();
   const fields = propertyFilterConfig[category] || propertyFilterConfig.plot || [];
 
   const update = (key, value) => {
@@ -27,8 +30,8 @@ const PropertySearchFilterPanel = ({
     <div className="property-filter-panel space-y-6">
       {/* 1. Common Location Cascading Filters (Applicable to All Property Types) */}
       <div className="property-filter-block">
-        <p className="property-filter-heading">Location Details</p>
-        <p className="property-filter-sub">Select country, state, district, taluk, village, and locality.</p>
+        <p className="property-filter-heading">{t("filters.locationDetails") || "Location Details"}</p>
+        <p className="property-filter-sub">{t("filters.locationSub") || "Select country, state, district, taluk, village, and locality."}</p>
         <div className="mt-3">
           <LocationCascadeFilter values={values} update={update} />
         </div>
@@ -37,8 +40,8 @@ const PropertySearchFilterPanel = ({
       {/* Category Selection */}
       {showCategoryPicker ? (
         <div className="property-filter-block">
-          <p className="property-filter-heading">Property Category</p>
-          <p className="property-filter-sub">Choose property category to update available filters.</p>
+          <p className="property-filter-heading">{t("filters.propertyCategory") || "Property Category"}</p>
+          <p className="property-filter-sub">{t("filters.propertyCategorySub") || "Choose property category to update available filters."}</p>
           <div className="property-filter-category-list mt-3">
             {PROPERTY_FILTER_CATEGORIES.map((item) => (
               <button
@@ -48,7 +51,9 @@ const PropertySearchFilterPanel = ({
                 className={`property-filter-category-item ${category === item.id ? "is-active" : ""}`}
               >
                 <span className="property-filter-category-dot" aria-hidden />
-                <span className="property-filter-category-label">{item.label}</span>
+                <span className="property-filter-category-label">
+                  {localizeCatalogText(item.label, currentLanguage)}
+                </span>
               </button>
             ))}
           </div>

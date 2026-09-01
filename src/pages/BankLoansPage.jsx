@@ -5,8 +5,11 @@ import { ArrowRightIcon, CheckCircleIcon, ChevronDownIcon } from "../components/
 import SeoHead from "../components/SeoHead";
 import LoanCalculator from "../components/LoanCalculator";
 import { bankLoans } from "../constants/bankLoans";
+import { useAppLanguage } from "../context/LanguageContext";
+import { localizeCatalogText } from "../utils/i18nCatalog";
 
 const BankLoansPage = () => {
+  const { t, currentLanguage } = useAppLanguage();
   const [selectedBank, setSelectedBank] = useState(bankLoans[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -22,9 +25,11 @@ const BankLoansPage = () => {
       <section className="px-5 py-8 sm:px-8 lg:px-10 bg-white border-b border-slate-200/80">
         <div className="mx-auto max-w-[1440px] flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-black leading-tight sm:text-4xl lg:text-5xl text-navy">Bank Loans</h1>
+            <h1 className="text-3xl font-black leading-tight sm:text-4xl lg:text-5xl text-navy">
+              {t("nav.bankLoans") || "Bank Loans"}
+            </h1>
             <p className="mt-2 max-w-3xl text-sm sm:text-base text-slate-500 font-medium">
-              Compare Interest Rates & Calculate Your EMI
+              {t("services.bankLoansDesc") || "Compare Interest Rates & Calculate Your EMI"}
             </p>
           </div>
           {/* Bank pills on top right */}
@@ -55,7 +60,7 @@ const BankLoansPage = () => {
             <div className="space-y-6">
               <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
                 <label className="block text-sm font-bold text-slate-800 mb-2">
-                  Choose Bank
+                  {t("bankLoans.chooseBank") || "Choose Bank"}
                 </label>
                 <div className="relative">
                   {/* Custom animated dropdown button */}
@@ -120,36 +125,52 @@ const BankLoansPage = () => {
                   </span>
                   <div>
                     <h3 className="text-xl font-black text-navy leading-tight">{selectedBank.name}</h3>
-                    <p className="text-sm text-slate-500 font-semibold mt-0.5">{selectedBank.description}</p>
+                    <p className="text-sm text-slate-500 font-semibold mt-0.5">
+                      {localizeCatalogText(selectedBank.description, currentLanguage)}
+                    </p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
                   <div>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Interest Rate</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                      {t("bankLoans.interestRate") || "Interest Rate"}
+                    </p>
                     <p className="text-base font-extrabold text-navy mt-1">{selectedBank.minRate}% - {selectedBank.maxRate}%</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider font-bold">Processing Fee</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                      {t("bankLoans.processingFee") || "Processing Fee"}
+                    </p>
                     <p className="text-base font-extrabold text-green-600 mt-1">{selectedBank.processingFee}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Max Loan Amount</p>
-                    <p className="text-base font-extrabold text-purple-600 mt-1">{selectedBank.maxLoanAmount}</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                      {t("bankLoans.maxLoanAmount") || "Max Loan Amount"}
+                    </p>
+                    <p className="text-base font-extrabold text-purple-600 mt-1">
+                      {localizeCatalogText(selectedBank.maxLoanAmount, currentLanguage)}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Loan Tenure</p>
-                    <p className="text-base font-extrabold text-slate-700 mt-1">Up to 30 yrs</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                      {t("bankLoans.loanTenure") || "Loan Tenure"}
+                    </p>
+                    <p className="text-base font-extrabold text-slate-700 mt-1">
+                      {localizeCatalogText("Up to 30 yrs", currentLanguage)}
+                    </p>
                   </div>
                 </div>
 
                 <div className="pt-4 border-t border-slate-100 space-y-3">
-                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Key Features</h4>
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    {t("bankLoans.keyFeatures") || "Key Features"}
+                  </h4>
                   <ul className="space-y-2">
                     {selectedBank.features.map((feature, i) => (
                       <li key={i} className="text-sm text-slate-600 flex items-start gap-2.5">
                         <CheckCircleIcon className="w-5 h-5 text-navy flex-shrink-0 mt-0.5" />
-                        <span className="leading-snug">{feature}</span>
+                        <span className="leading-snug">{localizeCatalogText(feature, currentLanguage)}</span>
                       </li>
                     ))}
                   </ul>
@@ -160,7 +181,9 @@ const BankLoansPage = () => {
                     to={`/request-service?category=loan&bank=${encodeURIComponent(selectedBank.name)}`}
                     className="site-button-primary flex w-full items-center justify-center gap-2 py-3.5 text-sm font-bold shadow-md hover:shadow-lg transition"
                   >
-                    <span>Apply Loan with {selectedBank.shortName || selectedBank.name}</span>
+                    <span>
+                      {t("bankLoans.applyLoanWith") || "Apply Loan with"} {selectedBank.shortName || selectedBank.name}
+                    </span>
                     <ArrowRightIcon className="w-4 h-4" />
                   </Link>
                 </div>
