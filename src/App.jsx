@@ -12,6 +12,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Loader from "./components/Loader";
 import PageLoader from "./components/PageLoader";
+import ScrollNavigationButtons from "./components/ScrollNavigationButtons";
 import { PrivateRouteSeo } from "./components/SeoHead";
 import ProtectedRoute from "./components/ProtectedRoute";
 import useLowMotionDevice from "./hooks/useLowMotionDevice";
@@ -220,6 +221,7 @@ const AppShell = () => {
       >
         <PageLoader />
         <Toaster position="top-right" toastOptions={{ duration: 2500 }} />
+        <ScrollNavigationButtons />
         {isPrivatePath ? <PrivateRouteSeo title="Account" /> : null}
         {!hideNavbar && <Navbar />}
         <main

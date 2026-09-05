@@ -95,6 +95,7 @@ export const ThreadsIcon = (props) => (
 
 export { default as GlobeAltIcon } from "@mui/icons-material/LanguageOutlined";
 export { default as TranslateIcon } from "@mui/icons-material/TranslateOutlined";
-
-
-
+export { default as ArrowUpwardIcon } from "@mui/icons-material/ArrowUpwardOutlined";
+export { default as ArrowDownwardIcon } from "@mui/icons-material/ArrowDownwardOutlined";
+export { default as KeyboardArrowUpIcon } from "@mui/icons-material/KeyboardArrowUpRounded";
+export { default as KeyboardArrowDownIcon } from "@mui/icons-material/KeyboardArrowDownRounded";
