@@ -16,9 +16,10 @@ import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
 import { getPropertyImageAlt, getPropertyPath } from "../utils/seo";
 import useScrollToTop from "../hooks/useScrollToTop";
 import { useAppLanguage } from "../context/LanguageContext";
+import { localizeCatalogText } from "../utils/i18nCatalog";
 
 const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
-  const { t } = useAppLanguage();
+  const { t, currentLanguage } = useAppLanguage();
   const href = getPropertyPath(item);
   const scrollToTop = useScrollToTop();
   const isSold = Boolean(item.isSold);
@@ -31,7 +32,7 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
     ? t("propertyCard.reraApproved") || "RERA APRVD"
     : t("propertyCard.featured") || "FEATURED";
 
-  const propType = item.propertyType || "Plot";
+  const propType = localizeCatalogText(item.propertyType || "Plot", currentLanguage);
   const propSize = item.carpetArea
     ? `${formatArea(item.carpetArea, item.areaUnit)}`
     : t("propertyCard.onRequest") || "On Request";

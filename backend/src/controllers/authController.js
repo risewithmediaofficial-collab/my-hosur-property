@@ -728,6 +728,14 @@ const verifyOtp = async (req, res) => {
     } else {
       console.warn(`[signup] No email on account — skipping welcome email for user ${user._id}`);
     }
+
+    // WhatsApp welcome notification (non-blocking)
+    try {
+      const { sendWelcomeMessage } = require("../services/whatsapp/whatsappEvents.service");
+      setImmediate(() => sendWelcomeMessage(user).catch((e) => console.error("[wa] welcome failed:", e.message)));
+    } catch (e) {
+      /* never block signup */
+    }
   }
 
   if (purpose === "login") {
@@ -799,6 +807,16 @@ const socialLogin = async (req, res) => {
       console.log(`[socialLogin] Welcome email sent to ${user.email}`);
     } catch (error) {
       console.error("[socialLogin] Welcome email failed:", error.message);
+    }
+
+    if (user.phone) {
+      // WhatsApp welcome notification (non-blocking)
+      try {
+        const { sendWelcomeMessage } = require("../services/whatsapp/whatsappEvents.service");
+        setImmediate(() => sendWelcomeMessage(user).catch((e) => console.error("[wa] welcome failed:", e.message)));
+      } catch (e) {
+        /* never block signup */
+      }
     }
   }
 
@@ -881,6 +899,14 @@ const verifyWidgetToken = async (req, res) => {
         console.log(`[signup-widget] Welcome email sent to ${user.email}`);
       } catch (error) {
         console.error("[signup-widget] Welcome email failed:", error.message);
+      }
+
+      // WhatsApp welcome notification (non-blocking)
+      try {
+        const { sendWelcomeMessage } = require("../services/whatsapp/whatsappEvents.service");
+        setImmediate(() => sendWelcomeMessage(user).catch((e) => console.error("[wa] welcome failed:", e.message)));
+      } catch (e) {
+        /* never block signup */
       }
     } else {
       if (!user) {

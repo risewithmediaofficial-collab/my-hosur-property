@@ -45,6 +45,8 @@ import {
   updateInquiryHistoryItem,
 } from "../utils/inquiryHistory";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
+import { useAppLanguage } from "../context/LanguageContext";
+import { localizeCatalogText } from "../utils/i18nCatalog";
 
 const formatDateSafe = (dateVal) => {
   if (!dateVal) return "Recently";
@@ -58,6 +60,7 @@ const formatDateSafe = (dateVal) => {
 };
 
 const PropertyDetailPage = () => {
+  const { t, currentLanguage } = useAppLanguage();
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -215,14 +218,15 @@ const PropertyDetailPage = () => {
     if (!p) return [];
     const area = p.location?.area || "Hosur";
     const city = p.location?.city || "Hosur";
+    const propTypeLabel = localizeCatalogText(p.propertyType || "Plot", currentLanguage);
     return [
-      { label: "Home", to: "/" },
-      { label: `Property in ${city}`, to: `/listings?city=${encodeURIComponent(city)}` },
-      { label: `${p.propertyType || "Plot"}s in ${city}`, to: `/listings?propertyType=${encodeURIComponent(p.propertyType || "")}` },
-      { label: `Plots in ${area}`, to: `/listings?city=${encodeURIComponent(city)}&area=${encodeURIComponent(area)}` },
-      { label: p.title || "Property Details", to: propertyPath },
+      { label: t("nav.home") || "Home", to: "/" },
+      { label: `${t("propertyDetail.propertyIn") || "Property in"} ${city}`, to: `/listings?city=${encodeURIComponent(city)}` },
+      { label: `${propTypeLabel} - ${city}`, to: `/listings?propertyType=${encodeURIComponent(p.propertyType || "")}` },
+      { label: `${area}`, to: `/listings?city=${encodeURIComponent(city)}&area=${encodeURIComponent(area)}` },
+      { label: p.title || t("propertyDetail.aboutProperty") || "Property Details", to: propertyPath },
     ];
-  }, [p, propertyPath]);
+  }, [p, propertyPath, t, currentLanguage]);
 
   const faqItems = useMemo(() => {
     if (!p) return [];
@@ -357,9 +361,11 @@ const PropertyDetailPage = () => {
             ))}
           </nav>
           <div className="flex items-center gap-3 text-xs text-slate-500 font-medium shrink-0">
-            <span>Posted on {formatDateSafe(p?.createdAt)}</span>
+            <span>{t("propertyDetail.postedOn") || "Posted on"} {formatDateSafe(p?.createdAt)}</span>
             <span className="h-3 w-px bg-slate-300" aria-hidden />
-            <span className="font-semibold text-emerald-600">{p?.possessionStatus || "Ready to move"}</span>
+            <span className="font-semibold text-emerald-600">
+              {localizeCatalogText(p?.possessionStatus || "Ready to move", currentLanguage)}
+            </span>
           </div>
         </div>
       </section>
@@ -371,18 +377,18 @@ const PropertyDetailPage = () => {
             <div className="flex-1 min-w-0">
               {/* Category / Type Pill */}
               <div className="inline-flex items-center gap-2 rounded-full bg-orange/10 border border-orange/20 px-3 py-1 text-xs font-black text-orange uppercase tracking-wider mb-2.5">
-                <span>{p.propertyType || "Residential"}</span>
+                <span>{localizeCatalogText(p.propertyType || "Residential", currentLanguage)}</span>
                 <span className="h-1 w-1 rounded-full bg-orange" />
-                <span>For {p.listingType === "rent" ? "Rent" : "Sale"}</span>
+                <span>{p.listingType === "rent" ? (t("propertyCard.forRent") || "For Rent") : (t("propertyCard.forSale") || "For Sale")}</span>
               </div>
 
               {/* Big Highlighted Property Title */}
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] font-black text-navy leading-tight tracking-tight">
                 <span className="text-navy">
-                  {p.bhk ? `${p.bhk} BHK ` : ""}{p.propertyType || "Residential Property"}
+                  {p.bhk ? `${p.bhk} BHK ` : ""}{localizeCatalogText(p.propertyType || "Residential Property", currentLanguage)}
                 </span>{" "}
                 <span className="text-orange bg-gradient-to-r from-orange via-amber-500 to-orange bg-clip-text text-transparent">
-                  for {p.listingType === "rent" ? "Rent" : "Sale"}
+                  {p.listingType === "rent" ? (t("propertyCard.forRent") || "for Rent") : (t("propertyCard.forSale") || "for Sale")}
                 </span>{" "}
                 <span className="font-bold text-slate-800">
                   in {p.location?.area || "Mathigiri"}, {p.location?.city || "Hosur"}
@@ -396,7 +402,7 @@ const PropertyDetailPage = () => {
                 </span>
                 {pricePerSqft > 0 && (
                   <span className="text-sm sm:text-base font-bold text-slate-500">
-                    @ ₹{pricePerSqft.toLocaleString("en-IN")} per sqft
+                    @ ₹{pricePerSqft.toLocaleString("en-IN")} {t("propertyDetail.perSqft") || "per sqft"}
                   </span>
                 )}
                 {p.carpetArea || p.builtupArea ? (
@@ -411,17 +417,17 @@ const PropertyDetailPage = () => {
                 {p.verification?.reraId ? (
                   <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-xs font-bold text-emerald-700">
                     <CheckBadgeIcon className="h-4 w-4 text-emerald-600" />
-                    RERA APPROVED ({p.verification.reraId})
+                    {t("propertyCard.reraApproved") || "RERA APPROVED"} ({p.verification.reraId})
                   </span>
                 ) : p.verification?.isVerified ? (
                   <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-xs font-bold text-emerald-700">
                     <CheckBadgeIcon className="h-4 w-4 text-emerald-600" />
-                    VERIFIED LISTING
+                    {t("propertyCard.verified") || "VERIFIED LISTING"}
                   </span>
                 ) : null}
                 {p.possessionStatus ? (
                   <span className="inline-flex items-center gap-1 rounded-md bg-blue-50 border border-blue-200 px-2.5 py-1 text-xs font-bold text-blue-700">
-                    🔑 {p.possessionStatus}
+                    🔑 {localizeCatalogText(p.possessionStatus, currentLanguage)}
                   </span>
                 ) : null}
               </div>
@@ -435,7 +441,7 @@ const PropertyDetailPage = () => {
                   onClick={() => navigate(`/edit-property/${p._id}`)}
                   className="inline-flex items-center gap-2 rounded-xl bg-orange-600 border border-orange-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-orange-700 transition shadow-sm"
                 >
-                  Edit Property
+                  {t("propertyDetail.editProperty") || "Edit Property"}
                 </button>
               )}
 
@@ -449,7 +455,7 @@ const PropertyDetailPage = () => {
                 }`}
               >
                 <BookmarkIcon className="h-4.5 w-4.5" />
-                {isSaved ? "Saved" : "Save Property"}
+                {isSaved ? (t("propertyCard.saved") || "Saved") : (t("propertyCard.saveProperty") || "Save Property")}
               </button>
 
               <button
@@ -465,7 +471,7 @@ const PropertyDetailPage = () => {
                 className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-navy hover:bg-slate-50 transition"
               >
                 <ShareIcon className="h-4.5 w-4.5" />
-                Share
+                {t("propertyDetail.share") || "Share"}
               </button>
             </div>
           </div>
@@ -490,7 +496,7 @@ const PropertyDetailPage = () => {
                       : "border-transparent text-slate-500 hover:text-navy"
                   }`}
                 >
-                  Photos ({safeImages.length})
+                  {t("propertyDetail.photos") || "Photos"} ({safeImages.length})
                 </button>
                 <button
                   type="button"
@@ -501,16 +507,16 @@ const PropertyDetailPage = () => {
                       : "border-transparent text-slate-500 hover:text-navy"
                   }`}
                 >
-                  Videos ({propertyVideos.length})
+                  {t("propertyDetail.videos") || "Videos"} ({propertyVideos.length})
                 </button>
               </div>
             ) : (
               <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                 <span className="text-sm font-bold text-navy pb-1 border-b-2 border-orange">
-                  Property Photos ({safeImages.length})
+                  {t("propertyDetail.propertyPhotos") || "Property Photos"} ({safeImages.length})
                 </span>
                 <span className="text-xs font-semibold text-slate-400">
-                  {activeImageIndex + 1} of {safeImages.length}
+                  {activeImageIndex + 1} / {safeImages.length}
                 </span>
               </div>
             )}
@@ -602,10 +608,10 @@ const PropertyDetailPage = () => {
                   🏷️
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Price</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("propertyDetail.price") || "Price"}</p>
                   <p className="font-extrabold text-navy text-base mt-0.5">{currency(p.price)}</p>
                   {pricePerSqft > 0 ? (
-                    <p className="text-xs text-slate-600 font-medium">@ ₹{pricePerSqft.toLocaleString("en-IN")} per sqft</p>
+                    <p className="text-xs text-slate-600 font-medium">@ ₹{pricePerSqft.toLocaleString("en-IN")} {t("propertyDetail.perSqft") || "per sqft"}</p>
                   ) : null}
                 </div>
               </div>
@@ -617,7 +623,7 @@ const PropertyDetailPage = () => {
                     📏
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Area</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("propertyDetail.area") || "Area"}</p>
                     <p className="font-extrabold text-navy text-base mt-0.5">
                       {formatArea(p.carpetArea || p.builtupArea, p.areaUnit)}
                     </p>
@@ -631,7 +637,7 @@ const PropertyDetailPage = () => {
                   📍
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Location</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("propertyDetail.location") || "Location"}</p>
                   <p className="font-extrabold text-navy text-base mt-0.5">{[p.location?.area, p.location?.city || "Hosur"].filter(Boolean).join(", ")}</p>
                 </div>
               </div>
@@ -642,8 +648,8 @@ const PropertyDetailPage = () => {
                   🏠
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Property Type</p>
-                  <p className="font-extrabold text-navy text-base mt-0.5">{p.propertyType || "Residential"}</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("propertyCard.propertyType") || "Property Type"}</p>
+                  <p className="font-extrabold text-navy text-base mt-0.5">{localizeCatalogText(p.propertyType || "Residential", currentLanguage)}</p>
                 </div>
               </div>
 
@@ -654,7 +660,7 @@ const PropertyDetailPage = () => {
                     🛏️
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Bedrooms</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("propertyDetail.bedrooms") || "Bedrooms"}</p>
                     <p className="font-extrabold text-navy text-base mt-0.5">{p.bhk} BHK</p>
                   </div>
                 </div>
@@ -667,8 +673,8 @@ const PropertyDetailPage = () => {
                     🧭
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Facing</p>
-                    <p className="font-extrabold text-navy text-base mt-0.5">{p.facing}</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("propertyDetail.facing") || "Facing"}</p>
+                    <p className="font-extrabold text-navy text-base mt-0.5">{localizeCatalogText(p.facing, currentLanguage)}</p>
                   </div>
                 </div>
               ) : null}
@@ -680,8 +686,8 @@ const PropertyDetailPage = () => {
                     🔑
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Possession</p>
-                    <p className="font-extrabold text-navy text-base mt-0.5">{p.possessionStatus}</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("propertyDetail.possession") || "Possession"}</p>
+                    <p className="font-extrabold text-navy text-base mt-0.5">{localizeCatalogText(p.possessionStatus, currentLanguage)}</p>
                   </div>
                 </div>
               ) : null}
@@ -692,19 +698,21 @@ const PropertyDetailPage = () => {
             <div className="mt-2 pt-4 border-t border-slate-200/80 flex flex-col gap-3">
               {isApproved ? (
                 <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4">
-                  <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">Approved Owner Contact</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+                    {t("propertyDetail.approvedOwnerContact") || "Approved Owner Contact"}
+                  </p>
                   <p className="mt-1 text-lg font-extrabold text-navy">{modalContact.name}</p>
                   <p className="text-xl font-bold text-orange mt-0.5">{modalContact.phone}</p>
                   {modalContact.email && <p className="text-sm font-semibold text-slate-600 mt-1">{modalContact.email}</p>}
                 </div>
               ) : isPending ? (
                 <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 text-center">
-                  <p className="text-sm font-bold text-amber-800">Contact Request Pending Admin Approval</p>
-                  <p className="text-xs text-amber-700 mt-1">Your request is sent to Admin for approval. Owner contact will appear once approved.</p>
+                  <p className="text-sm font-bold text-amber-800">{t("propertyDetail.requestPending") || "Contact Request Pending Admin Approval"}</p>
+                  <p className="text-xs text-amber-700 mt-1">{t("propertyDetail.requestPendingDesc") || "Your request is sent to Admin for approval. Owner contact will appear once approved."}</p>
                 </div>
               ) : isRejected ? (
                 <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 text-center">
-                  <p className="text-sm font-bold text-rose-800">Contact Request Declined by Admin</p>
+                  <p className="text-sm font-bold text-rose-800">{t("propertyDetail.requestDeclined") || "Contact Request Declined by Admin"}</p>
                 </div>
               ) : (
                 <button
@@ -721,7 +729,7 @@ const PropertyDetailPage = () => {
                   className="site-button-primary flex w-full items-center justify-center gap-2.5 py-3.5 text-base font-bold shadow-md hover:shadow-lg transition"
                 >
                   <PhoneIcon className="h-5 w-5" />
-                  Get Owner / Dealer Contact Details
+                  {t("propertyDetail.getContact") || "Get Owner / Dealer Contact Details"}
                 </button>
               )}
             </div>
@@ -736,15 +744,15 @@ const PropertyDetailPage = () => {
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/40">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
-              <h3 className="text-xl font-extrabold text-navy">About Property</h3>
+              <h3 className="text-xl font-extrabold text-navy">{t("propertyDetail.aboutProperty") || "About Property"}</h3>
               <p className="mt-2 text-sm text-slate-500">
-                Address: <span className="font-semibold text-slate-900">{[p.location?.area, p.location?.city || "Hosur"].filter(Boolean).join(", ")}</span>
+                {t("propertyDetail.address") || "Address"}: <span className="font-semibold text-slate-900">{[p.location?.area, p.location?.city || "Hosur"].filter(Boolean).join(", ")}</span>
               </p>
             </div>
             <div className="inline-flex flex-col items-start gap-2 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700 md:items-end">
-              <span className="font-semibold text-slate-900">{p.propertyType || "Property"}</span>
+              <span className="font-semibold text-slate-900">{localizeCatalogText(p.propertyType || "Property", currentLanguage)}</span>
               <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">
-                {p.listingType === "rent" ? "Rent" : "Sale"}
+                {p.listingType === "rent" ? (t("propertyCard.forRent") || "Rent") : (t("propertyCard.forSale") || "Sale")}
               </span>
             </div>
           </div>
@@ -753,13 +761,13 @@ const PropertyDetailPage = () => {
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {p.propertyType ? (
                 <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Property Type</p>
-                  <p className="mt-1 font-semibold text-slate-900">{p.propertyType}</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{t("propertyCard.propertyType") || "Property Type"}</p>
+                  <p className="mt-1 font-semibold text-slate-900">{localizeCatalogText(p.propertyType, currentLanguage)}</p>
                 </div>
               ) : null}
               {p.location?.area ? (
                 <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 sm:col-span-2">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Location</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{t("propertyDetail.location") || "Location"}</p>
                   <p className="mt-1 text-slate-700">
                     {[p.location?.area, p.location?.village, p.location?.taluk, p.location?.district, p.location?.city, p.location?.state, p.location?.country]
                       .filter(Boolean)
@@ -769,32 +777,32 @@ const PropertyDetailPage = () => {
               ) : null}
               {p.landArea ? (
                 <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Land Area</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{t("propertyDetail.landArea") || "Land Area"}</p>
                   <p className="mt-1 font-semibold text-slate-900">{p.landArea} {p.areaUnit || "sqft"}</p>
                 </div>
               ) : null}
               {p.builtupArea ? (
                 <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Built-up Area</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{t("propertyDetail.builtupArea") || "Built-up Area"}</p>
                   <p className="mt-1 font-semibold text-slate-900">{formatArea(p.builtupArea, p.areaUnit)}</p>
                 </div>
               ) : null}
               {p.length ? (
                 <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Length</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{t("propertyDetail.length") || "Length"}</p>
                   <p className="mt-1 font-semibold text-slate-900">{p.length}</p>
                 </div>
               ) : null}
               {p.width ? (
                 <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Width</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{t("propertyDetail.width") || "Width"}</p>
                   <p className="mt-1 font-semibold text-slate-900">{p.width}</p>
                 </div>
               ) : null}
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm leading-7 text-slate-700">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Property Summary</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{t("propertyDetail.propertySummary") || "Property Summary"}</p>
               <p className="mt-3 whitespace-pre-line text-slate-700">{p.description || `Verified ${p.propertyType || "property"} listing in ${p.location?.area || p.location?.city || "Hosur"}. Contact the property owner or listing agent for complete details, site visits, and legal documentation support.`}</p>
             </div>
           </div>
@@ -804,8 +812,8 @@ const PropertyDetailPage = () => {
       {/* ── 6. LOCATION MAP ── */}
       <section className="mx-auto max-w-[1440px] px-5 py-6 sm:px-8 lg:px-10">
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-extrabold text-navy">Location Map</h3>
-          <p className="mt-1 text-xs text-slate-500">Explore surrounding area in {[p.location?.area, p.location?.city || "Hosur"].filter(Boolean).join(", ")}.</p>
+          <h3 className="text-lg font-extrabold text-navy">{t("propertyDetail.locationMap") || "Location Map"}</h3>
+          <p className="mt-1 text-xs text-slate-500">{t("propertyDetail.exploreSurrounding") || "Explore surrounding area in"} {[p.location?.area, p.location?.city || "Hosur"].filter(Boolean).join(", ")}.</p>
           
           <iframe
             title="Property Map"
@@ -820,9 +828,9 @@ const PropertyDetailPage = () => {
       {data.similar?.length > 0 && (
         <section className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 lg:px-10">
           <div className="border-t border-slate-200 pt-8">
-            <p className="text-xs font-bold uppercase tracking-wider text-orange">More Options</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-orange">{t("propertyDetail.moreOptions") || "More Options"}</p>
             <h2 className="mt-1 text-2xl font-extrabold text-navy sm:text-3xl">
-              Related Properties in Hosur
+              {t("propertyDetail.relatedProperties") || "Related Properties in Hosur"}
             </h2>
             <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {data.similar.map((item) => (
@@ -841,14 +849,14 @@ const PropertyDetailPage = () => {
       {/* ── 8. REPORT FOOTER ── */}
       <section className="mx-auto max-w-[1440px] px-5 py-4 sm:px-8 lg:px-10">
         <div className="flex items-center justify-between text-xs text-slate-500">
-          <span>Property sold out? Incorrect data?</span>
+          <span>{t("propertyDetail.reportText") || "Property sold out? Incorrect data?"}</span>
           <button
             type="button"
             onClick={() => toast.success("Thank you for your report. Our team will review this listing.")}
             className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 font-bold text-slate-700 hover:bg-slate-50 transition"
           >
             <FlagIcon className="h-3.5 w-3.5 text-slate-500" />
-            Report Issue
+            {t("propertyDetail.reportIssue") || "Report Issue"}
           </button>
         </div>
       </section>

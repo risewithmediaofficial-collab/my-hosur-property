@@ -39,7 +39,7 @@ body {
   color: #1c1c1c;
   background: #ffffff;
   --font-en: "Poppins", "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-ta: "Mukta Malar", "Noto Sans Tamil", "Catamaran", system-ui, sans-serif;
+  --font-ta: "Noto Sans Tamil", "Mukta Malar", "Catamaran", system-ui, sans-serif;
   --font-te: "Noto Sans Telugu", system-ui, sans-serif;
   --font-kn: "Noto Sans Kannada", system-ui, sans-serif;
   --font-hi: "Noto Sans Devanagari", "Poppins", system-ui, sans-serif;
@@ -85,14 +85,30 @@ html, body {
 html[lang="ta"],
 body[data-lang="ta"],
 .lang-ta,
-[data-lang="ta"] * {
-  font-family: "Mukta Malar", "Noto Sans Tamil", "Catamaran", sans-serif !important;
+[data-lang="ta"] input,
+[data-lang="ta"] select,
+[data-lang="ta"] textarea,
+[data-lang="ta"] button,
+[data-lang="ta"] p,
+[data-lang="ta"] span,
+[data-lang="ta"] a,
+[data-lang="ta"] label,
+[data-lang="ta"] li,
+[data-lang="ta"] h1,
+[data-lang="ta"] h2,
+[data-lang="ta"] h3,
+[data-lang="ta"] h4,
+[data-lang="ta"] h5,
+[data-lang="ta"] h6 {
+  font-family: "Noto Sans Tamil", "Mukta Malar", "Catamaran", sans-serif !important;
+  letter-spacing: normal !important;
+  word-spacing: 0.04em;
 }
 
 html[lang="ta"],
 body[data-lang="ta"],
 .lang-ta {
-  line-height: 1.6;
+  line-height: 1.62;
 }
 
 html[lang="ta"] h1,
@@ -111,18 +127,35 @@ body[data-lang="ta"] h5,
 body[data-lang="ta"] h6,
 body[data-lang="ta"] .font-philosopher,
 body[data-lang="ta"] .hero-title {
-  font-family: "Mukta Malar", "Noto Sans Tamil", sans-serif !important;
+  font-family: "Noto Sans Tamil", "Mukta Malar", sans-serif !important;
   font-weight: 700 !important;
-  line-height: 1.35 !important;
+  line-height: 1.38 !important;
   letter-spacing: normal !important;
+  word-spacing: 0.04em !important;
 }
 
 /* Telugu Typography */
 html[lang="te"],
 body[data-lang="te"],
 .lang-te,
-[data-lang="te"] * {
+[data-lang="te"] input,
+[data-lang="te"] select,
+[data-lang="te"] textarea,
+[data-lang="te"] button,
+[data-lang="te"] p,
+[data-lang="te"] span,
+[data-lang="te"] a,
+[data-lang="te"] label,
+[data-lang="te"] li,
+[data-lang="te"] h1,
+[data-lang="te"] h2,
+[data-lang="te"] h3,
+[data-lang="te"] h4,
+[data-lang="te"] h5,
+[data-lang="te"] h6 {
   font-family: "Noto Sans Telugu", sans-serif !important;
+  letter-spacing: normal !important;
+  word-spacing: 0.04em;
 }
 
 html[lang="te"],
@@ -150,14 +183,31 @@ body[data-lang="te"] .hero-title {
   font-family: "Noto Sans Telugu", sans-serif !important;
   font-weight: 700 !important;
   line-height: 1.38 !important;
+  letter-spacing: normal !important;
 }
 
 /* Kannada Typography */
 html[lang="kn"],
 body[data-lang="kn"],
 .lang-kn,
-[data-lang="kn"] * {
+[data-lang="kn"] input,
+[data-lang="kn"] select,
+[data-lang="kn"] textarea,
+[data-lang="kn"] button,
+[data-lang="kn"] p,
+[data-lang="kn"] span,
+[data-lang="kn"] a,
+[data-lang="kn"] label,
+[data-lang="kn"] li,
+[data-lang="kn"] h1,
+[data-lang="kn"] h2,
+[data-lang="kn"] h3,
+[data-lang="kn"] h4,
+[data-lang="kn"] h5,
+[data-lang="kn"] h6 {
   font-family: "Noto Sans Kannada", sans-serif !important;
+  letter-spacing: normal !important;
+  word-spacing: 0.04em;
 }
 
 html[lang="kn"],
@@ -185,14 +235,31 @@ body[data-lang="kn"] .hero-title {
   font-family: "Noto Sans Kannada", sans-serif !important;
   font-weight: 700 !important;
   line-height: 1.38 !important;
+  letter-spacing: normal !important;
 }
 
 /* Hindi (Devanagari) Typography */
 html[lang="hi"],
 body[data-lang="hi"],
 .lang-hi,
-[data-lang="hi"] * {
+[data-lang="hi"] input,
+[data-lang="hi"] select,
+[data-lang="hi"] textarea,
+[data-lang="hi"] button,
+[data-lang="hi"] p,
+[data-lang="hi"] span,
+[data-lang="hi"] a,
+[data-lang="hi"] label,
+[data-lang="hi"] li,
+[data-lang="hi"] h1,
+[data-lang="hi"] h2,
+[data-lang="hi"] h3,
+[data-lang="hi"] h4,
+[data-lang="hi"] h5,
+[data-lang="hi"] h6 {
   font-family: "Noto Sans Devanagari", "Poppins", sans-serif !important;
+  letter-spacing: normal !important;
+  word-spacing: 0.03em;
 }
 
 html[lang="hi"],
@@ -220,6 +287,7 @@ body[data-lang="hi"] .hero-title {
   font-family: "Noto Sans Devanagari", "Poppins", sans-serif !important;
   font-weight: 700 !important;
   line-height: 1.45 !important;
+  letter-spacing: normal !important;
 }
 
 /* ============================================================

@@ -321,6 +321,17 @@ const approvePaymentRequest = async (req, res, next) => {
       } catch (e) {
         console.error("[approvePaymentRequest] Background email failed: ", e.message);
       }
+
+      // WhatsApp payment success notification (non-blocking)
+      try {
+        const { sendPaymentSuccessMessage } = require("../services/whatsapp/whatsappEvents.service");
+        const user = await User.findById(paymentRequest.userId).select("name phone email");
+        if (user) {
+          await sendPaymentSuccessMessage(paymentRequest, user);
+        }
+      } catch (e) {
+        console.error("[wa] payment notification failed: ", e.message);
+      }
     });
   } catch (error) {
     next(error);

@@ -3,8 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CheckIcon, ChevronDownIcon } from "./AppIcons";
 import { LOCALITY_SECTIONS } from "../constants/localities";
 import { fetchPropertyLocations } from "../services/api/propertyApi";
+import { useAppLanguage } from "../context/LanguageContext";
+import { localizeCatalogText } from "../utils/i18nCatalog";
 
 const LocalityDropdown = ({ value, onChange, onSelect, onOpenChange }) => {
+  const { t, currentLanguage } = useAppLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [dynamicLocations, setDynamicLocations] = useState([]);
@@ -108,7 +111,7 @@ const LocalityDropdown = ({ value, onChange, onSelect, onOpenChange }) => {
             />
           </svg>
           <span className={`truncate text-sm font-medium ${value ? "text-navy" : "text-slate-500"}`}>
-            {value || "Search or select locality..."}
+            {value || t("search.selectLocality") || "Search or select locality..."}
           </span>
         </span>
         <ChevronDownIcon
@@ -144,7 +147,7 @@ const LocalityDropdown = ({ value, onChange, onSelect, onOpenChange }) => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder=" "
+                  placeholder={t("search.searchLocalityPlaceholder") || t("search.selectLocality") || "Search or select locality..."}
                   className="w-full rounded-lg border-2 border-slate-200 bg-slate-50 py-2.5 pl-9 pr-4 text-sm font-medium text-navy outline-none transition duration-200 placeholder:text-slate-400 focus:border-orange focus:bg-white focus:ring-2 focus:ring-orange/20"
                   autoFocus
                 />
@@ -158,7 +161,7 @@ const LocalityDropdown = ({ value, onChange, onSelect, onOpenChange }) => {
                     <div key={section.key}>
                       {sectionIndex > 0 ? <div className="my-1 border-t border-slate-100" /> : null}
                       <div className="sticky top-0 z-[1] bg-white px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-600">
-                        {section.label}
+                        {localizeCatalogText(section.label, currentLanguage)}
                       </div>
                       <div className="space-y-0.5 px-2 pb-1">
                         {section.items.map((locality, index) => (
@@ -166,7 +169,7 @@ const LocalityDropdown = ({ value, onChange, onSelect, onOpenChange }) => {
                             key={locality}
                             type="button"
                             onClick={() => handleSelectLocality(locality)}
-                            initial={{ opacity: 0, x: -8 }}
+                            initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.02 }}
                             className="group flex w-full items-center justify-between rounded-lg px-4 py-3 text-left text-sm font-medium text-slate-700 transition duration-150 hover:bg-gradient-to-r hover:from-orange/10 hover:to-transparent hover:text-orange active:scale-95"
@@ -191,8 +194,8 @@ const LocalityDropdown = ({ value, onChange, onSelect, onOpenChange }) => {
                   <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
                     <span className="text-lg">🔍</span>
                   </div>
-                  <p className="text-sm font-semibold text-slate-700">No localities found</p>
-                  <p className="mt-1 text-xs text-slate-500">Try searching with different keywords</p>
+                  <p className="text-sm font-semibold text-slate-700">{t("search.noResults") || "No localities found"}</p>
+                  <p className="mt-1 text-xs text-slate-500">{t("search.tryAdjusting") || "Try searching with different keywords"}</p>
                 </div>
               )}
             </div>

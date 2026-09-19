@@ -149,6 +149,20 @@ const moderateProperty = async (req, res) => {
 
   await property.save();
   res.json(property);
+
+  // WhatsApp property status notification (non-blocking)
+  setImmediate(async () => {
+    try {
+      const owner = await User.findById(property.ownerId).select("name phone email");
+      if (owner) {
+        const { sendPropertyApprovedMessage, sendPropertyRejectedMessage } = require("../services/whatsapp/whatsappEvents.service");
+        if (status === "approved") await sendPropertyApprovedMessage(property, owner);
+        if (status === "rejected") await sendPropertyRejectedMessage(property, owner);
+      }
+    } catch (e) {
+      console.error("[wa] moderate notification failed:", e.message);
+    }
+  });
 };
 
 const listPropertyApplications = async (req, res) => {

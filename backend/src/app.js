@@ -14,6 +14,7 @@ const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const customerRequestRoutes = require("./routes/customerRequestRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const whatsappBotRoutes = require("./routes/whatsappBot.routes");
 const seoController = require("./controllers/seoController");
 const notFound = require("./middleware/notFound");
 const errorHandler = require("./middleware/errorHandler");
@@ -41,7 +42,7 @@ app.use(
     origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-bot-api-key"],
   })
 );
 app.use(express.json({ limit: "1mb" }));
@@ -125,6 +126,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/customer-requests", customerRequestRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/whatsapp/bot", whatsappBotRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

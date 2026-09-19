@@ -78,7 +78,9 @@ const PropertySearchFilterPanel = ({
         return (
           <div key={field.key} className="property-filter-block">
             <div className="property-filter-section-head mb-2.5">
-              <h3 className="property-filter-section-title text-sm font-bold text-navy">{field.label}</h3>
+              <h3 className="property-filter-section-title text-sm font-bold text-navy">
+                {localizeCatalogText(field.label, currentLanguage)}
+              </h3>
               {selectedCount > 0 ? (
                 <span className="property-filter-section-count">{selectedCount}</span>
               ) : null}
@@ -92,6 +94,8 @@ const PropertySearchFilterPanel = ({
 };
 
 const FieldControl = ({ field, values, update, category }) => {
+  const { t, currentLanguage } = useAppLanguage();
+
   if (field.type === "checkbox") {
     let optionsToRender = field.options;
 
@@ -116,7 +120,7 @@ const FieldControl = ({ field, values, update, category }) => {
               onClick={() => update(field.key, toggleCheckboxValue(getFieldValue(values, field.key), option))}
               aria-pressed={isOn}
             >
-              {option}
+              {localizeCatalogText(option, currentLanguage)}
             </button>
           );
         })}
@@ -138,7 +142,7 @@ const FieldControl = ({ field, values, update, category }) => {
             onClick={() => update(field.key, option)}
             aria-pressed={current === option}
           >
-            {option}
+            {localizeCatalogText(option, currentLanguage)}
           </button>
         ))}
       </div>
@@ -152,10 +156,10 @@ const FieldControl = ({ field, values, update, category }) => {
         value={getFieldValue(values, field.key)}
         onChange={(e) => update(field.key, e.target.value)}
       >
-        <option value="">Any</option>
+        <option value="">{t("search.anyBudget") || "Any"}</option>
         {field.options.map((option) => (
           <option key={option} value={option}>
-            {option}
+            {localizeCatalogText(option, currentLanguage)}
           </option>
         ))}
       </select>

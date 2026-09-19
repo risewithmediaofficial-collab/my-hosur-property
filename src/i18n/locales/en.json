@@ -327,7 +327,11 @@
     "furnishing": "Furnishing",
     "resultsFound": "{{count}} properties found",
     "noResults": "No properties found matching your criteria.",
-    "tryAdjusting": "Try adjusting your filters or search in other Hosur localities."
+    "tryAdjusting": "Try adjusting your filters or search in other Hosur localities.",
+    "searchLocalityPlaceholder": "Search or select locality...",
+    "postedLocations": "Posted Locations",
+    "popularLocalities": "Popular Localities",
+    "propertiesFound": "properties found"
   },
   "categories": {
     "title": "Explore by Property Category",
@@ -360,7 +364,7 @@
     "availableSize": "Available Size",
     "onRequest": "On Request",
     "viewProperty": "View Property",
-    "saveProperty": "Save property",
+    "saveProperty": "Save Property",
     "saved": "Saved",
     "removeFromSaved": "Remove from saved",
     "forSale": "For Sale",
@@ -368,7 +372,7 @@
     "soldMessage": "This property has been sold",
     "studio": "Studio",
     "bhk": "{{count}} BHK",
-    "locationIn": "{{area}}, {{city}}"
+    "locationIn": "in"
   },
   "services": {
     "badge": "Our Core Services",
@@ -456,7 +460,9 @@
     "close": "Close",
     "back": "Back",
     "next": "Next",
-    "viewAll": "View All"
+    "viewAll": "View All",
+    "loadingMore": "Loading more properties...",
+    "endOfResults": "You have reached the end of the results."
   },
   "filters": {
     "locationFilters": "Location Filters",
@@ -476,7 +482,10 @@
     "locationDetails": "Location Details",
     "locationSub": "Select country, state, district, taluk, village, and locality.",
     "propertyCategory": "Property Category",
-    "propertyCategorySub": "Choose property category to update available filters."
+    "propertyCategorySub": "Choose property category to update available filters.",
+    "apply": "Apply Filters",
+    "clear": "Clear",
+    "resetAll": "Reset All"
   },
   "bankLoans": {
     "chooseBank": "Choose Bank",
@@ -495,5 +504,41 @@
     "loanSummary": "Loan Summary",
     "principalAmount": "Principal Amount",
     "totalPayable": "Total Payable"
+  },
+  "propertyDetail": {
+    "propertyIn": "Property in",
+    "postedOn": "Posted on",
+    "readyToMove": "Ready to move",
+    "underConstruction": "Under construction",
+    "photos": "Photos",
+    "videos": "Videos",
+    "propertyPhotos": "Property Photos",
+    "price": "Price",
+    "area": "Area",
+    "location": "Location",
+    "bedrooms": "Bedrooms",
+    "facing": "Facing",
+    "possession": "Possession",
+    "perSqft": "per sqft",
+    "getContact": "Get Owner / Dealer Contact Details",
+    "approvedOwnerContact": "Approved Owner Contact",
+    "requestPending": "Contact Request Pending Admin Approval",
+    "requestPendingDesc": "Your request is sent to Admin for approval. Owner contact will appear once approved.",
+    "requestDeclined": "Contact Request Declined by Admin",
+    "aboutProperty": "About Property",
+    "address": "Address",
+    "landArea": "Land Area",
+    "builtupArea": "Built-up Area",
+    "length": "Length",
+    "width": "Width",
+    "propertySummary": "Property Summary",
+    "locationMap": "Location Map",
+    "exploreSurrounding": "Explore surrounding area in",
+    "moreOptions": "More Options",
+    "relatedProperties": "Related Properties in Hosur",
+    "reportText": "Property sold out? Incorrect data?",
+    "reportIssue": "Report Issue",
+    "share": "Share",
+    "editProperty": "Edit Property"
   }
 }

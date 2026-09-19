@@ -203,14 +203,14 @@ const ListingPage = () => {
   const filterActions = (
     <>
       <button type="button" onClick={applyFilters} className="property-filter-btn-primary w-full">
-        Apply filters
+        {t("filters.apply") || "Apply filters"}
       </button>
       <div className="property-filter-footer-row">
         <button type="button" onClick={clearFilters} className="property-filter-btn-secondary flex-1">
-          Clear
+          {t("filters.clear") || "Clear"}
         </button>
         <button type="button" onClick={resetAll} className="property-filter-btn-ghost flex-1">
-          Reset all
+          {t("filters.resetAll") || "Reset all"}
         </button>
       </div>
     </>
@@ -252,7 +252,7 @@ const ListingPage = () => {
                   {t("hero.homeTitlePrefix") || "Search your property in"} {t("hero.homeTitleCity") || "Hosur"}
                 </h1>
                 <p className="mt-1 text-sm text-slate-600">
-                  {loading ? (t("common.loading") || "Searching properties...") : `${data.total || data.items.length} ${t("search.resultsFound", { count: data.total || data.items.length }) || "properties found"}`}
+                  {loading ? (t("common.loading") || "Searching properties...") : `${data.total || data.items.length} ${t("search.propertiesFound") || "properties found"}`}
                   {applied.category ? ` · ${getCategoryLabel(applied.category)}` : ""}
                 </p>
               </div>
@@ -327,9 +327,9 @@ const ListingPage = () => {
                 </div>
               ) : (
                 <div className="rounded-xl bg-surface px-6 py-16 text-center">
-                  <h3 className="text-xl font-bold text-navy">No properties found</h3>
+                  <h3 className="text-xl font-bold text-navy">{t("search.noResults") || "No properties found"}</h3>
                   <p className="mx-auto mt-3 max-w-md text-sm leading-7 text-slate-600">
-                    Didn't find what you're looking for? Submit your property requirement and our Hosur team will help you find the right match.
+                    {t("search.tryAdjusting") || "Didn't find what you're looking for? Submit your property requirement and our Hosur team will help you find the right match."}
                   </p>
                   <div className="mt-6 flex flex-wrap justify-center gap-3">
                     <Link
@@ -337,10 +337,10 @@ const ListingPage = () => {
                       className="site-button-primary inline-flex items-center gap-2 px-5 py-3 text-sm font-bold"
                     >
                       <PropertySearchIcon className="h-4 w-4" />
-                      <span>Request for Property</span>
+                      <span>{t("hero.requestNewProperty") || "Request for Property"}</span>
                     </Link>
                     <button type="button" onClick={resetAll} className="site-button-secondary px-5 py-3 text-sm font-bold">
-                      Reset all filters
+                      {t("filters.resetAll") || "Reset all filters"}
                     </button>
                   </div>
                 </div>
@@ -348,9 +348,9 @@ const ListingPage = () => {
             </div>
 
               <div ref={sentinelRef} className="py-8 text-center text-sm text-slate-400">
-                {loading && data.items.length ? "Loading..." : null}
-                {!loading && data.page < data.totalPages ? "Loading more properties..." : null}
-                {!loading && data.items.length && data.page >= data.totalPages ? "You have reached the end of the results." : null}
+                {loading && data.items.length ? (t("common.loading") || "Loading...") : null}
+                {!loading && data.page < data.totalPages ? (t("common.loadingMore") || "Loading more properties...") : null}
+                {!loading && data.items.length && data.page >= data.totalPages ? (t("common.endOfResults") || "You have reached the end of the results.") : null}
               </div>
             </div>
           </div>

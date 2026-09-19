@@ -110,7 +110,7 @@ const Navbar = () => {
       to={item.to}
       onClick={scrollToTop}
       className={({ isActive }) =>
-        `relative inline-flex items-center px-2 py-1.5 text-xs xl:px-3 xl:py-2 xl:text-sm font-semibold whitespace-nowrap rounded-lg transition-colors ${
+        `relative inline-flex items-center px-2.5 py-1.5 text-xs xl:px-3.5 xl:py-2 xl:text-sm font-semibold whitespace-nowrap rounded-lg transition-colors ${
           isActive
             ? "text-orange bg-orange/5 font-bold"
             : "text-navy hover:text-orange hover:bg-slate-50"
@@ -225,7 +225,7 @@ const Navbar = () => {
             </NavLink>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden flex-1 items-center justify-center gap-0.5 xl:gap-1.5 lg:flex min-w-0 px-1">
+            <nav className="hidden flex-1 items-center justify-center gap-1.5 lg:gap-2 xl:gap-3 lg:flex min-w-0 px-1">
               {desktopNavLinks.map(renderDesktopLink)}
             </nav>
 

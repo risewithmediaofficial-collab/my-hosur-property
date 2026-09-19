@@ -497,6 +497,14 @@ const createProperty = async (req, res) => {
         console.error("[createProperty] Owner notification failed:", err.message);
       }
 
+      // WhatsApp property submitted notification (non-blocking)
+      try {
+        const { sendPropertySubmittedMessage } = require("../services/whatsapp/whatsappEvents.service");
+        await sendPropertySubmittedMessage(property, user);
+      } catch (e) {
+        console.error("[wa] property submitted notification failed:", e.message);
+      }
+
       try {
         const adminEmails = (await User.find({ role: "admin" }).select("email")).map((a) => a.email);
         if (adminEmails.length > 0) {

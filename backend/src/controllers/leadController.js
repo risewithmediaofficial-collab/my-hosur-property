@@ -176,6 +176,21 @@ const createLead = async (req, res) => {
       } catch (err) {
         console.error("[createLead] Background email failed:", err.message);
       }
+
+      // WhatsApp enquiry/callback notification (non-blocking)
+      try {
+        const { sendEnquiryCreatedMessage, sendCallbackRequestedMessage } = require("../services/whatsapp/whatsappEvents.service");
+        const owner = property.ownerId;
+        if (owner) {
+          if (lead.intentType === "callback") {
+            await sendCallbackRequestedMessage(lead, property, owner);
+          } else {
+            await sendEnquiryCreatedMessage(lead, property, owner);
+          }
+        }
+      } catch (e) {
+        console.error("[wa] lead notification failed:", e.message);
+      }
     });
   } catch (err) {
     console.error("[createLead] Error:", err.message);

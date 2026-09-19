@@ -41,6 +41,7 @@ import useDebounce from "../hooks/useDebounce";
 import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
 import { useAppLanguage } from "../context/LanguageContext";
+import { localizeCatalogText } from "../utils/i18nCatalog";
 import servicesHeroImage from "../assets/house.png";
 import alluringRealityImg from "../assets/alluring reality.jpeg";
 import chatGptBannerImage from "../assets/ChatGPT Image Aug 4, 2026, 10_37_17 AM.png";
@@ -212,7 +213,7 @@ const testimonialPlaceholders = [
 ];
 
 const HomePage = () => {
-  const { t } = useAppLanguage();
+  const { t, currentLanguage } = useAppLanguage();
   const navigate = useNavigate();
   const scrollToTop = useScrollToTop();
   const { isAuthenticated } = useAuth();
@@ -606,7 +607,10 @@ const HomePage = () => {
                     >
                       <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-2xl max-h-[60vh] overflow-y-auto">
                         {group.items.map((item) => {
-                          const isLongShortcutLabel = item.label.length > 34;
+                          const itemLabel = item.labelKey
+                            ? t(item.labelKey) || item.label
+                            : localizeCatalogText(item.label, currentLanguage);
+                          const isLongShortcutLabel = itemLabel.length > 34;
                           return (
                             <Link
                               key={`${group.label}-${item.label}`}
@@ -615,7 +619,7 @@ const HomePage = () => {
                               onClick={() => setOpenShortcutMenu("")}
                             >
                               <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-orange" />
-                              <span className={`min-w-0 flex-1 ${(item.labelKey ? (t(item.labelKey) || item.label) : item.label).length > 34 ? "whitespace-normal" : "whitespace-nowrap"}`}>{item.labelKey ? (t(item.labelKey) || item.label) : item.label}</span>
+                              <span className={`min-w-0 flex-1 ${isLongShortcutLabel ? "whitespace-normal" : "whitespace-nowrap"}`}>{itemLabel}</span>
                             </Link>
                           );
                         })}
@@ -636,16 +640,21 @@ const HomePage = () => {
                 transition={{ duration: 0.15 }}
               >
                 <div className="mx-auto max-h-[260px] w-[min(18rem,calc(100vw-2rem))] overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 text-center shadow-lg">
-                  {openShortcutGroup.items.map((item) => (
-                    <Link
-                      key={`${openShortcutGroup.label}-${item.label}`}
-                      to={item.to}
-                      className="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 text-slate-800 transition duration-150 hover:bg-orange hover:text-white"
-                      onClick={() => setOpenShortcutMenu("")}
-                    >
-                      {item.labelKey ? (t(item.labelKey) || item.label) : item.label}
-                    </Link>
-                  ))}
+                  {openShortcutGroup.items.map((item) => {
+                    const itemLabel = item.labelKey
+                      ? t(item.labelKey) || item.label
+                      : localizeCatalogText(item.label, currentLanguage);
+                    return (
+                      <Link
+                        key={`${openShortcutGroup.label}-${item.label}`}
+                        to={item.to}
+                        className="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 text-slate-800 transition duration-150 hover:bg-orange hover:text-white"
+                        onClick={() => setOpenShortcutMenu("")}
+                      >
+                        {itemLabel}
+                      </Link>
+                    );
+                  })}
                 </div>
               </motion.div>
             )}
