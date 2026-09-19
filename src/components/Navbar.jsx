@@ -110,7 +110,7 @@ const Navbar = () => {
       to={item.to}
       onClick={scrollToTop}
       className={({ isActive }) =>
-        `relative inline-flex items-center px-2.5 py-1.5 text-xs xl:px-3.5 xl:py-2 xl:text-sm font-semibold whitespace-nowrap rounded-lg transition-colors ${
+        `relative shrink-0 inline-flex items-center px-2 py-1 xl:px-2.5 xl:py-1.5 2xl:px-3.5 2xl:py-2 text-xs xl:text-[13px] 2xl:text-sm font-semibold whitespace-nowrap rounded-lg transition-colors ${
           isActive
             ? "text-orange bg-orange/5 font-bold"
             : "text-navy hover:text-orange hover:bg-slate-50"
@@ -157,7 +157,7 @@ const Navbar = () => {
 
       {/* Top Bar with Contacts and Language Switcher */}
       <div className="bg-navy text-white py-1 block">
-        <div className="mx-auto flex max-w-[1440px] items-center justify-between px-3.5 sm:px-8 lg:px-10 text-xs">
+        <div className="mx-auto flex max-w-[1536px] items-center justify-between px-3 sm:px-6 lg:px-8 text-xs">
           <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-1">
             <div className="hidden sm:inline-flex flex-wrap items-center gap-x-4 gap-y-1">
               {CONTACT_PHONE_NUMBERS.map((phone) => (
@@ -199,8 +199,8 @@ const Navbar = () => {
           isSticky ? "shadow-md" : "shadow-sm"
         }`}
       >
-        <div className="px-3 sm:px-8 lg:px-10 py-0.5 sm:py-1.5 lg:py-2">
-          <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-2 xl:gap-4">
+        <div className="px-2 sm:px-4 lg:px-6 xl:px-8 py-0.5 sm:py-1.5 lg:py-2">
+          <div className="mx-auto flex w-full max-w-[1536px] items-center justify-between gap-1.5 sm:gap-2 xl:gap-4">
             {/* Logo */}
             <NavLink
               to="/"
@@ -213,10 +213,10 @@ const Navbar = () => {
               <img
                 src={logoSrc}
                 alt="MyHosurProperty"
-                className="block h-10 sm:h-12 lg:h-14 w-auto max-w-[130px] sm:max-w-[170px] lg:max-w-[190px] object-contain mx-auto transition-all"
-                style={{ maxHeight: "56px", width: "auto" }}
+                className="block h-9 sm:h-11 lg:h-12 xl:h-13 w-auto max-w-[120px] sm:max-w-[150px] lg:max-w-[165px] xl:max-w-[185px] object-contain mx-auto transition-all"
+                style={{ maxHeight: "52px", width: "auto" }}
               />
-              <span className="hidden sm:inline-block text-[10px] lg:text-[11px] font-medium leading-none text-slate-500 whitespace-nowrap text-center">
+              <span className="hidden xl:inline-block text-[10px] font-medium leading-none text-slate-500 whitespace-nowrap text-center">
                 {t("nav.poweredBy") || "Powered by"}{" "}
                 <span className="font-bold text-navy">
                   {t("nav.companyName") || "Gyes Property & Construction"}
@@ -225,29 +225,31 @@ const Navbar = () => {
             </NavLink>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden flex-1 items-center justify-center gap-1.5 lg:gap-2 xl:gap-3 lg:flex min-w-0 px-1">
+            <nav className="hidden flex-1 items-center justify-center gap-1 xl:gap-1.5 2xl:gap-2.5 lg:flex min-w-0 px-1 overflow-x-auto scrollbar-none">
               {desktopNavLinks.map(renderDesktopLink)}
             </nav>
 
             {/* Desktop Actions */}
-            <div className="hidden items-center gap-2.5 xl:gap-3 lg:flex shrink-0">
+            <div className="hidden items-center gap-1.5 xl:gap-2 2xl:gap-3 lg:flex shrink-0">
               {isAuthenticated ? (
                 <>
                   <NavLink
                     to={dashboardPath}
                     onClick={scrollToTop}
                     className={({ isActive }) =>
-                      `inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs xl:text-sm font-semibold transition ${
+                      `inline-flex items-center gap-1.5 rounded-lg px-2 xl:px-2.5 2xl:px-3 py-1.5 xl:py-2 text-xs xl:text-[13px] 2xl:text-sm font-semibold transition shrink-0 ${
                         isActive ? "text-orange" : "text-navy hover:text-orange"
                       }`
                     }
+                    title={t("nav.dashboard") || "Dashboard"}
+                    aria-label={t("nav.dashboard") || "Dashboard"}
                   >
                     {({ isActive }) => {
                       const DashboardIcon = isActive ? Squares2X2SolidIcon : Squares2X2Icon;
                       return (
                         <>
-                          <DashboardIcon className="h-4 w-4" />
-                          <span>{t("nav.dashboard") || "Dashboard"}</span>
+                          <DashboardIcon className="h-4 w-4 shrink-0" />
+                          <span className="hidden xl:inline">{t("nav.dashboard") || "Dashboard"}</span>
                         </>
                       );
                     }}
@@ -258,7 +260,7 @@ const Navbar = () => {
                       to="/dashboard?tab=saved"
                       onClick={scrollToTop}
                       className={({ isActive }) =>
-                        `inline-flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-semibold transition ${
+                        `inline-flex h-8 w-8 xl:h-9 xl:w-9 shrink-0 items-center justify-center rounded-lg border text-sm font-semibold transition ${
                           isActive
                             ? "border-orange bg-orange/10 text-orange"
                             : "border-slate-200 text-navy hover:border-orange hover:text-orange"
@@ -274,42 +276,42 @@ const Navbar = () => {
                   <button
                     type="button"
                     onClick={onLogout}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 xl:px-3.5 py-2 text-xs xl:text-sm font-bold text-slate-700 shadow-2xs transition-all duration-200 hover:border-red-500 hover:bg-red-50 hover:text-red-600 cursor-pointer"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 xl:px-2.5 2xl:px-3 py-1.5 xl:py-2 text-xs xl:text-[13px] 2xl:text-sm font-bold text-slate-700 shadow-2xs transition-all duration-200 hover:border-red-500 hover:bg-red-50 hover:text-red-600 cursor-pointer shrink-0"
                     title={t("nav.logout") || "Logout"}
                     aria-label={t("nav.logout") || "Logout"}
                   >
-                    <ArrowLeftOnRectangleIcon className="h-4 w-4 text-red-500" />
-                    <span>{t("nav.logout") || "Logout"}</span>
+                    <ArrowLeftOnRectangleIcon className="h-4 w-4 text-red-500 shrink-0" />
+                    <span className="hidden xl:inline">{t("nav.logout") || "Logout"}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={handlePostFreeProperty}
-                    className="header-btn-adissia px-4 xl:px-5 py-2 rounded-lg text-xs xl:text-sm transition-all duration-300 font-bold flex items-center gap-2 relative shrink-0"
+                    className="header-btn-adissia px-3 xl:px-4 2xl:px-5 py-1.5 xl:py-2 rounded-lg text-xs xl:text-[13px] 2xl:text-sm transition-all duration-300 font-bold flex items-center gap-1.5 xl:gap-2 relative shrink-0"
                   >
                     <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white free-blink-badge pointer-events-none uppercase tracking-wider shadow-md">
                       {t("common.free") || "Free"}
                     </span>
-                    <FlagIcon className="h-4 w-4" />
-                    <span>{t("nav.postFreeProperty") || "Post property"}</span>
+                    <FlagIcon className="h-4 w-4 shrink-0" />
+                    <span className="whitespace-nowrap">{t("nav.postFreeProperty") || "Post property"}</span>
                   </button>
                 </>
               ) : (
                 <>
-                  <div className="relative">
+                  <div className="relative shrink-0">
                     <button
                       type="button"
                       onClick={() => setLoginDropdownOpen(!loginDropdownOpen)}
-                      className={`inline-flex items-center gap-1.5 rounded-lg border px-3 xl:px-3.5 py-2 text-xs xl:text-sm font-bold shadow-2xs transition-all duration-200 cursor-pointer ${
+                      className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 xl:px-3 py-1.5 xl:py-2 text-xs xl:text-[13px] 2xl:text-sm font-bold shadow-2xs transition-all duration-200 cursor-pointer shrink-0 ${
                         loginDropdownOpen
                           ? "border-orange bg-orange text-white"
                           : "border-slate-200 bg-white text-navy hover:border-orange hover:bg-orange/5 hover:text-orange"
                       }`}
                     >
-                      <ArrowRightOnRectangleIcon className={`h-4 w-4 ${loginDropdownOpen ? "text-white" : "text-orange"}`} />
+                      <ArrowRightOnRectangleIcon className={`h-4 w-4 shrink-0 ${loginDropdownOpen ? "text-white" : "text-orange"}`} />
                       <span>{t("nav.login") || "Login"}</span>
                       <ChevronDownIcon
-                        className={`h-3.5 w-3.5 transition-transform duration-200 ${loginDropdownOpen ? "rotate-180 text-white" : "text-slate-400"}`}
+                        className={`h-3.5 w-3.5 transition-transform duration-200 shrink-0 ${loginDropdownOpen ? "rotate-180 text-white" : "text-slate-400"}`}
                       />
                     </button>
 
@@ -351,13 +353,13 @@ const Navbar = () => {
                   <button
                     type="button"
                     onClick={handlePostFreeProperty}
-                    className="header-btn-adissia px-4 xl:px-5 py-2 rounded-lg text-xs xl:text-sm transition-all duration-300 font-bold flex items-center gap-2 relative shrink-0"
+                    className="header-btn-adissia px-3 xl:px-4 2xl:px-5 py-1.5 xl:py-2 rounded-lg text-xs xl:text-[13px] 2xl:text-sm transition-all duration-300 font-bold flex items-center gap-1.5 xl:gap-2 relative shrink-0"
                   >
                     <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white free-blink-badge pointer-events-none uppercase tracking-wider shadow-md">
                       {t("common.free") || "Free"}
                     </span>
-                    <FlagIcon className="h-4 w-4" />
-                    <span>{t("nav.postFreeProperty") || "Post property"}</span>
+                    <FlagIcon className="h-4 w-4 shrink-0" />
+                    <span className="whitespace-nowrap">{t("nav.postFreeProperty") || "Post property"}</span>
                   </button>
                 </>
               )}
