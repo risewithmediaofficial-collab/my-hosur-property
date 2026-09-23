@@ -16,6 +16,32 @@ export default defineConfig(({ mode }) => {
         "@": path.resolve(__dirname, "./src"),
       },
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes("node_modules")) {
+              if (id.includes("react-router-dom") || id.includes("react-dom") || id.includes("/react/")) {
+                return "vendor-react";
+              }
+              if (id.includes("framer-motion") || id.includes("gsap")) {
+                return "vendor-motion";
+              }
+              if (id.includes("@mui") || id.includes("@emotion")) {
+                return "vendor-mui";
+              }
+              if (id.includes("i18next") || id.includes("react-i18next")) {
+                return "vendor-i18n";
+              }
+              if (id.includes("@headlessui") || id.includes("lucide-react") || id.includes("react-hot-toast")) {
+                return "vendor-ui";
+              }
+            }
+          },
+        },
+      },
+      chunkSizeWarningLimit: 600,
+    },
     server: {
       proxy: {
         "/api": {

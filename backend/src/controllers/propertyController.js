@@ -277,10 +277,10 @@ const listProperties = async (req, res) => {
   }
 
   const query = applyPublicVisibility(buildQuery(req.query), req);
-  const itemsRaw = await Property.find(query).populate("ownerId", "name email phone role");
+  const itemsRaw = await Property.find(query).populate("ownerId", "name email phone role").lean();
 
   const itemsWithRank = itemsRaw.map((item) => ({
-    ...item.toObject(),
+    ...item,
     rankScore: calculateRankScore(item, req.user, req.query),
   }));
 
@@ -451,6 +451,7 @@ const createProperty = async (req, res) => {
   };
 
   const property = await Property.create(payload);
+  cache.flushAll();
 
   if (!bypassPlanCheck && !isUnlimitedPosts) {
     await User.findByIdAndUpdate(req.user._id, {

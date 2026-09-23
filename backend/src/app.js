@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const compression = require("compression");
 const { uploadDir } = require("./utils/uploadPaths");
 
 const authRoutes = require("./routes/authRoutes");
@@ -37,6 +38,7 @@ const envOrigins = [process.env.CLIENT_URL, process.env.CORS_ORIGINS]
 const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...envOrigins])];
 
 app.use(helmet());
+app.use(compression());
 app.use(
   cors({
     origin: allowedOrigins,
