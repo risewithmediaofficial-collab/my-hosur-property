@@ -821,13 +821,15 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
     return new Date(plan.expiresAt) >= new Date();
   }, [user?.activePlan]);
 
+  const isUnlimitedPlan = (user?.activePlan?.listingLimit || 0) >= 9999 || Boolean(user?.canPostProperty);
+
   const hasPostingQuota = useMemo(
-    () => (user?.activePlan?.listingsUsed || 0) < (user?.activePlan?.listingLimit || 0),
-    [user?.activePlan?.listingsUsed, user?.activePlan?.listingLimit]
+    () => isUnlimitedPlan || (user?.activePlan?.listingsUsed || 0) < (user?.activePlan?.listingLimit || 0),
+    [isUnlimitedPlan, user?.activePlan?.listingsUsed, user?.activePlan?.listingLimit]
   );
 
-  const remainingPosts = Math.max((user?.activePlan?.listingLimit || 0) - (user?.activePlan?.listingsUsed || 0), 0);
-  const canPostForFree = isAdmin || (hasActivePlan && hasPostingQuota);
+  const remainingPosts = isUnlimitedPlan ? 99999 : Math.max((user?.activePlan?.listingLimit || 0) - (user?.activePlan?.listingsUsed || 0), 0);
+  const canPostForFree = isAdmin || isUnlimitedPlan || (hasActivePlan && hasPostingQuota);
   const postingLimit = user?.activePlan?.listingLimit || 0;
   const postingUsed = user?.activePlan?.listingsUsed || 0;
   const contactLimit = user?.contactAccess?.monthlyLimit || user?.activePlan?.contactUnlocks || 0;
@@ -835,7 +837,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   const contactLeft = Math.max(contactLimit - contactUsed, 0);
   const leadCreditsLeft = Math.max((user?.activePlan?.leadCredits || 0) + (user?.leadCredits || 0), 0);
   const planExpired = Boolean(user?.activePlan?.expiresAt && new Date(user.activePlan.expiresAt) < new Date());
-  const activePlanName = user?.activePlan?.planId?.name || (isAdmin ? "Admin access" : "Active posting plan");
+  const activePlanName = user?.activePlan?.planId?.name || (isAdmin ? "Admin access" : isUnlimitedPlan ? "6 Months Free (Unlimited Posts)" : "Active posting plan");
   const accountType = roleLabels[user?.role] || "User";
   const accountContact = useMemo(
     () => ({
@@ -861,11 +863,11 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   }, [user]);
 
   useEffect(() => {
-    if (!isAdmin && hasPostingAccess && !canPostForFree && !initialData) {
-      toast.error("You have used your 6 free listings quota or your 6-month free posting period has ended. Please purchase a plan to post additional properties.");
+    if (!isAdmin && !isUnlimitedPlan && hasPostingAccess && !canPostForFree && !initialData) {
+      toast.error("Your free posting period has ended. Please purchase a plan to post additional properties.");
       navigate("/plans");
     }
-  }, [canPostForFree, isAdmin, hasPostingAccess, navigate, initialData]);
+  }, [canPostForFree, isAdmin, isUnlimitedPlan, hasPostingAccess, navigate, initialData]);
 
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -1115,6 +1117,7 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
   };
 
   const submitProperty = async (e) => {
+    if (publishing) return;
     if (imageFiles.length > 0) {
       toast.error("Please click 'Upload selected images' before publishing/saving.");
       return;
@@ -1144,13 +1147,16 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         warehouseSellingPrice > 0 && warehouseBuiltupArea > 0 ? Math.round(warehouseSellingPrice / warehouseBuiltupArea) : ""
       );
       const isWarehouse = form.propertyType === "Warehouse" || form.propertyType === "Warehouse / Industry";
-      const isExpectedPriceOnly = ["Villa", "Independent House", "Flat", "Apartment", "Rental Income Building"].includes(form.propertyType);
+      const isExpectedPriceOnly = ["Villa", "Independent House", "Flat", "Apartment"].includes(form.propertyType);
+      const isRentalIncome = form.propertyType === "Rental Income Building";
       const isRentListing = getListingType(form.propertyType) === "rent";
       const isCommercialLand = form.propertyType === "Commercial Land / Building" && form.commercialSubType === "Commercial Land";
+      const rentalIncomeValue = toNumber(form.rentalPrice);
 
       const amount = isWarehouse
         ? (warehouseSellingPrice || priceFieldValue || totalAmount)
         : isRentListing ? (monthlyRent || priceFieldValue)
+        : isRentalIncome ? (priceFieldValue || rentalIncomeValue || 0)
         : isExpectedPriceOnly ? (priceFieldValue || totalAmount)
         : isCommercialLand ? priceFieldValue
         : (totalAmount || priceFieldValue);
@@ -1300,7 +1306,32 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         navigate(isAdmin ? "/admin/dashboard" : "/dashboard");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Unable to save property");
+      const responseData = error.response?.data;
+      if (responseData?.errors && Array.isArray(responseData.errors) && responseData.errors.length > 0) {
+        const fieldNameMap = {
+          propertyType: "Property Type",
+          price: "Price / Rental Amount",
+          rentalPrice: "Monthly Rental Income",
+          title: "Property Title",
+          description: "Description",
+          "location.country": "Country",
+          "location.state": "State",
+          "location.district": "District",
+          "location.taluk": "Taluk / City",
+          "location.village": "Village / Landmark",
+          "location.city": "City",
+          "location.area": "Area / Locality",
+        };
+        const messages = responseData.errors.map((e) => {
+          const field = fieldNameMap[e.path || e.param] || (e.path || e.param || "Field");
+          return `${field}: ${e.msg || "Invalid value"}`;
+        });
+        toast.error(`Please check the following details:\n• ${messages.join("\n• ")}`, {
+          duration: 7000,
+        });
+      } else {
+        toast.error(responseData?.message || "Unable to save property");
+      }
     } finally {
       setPublishing(false);
     }
@@ -2260,9 +2291,9 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
             <StatusCard
               icon={<ClipboardDocumentCheckIcon className="h-5 w-5" />}
               label="Posting credits left"
-              value={isAdmin ? "Unlimited" : `${remainingPosts} left`}
-              helper={isAdmin ? "Admin can post without limit" : `${postingUsed} used of ${postingLimit || 0}`}
-              tone={remainingPosts > 0 || isAdmin ? "default" : "warning"}
+              value={isAdmin || isUnlimitedPlan ? "Unlimited" : `${remainingPosts} left`}
+              helper={isAdmin || isUnlimitedPlan ? "Free property posting enabled" : `${postingUsed} used of ${postingLimit || 0}`}
+              tone={remainingPosts > 0 || isAdmin || isUnlimitedPlan ? "default" : "warning"}
             />
             <StatusCard
               icon={<TicketIcon className="h-5 w-5" />}
@@ -2274,9 +2305,9 @@ const PropertyPostingForm = ({ heading = "Post Property", onSuccess, initialData
         </div>
       ) : null}
 
-      {hasPostingAccess && !isAdmin && !canPostForFree && !initialData && (
+      {hasPostingAccess && !isAdmin && !isUnlimitedPlan && !canPostForFree && !initialData && (
         <div className="rounded-xl bg-surface p-4">
-          <p className="text-sm text-slate-600">You have used your 6 free listings quota or your 6-month free posting period has ended. Please purchase a plan to post additional properties.</p>
+          <p className="text-sm text-slate-600">Your free posting period has ended. Please purchase a plan to post additional properties.</p>
           <button onClick={() => navigate("/plans")} className="site-button-primary mt-3 px-4 py-2 text-sm">
             Go to plans
           </button>

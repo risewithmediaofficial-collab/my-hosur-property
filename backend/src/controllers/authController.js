@@ -39,6 +39,8 @@ const maskPhone = (phone) => {
   return `${cleaned.slice(0, 3)}******${cleaned.slice(-4)}`;
 };
 
+const UNLIMITED_POSTING_LIMIT = 99999;
+
 const buildFreeOnboardingPack = () => {
   const resetAt = new Date();
   resetAt.setDate(resetAt.getDate() + 30);
@@ -61,7 +63,7 @@ const buildFreeOnboardingPack = () => {
     activePlan: {
       planId: null,
       expiresAt: freePostExpiry,
-      listingLimit: 6,
+      listingLimit: UNLIMITED_POSTING_LIMIT,
       listingsUsed: 0,
       isBoosted: false,
       contactUnlocks: 30,
@@ -74,37 +76,39 @@ const buildFreeOnboardingPack = () => {
 const ensureFreeOnboardingValidity = async (user) => {
   if (!user || user.activePlan?.planId) return user;
 
-  const isFreeListingPlan = (user.activePlan?.listingLimit || 0) <= 6 && (user.activePlan?.listingLimit || 0) > 0;
-  if (!isFreeListingPlan) return user;
-
-  const accountStart = user.createdAt || new Date();
-  const expectedExpiry = addDays(accountStart, FREE_POST_VALIDITY_DAYS);
-  const currentFreeExpiry = user.freePost?.expiresAt ? new Date(user.freePost.expiresAt) : null;
+  // 6 months (180 days) from login/current date for all accounts
+  const targetExpiry = addDays(new Date(), FREE_POST_VALIDITY_DAYS);
   const currentPlanExpiry = user.activePlan?.expiresAt ? new Date(user.activePlan.expiresAt) : null;
+  const currentFreeExpiry = user.freePost?.expiresAt ? new Date(user.freePost.expiresAt) : null;
 
-  const needsExpiryUpdate = !currentFreeExpiry || currentFreeExpiry < expectedExpiry || !currentPlanExpiry || currentPlanExpiry < expectedExpiry;
+  // Needs update if expiry is less than 150 days ahead, or not unlimited, or canPostProperty not true
+  const fiveMonthsFromNow = addDays(new Date(), 150);
+  const needsExpiryUpdate = !currentPlanExpiry || currentPlanExpiry < fiveMonthsFromNow || !currentFreeExpiry || currentFreeExpiry < fiveMonthsFromNow;
   const needsPlanUpdate =
-    (user.activePlan?.listingLimit || 0) !== 6 ||
-    (user.activePlan?.contactUnlocks || 0) !== 30 ||
-    (user.contactAccess?.monthlyLimit || 0) !== 30;
+    !user.canPostProperty ||
+    (user.activePlan?.listingLimit || 0) < UNLIMITED_POSTING_LIMIT ||
+    (user.contactAccess?.monthlyLimit || 0) < 30;
 
   if (needsExpiryUpdate || needsPlanUpdate) {
+    user.canPostProperty = true;
     user.freePost = {
       ...(user.freePost?.toObject ? user.freePost.toObject() : user.freePost || {}),
-      expiresAt: expectedExpiry,
+      used: false,
+      expiresAt: targetExpiry,
     };
     user.activePlan = {
       ...(user.activePlan?.toObject ? user.activePlan.toObject() : user.activePlan || {}),
-      expiresAt: expectedExpiry,
-      listingLimit: 6,
-      contactUnlocks: 30,
-      leadCredits: 0,
+      planId: null,
+      expiresAt: targetExpiry,
+      listingLimit: UNLIMITED_POSTING_LIMIT,
+      contactUnlocks: Math.max(user.activePlan?.contactUnlocks || 0, 30),
+      leadCredits: user.activePlan?.leadCredits || 0,
     };
     user.contactAccess = {
       ...(user.contactAccess?.toObject ? user.contactAccess.toObject() : user.contactAccess || {}),
-      monthlyLimit: 30,
+      monthlyLimit: Math.max(user.contactAccess?.monthlyLimit || 0, 30),
       usedCount: user.contactAccess?.usedCount || 0,
-      resetAt: expectedExpiry,
+      resetAt: targetExpiry,
       isPremium: false,
     };
     await user.save();

@@ -35,6 +35,7 @@ const PROPERTY_TYPES = [
   "House",
   "Land",
   "Industrial Shed",
+  "Rental Income Building",
 ];
 
 const expandFacingAliases = (facing) => {
@@ -83,6 +84,7 @@ const propertyValidators = [
   body("location.city").trim().notEmpty(),
   body("location.area").trim().notEmpty(),
   body("monthlyRent").optional().isNumeric(),
+  body("rentalPrice").optional().isNumeric(),
   body("ratePerUnit").optional().isNumeric(),
   body("totalAmount").optional().isNumeric(),
 ];
@@ -390,12 +392,30 @@ const createProperty = async (req, res) => {
 
   const plan = user.activePlan;
   const bypassPlanCheck = user.role === "admin";
+  const isUnlimitedPosts = Boolean(
+    bypassPlanCheck ||
+    user.canPostProperty ||
+    (plan?.listingLimit && plan.listingLimit >= 9999)
+  );
+
   if (!bypassPlanCheck) {
     if (!plan || !plan.expiresAt || new Date(plan.expiresAt) < new Date()) {
-      return res.status(402).json({ message: "Your 6-month free posting period has ended. Please purchase a plan to post additional properties." });
+      if (user.canPostProperty) {
+        // Auto-refresh 6 months free for accounts with posting access
+        const targetExpiry = new Date();
+        targetExpiry.setDate(targetExpiry.getDate() + 180);
+        user.activePlan = {
+          ...(user.activePlan?.toObject ? user.activePlan.toObject() : user.activePlan || {}),
+          expiresAt: targetExpiry,
+          listingLimit: 99999,
+        };
+        await user.save();
+      } else {
+        return res.status(402).json({ message: "Your 6-month free posting period has ended. Please purchase a plan to post additional properties." });
+      }
     }
-    if ((plan.listingsUsed || 0) >= (plan.listingLimit || 0)) {
-      return res.status(402).json({ message: "You have reached your 6 free listings limit. Please purchase a plan to post additional properties." });
+    if (!isUnlimitedPosts && (plan.listingsUsed || 0) >= (plan.listingLimit || 0)) {
+      return res.status(402).json({ message: "You have reached your listings limit. Please purchase a plan to post additional properties." });
     }
   }
 
@@ -432,7 +452,7 @@ const createProperty = async (req, res) => {
 
   const property = await Property.create(payload);
 
-  if (!bypassPlanCheck) {
+  if (!bypassPlanCheck && !isUnlimitedPosts) {
     await User.findByIdAndUpdate(req.user._id, {
       $inc: { "activePlan.listingsUsed": 1 },
     });
