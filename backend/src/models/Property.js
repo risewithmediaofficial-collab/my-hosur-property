@@ -142,6 +142,11 @@ const propertySchema = new mongoose.Schema(
     promotionalScore: { type: Number, default: 0 },
     viewCount: { type: Number, default: 0 },
     inquiryCount: { type: Number, default: 0 },
+    isDeleted: { type: Boolean, default: false, index: true },
+    deletedAt: { type: Date, default: null },
+    deletedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+    deletedWithUser: { type: Boolean, default: false },
+    deleteReason: { type: String, default: "" },
   },
   { timestamps: true }
 );

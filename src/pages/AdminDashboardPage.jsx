@@ -27,6 +27,11 @@ import {
   fetchAdminRoleChangeRequests,
   approveAdminRoleChangeRequest,
   rejectAdminRoleChangeRequest,
+  fetchAdminRecycleBin,
+  restoreRecycleBinItem,
+  permanentDeleteRecycleBinItem,
+  emptyAdminRecycleBin,
+  fetchAdminActivityLogs,
 } from "../services/api/adminApi";
 import toast from "react-hot-toast";
 import PropertyPostingForm from "../components/PropertyPostingForm";
@@ -48,6 +53,11 @@ import {
   EnvelopeIcon,
   TicketIcon,
   XMarkIcon,
+  TrashIcon,
+  ArrowPathIcon,
+  ActivityIcon,
+  RefreshIcon,
+  CheckCircleIcon,
 } from "../components/AppIcons";
 
 const formatCustomerRequestLabel = (item) => {
@@ -83,6 +93,21 @@ const formatAdminDateTime = (value) => {
   return `${date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}, ${date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true })}`;
 };
 
+const formatTimeAgo = (dateStr) => {
+  if (!dateStr) return "-";
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "-";
+  const diffSec = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (diffSec < 60) return "Just now";
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  const diffDay = Math.floor(diffHr / 24);
+  if (diffDay < 7) return `${diffDay}d ago`;
+  return date.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+};
+
 const AdminDashboardPage = () => {
   const { token } = useAuth();
   const [metrics, setMetrics] = useState({});
@@ -98,6 +123,25 @@ const AdminDashboardPage = () => {
   const [userProperties, setUserProperties] = useState([]);
   const [userSearch, setUserSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+
+  // Recycle Bin states
+  const [recycleBinData, setRecycleBinData] = useState({
+    items: [],
+    counts: { total: 0, users: 0, properties: 0, leads: 0, requests: 0 },
+  });
+  const [recycleBinFilter, setRecycleBinFilter] = useState("all");
+  const [recycleBinSearch, setRecycleBinSearch] = useState("");
+  const [recycleBinLoading, setRecycleBinLoading] = useState(false);
+  const [recycleActionLoading, setRecycleActionLoading] = useState(false);
+
+  // Live Activity Tracker states
+  const [activityLogs, setActivityLogs] = useState([]);
+  const [activityLogsTotal, setActivityLogsTotal] = useState(0);
+  const [activityLogsLoading, setActivityLogsLoading] = useState(false);
+  const [activityActionFilter, setActivityActionFilter] = useState("all");
+  const [activityEntityFilter, setActivityEntityFilter] = useState("all");
+  const [activitySearch, setActivitySearch] = useState("");
+  const [activityAutoRefresh, setActivityAutoRefresh] = useState(true);
   const [filterRole, setFilterRole] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [paymentPlanFilter, setPaymentPlanFilter] = useState("all");
@@ -191,12 +235,104 @@ const AdminDashboardPage = () => {
     document.body.removeChild(link);
   };
 
+  const loadRecycleBin = useCallback(async () => {
+    if (!token) return;
+    try {
+      setRecycleBinLoading(true);
+      const res = await fetchAdminRecycleBin(token, {
+        type: recycleBinFilter,
+        search: recycleBinSearch,
+      });
+      setRecycleBinData(res || { items: [], counts: { total: 0, users: 0, properties: 0, leads: 0, requests: 0 } });
+    } catch (err) {
+      console.error("[loadRecycleBin] Error:", err);
+    } finally {
+      setRecycleBinLoading(false);
+    }
+  }, [token, recycleBinFilter, recycleBinSearch]);
+
+  const loadActivityLogs = useCallback(async () => {
+    if (!token) return;
+    try {
+      setActivityLogsLoading(true);
+      const res = await fetchAdminActivityLogs(token, {
+        action: activityActionFilter,
+        entityType: activityEntityFilter,
+        search: activitySearch,
+        limit: 100,
+      });
+      setActivityLogs(res?.items || []);
+      setActivityLogsTotal(res?.total || 0);
+    } catch (err) {
+      console.error("[loadActivityLogs] Error:", err);
+    } finally {
+      setActivityLogsLoading(false);
+    }
+  }, [token, activityActionFilter, activityEntityFilter, activitySearch]);
+
+  const handleRestoreItem = async (type, id, title) => {
+    try {
+      setRecycleActionLoading(true);
+      const res = await restoreRecycleBinItem(token, type, id);
+      toast.success(res.message || `"${title}" restored successfully!`);
+      await loadRecycleBin();
+      await load();
+    } catch (err) {
+      toast.error(err.response?.data?.message || `Failed to restore ${type}`);
+    } finally {
+      setRecycleActionLoading(false);
+    }
+  };
+
+  const handlePermanentDeleteItem = async (type, id, title) => {
+    if (!window.confirm(`PERMANENTLY PURGE "${title}" from the database? This action CANNOT be undone.`)) return;
+    try {
+      setRecycleActionLoading(true);
+      const res = await permanentDeleteRecycleBinItem(token, type, id);
+      toast.success(res.message || `"${title}" permanently deleted.`);
+      await loadRecycleBin();
+      await load();
+    } catch (err) {
+      toast.error(err.response?.data?.message || `Failed to permanently delete ${type}`);
+    } finally {
+      setRecycleActionLoading(false);
+    }
+  };
+
+  const handleEmptyRecycleBin = async (type = "all") => {
+    const targetLabel = type === "all" ? "ALL items in the Recycle Bin" : `all ${type}s in the Recycle Bin`;
+    if (!window.confirm(`Are you absolutely sure you want to permanently empty ${targetLabel}? All deleted records will be permanently erased.`)) return;
+    try {
+      setRecycleActionLoading(true);
+      const res = await emptyAdminRecycleBin(token, type);
+      toast.success(res.message || "Recycle bin emptied successfully.");
+      await loadRecycleBin();
+      await load();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to empty recycle bin");
+    } finally {
+      setRecycleActionLoading(false);
+    }
+  };
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [metricsRes, usersRes, paymentsRes, propertyRes, leadsRes, customerRequestsRes, leadUnlocksRes, leadPriceRes, manualPayRes, roleReqRes] = await Promise.allSettled([
+      const [
+        metricsRes,
+        usersRes,
+        paymentsRes,
+        propertyRes,
+        leadsRes,
+        customerRequestsRes,
+        leadUnlocksRes,
+        leadPriceRes,
+        manualPayRes,
+        roleReqRes,
+        recycleBinRes,
+      ] = await Promise.allSettled([
         fetchAdminMetrics(token),
-        fetchAdminUsers(token),
+        fetchAdminUsers(token, { limit: 200 }),
         fetchAdminPayments(token, {
           limit: 50,
           ...(paymentPlanFilter !== "all" ? { planId: paymentPlanFilter } : {}),
@@ -208,6 +344,7 @@ const AdminDashboardPage = () => {
         fetchAdminLeadPrice(token),
         fetchAdminPaymentRequests(token),
         fetchAdminRoleChangeRequests(token),
+        fetchAdminRecycleBin(token),
       ]);
 
       if (metricsRes.status === "fulfilled") setMetrics(metricsRes.value);
@@ -223,6 +360,9 @@ const AdminDashboardPage = () => {
       if (leadPriceRes.status === "fulfilled") setLeadPrice(Number(leadPriceRes.value.value || 200));
       if (manualPayRes.status === "fulfilled") setPaymentRequests(manualPayRes.value.items || []);
       if (roleReqRes.status === "fulfilled") setRoleChangeRequests(roleReqRes.value.items || []);
+      if (recycleBinRes.status === "fulfilled") {
+        setRecycleBinData(recycleBinRes.value || { items: [], counts: { total: 0, users: 0, properties: 0, leads: 0, requests: 0 } });
+      }
     } finally {
       setLoading(false);
     }
@@ -231,6 +371,22 @@ const AdminDashboardPage = () => {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    if (activeTab === "recycle-bin") {
+      loadRecycleBin();
+    } else if (activeTab === "activity-log") {
+      loadActivityLogs();
+    }
+  }, [activeTab, loadRecycleBin, loadActivityLogs]);
+
+  useEffect(() => {
+    if (activeTab !== "activity-log" || !activityAutoRefresh) return;
+    const interval = setInterval(() => {
+      loadActivityLogs();
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [activeTab, activityAutoRefresh, loadActivityLogs]);
 
   useEffect(() => {
     if (selectedUser) {
@@ -435,9 +591,11 @@ const AdminDashboardPage = () => {
       { id: "leads", label: "Requests & Leads", icon: ChatBubbleLeftRightIcon, badge: inquiryNewCount > 0 ? `${inquiryNewCount} NEW` : leadQueueCount },
       { id: "payment-requests", label: "Payment Requests", icon: TicketIcon, badge: pendingPaymentReqCount > 0 ? `${pendingPaymentReqCount} NEW` : paymentRequests.length },
       { id: "payments", label: "Payments", icon: BanknotesIcon, badge: payments.length },
+      { id: "recycle-bin", label: "Recycle Bin", icon: TrashIcon, badge: recycleBinData.counts?.total > 0 ? `${recycleBinData.counts.total}` : null },
+      { id: "activity-log", label: "Live Tracker", icon: ActivityIcon, badge: "LIVE" },
       { id: "settings", label: "Settings", icon: Cog6ToothIcon },
     ],
-    [inquiryNewCount, leadQueueCount, metrics.properties, metrics.users, paymentRequests.length, payments.length, pendingPaymentReqCount, pendingRoleReqCount, propertyListings.length, roleChangeRequests.length, users.length]
+    [inquiryNewCount, leadQueueCount, metrics.properties, metrics.users, paymentRequests.length, payments.length, pendingPaymentReqCount, pendingRoleReqCount, propertyListings.length, recycleBinData.counts?.total, roleChangeRequests.length, users.length]
   );
 
   const leadViews = useMemo(
@@ -469,11 +627,11 @@ const AdminDashboardPage = () => {
   };
 
   const onDeleteProperty = async (propertyId, propertyTitle) => {
-    if (!window.confirm(`Delete "${propertyTitle}"? This action cannot be undone.`)) return;
+    if (!window.confirm(`Move "${propertyTitle}" to the Recycle Bin? It can be restored at any time.`)) return;
 
     try {
       await deleteProperty(token, propertyId);
-      toast.success("Property deleted");
+      toast.success("Property moved to Recycle Bin");
       setPropertyListings((current) => current.filter((item) => item._id !== propertyId));
       setUserProperties((current) => current.filter((item) => item._id !== propertyId));
       load();
@@ -520,10 +678,10 @@ const AdminDashboardPage = () => {
   };
 
   const onDeleteUser = async (user) => {
-    if (!window.confirm(`Are you sure you want to PERMANENTLY DELETE user "${user.name}"? This will delete all their listings, messages, and associated accounts. This action CANNOT be undone.`)) return;
+    if (!window.confirm(`Move user "${user.name}" to the Recycle Bin? Their account and listings will be safely archived and can be restored at any time.`)) return;
     try {
       await deleteAdminUser(token, user._id);
-      toast.success("User and associated data deleted");
+      toast.success(`User "${user.name}" moved to Recycle Bin`);
       setSelectedUser(null);
       load();
     } catch (error) {
@@ -587,7 +745,7 @@ const AdminDashboardPage = () => {
         ? `Property Request from ${item.customerName || "N/A"}`
         : `Lead Unlock for ${item.customerId?.name || "N/A"}`;
 
-    if (!window.confirm(`Are you sure you want to PERMANENTLY DELETE "${itemName}"? This action CANNOT be undone.`)) return;
+    if (!window.confirm(`Move "${itemName}" to the Recycle Bin? It can be restored at any time.`)) return;
 
     try {
       if (type === "inquiries") {
@@ -597,7 +755,7 @@ const AdminDashboardPage = () => {
       } else if (type === "unlocks") {
         await deleteAdminLeadUnlock(token, item._id);
       }
-      toast.success("Item deleted successfully");
+      toast.success("Item moved to Recycle Bin");
       setSelectedLeadItem(null);
       load();
     } catch (error) {
@@ -800,7 +958,7 @@ const AdminDashboardPage = () => {
               <div className="flex w-full flex-col gap-2 sm:flex-row">
                 <input 
                   type="text" 
-                  placeholder=" " 
+                  placeholder="Search users by name, email, phone..." 
                   className="dashboard-control flex-1 text-sm"
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
@@ -900,6 +1058,13 @@ const AdminDashboardPage = () => {
                         <div className="flex items-center justify-end gap-2">
                           <button onClick={() => openUserModal(u)} className="dashboard-secondary px-3 py-1 text-xs">
                             View Details
+                          </button>
+                          <button
+                            onClick={() => onDeleteUser(u)}
+                            title="Move user to Recycle Bin"
+                            className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 p-1.5 text-red-600 hover:bg-red-100 hover:text-red-700 transition"
+                          >
+                            <TrashIcon className="h-3.5 w-3.5" />
                           </button>
                         </div>
                       </td>
@@ -1709,6 +1874,382 @@ const AdminDashboardPage = () => {
               </div>
             </div>
           </section>
+        )}
+
+        {activeTab === "recycle-bin" && (
+          <article className="dashboard-shell flex min-h-0 flex-1 flex-col p-6">
+            {/* Header */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-5">
+              <div>
+                <div className="flex items-center gap-2">
+                  <div className="rounded-xl bg-red-50 p-2 text-red-600 border border-red-100">
+                    <TrashIcon className="h-5 w-5" />
+                  </div>
+                  <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Recycle Bin & Safe Recovery</h2>
+                </div>
+                <p className="mt-1 text-xs text-slate-500">
+                  Deleted accounts, listings, and leads are safely stored here. You can restore them instantly to active status or purge them permanently.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={loadRecycleBin}
+                  disabled={recycleBinLoading}
+                  className="dashboard-secondary inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold"
+                  title="Reload recycle bin"
+                >
+                  <RefreshIcon className={`h-4 w-4 ${recycleBinLoading ? "animate-spin text-orange-600" : ""}`} />
+                  Refresh
+                </button>
+                {recycleBinData.counts?.total > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => handleEmptyRecycleBin(recycleBinFilter)}
+                    disabled={recycleActionLoading}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2 text-xs font-bold text-red-700 hover:bg-red-100 transition shadow-sm"
+                  >
+                    <TrashIcon className="h-4 w-4" />
+                    Empty {recycleBinFilter === "all" ? "Bin" : `${recycleBinFilter}s`}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Filter Pills & Search */}
+            <div className="my-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              {/* Type Tabs */}
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { id: "all", label: "All Items", count: recycleBinData.counts?.total || 0 },
+                  { id: "user", label: "Users", count: recycleBinData.counts?.users || 0 },
+                  { id: "property", label: "Properties", count: recycleBinData.counts?.properties || 0 },
+                  { id: "lead", label: "Inquiry Leads", count: recycleBinData.counts?.leads || 0 },
+                  { id: "customer_request", label: "Property Requests", count: recycleBinData.counts?.requests || 0 },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setRecycleBinFilter(tab.id)}
+                    className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
+                      recycleBinFilter === tab.id
+                        ? "bg-slate-900 text-white shadow-sm"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900"
+                    }`}
+                  >
+                    <span>{tab.label}</span>
+                    <span
+                      className={`rounded-full px-1.5 py-0.2 text-[10px] font-extrabold ${
+                        recycleBinFilter === tab.id
+                          ? "bg-white/20 text-white"
+                          : "bg-slate-200 text-slate-700"
+                      }`}
+                    >
+                      {tab.count}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Search Input */}
+              <div className="w-full lg:w-72">
+                <input
+                  type="text"
+                  value={recycleBinSearch}
+                  onChange={(e) => setRecycleBinSearch(e.target.value)}
+                  placeholder="Search deleted records..."
+                  className="dashboard-control text-xs w-full"
+                />
+              </div>
+            </div>
+
+            {/* Items List */}
+            <div className="min-h-0 flex-1 overflow-y-auto space-y-3 pr-1">
+              {recycleBinLoading ? (
+                <div className="py-16 text-center">
+                  <Loader text="Loading Recycle Bin items..." />
+                </div>
+              ) : recycleBinData.items?.length === 0 ? (
+                <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 py-16 text-center">
+                  <div className="rounded-full bg-slate-100 p-4 text-slate-400">
+                    <TrashIcon className="h-8 w-8" />
+                  </div>
+                  <h3 className="mt-3 text-base font-bold text-slate-800">Recycle Bin is Empty</h3>
+                  <p className="mt-1 text-xs text-slate-500 max-w-sm">
+                    {recycleBinSearch
+                      ? "No deleted records match your search criteria."
+                      : "No deleted users, listings, or leads found. Deleted items will be held here safely."}
+                  </p>
+                </div>
+              ) : (
+                recycleBinData.items.map((item) => (
+                  <div
+                    key={`${item.itemType}-${item._id}`}
+                    className="flex flex-col justify-between gap-4 rounded-2xl border border-slate-200/90 bg-white p-4 shadow-sm hover:border-slate-300 transition-all sm:flex-row sm:items-center"
+                  >
+                    <div className="flex items-start gap-3.5 min-w-0 flex-1">
+                      <div
+                        className={`mt-0.5 rounded-xl p-2.5 shrink-0 ${
+                          item.itemType === "user"
+                            ? "bg-blue-50 text-blue-600 border border-blue-100"
+                            : item.itemType === "property"
+                            ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
+                            : item.itemType === "lead"
+                            ? "bg-amber-50 text-amber-600 border border-amber-100"
+                            : "bg-purple-50 text-purple-600 border border-purple-100"
+                        }`}
+                      >
+                        {item.itemType === "user" ? (
+                          <UsersIcon className="h-5 w-5" />
+                        ) : item.itemType === "property" ? (
+                          <HomeModernIcon className="h-5 w-5" />
+                        ) : item.itemType === "lead" ? (
+                          <ChatBubbleLeftRightIcon className="h-5 w-5" />
+                        ) : (
+                          <TicketIcon className="h-5 w-5" />
+                        )}
+                      </div>
+
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-extrabold text-sm text-slate-900 truncate">{item.title}</span>
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                              item.itemType === "user"
+                                ? "bg-blue-100 text-blue-800"
+                                : item.itemType === "property"
+                                ? "bg-emerald-100 text-emerald-800"
+                                : item.itemType === "lead"
+                                ? "bg-amber-100 text-amber-800"
+                                : "bg-purple-100 text-purple-800"
+                            }`}
+                          >
+                            {item.itemType.replace("_", " ")}
+                          </span>
+                          {item.badge && (
+                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 capitalize">
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="text-xs text-slate-600 truncate">{item.subtitle}</p>
+                        {item.extra && <p className="text-[11px] text-slate-400">{item.extra}</p>}
+
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-[11px] text-slate-400">
+                          <span className="inline-flex items-center gap-1 text-red-600 font-medium bg-red-50 px-2 py-0.5 rounded-md">
+                            Reason: {item.deleteReason}
+                          </span>
+                          <span>Deleted by: <strong className="text-slate-600 font-semibold">{item.deletedBy}</strong></span>
+                          <span>•</span>
+                          <span>{formatAdminDateTime(item.deletedAt)} ({formatTimeAgo(item.deletedAt)})</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                      <button
+                        type="button"
+                        onClick={() => handleRestoreItem(item.itemType, item._id, item.title)}
+                        disabled={recycleActionLoading}
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition"
+                      >
+                        <ArrowPathIcon className="h-4 w-4" />
+                        Restore
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handlePermanentDeleteItem(item.itemType, item._id, item.title)}
+                        disabled={recycleActionLoading}
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-red-200 bg-white px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 hover:border-red-300 transition"
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                        Purge
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </article>
+        )}
+
+        {activeTab === "activity-log" && (
+          <article className="dashboard-shell flex min-h-0 flex-1 flex-col p-6">
+            {/* Header */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-5">
+              <div>
+                <div className="flex items-center gap-2">
+                  <div className="rounded-xl bg-slate-900 p-2 text-orange-400">
+                    <ActivityIcon className="h-5 w-5" />
+                  </div>
+                  <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Live Activity Tracker & Audit Stream</h2>
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-800 tracking-wide">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                    LIVE
+                  </span>
+                </div>
+                <p className="mt-1 text-xs text-slate-500">
+                  Chronological audit trail of all platform updates, role modifications, property moderation, and deletion/restoration actions.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={activityAutoRefresh}
+                    onChange={(e) => setActivityAutoRefresh(e.target.checked)}
+                    className="rounded text-slate-900 focus:ring-slate-900 h-4 w-4"
+                  />
+                  Auto-refresh (15s)
+                </label>
+                <button
+                  type="button"
+                  onClick={loadActivityLogs}
+                  disabled={activityLogsLoading}
+                  className="dashboard-primary inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold"
+                >
+                  <RefreshIcon className={`h-4 w-4 ${activityLogsLoading ? "animate-spin" : ""}`} />
+                  Refresh
+                </button>
+              </div>
+            </div>
+
+            {/* Filter bar */}
+            <div className="my-4 grid gap-3 sm:grid-cols-3">
+              <div>
+                <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Entity Type</label>
+                <select
+                  value={activityEntityFilter}
+                  onChange={(e) => setActivityEntityFilter(e.target.value)}
+                  className="dashboard-control text-xs"
+                >
+                  <option value="all">All Entities</option>
+                  <option value="user">Users</option>
+                  <option value="property">Properties</option>
+                  <option value="lead">Leads & Inquiries</option>
+                  <option value="customer_request">Customer Requests</option>
+                  <option value="recycle_bin">Recycle Bin</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Action Type</label>
+                <select
+                  value={activityActionFilter}
+                  onChange={(e) => setActivityActionFilter(e.target.value)}
+                  className="dashboard-control text-xs"
+                >
+                  <option value="all">All Actions</option>
+                  <option value="USER_ROLE_CHANGED">User Role Changed</option>
+                  <option value="USER_STATUS_CHANGED">User Status Changed</option>
+                  <option value="USER_DELETED_SOFT">User Moved to Bin</option>
+                  <option value="USER_RESTORED">User Restored</option>
+                  <option value="USER_PURGED_PERMANENT">User Permanently Purged</option>
+                  <option value="PROPERTY_MODERATED">Property Moderated / Approved</option>
+                  <option value="PROPERTY_DELETED_SOFT">Property Moved to Bin</option>
+                  <option value="PROPERTY_RESTORED">Property Restored</option>
+                  <option value="RECYCLE_BIN_EMPTIED">Recycle Bin Emptied</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Search Logs</label>
+                <input
+                  type="text"
+                  value={activitySearch}
+                  onChange={(e) => setActivitySearch(e.target.value)}
+                  placeholder="Search by name, summary..."
+                  className="dashboard-control text-xs"
+                />
+              </div>
+            </div>
+
+            {/* Log Stream */}
+            <div className="min-h-0 flex-1 overflow-y-auto space-y-2.5 pr-1">
+              {activityLogsLoading && activityLogs.length === 0 ? (
+                <div className="py-16 text-center">
+                  <Loader text="Streaming activity events..." />
+                </div>
+              ) : activityLogs.length === 0 ? (
+                <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 py-16 text-center">
+                  <div className="rounded-full bg-slate-100 p-4 text-slate-400">
+                    <ActivityIcon className="h-8 w-8" />
+                  </div>
+                  <h3 className="mt-3 text-base font-bold text-slate-800">No Activity Recorded Yet</h3>
+                  <p className="mt-1 text-xs text-slate-500 max-w-sm">
+                    Activity events will be tracked and displayed here in real time as operations occur on the platform.
+                  </p>
+                </div>
+              ) : (
+                activityLogs.map((log) => {
+                  const isRestore = log.action?.includes("RESTORE");
+                  const isDeleteSoft = log.action?.includes("DELETED_SOFT");
+                  const isPurge = log.action?.includes("PURGED") || log.action?.includes("EMPTIED");
+                  const isApprove = log.action?.includes("MODERATED") || log.action?.includes("APPROVED");
+                  const isRoleOrStatus = log.action?.includes("ROLE") || log.action?.includes("STATUS");
+
+                  return (
+                    <div
+                      key={log._id}
+                      className="flex flex-col gap-2 rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-sm hover:border-slate-300 transition-all sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div className="flex items-start gap-3 min-w-0 flex-1">
+                        <div
+                          className={`mt-0.5 rounded-xl p-2 shrink-0 ${
+                            isRestore
+                              ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
+                              : isDeleteSoft
+                              ? "bg-amber-50 text-amber-600 border border-amber-100"
+                              : isPurge
+                              ? "bg-red-50 text-red-600 border border-red-100"
+                              : isApprove
+                              ? "bg-teal-50 text-teal-600 border border-teal-100"
+                              : isRoleOrStatus
+                              ? "bg-indigo-50 text-indigo-600 border border-indigo-100"
+                              : "bg-slate-100 text-slate-700 border border-slate-200"
+                          }`}
+                        >
+                          {isRestore ? (
+                            <ArrowPathIcon className="h-4 w-4" />
+                          ) : isDeleteSoft || isPurge ? (
+                            <TrashIcon className="h-4 w-4" />
+                          ) : isApprove ? (
+                            <CheckCircleIcon className="h-4 w-4" />
+                          ) : (
+                            <UsersIcon className="h-4 w-4" />
+                          )}
+                        </div>
+
+                        <div className="min-w-0 flex-1 space-y-0.5">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-bold text-xs text-slate-900 leading-snug">{log.summary}</span>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-slate-500">
+                            <span className="font-semibold text-slate-700">By: {log.performedBy?.name || "Admin"}</span>
+                            <span>•</span>
+                            <span className="font-mono text-[10px] text-slate-400 uppercase">{log.action}</span>
+                            <span>•</span>
+                            <span>{formatAdminDateTime(log.createdAt)}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="shrink-0 self-start sm:self-center">
+                        <span className="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold text-slate-600 whitespace-nowrap">
+                          {formatTimeAgo(log.createdAt)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </article>
         )}
     </DashboardSidebar>
 

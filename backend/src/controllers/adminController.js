@@ -13,6 +13,7 @@ const buildPagination = require("../utils/paginate");
 const sendEmail = require("../utils/sendEmail");
 const { sendBulkEmail } = require("../utils/sendEmail");
 const generateHtmlEmail = require("../utils/emailFormatter");
+const { logActivity } = require("../services/activityLogger");
 
 const getDateDaysAgo = (days = 0) => {
   const d = new Date();
@@ -46,21 +47,21 @@ const getMetrics = async (req, res) => {
     leadUnlocks,
     unreadNotifications,
   ] = await Promise.all([
-    User.countDocuments(),
-    Property.countDocuments(),
-    Property.countDocuments({ status: "pending" }),
-    Lead.countDocuments(),
+    User.countDocuments({ isDeleted: { $ne: true } }),
+    Property.countDocuments({ isDeleted: { $ne: true } }),
+    Property.countDocuments({ status: "pending", isDeleted: { $ne: true } }),
+    Lead.countDocuments({ isDeleted: { $ne: true } }),
     Payment.countDocuments({ status: "paid" }),
-    User.countDocuments({ "activePlan.expiresAt": { $gt: new Date() } }),
+    User.countDocuments({ "activePlan.expiresAt": { $gt: new Date() }, isDeleted: { $ne: true } }),
     Payment.countDocuments({ status: "failed" }),
-    Lead.countDocuments({ createdAt: { $gte: today } }),
-    Lead.countDocuments({ createdAt: { $gte: sevenDaysAgo } }),
-    User.countDocuments({ createdAt: { $gte: sevenDaysAgo } }),
-    Property.countDocuments({ createdAt: { $gte: sevenDaysAgo } }),
+    Lead.countDocuments({ createdAt: { $gte: today }, isDeleted: { $ne: true } }),
+    Lead.countDocuments({ createdAt: { $gte: sevenDaysAgo }, isDeleted: { $ne: true } }),
+    User.countDocuments({ createdAt: { $gte: sevenDaysAgo }, isDeleted: { $ne: true } }),
+    Property.countDocuments({ createdAt: { $gte: sevenDaysAgo }, isDeleted: { $ne: true } }),
     Payment.find({ status: "paid" }).select("amount"),
-    User.aggregate([{ $group: { _id: "$role", count: { $sum: 1 } } }]),
-    User.countDocuments({ role: { $in: ["seller", "agent", "broker", "builder"] }, canPostProperty: false }),
-    CustomerRequest.countDocuments(),
+    User.aggregate([{ $match: { isDeleted: { $ne: true } } }, { $group: { _id: "$role", count: { $sum: 1 } } }]),
+    User.countDocuments({ role: { $in: ["seller", "agent", "broker", "builder"] }, canPostProperty: false, isDeleted: { $ne: true } }),
+    CustomerRequest.countDocuments({ isDeleted: { $ne: true } }),
     LeadUnlock.countDocuments({ status: "paid" }),
     Notification.countDocuments({ readAt: null }),
   ]);
@@ -148,6 +149,17 @@ const moderateProperty = async (req, res) => {
   }
 
   await property.save();
+
+  logActivity({
+    action: "PROPERTY_MODERATED",
+    entityType: "property",
+    entityId: property._id,
+    entityTitle: property.title,
+    req,
+    summary: `Admin set status of property "${property.title}" to "${status}"`,
+    details: { status, title: property.title },
+  });
+
   res.json(property);
 
   // WhatsApp property status notification (non-blocking)
@@ -166,8 +178,8 @@ const moderateProperty = async (req, res) => {
 };
 
 const listPropertyApplications = async (req, res) => {
-  const { page, limit, skip } = buildPagination(req.query.page, req.query.limit);
-  const query = {};
+  const { page, limit, skip } = buildPagination(req.query.page, req.query.limit, 200);
+  const query = { isDeleted: { $ne: true } };
 
   if (req.query.status && req.query.status !== "all") {
     query.status = req.query.status;
@@ -232,14 +244,16 @@ const listPostingAccessApplications = async (req, res) => {
 };
 
 const listUsers = async (req, res) => {
-  const { page, limit, skip } = buildPagination(req.query.page, req.query.limit);
-  const query = {};
+  const reqLimit = req.query.limit ? Number(req.query.limit) : 200;
+  const { page, limit, skip } = buildPagination(req.query.page, reqLimit, 500);
+  const query = { isDeleted: { $ne: true } };
 
-  if (req.query.role) query.role = req.query.role;
+  if (req.query.role && req.query.role !== "all") query.role = req.query.role;
+  if (req.query.status && req.query.status !== "all") query.status = req.query.status;
   if (req.query.canPostProperty === "true") query.canPostProperty = true;
   if (req.query.canPostProperty === "false") query.canPostProperty = false;
-  if (req.query.search) {
-    const rx = new RegExp(req.query.search, "i");
+  if (req.query.search && req.query.search.trim()) {
+    const rx = new RegExp(req.query.search.trim(), "i");
     query.$or = [{ name: rx }, { email: rx }, { phone: rx }];
   }
 
@@ -335,6 +349,17 @@ const toggleUserStatus = async (req, res) => {
 
   user.status = status;
   await user.save();
+
+  await logActivity({
+    action: "USER_STATUS_CHANGED",
+    entityType: "user",
+    entityId: user._id,
+    entityTitle: user.name,
+    req,
+    summary: `Admin updated status of user "${user.name}" to "${status}"`,
+    details: { status, user: user.name, email: user.email },
+  });
+
   return res.json({ message: `User status updated to ${status}`, user });
 };
 
@@ -346,6 +371,17 @@ const updateUserNotes = async (req, res) => {
 
   user.adminNotes = notes;
   await user.save();
+
+  await logActivity({
+    action: "NOTES_UPDATED",
+    entityType: "user",
+    entityId: user._id,
+    entityTitle: user.name,
+    req,
+    summary: `Admin updated internal notes for user "${user.name}"`,
+    details: { notes },
+  });
+
   return res.json({ message: "User notes updated", user });
 };
 
@@ -648,16 +684,49 @@ const deleteUser = async (req, res) => {
       return res.status(400).json({ message: "You cannot delete yourself" });
     }
 
-    // Hard delete user
-    await User.findByIdAndDelete(id);
-    
-    // Clean up user properties
-    await Property.deleteMany({ ownerId: id });
-    
-    // Clean up user leads
-    await Lead.deleteMany({ userId: id });
+    user.isDeleted = true;
+    user.deletedAt = new Date();
+    user.deletedBy = req.user._id;
+    user.deleteReason = req.body?.reason || "Moved to Recycle Bin by admin";
+    await user.save();
 
-    return res.json({ message: "User and associated data deleted successfully" });
+    // Soft delete user properties
+    await Property.updateMany(
+      { ownerId: id, isDeleted: { $ne: true } },
+      {
+        $set: {
+          isDeleted: true,
+          deletedAt: new Date(),
+          deletedBy: req.user._id,
+          deletedWithUser: true,
+          deleteReason: "Owner account moved to Recycle Bin",
+        },
+      }
+    );
+
+    // Soft delete user leads
+    await Lead.updateMany(
+      { userId: id, isDeleted: { $ne: true } },
+      {
+        $set: {
+          isDeleted: true,
+          deletedAt: new Date(),
+          deletedBy: req.user._id,
+        },
+      }
+    );
+
+    await logActivity({
+      action: "USER_DELETED_SOFT",
+      entityType: "user",
+      entityId: user._id,
+      entityTitle: user.name,
+      req,
+      summary: `Admin moved user "${user.name}" (${user.email || user.phone}) to Recycle Bin`,
+      details: { name: user.name, email: user.email, role: user.role },
+    });
+
+    return res.json({ message: `User "${user.name}" moved to Recycle Bin`, user });
   } catch (error) {
     console.error("[deleteUser] Error:", error.message);
     return res.status(500).json({ message: "Error deleting user", error: error.message });
@@ -670,8 +739,21 @@ const deleteLead = async (req, res) => {
     const lead = await Lead.findById(id);
     if (!lead) return res.status(404).json({ message: "Lead not found" });
 
-    await Lead.findByIdAndDelete(id);
-    return res.json({ message: "Inquiry lead deleted successfully" });
+    lead.isDeleted = true;
+    lead.deletedAt = new Date();
+    lead.deletedBy = req.user._id;
+    await lead.save();
+
+    await logActivity({
+      action: "LEAD_DELETED_SOFT",
+      entityType: "lead",
+      entityId: lead._id,
+      entityTitle: `Inquiry (${lead.intentType || "lead"})`,
+      req,
+      summary: `Admin moved inquiry lead to Recycle Bin`,
+    });
+
+    return res.json({ message: "Inquiry lead moved to Recycle Bin" });
   } catch (error) {
     console.error("[deleteLead] Error:", error.message);
     return res.status(500).json({ message: "Error deleting lead", error: error.message });
@@ -684,10 +766,21 @@ const deleteCustomerRequest = async (req, res) => {
     const request = await CustomerRequest.findById(id);
     if (!request) return res.status(404).json({ message: "Property request not found" });
 
-    await CustomerRequest.findByIdAndDelete(id);
-    await LeadUnlock.deleteMany({ customerRequestId: id });
+    request.isDeleted = true;
+    request.deletedAt = new Date();
+    request.deletedBy = req.user._id;
+    await request.save();
 
-    return res.json({ message: "Property request deleted successfully" });
+    await logActivity({
+      action: "CUSTOMER_REQUEST_DELETED_SOFT",
+      entityType: "customer_request",
+      entityId: request._id,
+      entityTitle: request.customerName,
+      req,
+      summary: `Admin moved property request for "${request.customerName}" to Recycle Bin`,
+    });
+
+    return res.json({ message: "Property request moved to Recycle Bin" });
   } catch (error) {
     console.error("[deleteCustomerRequest] Error:", error.message);
     return res.status(500).json({ message: "Error deleting property request", error: error.message });
@@ -720,8 +813,19 @@ const updateUserRole = async (req, res) => {
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    const prevRole = user.role;
     user.role = role;
     await user.save();
+
+    await logActivity({
+      action: "USER_ROLE_CHANGED",
+      entityType: "user",
+      entityId: user._id,
+      entityTitle: user.name,
+      req,
+      summary: `Admin changed role of user "${user.name}" from ${prevRole} to ${role}`,
+      details: { previousRole: prevRole, newRole: role, userName: user.name },
+    });
 
     return res.json({ message: `User role updated to ${role}`, user });
   } catch (error) {

@@ -43,6 +43,9 @@ const customerRequestSchema = new mongoose.Schema(
     propertyDetails: { type: mongoose.Schema.Types.Mixed, default: undefined },
     status: { type: String, enum: ["open", "matched", "closed"], default: "open" },
     matchedAgents: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    isDeleted: { type: Boolean, default: false, index: true },
+    deletedAt: { type: Date, default: null },
+    deletedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
   },
   { timestamps: true }
 );

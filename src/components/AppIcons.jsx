@@ -99,3 +99,7 @@ export { default as ArrowUpwardIcon } from "@mui/icons-material/ArrowUpwardOutli
 export { default as ArrowDownwardIcon } from "@mui/icons-material/ArrowDownwardOutlined";
 export { default as KeyboardArrowUpIcon } from "@mui/icons-material/KeyboardArrowUpRounded";
 export { default as KeyboardArrowDownIcon } from "@mui/icons-material/KeyboardArrowDownRounded";
+export { default as TrashIcon } from "@mui/icons-material/DeleteOutlineOutlined";
+export { default as ArrowPathIcon } from "@mui/icons-material/RestoreOutlined";
+export { default as ActivityIcon } from "@mui/icons-material/TimelineOutlined";
+export { default as RefreshIcon } from "@mui/icons-material/RefreshOutlined";

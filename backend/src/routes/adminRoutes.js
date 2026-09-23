@@ -50,5 +50,14 @@ router.get("/payment-requests", paymentCtrl.getAdminPaymentRequests);
 router.put("/payment-request/:id/approve", paymentCtrl.approvePaymentRequest);
 router.put("/payment-request/:id/reject", paymentCtrl.rejectPaymentRequest);
 
+const recycleBinCtrl = require("../controllers/recycleBinController");
+router.get("/recycle-bin", recycleBinCtrl.getRecycleBinItems);
+router.post("/recycle-bin/:type/:id/restore", recycleBinCtrl.restoreItem);
+router.delete("/recycle-bin/:type/:id/permanent", recycleBinCtrl.permanentlyDeleteItem);
+router.delete("/recycle-bin/empty", recycleBinCtrl.emptyRecycleBin);
+
+const activityLogCtrl = require("../controllers/activityLogController");
+router.get("/activity-logs", activityLogCtrl.getActivityLogs);
+
 module.exports = router;
 

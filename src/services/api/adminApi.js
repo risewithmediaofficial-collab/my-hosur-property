@@ -3,7 +3,8 @@ import apiClient, { withAuth } from "./client";
 export const fetchAdminMetrics = async (token) => (await apiClient.get("/api/admin/metrics", withAuth(token))).data;
 export const fetchAdminDashboardOverview = async (token) => (await apiClient.get("/api/admin/dashboard", withAuth(token))).data;
 export const fetchAdminRecentActivity = async (token) => (await apiClient.get("/api/admin/activity/recent", withAuth(token))).data;
-export const fetchAdminUsers = async (token) => (await apiClient.get("/api/admin/users", withAuth(token))).data;
+export const fetchAdminUsers = async (token, params) =>
+  (await apiClient.get("/api/admin/users", { ...withAuth(token), params })).data;
 export const updateUserPostingAccess = async (token, userId, enabled) =>
   (await apiClient.patch(`/api/admin/users/${userId}/posting-access`, { enabled }, withAuth(token))).data;
 export const toggleUserStatus = async (token, userId, status) =>
@@ -59,4 +60,21 @@ export const approveAdminPaymentRequest = async (token, requestId, payload) =>
   (await apiClient.put(`/api/admin/payment-request/${requestId}/approve`, payload, withAuth(token))).data;
 export const rejectAdminPaymentRequest = async (token, requestId, payload) =>
   (await apiClient.put(`/api/admin/payment-request/${requestId}/reject`, payload, withAuth(token))).data;
+
+// Recycle Bin & Restore APIs
+export const fetchAdminRecycleBin = async (token, params) =>
+  (await apiClient.get("/api/admin/recycle-bin", { ...withAuth(token), params })).data;
+
+export const restoreRecycleBinItem = async (token, type, id) =>
+  (await apiClient.post(`/api/admin/recycle-bin/${type}/${id}/restore`, {}, withAuth(token))).data;
+
+export const permanentDeleteRecycleBinItem = async (token, type, id) =>
+  (await apiClient.delete(`/api/admin/recycle-bin/${type}/${id}/permanent`, withAuth(token))).data;
+
+export const emptyAdminRecycleBin = async (token, type = "all") =>
+  (await apiClient.delete("/api/admin/recycle-bin/empty", { ...withAuth(token), params: { type } })).data;
+
+// Live Activity Tracker APIs
+export const fetchAdminActivityLogs = async (token, params) =>
+  (await apiClient.get("/api/admin/activity-logs", { ...withAuth(token), params })).data;
 

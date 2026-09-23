@@ -88,7 +88,7 @@ const propertyValidators = [
 ];
 
 const buildQuery = (q) => {
-  const query = {};
+  const query = { isDeleted: { $ne: true } };
 
   if (q.status && q.status !== "all") {
     query.status = q.status;
@@ -593,9 +593,27 @@ const deleteProperty = async (req, res) => {
   const canDelete = req.user.role === "admin" || String(property.ownerId) === String(req.user._id);
   if (!canDelete) return res.status(403).json({ message: "Forbidden" });
 
-  await property.deleteOne();
+  property.isDeleted = true;
+  property.deletedAt = new Date();
+  property.deletedBy = req.user._id;
+  property.deleteReason = req.body?.reason || "Deleted by user/admin";
+  await property.save();
+
+  try {
+    const { logActivity } = require("../services/activityLogger");
+    await logActivity({
+      action: "PROPERTY_DELETED_SOFT",
+      entityType: "property",
+      entityId: property._id,
+      entityTitle: property.title,
+      req,
+      summary: `${req.user.role === "admin" ? "Admin" : "User"} moved property "${property.title}" to Recycle Bin`,
+      details: { title: property.title, price: property.price },
+    });
+  } catch (e) {}
+
   cache.flushAll();
-  return res.json({ message: "Property deleted" });
+  return res.json({ message: "Property moved to Recycle Bin", property });
 };
 
 const featured = async (req, res) => {
