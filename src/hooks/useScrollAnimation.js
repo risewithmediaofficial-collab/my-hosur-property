@@ -1,17 +1,24 @@
-import { useEffect } from "react";
+﻿import { useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export const useScrollAnimation = (triggerDeps = []) => {
+/**
+ * Shared GSAP scroll-animation hook.
+ * Pass a rootRef to scope queries to the component subtree (faster than document-wide querySelectorAll).
+ *
+ * @param {React.RefObject} [rootRef] - optional root element to scope queries
+ * @param {any[]} [triggerDeps] - deps that cause animations to re-initialize
+ */
+export const useScrollAnimation = (rootRef = null, triggerDeps = []) => {
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduceMotion) return undefined;
 
     const ctx = gsap.context(() => {
-      // 1. Smooth hero entrance
-      const heroItems = document.querySelectorAll(".gsap-hero-item");
+      // 1. Hero entrance animations
+      const heroItems = (rootRef?.current ?? document).querySelectorAll(".gsap-hero-item");
       if (heroItems.length > 0) {
         gsap.fromTo(
           heroItems,
@@ -19,19 +26,20 @@ export const useScrollAnimation = (triggerDeps = []) => {
           {
             opacity: 1,
             y: 0,
-            duration: 0.5,
+            duration: 0.45,
             stagger: 0.05,
             ease: "power2.out",
             overwrite: "auto",
+            force3D: true,
           }
         );
       }
 
-      // 2. Ultra-smooth batch scroll trigger for cards (hardware accelerated)
+      // 2. Batched card reveal - hardware accelerated
       ScrollTrigger.batch(".gsap-card", {
-        start: "top 92%",
+        start: "top 93%",
         once: true,
-        interval: 0.05,
+        interval: 0.04,
         onEnter: (batch) => {
           gsap.fromTo(
             batch,
@@ -39,7 +47,7 @@ export const useScrollAnimation = (triggerDeps = []) => {
             {
               opacity: 1,
               y: 0,
-              duration: 0.45,
+              duration: 0.4,
               stagger: 0.04,
               ease: "power2.out",
               overwrite: "auto",
@@ -48,11 +56,11 @@ export const useScrollAnimation = (triggerDeps = []) => {
         },
       });
 
-      // 3. Fast & clean section reveal on scroll
+      // 3. Section reveal
       ScrollTrigger.batch(".gsap-section", {
         start: "top 94%",
         once: true,
-        interval: 0.05,
+        interval: 0.04,
         onEnter: (batch) => {
           gsap.fromTo(
             batch,
@@ -60,7 +68,7 @@ export const useScrollAnimation = (triggerDeps = []) => {
             {
               opacity: 1,
               y: 0,
-              duration: 0.4,
+              duration: 0.38,
               stagger: 0.05,
               ease: "power2.out",
               overwrite: "auto",
@@ -68,20 +76,17 @@ export const useScrollAnimation = (triggerDeps = []) => {
           );
         },
       });
-    });
+    }, rootRef?.current ?? undefined);
 
-    const timer = setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 100);
+    // Debounced refresh - avoid thrashing layout when images lazy-load
+    const timer = setTimeout(() => ScrollTrigger.refresh(), 200);
 
     return () => {
       clearTimeout(timer);
       ctx.revert();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, triggerDeps);
 };
 
 export default useScrollAnimation;
-
-
-

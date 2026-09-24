@@ -8,7 +8,6 @@ import { loginUser, resendOtp, signupUser, verifyOtp as verifyOtpApi, verifyWidg
 import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
 import AnimatedOTPInput from "../components/AnimatedOTPInput";
-import { AnimatedCharactersLoginPage } from "../components/ui/animated-characters-login-page";
 import loginIllustration from "../assets/Wavy_Gen-01_Single-07.jpg";
 
 const MotionDiv = motion.div;

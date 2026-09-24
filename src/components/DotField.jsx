@@ -85,24 +85,29 @@ const DotField = memo(({
       dotsRef.current = dots;
     }
 
+    let lastMouseMoveTime = 0;
     function onMouseMove(e) {
       const s = sizeRef.current;
-      mouseRef.current.x = e.pageX - s.offsetX;
-      mouseRef.current.y = e.pageY - s.offsetY;
-    }
+      const now = performance.now();
+      const dt = Math.max(now - lastMouseMoveTime, 8);
+      lastMouseMoveTime = now;
 
-    function updateMouseSpeed() {
       const m = mouseRef.current;
-      const dx = m.prevX - m.x;
-      const dy = m.prevY - m.y;
+      const newX = e.pageX - s.offsetX;
+      const newY = e.pageY - s.offsetY;
+      const dx = newX - m.x;
+      const dy = newY - m.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      m.speed += (dist - m.speed) * 0.5;
-      if (m.speed < 0.001) m.speed = 0;
-      m.prevX = m.x;
-      m.prevY = m.y;
+
+      m.x = newX;
+      m.y = newY;
+      m.speed = Math.min((dist / dt) * 16, 25);
+
+      if (isVisible && !rafRef.current) {
+        rafRef.current = requestAnimationFrame(tick);
+      }
     }
 
-    const speedInterval = setInterval(updateMouseSpeed, 20);
     let isVisible = true;
     const observer = new IntersectionObserver(([entry]) => {
       isVisible = entry.isIntersecting;
@@ -130,6 +135,9 @@ const DotField = memo(({
       const len = dots.length;
       const t = frameCount * 0.02;
 
+      m.speed *= 0.88;
+      if (m.speed < 0.001) m.speed = 0;
+
       const targetEngagement = Math.min(m.speed / 5, 1);
       engagement.current += (targetEngagement - engagement.current) * 0.06;
       if (engagement.current < 0.001) engagement.current = 0;
@@ -156,6 +164,7 @@ const DotField = memo(({
       const isBulge = p.bulgeOnly;
 
       ctx.beginPath();
+      let maxDisplacement = 0;
 
       for (let i = 0; i < len; i++) {
         const d = dots[i];
@@ -191,6 +200,9 @@ const DotField = memo(({
           d.sy += (d.y - d.sy) * 0.1;
         }
 
+        const disp = Math.abs(d.sx - d.ax) + Math.abs(d.sy - d.ay);
+        if (disp > maxDisplacement) maxDisplacement = disp;
+
         let drawX = d.sx;
         let drawY = d.sy;
         if (p.waveAmplitude > 0) {
@@ -214,6 +226,14 @@ const DotField = memo(({
       }
 
       ctx.fill();
+
+      // If no continuous wave/sparkle and dots have fully settled and engagement is 0, pause loop to save 100% idle CPU
+      const hasContinuousFx = p.waveAmplitude > 0 || p.sparkle;
+      if (!hasContinuousFx && eng < 0.005 && maxDisplacement < 0.05) {
+        rafRef.current = null;
+        return;
+      }
+
       rafRef.current = requestAnimationFrame(tick);
     }
 
@@ -230,7 +250,6 @@ const DotField = memo(({
     return () => {
       observer.disconnect();
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      clearInterval(speedInterval);
       clearTimeout(resizeTimer);
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMouseMove);

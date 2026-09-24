@@ -114,7 +114,7 @@ const ServicesPage = () => {
       })
     : serviceCategories;
 
-  useScrollAnimation([filteredServices.length]);
+  useScrollAnimation(null, [filteredServices.length]);
 
   return (
     <main className="page-shell w-full">

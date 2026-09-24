@@ -89,7 +89,7 @@ const CustomerDashboardPage = () => {
     loadAll();
   }, [loadAll]);
 
-  const onSubmitRequest = async (event) => {
+  const onSubmitRequest = useCallback(async (event) => {
     event.preventDefault();
     if (!form.city || !form.area || !form.budgetMax) {
       toast.error("City, area, and max budget are required");
@@ -115,9 +115,9 @@ const CustomerDashboardPage = () => {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [form, token, loadAll]);
 
-  const onMarkRead = async (id) => {
+  const onMarkRead = useCallback(async (id) => {
     try {
       await markNotificationRead(token, id);
       setNotifications((previous) =>
@@ -126,7 +126,7 @@ const CustomerDashboardPage = () => {
     } catch {
       toast.error("Unable to mark notification as read");
     }
-  };
+  }, [token]);
 
   const unreadCount = useMemo(() => notifications.filter((item) => !item.readAt).length, [notifications]);
   const inquiryHistory = useMemo(() => getInquiryHistory(user?._id), [user?._id, requests.length, notifications.length]);
@@ -148,10 +148,31 @@ const CustomerDashboardPage = () => {
     }
   }, [searchParams]);
 
-  const handleTabSelect = (newTab) => {
+  const handleTabSelect = useCallback((newTab) => {
     setTab(newTab);
     setSearchParams(newTab === "overview" ? {} : { tab: newTab }, { replace: true });
-  };
+  }, [setSearchParams]);
+
+  const sidebarStats = useMemo(() => [
+    { label: "Requirements", value: requests.length, icon: <ClipboardDocumentListIcon className="h-4 w-4" /> },
+    { label: "Open", value: openCount, icon: <Squares2X2Icon className="h-4 w-4" /> },
+    { label: "Matches", value: matchedCount, icon: <HomeModernIcon className="h-4 w-4" /> },
+    { label: "Unread", value: unreadCount, icon: <BellIcon className="h-4 w-4" /> },
+    { label: "Saved", value: saved.length, icon: <BookmarkIcon className="h-4 w-4" /> },
+  ], [requests.length, openCount, matchedCount, unreadCount, saved.length]);
+
+  const navItems = useMemo(() => [
+    { key: "overview", label: t("dashboard.title") || "Overview", icon: <Squares2X2Icon className="h-4 w-4" /> },
+    { key: "requests", label: t("dashboard.inquiries") || "My Requests", icon: <ClipboardDocumentListIcon className="h-4 w-4" />, badge: openCount > 0 ? `${openCount} OPEN` : requests.length || undefined },
+    { key: "matches", label: "Matches", icon: <HomeModernIcon className="h-4 w-4" />, badge: matchedCount || undefined },
+    { key: "notifications", label: "Notifications", icon: <BellIcon className="h-4 w-4" />, badge: unreadCount > 0 ? `${unreadCount} NEW` : undefined },
+    { key: "inquiries", label: "My Inquiries", icon: <ChatBubbleLeftRightIcon className="h-4 w-4" />, badge: inquiryHistory.length || undefined },
+    { key: "saved", label: t("dashboard.savedProperties") || "Saved", icon: <BookmarkIcon className="h-4 w-4" />, badge: saved.length || undefined },
+  ].map((item) => ({
+    ...item,
+    active: tab === item.key,
+    onClick: handleTabSelect,
+  })), [t, openCount, requests.length, matchedCount, unreadCount, inquiryHistory.length, saved.length, tab, handleTabSelect]);
 
   if (loading) {
     return (
@@ -168,25 +189,8 @@ const CustomerDashboardPage = () => {
       title={user?.name || "Customer"}
       subtitle="Customer Dashboard"
       description="Track your requirements, receive property-side responses, and manage dashboard activity from one cleaner workspace."
-      stats={[
-        { label: "Requirements", value: requests.length, icon: <ClipboardDocumentListIcon className="h-4 w-4" /> },
-        { label: "Open", value: openCount, icon: <Squares2X2Icon className="h-4 w-4" /> },
-        { label: "Matches", value: matchedCount, icon: <HomeModernIcon className="h-4 w-4" /> },
-        { label: "Unread", value: unreadCount, icon: <BellIcon className="h-4 w-4" /> },
-        { label: "Saved", value: saved.length, icon: <BookmarkIcon className="h-4 w-4" /> },
-      ]}
-      navItems={[
-        { key: "overview", label: t("dashboard.title") || "Overview", icon: <Squares2X2Icon className="h-4 w-4" /> },
-        { key: "requests", label: t("dashboard.inquiries") || "My Requests", icon: <ClipboardDocumentListIcon className="h-4 w-4" />, badge: openCount > 0 ? `${openCount} OPEN` : requests.length || undefined },
-        { key: "matches", label: "Matches", icon: <HomeModernIcon className="h-4 w-4" />, badge: matchedCount || undefined },
-        { key: "notifications", label: "Notifications", icon: <BellIcon className="h-4 w-4" />, badge: unreadCount > 0 ? `${unreadCount} NEW` : undefined },
-        { key: "inquiries", label: "My Inquiries", icon: <ChatBubbleLeftRightIcon className="h-4 w-4" />, badge: inquiryHistory.length || undefined },
-        { key: "saved", label: t("dashboard.savedProperties") || "Saved", icon: <BookmarkIcon className="h-4 w-4" />, badge: saved.length || undefined },
-      ].map((item) => ({
-        ...item,
-        active: tab === item.key,
-        onClick: handleTabSelect,
-      }))}
+      stats={sidebarStats}
+      navItems={navItems}
     >
       {tab === "overview" && (
         <div className="space-y-6">

@@ -13,13 +13,13 @@ export const AuthProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(Boolean(token));
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setToken("");
     setUser(null);
     setLoading(false);
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
-  };
+  }, []);
 
   useEffect(() => {
     if (!token) {
@@ -35,13 +35,13 @@ export const AuthProvider = ({ children }) => {
       .finally(() => setLoading(false));
   }, [token]);
 
-  const login = (payload) => {
+  const login = useCallback((payload) => {
     setToken(payload.token);
     setUser(payload.user);
     setLoading(false);
     localStorage.setItem(TOKEN_KEY, payload.token);
     localStorage.setItem(USER_KEY, JSON.stringify(payload.user));
-  };
+  }, []);
 
   const refreshProfile = useCallback(async () => {
     if (!token) return null;

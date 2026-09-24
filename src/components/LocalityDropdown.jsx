@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckIcon, ChevronDownIcon } from "./AppIcons";
 import { LOCALITY_SECTIONS } from "../constants/localities";
@@ -20,28 +20,34 @@ const LocalityDropdown = ({ value, onChange, onSelect, onOpenChange }) => {
       .catch(() => setDynamicLocations([]));
   }, []);
 
-  const sectionsToUse = [...LOCALITY_SECTIONS];
-  if (dynamicLocations.length > 0) {
-    const extraLocs = dynamicLocations.filter(
-      (loc) => !LOCALITY_SECTIONS.some((sec) => sec.items.includes(loc))
-    );
-    if (extraLocs.length > 0) {
-      sectionsToUse.unshift({
-        key: "posted-locations",
-        label: "Posted Locations",
-        items: extraLocs,
-      });
+  const { filteredSections, totalResults } = useMemo(() => {
+    const sectionsToUse = [...LOCALITY_SECTIONS];
+    if (dynamicLocations.length > 0) {
+      const extraLocs = dynamicLocations.filter(
+        (loc) => !LOCALITY_SECTIONS.some((sec) => sec.items.includes(loc))
+      );
+      if (extraLocs.length > 0) {
+        sectionsToUse.unshift({
+          key: "posted-locations",
+          label: "Posted Locations",
+          items: extraLocs,
+        });
+      }
     }
-  }
 
-  const filteredSections = sectionsToUse.map((section) => ({
-    ...section,
-    items: section.items.filter((item) =>
-      item.toLowerCase().includes(searchQuery.toLowerCase())
-    ),
-  })).filter((section) => section.items.length > 0);
+    const filtered = sectionsToUse
+      .map((section) => ({
+        ...section,
+        items: section.items.filter((item) =>
+          item.toLowerCase().includes(searchQuery.toLowerCase())
+        ),
+      }))
+      .filter((section) => section.items.length > 0);
 
-  const totalResults = filteredSections.reduce((sum, section) => sum + section.items.length, 0);
+    const total = filtered.reduce((sum, section) => sum + section.items.length, 0);
+
+    return { filteredSections: filtered, totalResults: total };
+  }, [dynamicLocations, searchQuery]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -206,4 +212,4 @@ const LocalityDropdown = ({ value, onChange, onSelect, onOpenChange }) => {
   );
 };
 
-export default LocalityDropdown;
+export default memo(LocalityDropdown);

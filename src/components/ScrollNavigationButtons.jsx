@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, memo } from "react";
 import { KeyboardArrowUpIcon, KeyboardArrowDownIcon } from "./AppIcons";
 
 const ScrollNavigationButtons = () => {
@@ -24,25 +24,47 @@ const ScrollNavigationButtons = () => {
     const isAtBottom = scrollY + clientHeight >= scrollHeight - 60;
     const canScroll = scrollHeight > clientHeight + 150;
 
-    setScrollProgress({
-      canScroll,
-      isAtTop,
-      isAtBottom,
+    setScrollProgress((prev) => {
+      if (
+        prev.canScroll === canScroll &&
+        prev.isAtTop === isAtTop &&
+        prev.isAtBottom === isAtBottom
+      ) {
+        return prev;
+      }
+      return { canScroll, isAtTop, isAtBottom };
     });
   }, []);
 
   useEffect(() => {
     checkScroll();
-    window.addEventListener("scroll", checkScroll, { passive: true });
-    window.addEventListener("resize", checkScroll, { passive: true });
 
-    // Also check on DOM changes (e.g. dynamic listings or async loaded content)
-    const observer = new MutationObserver(checkScroll);
+    let ticking = false;
+    const onScrollOrResize = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          checkScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", onScrollOrResize, { passive: true });
+    window.addEventListener("resize", onScrollOrResize, { passive: true });
+
+    // Debounced check on DOM subtree changes (e.g. dynamic listings)
+    let domTimer;
+    const observer = new MutationObserver(() => {
+      clearTimeout(domTimer);
+      domTimer = setTimeout(checkScroll, 400);
+    });
     observer.observe(document.body, { childList: true, subtree: true });
 
     return () => {
-      window.removeEventListener("scroll", checkScroll);
-      window.removeEventListener("resize", checkScroll);
+      clearTimeout(domTimer);
+      window.removeEventListener("scroll", onScrollOrResize);
+      window.removeEventListener("resize", onScrollOrResize);
       observer.disconnect();
     };
   }, [checkScroll]);
@@ -155,4 +177,4 @@ const ScrollNavigationButtons = () => {
   );
 };
 
-export default ScrollNavigationButtons;
+export default memo(ScrollNavigationButtons);

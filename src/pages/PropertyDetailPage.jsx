@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
@@ -124,12 +124,11 @@ const PropertyDetailPage = () => {
     }
   }, [id, token, user?._id]);
 
-  const handleToggleSaved = async (propertyId) => {
+  const handleToggleSaved = useCallback(async (propertyId) => {
     if (!token) {
       toast.error("Please login to save properties");
       return;
     }
-
     const wasSaved = savedIds.includes(propertyId);
     try {
       const res = await toggleSavedProperty(token, { propertyId });
@@ -142,15 +141,14 @@ const PropertyDetailPage = () => {
     } catch {
       toast.error("Unable to update saved properties");
     }
-  };
+  }, [token, savedIds]);
 
-  const handleSubmitInquiry = async () => {
+  const handleSubmitInquiry = useCallback(async () => {
     if (!token) {
       toast.success("Sign in to contact the owner and request property details.");
       navigate("/auth", { state: { from: location } });
       return;
     }
-
     try {
       const res = await createLead(token, {
         propertyId: id,
@@ -183,7 +181,8 @@ const PropertyDetailPage = () => {
         toast.error(e.response?.data?.message || "Failed to send inquiry.");
       }
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, id, intentType, inquiryText, p, user?._id]);
 
   const safeImages = useMemo(() => {
     if (!p || !Array.isArray(p.images) || p.images.length === 0) {
@@ -552,6 +551,8 @@ const PropertyDetailPage = () => {
                 <img
                   src={activeImage}
                   alt={p.title}
+                  fetchpriority="high"
+                  decoding="sync"
                   className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                 />
 
@@ -591,7 +592,7 @@ const PropertyDetailPage = () => {
                         : "opacity-70 hover:opacity-100"
                     }`}
                   >
-                    <img src={img} alt="" className="h-16 w-20 object-cover sm:h-20 sm:w-24 rounded-lg" />
+                    <img src={img} alt="" loading="lazy" decoding="async" className="h-16 w-20 object-cover sm:h-20 sm:w-24 rounded-lg" />
                   </button>
                 ))}
               </div>

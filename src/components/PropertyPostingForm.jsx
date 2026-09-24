@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, memo } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { ClipboardDocumentCheckIcon, CreditCardIcon, TicketIcon, UserCircleIcon, XMarkIcon } from "./AppIcons";
 import { useNavigate } from "react-router-dom";
@@ -2744,4 +2744,4 @@ const GeoLocationDropdown = ({ field, value, options = [], onChange, placeholder
   );
 };
 
-export default PropertyPostingForm;
+export default memo(PropertyPostingForm);

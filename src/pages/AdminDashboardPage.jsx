@@ -201,12 +201,13 @@ const AdminDashboardPage = () => {
   const navigate = useNavigate();
   useBodyScrollLock(Boolean(selectedUser) || emailModalOpen || Boolean(selectedLeadItem));
 
-  const overviewStats = [
+  const overviewStats = useMemo(() => [
     { key: "users", label: "Users", value: metrics.users || users.length || 0, icon: <UsersIcon className="h-5 w-5" /> },
     { key: "properties", label: "Properties", value: metrics.properties || propertyListings.length || 0, icon: <HomeModernIcon className="h-5 w-5" /> },
     { key: "payments", label: "Payments", value: metrics.payments || payments.length || 0, icon: <BanknotesIcon className="h-5 w-5" /> },
     { key: "leads", label: "Lead Requests", value: metrics.leads || leads.length || 0, icon: <TicketIcon className="h-5 w-5" /> },
-  ];
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ], [metrics, users.length, propertyListings.length, payments.length, leads.length]);
 
   const exportToExcel = () => {
     const headers = ["Name", "Email", "Phone", "Address", "Role", "Status", "Plan", "Credits", "Prop Added", "Matches Sent", "Leads Bought", "Admin Notes", "Date Joined"];
@@ -398,16 +399,17 @@ const AdminDashboardPage = () => {
     }
   }, [selectedUser, token]);
 
-  const filteredUsers = users.filter(u => {
-    const matchesSearch = u.name.toLowerCase().includes(userSearch.toLowerCase()) || 
-      u.email.toLowerCase().includes(userSearch.toLowerCase()) ||
+  const filteredUsers = useMemo(() => users.filter((u) => {
+    const q = userSearch.toLowerCase();
+    const matchesSearch =
+      !q ||
+      u.name.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q) ||
       (u.phone && u.phone.includes(userSearch));
-    
     const matchesRole = filterRole === "all" || u.role === filterRole;
     const matchesStatus = filterStatus === "all" || (u.status || "active") === filterStatus;
-
     return matchesSearch && matchesRole && matchesStatus;
-  });
+  }), [users, userSearch, filterRole, filterStatus]);
 
   const filteredPropertyListings = useMemo(() => {
     let list = propertyListings.filter((p) => {

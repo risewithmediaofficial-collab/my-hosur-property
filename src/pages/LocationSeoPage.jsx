@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import SeoHead from "../components/SeoHead";
 import SeoLocationLinks from "../components/SeoLocationLinks";
@@ -6,6 +6,7 @@ import PropertyCard from "../components/PropertyCard";
 import ContactModal from "../components/ContactModal";
 import Breadcrumbs from "../components/Breadcrumbs";
 import Loader from "../components/Loader";
+import useScrollAnimation from "../hooks/useScrollAnimation";
 import { getSeoPageBySlug } from "../constants/seoLocations";
 import { fetchProperties } from "../services/api/propertyApi";
 import { slugify } from "../utils/format";
@@ -18,6 +19,8 @@ const LocationSeoPage = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
+  useScrollAnimation(null, [properties.length]);
 
   // Look up predefined page details or build dynamic fallback based on slug
   const seoConfig = getSeoPageBySlug(slug) || {
@@ -65,7 +68,7 @@ const LocationSeoPage = () => {
   }, [locationName, category]);
 
   // Schema.org FAQ data for Google Rich Snippets
-  const faqList = [
+  const faqList = useMemo(() => [
     {
       question: `Why invest in ${title} in Hosur?`,
       answer: `${title} is one of the highest growth corridors in Hosur due to its strategic proximity to Hosur SIPCOT industrial hub, Electronic City Bangalore, NH44 highway connectivity, and rapid infrastructure expansion by Gyes Property & Construction.`,
@@ -82,9 +85,9 @@ const LocationSeoPage = () => {
       question: `Can I get bank loan approval for lands in ${locationName}?`,
       answer: `Yes, properties listed on MyHosurProperty have clear titles and are eligible for bank loan approvals with leading financial partners including SBI, HDFC, ICICI, and LIC Housing Finance.`,
     },
-  ];
+  ], [title, locationName]);
 
-  const faqSchema = {
+  const faqSchema = useMemo(() => ({
     "@context": "https://schema.org",
     "@type": "FAQPage",
     mainEntity: faqList.map((faq) => ({
@@ -95,9 +98,9 @@ const LocationSeoPage = () => {
         text: faq.answer,
       },
     })),
-  };
+  }), [faqList]);
 
-  const breadcrumbSchema = {
+  const breadcrumbSchema = useMemo(() => ({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
@@ -120,7 +123,7 @@ const LocationSeoPage = () => {
         item: absoluteUrl(`/location/${slug}`),
       },
     ],
-  };
+  }), [title, slug]);
 
   return (
     <div className="min-h-screen bg-slate-50 pb-16">

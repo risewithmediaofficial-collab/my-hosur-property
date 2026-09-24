@@ -62,7 +62,7 @@ const coreValueItems = [
 
 const AboutPage = () => {
   const { t, currentLanguage } = useAppLanguage();
-  useScrollAnimation();
+  useScrollAnimation(null, []);
   const breadcrumbs = [
     { label: t("nav.home") || "Home", to: "/" },
     { label: t("nav.aboutUs") || "About", to: "/about" },

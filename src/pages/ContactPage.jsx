@@ -26,7 +26,7 @@ import { localizeCatalogText } from "../utils/i18nCatalog";
 
 const ContactPage = () => {
   const { t, currentLanguage } = useAppLanguage();
-  useScrollAnimation();
+  useScrollAnimation(null, []);
   const breadcrumbs = [
     { label: t("nav.home") || "Home", to: "/" },
     { label: t("nav.contact") || "Contact", to: "/contact" },

@@ -86,7 +86,7 @@ const UserDashboardPage = () => {
     loadDashboard();
   }, [loadDashboard]);
 
-  const handleLeadAction = async (id, status) => {
+  const handleLeadAction = useCallback(async (id, status) => {
     try {
       await updateLeadApproval(token, id, status);
       toast.success(`Request ${status}`);
@@ -94,7 +94,7 @@ const UserDashboardPage = () => {
     } catch {
       toast.error("Action failed");
     }
-  };
+  }, [token, loadDashboard]);
 
   const onUnlockLead = async (id) => {
     try {
@@ -146,7 +146,7 @@ const UserDashboardPage = () => {
   };
 
 
-  const onToggleSaved = async (propertyId) => {
+  const onToggleSaved = useCallback(async (propertyId) => {
     try {
       await toggleSavedProperty(token, { propertyId });
       const savedProps = await fetchSavedProperties(token);
@@ -155,24 +155,24 @@ const UserDashboardPage = () => {
     } catch {
       toast.error("Unable to update saved properties");
     }
-  };
+  }, [token]);
 
   const VALID_TABS = ["overview", "listings", "leads", "inquiries", "payments", "saved"];
 
-  const pendingLeads = incomingLeads.filter((lead) => lead.status === "pending");
+  const pendingLeads = useMemo(() => incomingLeads.filter((lead) => lead.status === "pending"), [incomingLeads]);
   const inquiryHistory = useMemo(() => getInquiryHistory(user?._id), [user?._id, myProperties.length, incomingLeads.length]);
-  const sidebarStats = [
+  const sidebarStats = useMemo(() => [
     { label: "Properties", value: myProperties.length, icon: <HomeModernIcon className="h-4 w-4" /> },
     { label: "Lead Credits", value: customerLeadCredits, icon: <TicketIcon className="h-4 w-4" /> },
     { label: "Saved", value: saved.length, icon: <BookmarkIcon className="h-4 w-4" /> },
-  ];
-  const handleTabSelect = (newTab) => {
+  ], [myProperties.length, customerLeadCredits, saved.length]);
+  const handleTabSelect = useCallback((newTab) => {
     setTab(newTab);
     setSearchParams(newTab === "overview" ? {} : { tab: newTab }, { replace: true });
-  };
+  }, [setSearchParams]);
 
-  const pendingLeadsCount = incomingLeads.filter((l) => l.status === "pending").length;
-  const navItems = [
+  const pendingLeadsCount = pendingLeads.length;
+  const navItems = useMemo(() => [
     { key: "overview", label: t("dashboard.title") || "Overview", icon: <Squares2X2Icon className="h-4 w-4" /> },
     { key: "listings", label: t("dashboard.myListings") || "My Listings", icon: <HomeModernIcon className="h-4 w-4" />, badge: myProperties.length },
     { key: "leads", label: t("dashboard.inquiries") || "My Leads", icon: <UserGroupIcon className="h-4 w-4" />, badge: pendingLeadsCount > 0 ? `${pendingLeadsCount} NEW` : incomingLeads.length },
@@ -183,7 +183,7 @@ const UserDashboardPage = () => {
     ...item,
     active: tab === item.key,
     onClick: handleTabSelect,
-  }));
+  })), [t, myProperties.length, pendingLeadsCount, incomingLeads.length, inquiryHistory.length, payments.length, saved.length, tab, handleTabSelect]);
 
   useEffect(() => {
     const queryTab = searchParams.get("tab") || "overview";

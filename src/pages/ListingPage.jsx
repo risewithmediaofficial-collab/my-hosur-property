@@ -49,9 +49,9 @@ const ListingPage = () => {
   const [draft, setDraft] = useState(() => parseFiltersFromSearchParams(params));
   const [applied, setApplied] = useState(() => parseFiltersFromSearchParams(params));
   const [data, setData] = useState({ items: [], totalPages: 0, page: 1, total: 0 });
-  const [savedIds, setSavedIds] = useState([]);
+  const [savedIds, setSavedIds] = useState(new Set());
 
-  useScrollAnimation([data.items]);
+  useScrollAnimation(null, [data.items.length]);
   const sentinelRef = useRef(null);
   const resultsScrollRef = useRef(null);
 
@@ -113,8 +113,8 @@ const ListingPage = () => {
     }
 
     fetchSavedProperties(token)
-      .then((res) => setSavedIds((res.items || []).map((item) => item._id)))
-      .catch(() => setSavedIds([]));
+      .then((res) => setSavedIds(new Set((res.items || []).map((item) => item._id))))
+      .catch(() => setSavedIds(new Set()));
   }, [token]);
 
   useEffect(() => {
@@ -175,20 +175,19 @@ const ListingPage = () => {
     setDraft(next);
   };
 
-  const onSave = async (propertyId) => {
+  const onSave = useCallback(async (propertyId) => {
     if (!isAuthenticated) {
       toast.error("Please login to save properties");
       return;
     }
-
     try {
       const res = await toggleSavedProperty(token, { propertyId });
-      setSavedIds(res.savedProperties);
+      setSavedIds(new Set(res.savedProperties));
       toast.success("Wishlist updated");
     } catch {
       toast.error("Unable to update wishlist");
     }
-  };
+  }, [isAuthenticated, token]);
 
   const openMobileFilters = () => {
     setDraft({ ...applied });
@@ -322,7 +321,7 @@ const ListingPage = () => {
               ) : data.items.length ? (
                 <div className={`grid gap-6 ${desktopFilterOpen ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"}`}>
                   {data.items.map((item) => (
-                    <PropertyCard key={item._id} item={item} onSave={onSave} isSaved={savedIds.includes(item._id)} />
+                    <PropertyCard key={item._id} item={item} onSave={onSave} isSaved={savedIds.has(item._id)} />
                   ))}
                 </div>
               ) : (

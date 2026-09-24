@@ -1,3 +1,4 @@
+import { memo } from "react";
 import LocationCascadeFilter from "./LocationCascadeFilter";
 import {
   PROPERTY_FILTER_CATEGORIES,
@@ -283,4 +284,4 @@ const FieldControl = ({ field, values, update, category }) => {
   return null;
 };
 
-export default PropertySearchFilterPanel;
+export default memo(PropertySearchFilterPanel);

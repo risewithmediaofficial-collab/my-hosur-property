@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAppLanguage } from "../context/LanguageContext";
 import { CheckIcon, ChevronDownIcon, GlobeAltIcon } from "./AppIcons";
@@ -281,4 +281,4 @@ const LanguageSelector = ({ variant = "navbar", className = "" }) => {
   );
 };
 
-export default LanguageSelector;
+export default memo(LanguageSelector);

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { motion } from "framer-motion";
 
 const reveal = {
@@ -53,4 +54,4 @@ const PageSection = ({
   </motion.section>
 );
 
-export default PageSection;
+export default memo(PageSection);

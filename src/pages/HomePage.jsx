@@ -752,28 +752,16 @@ const HomePage = () => {
             <motion.button
               type="button"
               onClick={handlePostFreeProperty}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
               className="group relative inline-flex min-h-[46px] w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-orange to-orange-600 px-7 py-3 text-sm font-bold text-white shadow-lg transition duration-200 hover:shadow-2xl sm:w-auto overflow-hidden"
             >
-              <style>{`
-                @keyframes boom {
-                  0% { box-shadow: 0 0 0 0 rgba(255, 127, 14, 0.7); transform: scale(1); }
-                  50% { box-shadow: 0 0 0 10px rgba(255, 127, 14, 0.4); }
-                  100% { box-shadow: 0 0 0 20px rgba(255, 127, 14, 0); transform: scale(1); }
-                }
-                @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-                @keyframes wave { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(1.08); } }
-                @keyframes shine { 0% { left: -100%; } 100% { left: 100%; } }
-                .boom-button { animation: boom 2s infinite, blink 1.5s ease-in-out infinite; }
-                .group:hover .wave-icon { animation: wave 0.5s ease-in-out infinite; }
-                .shine-effect { position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: shine 1.2s infinite; }
-              `}</style>
-              <div className="shine-effect"></div>
+              <div className="shine-effect" aria-hidden="true"></div>
               <FlagIcon className="wave-icon h-5 w-5 transition-transform duration-300 relative z-10" />
               <span className="relative z-10">{t("nav.postFreePropertyFull") || "Post your free property"}</span>
               <div className="boom-button absolute inset-0 -z-10 rounded-xl bg-gradient-to-r from-orange to-orange-600" />
             </motion.button>
+
             <button
               type="button"
               onClick={() => {
@@ -1054,6 +1042,23 @@ const HomePage = () => {
                   <div className="mt-5 h-10 animate-pulse rounded-full bg-slate-100" />
                 </div>
               ))}
+            {!featuredLoading && filteredDiscoverListings.length === 0 && (
+              <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center min-h-[360px]">
+                <div className="rounded-full bg-white p-3.5 shadow-xs border border-slate-100 text-orange mb-3">
+                  <BuildingOfficeIcon className="h-8 w-8" />
+                </div>
+                <h4 className="text-base font-bold text-navy">Verified Properties in Hosur</h4>
+                <p className="mt-1 max-w-sm text-xs text-slate-500">
+                  Explore verified plots, villas, and apartments directly on our listings catalog.
+                </p>
+                <Link
+                  to="/listings"
+                  className="mt-4 inline-flex items-center gap-2 rounded-xl bg-navy px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-orange transition"
+                >
+                  Explore All Listings <ArrowRightIcon className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Right Column: Discover Properties Sidebar */}

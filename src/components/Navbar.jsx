@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { memo, useMemo, useState, useEffect, useCallback } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
@@ -51,7 +51,7 @@ const mobileNavLinks = [
   { labelKey: "nav.listProperty", defaultLabel: "List My Property", to: "/post-property" },
 ];
 
-const Navbar = () => {
+const Navbar = memo(() => {
   const { user, logout, isAuthenticated } = useAuth();
   const { t } = useAppLanguage();
   const navigate = useNavigate();
@@ -60,10 +60,10 @@ const Navbar = () => {
   const [isSticky, setIsSticky] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsSticky(window.scrollY > 40);
-    };
-    window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => setIsSticky(window.scrollY > 40);
+    // passive: true is critical — tells browser we won't call preventDefault()
+    // which lets it skip the sync hit on each scroll tick
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -145,15 +145,6 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-white">
-      <style>{`
-        @keyframes free-blink {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.15; transform: scale(0.9); }
-        }
-        .free-blink-badge {
-          animation: free-blink 1.2s ease-in-out infinite;
-        }
-      `}</style>
 
       {/* Top Bar with Contacts and Language Switcher */}
       <div className="bg-navy text-white py-1 block">
@@ -522,6 +513,7 @@ const Navbar = () => {
       ) : null}
     </header>
   );
-};
+});
 
+Navbar.displayName = "Navbar";
 export default Navbar;

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 
 const CountUpNumber = ({ value = 0, duration = 1200, suffix = "", prefix = "" }) => {
   const [displayValue, setDisplayValue] = useState(0);
@@ -48,4 +48,4 @@ const CountUpNumber = ({ value = 0, duration = 1200, suffix = "", prefix = "" })
   );
 };
 
-export default CountUpNumber;
+export default memo(CountUpNumber);

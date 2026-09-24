@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRightIcon,
@@ -18,7 +19,7 @@ import useScrollToTop from "../hooks/useScrollToTop";
 import { useAppLanguage } from "../context/LanguageContext";
 import { localizeCatalogText } from "../utils/i18nCatalog";
 
-const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
+const PropertyCard = memo(({ item, onSave, isSaved, showOwner = true }) => {
   const { t, currentLanguage } = useAppLanguage();
   const href = getPropertyPath(item);
   const scrollToTop = useScrollToTop();
@@ -159,6 +160,7 @@ const PropertyCard = ({ item, onSave, isSaved, showOwner = true }) => {
       </div>
     </article>
   );
-};
+});
 
+PropertyCard.displayName = "PropertyCard";
 export default PropertyCard;

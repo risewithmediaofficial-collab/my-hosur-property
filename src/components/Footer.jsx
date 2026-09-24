@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { NavLink } from "react-router-dom";
 import {
   CONTACT_ADDRESS,
@@ -286,4 +287,4 @@ const Footer = () => {
   );
 };
 
-export default Footer;
+export default memo(Footer);

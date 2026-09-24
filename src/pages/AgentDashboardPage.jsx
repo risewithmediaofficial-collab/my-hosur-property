@@ -232,7 +232,7 @@ const AgentDashboardPage = () => {
   };
 
 
-  const onToggleSaved = async (propertyId) => {
+  const onToggleSaved = useCallback(async (propertyId) => {
     try {
       await toggleSavedProperty(token, { propertyId });
       const savedResponse = await fetchSavedProperties(token);
@@ -241,23 +241,24 @@ const AgentDashboardPage = () => {
     } catch {
       toast.error("Unable to update saved properties");
     }
-  };
+  }, [token]);
 
-  const pendingLeadsCount = leads.filter((l) => l.status === "pending").length;
-  const tabs = [
+  const pendingLeadsCount = useMemo(() => leads.filter((l) => l.status === "pending").length, [leads]);
+  const tabs = useMemo(() => [
     { key: "overview", label: "Overview", icon: <Squares2X2Icon className="h-4 w-4" /> },
     { key: "listings", label: "Listings", icon: <HomeModernIcon className="h-4 w-4" />, badge: properties.length },
     { key: "leads", label: "Inquiries", icon: <UserGroupIcon className="h-4 w-4" />, badge: pendingLeadsCount > 0 ? `${pendingLeadsCount} NEW` : leads.length },
     { key: "saved", label: "Saved", icon: <BookmarkIcon className="h-4 w-4" />, badge: saved.length },
     { key: "payments", label: "Payment History", icon: <CreditCardIcon className="h-4 w-4" />, badge: paymentRequests.length },
     ...(isBroker ? [{ key: "requests", label: "Requests", icon: <ClipboardDocumentListIcon className="h-4 w-4" />, badge: customerRequests.length }] : []),
-  ];
-  const sidebarStats = [
+  ], [pendingLeadsCount, properties.length, leads.length, saved.length, paymentRequests.length, isBroker, customerRequests.length]);
+
+  const sidebarStats = useMemo(() => [
     { label: "Total Listings", value: properties.length, icon: <HomeModernIcon className="h-4 w-4" /> },
     { label: "Active Leads", value: leads.length, icon: <UserGroupIcon className="h-4 w-4" /> },
     { label: "Lead Credits", value: customerLeadCredits, icon: <TicketIcon className="h-4 w-4" /> },
     { label: "Saved", value: saved.length, icon: <BookmarkIcon className="h-4 w-4" /> },
-  ];
+  ], [properties.length, leads.length, customerLeadCredits, saved.length]);
 
   useEffect(() => {
     const queryTab = searchParams.get("tab") || "overview";
@@ -266,10 +267,10 @@ const AgentDashboardPage = () => {
     }
   }, [searchParams]);
 
-  const handleTabSelect = (newTab) => {
+  const handleTabSelect = useCallback((newTab) => {
     setTab(newTab);
     setSearchParams(newTab === "overview" ? {} : { tab: newTab }, { replace: true });
-  };
+  }, [setSearchParams]);
 
   if (loading) {
     return (

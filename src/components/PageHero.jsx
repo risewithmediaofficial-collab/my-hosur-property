@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { motion } from "framer-motion";
 
 const reveal = {
@@ -25,4 +26,4 @@ const PageHero = ({ tag, title, description, children, className = "" }) => (
   </motion.section>
 );
 
-export default PageHero;
+export default memo(PageHero);

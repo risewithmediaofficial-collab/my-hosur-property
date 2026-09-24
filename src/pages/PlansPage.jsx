@@ -141,7 +141,7 @@ const normalizePlan = (plan) => {
 
 const PlansPage = () => {
   const { t, currentLanguage } = useAppLanguage();
-  useScrollAnimation();
+  useScrollAnimation(null, []);
   const navigate = useNavigate();
   const { token, user, refreshProfile } = useAuth();
   const [plans, setPlans] = useState([]);

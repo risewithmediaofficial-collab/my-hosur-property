@@ -1,8 +1,24 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, memo } from "react";
 import { motion } from "framer-motion";
 import { ChevronDownIcon } from "./AppIcons";
 import { bankLoans } from "../constants/bankLoans";
 import { useAppLanguage } from "../context/LanguageContext";
+
+const formatCurrency = (value) => {
+  if (value >= 10000000) {
+    return `₹${(value / 10000000).toFixed(2)} Cr`;
+  } else if (value >= 100000) {
+    return `₹${(value / 100000).toFixed(2)} L`;
+  }
+  return `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+};
+
+const TENURES = [
+  { label: "5 yr", value: 60 },
+  { label: "10 yr", value: 120 },
+  { label: "15 yr", value: 180 },
+  { label: "20 yr", value: 240 },
+];
 
 const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
   const { t } = useAppLanguage();
@@ -79,21 +95,7 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
     return schedule;
   }, [calculations, tenure, interestRate]);
 
-  const formatCurrency = (value) => {
-    if (value >= 10000000) {
-      return `₹${(value / 10000000).toFixed(2)} Cr`;
-    } else if (value >= 100000) {
-      return `₹${(value / 100000).toFixed(2)} L`;
-    }
-    return `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
-  };
-
-  const tenures = [
-    { label: "5 yr", value: 60 },
-    { label: "10 yr", value: 120 },
-    { label: "15 yr", value: 180 },
-    { label: "20 yr", value: 240 },
-  ];
+  const tenures = TENURES;
 
   // Create years breakdown data
   const yearsBreakdown = useMemo(() => {
@@ -477,4 +479,4 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
   );
 };
 
-export default LoanCalculator;
+export default memo(LoanCalculator);

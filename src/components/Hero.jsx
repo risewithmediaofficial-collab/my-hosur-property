@@ -1,71 +1,68 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, memo, useCallback } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useAppLanguage } from "../context/LanguageContext";
-import backgroundLines from "../assets/background-lines.svg";
 import houseImage from "../assets/house.png";
 
-const Hero = () => {
+const Hero = memo(() => {
   const { t } = useAppLanguage();
   const containerRef = useRef(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
+  const isHoveredRef = useRef(false);
 
   // References for mouse interpolation (lerp)
   const animRef = useRef(null);
   const currentPos = useRef({ x: 0, y: 0 });
   const targetPos = useRef({ x: 0, y: 0 });
 
-  // 1. Framer Motion Scroll Parallax
+  // Framer Motion Scroll Parallax
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"],
   });
 
-  // Calculate different scroll speeds for depth
   const textScrollY = useTransform(scrollYProgress, [0, 1], ["0px", "-60px"]);
   const visualScrollY = useTransform(scrollYProgress, [0, 1], ["0px", "40px"]);
-  const bgScrollY = useTransform(scrollYProgress, [0, 1], ["0px", "-20px"]);
-  const houseScrollScale = useTransform(scrollYProgress, [0, 1], [1, 1.06]);
+  const houseScrollScale = useTransform(scrollYProgress, [0, 1], [1, 1.04]);
 
-  // 2. Mouse move events
-  const handleMouseMove = (event) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = (event.clientX - rect.left - rect.width / 2) / (rect.width / 2);
-    const y = (event.clientY - rect.top - rect.height / 2) / (rect.height / 2);
-
-    targetPos.current = { x, y };
-  };
-
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    targetPos.current = { x: 0, y: 0 };
-  };
-
-  // 3. requestAnimationFrame loop for smooth LERP mouse parallax
-  useEffect(() => {
-    const updateParallax = () => {
+  // Start rAF loop only while hovered — stops when mouse leaves (saves ~60fps idle cost)
+  const startLoop = useCallback(() => {
+    if (animRef.current) return;
+    const tick = () => {
       currentPos.current.x += (targetPos.current.x - currentPos.current.x) * 0.07;
       currentPos.current.y += (targetPos.current.y - currentPos.current.y) * 0.07;
-
-      setMousePos({
-        x: currentPos.current.x,
-        y: currentPos.current.y,
-      });
-
-      animRef.current = requestAnimationFrame(updateParallax);
-    };
-
-    animRef.current = requestAnimationFrame(updateParallax);
-
-    return () => {
-      if (animRef.current) {
-        cancelAnimationFrame(animRef.current);
+      setMousePos({ x: currentPos.current.x, y: currentPos.current.y });
+      if (isHoveredRef.current) {
+        animRef.current = requestAnimationFrame(tick);
+      } else {
+        animRef.current = null;
       }
+    };
+    animRef.current = requestAnimationFrame(tick);
+  }, []);
+
+  const handleMouseMove = useCallback((event) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    targetPos.current = {
+      x: (event.clientX - rect.left - rect.width / 2) / (rect.width / 2),
+      y: (event.clientY - rect.top - rect.height / 2) / (rect.height / 2),
+    };
+  }, []);
+
+  const handleMouseEnter = useCallback(() => {
+    isHoveredRef.current = true;
+    startLoop();
+  }, [startLoop]);
+
+  const handleMouseLeave = useCallback(() => {
+    isHoveredRef.current = false;
+    targetPos.current = { x: 0, y: 0 };
+    // Let loop wind down to zero naturally (already stops itself)
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
     };
   }, []);
 
@@ -94,32 +91,9 @@ const Hero = () => {
       className="relative w-full min-h-screen bg-white overflow-hidden flex items-center justify-center px-5 py-20 box-border"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
+      transition={{ duration: 0.6 }}
     >
-      {/* Background Line Art Layer */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-[2]">
-        <motion.div
-          className="h-full"
-          style={{
-            x: bgMouseTranslate.x,
-            y: bgScrollY,
-            width: "calc(100% + 300px)",
-            willChange: "transform",
-          }}
-        >
-          <motion.div
-            className="h-full w-full bg-repeat-x bg-left-bottom bg-cover"
-            style={{
-              backgroundImage: `url(${backgroundLines})`,
-              opacity: 0.15,
-            }}
-            animate={{ x: [0, -300] }}
-            transition={{ x: { repeat: Infinity, duration: 80, ease: "linear" } }}
-          />
-        </motion.div>
-      </div>
-
-      {/* Blueprint Grid Overlay */}
+      {/* Blueprint Grid Overlay — CSS only, zero JS cost */}
       <div className="absolute inset-0 pointer-events-none z-[1]"
         style={{
           backgroundImage: "linear-gradient(to right, rgba(0, 66, 162, 0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 66, 162, 0.02) 1px, transparent 1px)",
@@ -197,23 +171,25 @@ const Hero = () => {
             }}
           />
 
-          {/* House Villa Image */}
+          {/* House Villa Image — eager LCP image, no lazy loading */}
           <motion.div
             className="relative z-[3] w-full max-w-[500px] flex justify-center items-center overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl p-4 will-change-transform"
             style={{
-              x: houseMouseTranslate.x,
-              y: houseMouseTranslate.y,
+              x: mousePos.x * 18,
+              y: mousePos.y * 18,
               scale: houseScrollScale,
             }}
-            initial={{ opacity: 0, scale: 0.8, x: 120 }}
+            initial={{ opacity: 0, scale: 0.85, x: 80 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
-            transition={{ type: "spring", stiffness: 50, damping: 14, delay: 1.0 }}
+            transition={{ type: "spring", stiffness: 60, damping: 14, delay: 0.5 }}
           >
             <img
               src={houseImage}
               alt="Bespoke luxury villa rendering"
               className="w-full h-auto object-cover rounded-2xl select-none pointer-events-none"
               loading="eager"
+              fetchpriority="high"
+              decoding="sync"
             />
           </motion.div>
         </motion.div>
@@ -223,4 +199,5 @@ const Hero = () => {
   );
 };
 
+Hero.displayName = "Hero";
 export default Hero;
