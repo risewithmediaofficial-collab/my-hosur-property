@@ -125,7 +125,7 @@ const ScrollNavigationButtons = () => {
 
   return (
     <div
-      className="fixed bottom-6 right-4 sm:right-6 md:bottom-8 md:right-8 z-40 flex flex-col items-center gap-1.5 p-1 rounded-2xl bg-white/95 backdrop-blur-md shadow-xl border border-slate-200/90 transition-all duration-300 hover:shadow-2xl hover:border-slate-300"
+      className="fixed bottom-4 right-3 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 z-40 flex flex-col items-center gap-1 p-0.5 sm:p-1 rounded-xl sm:rounded-2xl bg-white/95 backdrop-blur-md shadow-lg border border-slate-200/90 transition-all duration-300 hover:shadow-2xl hover:border-slate-300"
       role="navigation"
       aria-label="Scroll controls"
     >
@@ -134,7 +134,7 @@ const ScrollNavigationButtons = () => {
         <button
           type="button"
           onClick={scrollToTop}
-          className={`h-10 w-10 sm:h-11 sm:w-11 flex items-center justify-center rounded-xl transition-all duration-200 cursor-pointer ${
+          className={`h-8 w-8 sm:h-10 sm:w-10 flex items-center justify-center rounded-lg sm:rounded-xl transition-all duration-200 cursor-pointer ${
             scrollProgress.isAtTop
               ? "text-slate-400 bg-slate-50 hover:bg-orange hover:text-white hover:shadow-md hover:shadow-orange/20"
               : "text-navy bg-slate-100 hover:bg-orange hover:text-white hover:shadow-md hover:shadow-orange/25 active:scale-95"
@@ -142,7 +142,7 @@ const ScrollNavigationButtons = () => {
           aria-label="Scroll to top"
           title="Scroll to top"
         >
-          <KeyboardArrowUpIcon className="h-6 w-6 transform transition-transform group-hover:-translate-y-0.5" />
+          <KeyboardArrowUpIcon className="h-5 w-5 sm:h-6 sm:w-6 transform transition-transform group-hover:-translate-y-0.5" />
         </button>
         {/* Tooltip */}
         <span className="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2.5 hidden rounded-md bg-navy px-2 py-1 text-[11px] font-semibold text-white shadow-md transition-opacity duration-150 group-hover:block whitespace-nowrap z-50">
@@ -151,14 +151,14 @@ const ScrollNavigationButtons = () => {
       </div>
 
       {/* Subtle Divider */}
-      <div className="w-5 h-px bg-slate-200/90" aria-hidden="true" />
+      <div className="w-4 sm:w-5 h-px bg-slate-200/90" aria-hidden="true" />
 
       {/* Scroll to Down Button */}
       <div className="relative group">
         <button
           type="button"
           onClick={scrollToBottom}
-          className={`h-10 w-10 sm:h-11 sm:w-11 flex items-center justify-center rounded-xl transition-all duration-200 cursor-pointer ${
+          className={`h-8 w-8 sm:h-10 sm:w-10 flex items-center justify-center rounded-lg sm:rounded-xl transition-all duration-200 cursor-pointer ${
             scrollProgress.isAtBottom
               ? "text-slate-400 bg-slate-50 hover:bg-orange hover:text-white hover:shadow-md hover:shadow-orange/20"
               : "text-navy bg-slate-100 hover:bg-orange hover:text-white hover:shadow-md hover:shadow-orange/25 active:scale-95"
@@ -166,7 +166,7 @@ const ScrollNavigationButtons = () => {
           aria-label="Scroll to down"
           title="Scroll to down"
         >
-          <KeyboardArrowDownIcon className="h-6 w-6 transform transition-transform group-hover:translate-y-0.5" />
+          <KeyboardArrowDownIcon className="h-5 w-5 sm:h-6 sm:w-6 transform transition-transform group-hover:translate-y-0.5" />
         </button>
         {/* Tooltip */}
         <span className="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2.5 hidden rounded-md bg-navy px-2 py-1 text-[11px] font-semibold text-white shadow-md transition-opacity duration-150 group-hover:block whitespace-nowrap z-50">

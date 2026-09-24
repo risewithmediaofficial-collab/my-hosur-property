@@ -357,8 +357,7 @@ const Navbar = memo(() => {
             </div>
 
             {/* Mobile Header Actions */}
-            <div className="flex items-center gap-1.5 lg:hidden">
-              <LanguageSelector variant="topbar" className="sm:hidden" />
+            <div className="flex items-center gap-1.5 sm:gap-2 lg:hidden shrink-0">
               {canShowSavedShortcut ? (
                 <NavLink
                   to="/dashboard?tab=saved"
@@ -366,43 +365,45 @@ const Navbar = memo(() => {
                     scrollToTop();
                     closeMenu();
                   }}
-                  className="inline-flex items-center justify-center rounded-lg border border-slate-200 p-1.5 text-navy transition hover:border-orange hover:text-orange"
-                  style={{ width: "32px", height: "32px" }}
-                  aria-label="Saved properties"
-                  title="Saved properties"
+                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-navy shadow-2xs transition hover:border-orange hover:text-orange"
+                  aria-label={t("nav.savedProperties") || "Saved properties"}
+                  title={t("nav.savedProperties") || "Saved properties"}
                 >
-                  <BookmarkIcon className="h-4 w-4" />
+                  <BookmarkIcon className="h-4.5 w-4.5" />
                 </NavLink>
               ) : null}
-              {!isAuthenticated ? (
-                <NavLink
-                  to="/auth"
-                  onClick={scrollToTop}
-                  className="hidden items-center rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-navy shadow-2xs transition hover:border-orange hover:text-orange xs:inline-flex"
-                >
-                  {t("nav.login") || "Login"}
-                </NavLink>
-              ) : (
+
+              {isAuthenticated ? (
                 <button
                   type="button"
                   onClick={onLogout}
-                  className="hidden items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-red-600 shadow-2xs transition hover:bg-red-50 hover:border-red-300 xs:inline-flex cursor-pointer"
+                  className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-red-600 shadow-2xs transition hover:bg-red-50 hover:border-red-300 whitespace-nowrap shrink-0 cursor-pointer"
+                  title={t("nav.logout") || "Logout"}
                 >
-                  <ArrowLeftOnRectangleIcon className="h-3.5 w-3.5" />
-                  <span>{t("nav.logout") || "Logout"}</span>
+                  <ArrowLeftOnRectangleIcon className="h-4 w-4 shrink-0 text-red-500" />
+                  <span className="whitespace-nowrap">{t("nav.logout") || "Logout"}</span>
                 </button>
+              ) : (
+                <NavLink
+                  to="/auth"
+                  onClick={scrollToTop}
+                  className="hidden sm:inline-flex items-center rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-navy shadow-2xs transition hover:border-orange hover:text-orange whitespace-nowrap shrink-0"
+                >
+                  {t("nav.login") || "Login"}
+                </NavLink>
               )}
+
+              {/* Hamburger Button */}
               <button
                 type="button"
-                className="inline-flex items-center justify-center rounded-lg border border-slate-200 p-1.5 text-navy hover:bg-surface focus:outline-none transition-all duration-300"
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-navy shadow-2xs hover:bg-slate-50 hover:border-slate-300 focus:outline-none transition-all duration-200 cursor-pointer"
                 onClick={() => setMobileMenuOpen((value) => !value)}
-                style={{ width: "32px", height: "32px" }}
                 aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               >
-                <div className="relative w-5 h-4 flex flex-col justify-between items-center">
+                <div className="relative w-4 h-3.5 flex flex-col justify-between items-center">
                   <span
                     className={`block h-[2px] w-full bg-navy rounded-full transform transition-all duration-300 ${
-                      mobileMenuOpen ? "rotate-45 translate-y-[7px]" : ""
+                      mobileMenuOpen ? "rotate-45 translate-y-[6px]" : ""
                     }`}
                   />
                   <span
@@ -412,7 +413,7 @@ const Navbar = memo(() => {
                   />
                   <span
                     className={`block h-[2px] w-full bg-navy rounded-full transform transition-all duration-300 ${
-                      mobileMenuOpen ? "-rotate-45 -translate-y-[7px]" : ""
+                      mobileMenuOpen ? "-rotate-45 -translate-y-[6px]" : ""
                     }`}
                   />
                 </div>
