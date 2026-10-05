@@ -108,7 +108,7 @@ const ListingPage = () => {
 
   useEffect(() => {
     if (!token) {
-      setSavedIds([]);
+      setSavedIds(new Set());
       return;
     }
 
