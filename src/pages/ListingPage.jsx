@@ -2,9 +2,22 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { AdjustmentsHorizontalIcon, PropertySearchIcon, XMarkIcon } from "../components/AppIcons";
+import {
+  AdjustmentsHorizontalIcon,
+  BuildingOffice2Icon,
+  BuildingOfficeIcon,
+  ChevronDownIcon,
+  HomeIcon,
+  LandIcon,
+  MagnifyingGlassIcon,
+  PropertySearchIcon,
+  Squares2X2Icon,
+  VillaIcon,
+  XMarkIcon,
+} from "../components/AppIcons";
 import PropertyCard from "../components/PropertyCard";
 import PropertySearchFilterPanel from "../components/PropertySearchFilterPanel";
+import { SORT_OPTIONS } from "../constants/propertyFilterConfig";
 import SeoHead from "../components/SeoHead";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
 import useAuth from "../hooks/useAuth";
@@ -39,6 +52,17 @@ const ListingSkeleton = ({ isSidebarOpen }) => (
   </div>
 );
 
+const QUICK_CATEGORIES = [
+  { id: "", label: "All Properties", icon: Squares2X2Icon },
+  { id: "plot", label: "Plots & Land", icon: LandIcon },
+  { id: "villa", label: "Villas", icon: VillaIcon },
+  { id: "individualHouse", label: "Houses", icon: HomeIcon },
+  { id: "apartment", label: "Apartments", icon: BuildingOffice2Icon },
+  { id: "commercial", label: "Commercial", icon: BuildingOfficeIcon },
+  { id: "agricultural", label: "Agricultural", icon: LandIcon },
+  { id: "houseRent", label: "For Rent", icon: HomeIcon },
+];
+
 const ListingPage = () => {
   const { t } = useAppLanguage();
   const [params, setParams] = useSearchParams();
@@ -50,12 +74,48 @@ const ListingPage = () => {
   const [applied, setApplied] = useState(() => parseFiltersFromSearchParams(params));
   const [data, setData] = useState({ items: [], totalPages: 0, page: 1, total: 0 });
   const [savedIds, setSavedIds] = useState(new Set());
+  const [searchInput, setSearchInput] = useState(
+    () => applied.location || applied.locality || ""
+  );
+
+  useEffect(() => {
+    setSearchInput(applied.location || applied.locality || "");
+  }, [applied.location, applied.locality]);
 
   useScrollAnimation(null, [data.items.length]);
   const sentinelRef = useRef(null);
   const resultsScrollRef = useRef(null);
 
   useBodyScrollLock(mobileFilterOpen);
+
+  const handleQuickCategoryChange = (catId) => {
+    setDraft((prev) => {
+      const cleared = clearCategoryFields(prev, prev.category);
+      return { ...cleared, category: catId, page: 1 };
+    });
+    setApplied((prev) => {
+      const cleared = clearCategoryFields(prev, prev.category);
+      return { ...cleared, category: catId, page: 1 };
+    });
+  };
+
+  const handleSortChange = (newSort) => {
+    setDraft((prev) => ({ ...prev, sort: newSort, page: 1 }));
+    setApplied((prev) => ({ ...prev, sort: newSort, page: 1 }));
+  };
+
+  const handleSearchSubmit = (e) => {
+    if (e) e.preventDefault();
+    const val = searchInput.trim();
+    setDraft((prev) => ({ ...prev, location: val, locality: val, page: 1 }));
+    setApplied((prev) => ({ ...prev, location: val, locality: val, page: 1 }));
+  };
+
+  const handleClearSearch = () => {
+    setSearchInput("");
+    setDraft((prev) => ({ ...prev, location: "", locality: "", page: 1 }));
+    setApplied((prev) => ({ ...prev, location: "", locality: "", page: 1 }));
+  };
 
   const apiQuery = useMemo(() => filtersToApiParams(applied), [applied]);
 
@@ -243,68 +303,177 @@ const ListingPage = () => {
 
         {/* Right: properties — own scrollbar, independent from filters */}
         <section className="listing-results flex min-h-0 flex-1 flex-col gsap-section" aria-label="Property results">
-          <div className="listing-results-header">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="listing-results-intro gsap-hero-item">
-                <p className="section-tag">{t("search.propertyCategory") || "Property listings"}</p>
-                <h1 className="mt-1.5 text-2xl font-bold text-navy sm:text-3xl">
-                  {t("hero.homeTitlePrefix") || "Search your property in"} {t("hero.homeTitleCity") || "Hosur"}
+          <div className="listing-results-header bg-white border-b border-slate-200 px-4 sm:px-6 py-4 space-y-3.5">
+            {/* Row 1: Title, Count Badge, Subtitle & Request Property CTA */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-orange font-sans">
+                    {t("search.propertyCategory") || "Property Listings"}
+                  </span>
+                  <span className="text-slate-300">•</span>
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-orange/10 px-2.5 py-0.5 text-xs font-bold text-orange font-sans">
+                    <BuildingOffice2Icon className="h-3.5 w-3.5" />
+                    {loading ? (t("common.loading") || "Loading...") : `${data.total || data.items.length} ${t("search.propertiesFound") || "properties found"}`}
+                  </span>
+                </div>
+                <h1 className="mt-1 font-sans text-2xl sm:text-3xl font-black text-navy tracking-tight leading-tight">
+                  {applied.category
+                    ? `${getCategoryLabel(applied.category)} Properties in Hosur`
+                    : "All Properties in Hosur"}
                 </h1>
-                <p className="mt-1 text-sm text-slate-600">
-                  {loading ? (t("common.loading") || "Searching properties...") : `${data.total || data.items.length} ${t("search.propertiesFound") || "properties found"}`}
-                  {applied.category ? ` · ${getCategoryLabel(applied.category)}` : ""}
+                <p className="mt-1 font-sans text-xs sm:text-sm text-slate-500 max-w-2xl">
+                  {loading
+                    ? (t("common.loading") || "Fetching verified properties in Hosur...")
+                    : "Explore verified residential, commercial, plots, and rental properties across Hosur with direct contact"}
                 </p>
               </div>
 
-              {/* Action Buttons: Request Property + Filter Icon */}
-              <div className="flex flex-wrap items-center gap-2.5 pt-1">
+              {/* Request for New Property CTA button */}
+              <div className="shrink-0 pt-1 md:pt-0">
                 <Link
                   to="/request-service?category=property_buy&type=Find%20your%20property"
-                  className="inline-flex h-[2.65rem] items-center gap-2 rounded-xl border border-orange bg-orange/10 px-4 text-xs font-bold text-orange shadow-xs transition-all duration-200 hover:bg-orange hover:text-white sm:text-sm hover:shadow-md hover:-translate-y-0.5"
+                  className="h-10 sm:h-11 inline-flex items-center justify-center gap-2 rounded-xl border border-orange bg-orange/10 hover:bg-orange text-orange hover:text-white px-4 text-xs sm:text-sm font-bold shadow-xs hover:shadow transition-all duration-200 whitespace-nowrap font-sans leading-none"
                   title="Can't find what you are looking for? Request your custom property requirement"
                 >
-                  <PropertySearchIcon className="h-4 w-4 flex-shrink-0" />
-                  <span className="whitespace-nowrap">{t("hero.requestNewProperty") || "Request for New Property"}</span>
+                  <PropertySearchIcon className="h-4 w-4 shrink-0" />
+                  <span>{t("hero.requestNewProperty") || "Request for New Property"}</span>
                 </Link>
+              </div>
+            </div>
 
+            {/* Row 2: Search Input, Sort Dropdown & Filter Button Toolbar */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-100">
+              {/* Search Input — with proper 40px left padding to prevent overlap with icon */}
+              <form onSubmit={handleSearchSubmit} className="relative flex-1 sm:max-w-md">
+                <MagnifyingGlassIcon className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="Search area, locality, or keyword..."
+                  className="h-10 sm:h-11 w-full rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white py-0 pl-10 pr-9 text-xs sm:text-sm font-medium text-navy placeholder:text-slate-400 focus:border-orange focus:outline-none focus:ring-2 focus:ring-orange/15 transition-all font-sans"
+                />
+                {searchInput ? (
+                  <button
+                    type="button"
+                    onClick={handleClearSearch}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-navy cursor-pointer p-0.5"
+                    aria-label="Clear search"
+                  >
+                    <XMarkIcon className="h-4 w-4" />
+                  </button>
+                ) : null}
+              </form>
+
+              {/* Sort & Filter Controls */}
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Sort Dropdown */}
+                <div className="relative flex-1 sm:flex-initial">
+                  <select
+                    value={applied.sort || "latest"}
+                    onChange={(e) => handleSortChange(e.target.value)}
+                    className="h-10 sm:h-11 w-full sm:w-auto appearance-none rounded-xl border border-slate-200 bg-white py-0 pl-3.5 pr-9 text-xs sm:text-sm font-semibold text-navy shadow-xs hover:border-slate-300 focus:border-orange focus:outline-none focus:ring-2 focus:ring-orange/15 cursor-pointer transition-all font-sans"
+                    aria-label="Sort properties"
+                  >
+                    {SORT_OPTIONS.map((opt) => (
+                      <option key={opt.id} value={opt.id}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDownIcon className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                </div>
+
+                {/* Desktop Filter Button */}
                 <button
                   type="button"
                   onClick={openDesktopFilters}
-                  className={`property-filter-toggle-icon-btn hidden md:inline-flex ${desktopFilterOpen ? "is-active" : ""}`}
+                  className={`hidden md:inline-flex h-10 sm:h-11 items-center justify-center gap-2 rounded-xl border px-4 text-xs sm:text-sm font-bold shadow-xs transition-all duration-200 cursor-pointer whitespace-nowrap font-sans leading-none ${
+                    desktopFilterOpen
+                      ? "border-orange bg-orange text-white shadow-sm"
+                      : "border-slate-200 bg-white text-navy hover:border-orange hover:text-orange hover:bg-orange/5"
+                  }`}
                   aria-label={desktopFilterOpen ? "Close filters sidebar" : "Open filters sidebar"}
                   title={desktopFilterOpen ? "Close filters" : "Filter properties"}
                   aria-expanded={desktopFilterOpen}
                 >
-                  <AdjustmentsHorizontalIcon className="h-5 w-5" />
-                  {filterChips.length ? <span className="property-filter-badge-dot">{filterChips.length}</span> : null}
+                  <AdjustmentsHorizontalIcon className="h-4 w-4 shrink-0" />
+                  <span>Filters</span>
+                  {filterChips.length ? (
+                    <span className={`inline-flex h-5 min-w-[20px] items-center justify-center rounded-full text-[10px] font-black px-1 ${desktopFilterOpen ? "bg-white text-orange" : "bg-orange text-white"}`}>
+                      {filterChips.length}
+                    </span>
+                  ) : null}
                 </button>
+
+                {/* Mobile Filter Button */}
                 <button
                   type="button"
                   onClick={openMobileFilters}
-                  className="property-filter-toggle-icon-btn inline-flex md:hidden"
+                  className="inline-flex md:hidden h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 text-xs font-bold text-navy shadow-xs hover:border-orange hover:text-orange transition-all cursor-pointer whitespace-nowrap font-sans leading-none"
                   aria-label="Open filters"
                   title="Filter properties"
                   aria-expanded={mobileFilterOpen}
                 >
-                  <AdjustmentsHorizontalIcon className="h-5 w-5" />
-                  {filterChips.length ? <span className="property-filter-badge-dot">{filterChips.length}</span> : null}
+                  <AdjustmentsHorizontalIcon className="h-4 w-4 shrink-0" />
+                  <span>Filters</span>
+                  {filterChips.length ? (
+                    <span className="inline-flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-orange text-[10px] font-bold text-white px-1">
+                      {filterChips.length}
+                    </span>
+                  ) : null}
                 </button>
               </div>
             </div>
 
+            {/* Row 3: Quick Category Navigation Pills Bar */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 scrollbar-none">
+              {QUICK_CATEGORIES.map((cat) => {
+                const isSelected = (applied.category || "") === cat.id;
+                const Icon = cat.icon;
+                return (
+                  <button
+                    key={cat.id || "all"}
+                    type="button"
+                    onClick={() => handleQuickCategoryChange(cat.id)}
+                    className={`inline-flex items-center gap-1.5 shrink-0 rounded-full px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-[13px] font-bold transition-all duration-200 cursor-pointer select-none whitespace-nowrap font-sans ${
+                      isSelected
+                        ? "bg-navy text-white shadow-sm ring-2 ring-navy/20"
+                        : "bg-white border border-slate-200 text-slate-600 hover:border-orange hover:text-orange hover:bg-orange/5 shadow-2xs"
+                    }`}
+                  >
+                    {Icon ? (
+                      <Icon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 ${isSelected ? "text-orange" : "text-slate-400"}`} />
+                    ) : null}
+                    <span>{cat.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Row 4: Active Filter Chips */}
             {filterChips.length ? (
-              <div className="listing-results-chips mt-3">
+              <div className="listing-results-chips flex flex-wrap items-center gap-1.5 pt-1.5 border-t border-slate-100">
+                <span className="text-xs font-semibold text-slate-400 mr-1">Active filters:</span>
                 {filterChips.map((chip) => (
                   <button
                     key={chip.key}
                     type="button"
                     onClick={() => removeChip(chip)}
-                    className="property-filter-chip"
+                    className="inline-flex items-center gap-1 rounded-lg border border-orange/30 bg-orange/10 px-2.5 py-0.5 text-xs font-semibold text-orange hover:bg-orange hover:text-white transition-all cursor-pointer font-sans"
                   >
-                    {chip.label}: {chip.value}
+                    <span>{chip.label}: {chip.value}</span>
                     <XMarkIcon className="h-3.5 w-3.5" />
                   </button>
                 ))}
+                <button
+                  type="button"
+                  onClick={resetAll}
+                  className="text-xs font-bold text-slate-500 hover:text-red-500 underline ml-1 cursor-pointer transition-colors font-sans"
+                >
+                  Clear all
+                </button>
               </div>
             ) : null}
           </div>

@@ -1,5 +1,5 @@
 import { memo, useMemo, useState, useEffect, useCallback } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import useAuth from "../hooks/useAuth";
@@ -14,6 +14,7 @@ import {
   Bars3Icon,
   BookmarkIcon,
   BriefcaseIcon,
+  BuildingOffice2Icon,
   ChevronDownIcon,
   EnvelopeIcon,
   FlagIcon,
@@ -29,6 +30,8 @@ import {
 
 const navIconMap = {
   "/": HomeIcon,
+  "/properties": BuildingOffice2Icon,
+  "/listings": BuildingOffice2Icon,
   "/services": BriefcaseIcon,
   "/bank-loans": LoanIcon,
   "/plans": LoanIcon,
@@ -39,6 +42,7 @@ const navIconMap = {
 
 const desktopNavLinks = [
   { labelKey: "nav.home", defaultLabel: "Home", to: "/" },
+  { labelKey: "nav.properties", defaultLabel: "Properties", to: "/properties" },
   { labelKey: "nav.services", defaultLabel: "Our Services", to: "/services" },
   { labelKey: "nav.bankLoans", defaultLabel: "Bank Loans", to: "/bank-loans" },
   { labelKey: "nav.plans", defaultLabel: "Plans", to: "/plans" },
@@ -55,6 +59,7 @@ const Navbar = memo(() => {
   const { user, logout, isAuthenticated } = useAuth();
   const { t } = useAppLanguage();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
@@ -104,18 +109,27 @@ const Navbar = memo(() => {
     navigate("/auth", { state: { from: { pathname: "/post-property" } } });
   };
 
+  const isLinkActive = (to, isActive) => {
+    if (isActive) return true;
+    if (to === "/properties" && (location.pathname.startsWith("/properties") || location.pathname.startsWith("/listings"))) {
+      return true;
+    }
+    return false;
+  };
+
   const renderDesktopLink = (item) => (
     <NavLink
       key={item.to}
       to={item.to}
       onClick={scrollToTop}
-      className={({ isActive }) =>
-        `relative shrink-0 inline-flex items-center px-2 py-1 xl:px-2.5 xl:py-1.5 2xl:px-3.5 2xl:py-2 text-xs xl:text-[13px] 2xl:text-sm font-semibold whitespace-nowrap rounded-lg transition-colors ${
-          isActive
+      className={({ isActive }) => {
+        const active = isLinkActive(item.to, isActive);
+        return `relative shrink-0 inline-flex items-center px-2 py-1 xl:px-2.5 xl:py-1.5 2xl:px-3.5 2xl:py-2 text-xs xl:text-[13px] 2xl:text-sm font-semibold whitespace-nowrap rounded-lg transition-colors ${
+          active
             ? "text-orange bg-orange/5 font-bold"
             : "text-navy hover:text-orange hover:bg-slate-50"
-        }`
-      }
+        }`;
+      }}
     >
       {t(item.labelKey) || item.defaultLabel}
     </NavLink>
@@ -131,11 +145,12 @@ const Navbar = memo(() => {
           scrollToTop();
           closeMenu();
         }}
-        className={({ isActive }) =>
-          `flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold transition ${
-            isActive ? "bg-orange/10 text-orange font-bold" : "text-navy hover:bg-surface"
-          }`
-        }
+        className={({ isActive }) => {
+          const active = isLinkActive(item.to, isActive);
+          return `flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold transition ${
+            active ? "bg-orange/10 text-orange font-bold" : "text-navy hover:bg-surface"
+          }`;
+        }}
       >
         <Icon className="h-5 w-5" />
         <span>{t(item.labelKey) || item.defaultLabel}</span>

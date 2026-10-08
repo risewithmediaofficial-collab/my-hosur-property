@@ -46,6 +46,7 @@ const NotFoundPage = lazyRoute(() => import("./pages/NotFoundPage"));
 
 // Pages that manage their own full-height layout (sidebars etc.)
 const FULL_HEIGHT_PATHS = [
+  "/properties",
   "/listings",
   "/dashboard",
   "/admin/dashboard",
@@ -111,7 +112,9 @@ const AppShell = () => {
   const isDashboardRoute =
     location.pathname.startsWith("/dashboard") ||
     location.pathname.startsWith("/admin/dashboard");
-  const isListingsRoute = location.pathname.startsWith("/listings");
+  const isListingsRoute =
+    location.pathname.startsWith("/listings") ||
+    location.pathname.startsWith("/properties");
   const isHomeRoute = location.pathname === "/";
 
   useEffect(() => {
@@ -247,6 +250,7 @@ const AppShell = () => {
                   <Route path="/contact" element={<ContactPage />} />
                   <Route path="/services" element={<ServicesPage />} />
                   <Route path="/bank-loans" element={<BankLoansPage />} />
+                  <Route path="/properties" element={<ListingPage />} />
                   <Route path="/listings" element={<ListingPage />} />
                   <Route path="/location/:slug" element={<LocationSeoPage />} />
                   <Route

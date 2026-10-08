@@ -41,13 +41,13 @@ const PropertyCard = memo(({ item, onSave, isSaved, showOwner = true }) => {
 
   return (
     <article
-      className={`group relative overflow-hidden rounded-xl border ${
-        isSold ? "border-slate-300 bg-slate-50" : "border-slate-200 bg-white"
-      } shadow-card transition duration-300 ${
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border ${
+        isSold ? "border-slate-300 bg-slate-50" : "border-slate-200/90 bg-white"
+      } shadow-card transition-all duration-300 ${
         isSold
           ? "hover:shadow-card"
-          : "hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(39,79,154,0.12)]"
-      } gsap-card`}
+          : "hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(39,79,154,0.12)] hover:border-orange/40"
+      } gsap-card font-sans`}
     >
       {/* Corner Diagonal Ribbon */}
       <div className="absolute top-0 right-0 overflow-hidden w-28 h-28 pointer-events-none z-20">
@@ -57,11 +57,11 @@ const PropertyCard = memo(({ item, onSave, isSaved, showOwner = true }) => {
       </div>
 
       {/* Image Block */}
-      <div className="relative h-56 overflow-hidden bg-slate-100">
+      <div className="relative h-52 sm:h-56 overflow-hidden bg-slate-100 shrink-0">
         <img
           src={item.images?.[0] || PROPERTY_PLACEHOLDER_IMAGE}
           alt={getPropertyImageAlt(item)}
-          className={`h-full w-full object-cover transition duration-500 ${
+          className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${
             isSold ? "grayscale opacity-60" : ""
           }`}
           loading="lazy"
@@ -71,10 +71,10 @@ const PropertyCard = memo(({ item, onSave, isSaved, showOwner = true }) => {
           }}
         />
         {isSold && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/20 z-10">
-            <div className="rounded-lg bg-white px-6 py-3 text-center shadow-lg">
-              <p className="text-lg font-bold text-navy">{t("propertyCard.sold") || "SOLD"}</p>
-              <p className="text-xs text-slate-600">
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30 z-10">
+            <div className="rounded-xl bg-white px-5 py-2.5 text-center shadow-lg">
+              <p className="text-base font-bold text-navy">{t("propertyCard.sold") || "SOLD"}</p>
+              <p className="text-xs text-slate-500">
                 {t("propertyCard.soldMessage") || "This property has been sold"}
               </p>
             </div>
@@ -82,70 +82,77 @@ const PropertyCard = memo(({ item, onSave, isSaved, showOwner = true }) => {
         )}
       </div>
 
-      {/* Card Body - Adissia Design Layout */}
-      <div className={`p-5 flex flex-col gap-4 ${isSold ? "opacity-70" : ""}`}>
-        {/* Title */}
-        <h3 className="text-lg font-bold text-navy leading-tight truncate group-hover:text-orange transition-colors duration-200">
-          {item.title}
-        </h3>
+      {/* Card Body */}
+      <div className={`p-4 sm:p-5 flex flex-col flex-1 justify-between gap-3.5 ${isSold ? "opacity-70" : ""}`}>
+        <div>
+          {/* Title */}
+          <h3
+            className="font-sans text-base sm:text-[17px] font-bold text-navy leading-snug truncate group-hover:text-orange transition-colors duration-200"
+            title={item.title}
+          >
+            {item.title}
+          </h3>
 
-        {/* Location & BHK Details */}
-        <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-3">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <MapPinIcon className="h-4.5 w-4.5 text-orange shrink-0" />
-            <span className="text-sm font-semibold text-slate-600 truncate">
-              {propLocation}, {item.location?.city || "Hosur"}
-            </span>
-          </div>
-          <div className="text-right shrink-0">
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-              {t("propertyCard.totalRooms") || "Total Rooms"}
-            </p>
-            <p className="text-xs font-extrabold text-navy">
-              {item.bhk ? `${item.bhk} BHK` : t("propertyCard.studio") || "Studio"}
-            </p>
+          {/* Location & BHK Details */}
+          <div className="mt-2.5 flex items-center justify-between gap-2 border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <MapPinIcon className="h-4 w-4 text-orange shrink-0" />
+              <span className="text-xs sm:text-sm font-semibold text-slate-600 truncate">
+                {propLocation}, {item.location?.city || "Hosur"}
+              </span>
+            </div>
+            <div className="text-right shrink-0">
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                {t("propertyCard.totalRooms") || "Total Rooms"}
+              </p>
+              <p className="text-xs font-extrabold text-navy">
+                {item.bhk ? `${item.bhk} BHK` : t("propertyCard.studio") || "Studio"}
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Property Type, Size details and action circular arrow */}
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex gap-6 min-w-0">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex gap-5 sm:gap-6 min-w-0">
             <div>
               <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider border-b-2 border-orange/40 pb-0.5 w-fit">
                 {t("propertyCard.propertyType") || "Property Type"}
               </p>
-              <p className="mt-1 text-sm font-bold text-navy truncate capitalize">{propType}</p>
+              <p className="mt-1 text-xs sm:text-sm font-bold text-navy truncate capitalize">{propType}</p>
             </div>
             <div>
               <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider border-b-2 border-orange/40 pb-0.5 w-fit">
                 {t("propertyCard.availableSize") || "Available Size"}
               </p>
-              <p className="mt-1 text-sm font-bold text-navy truncate">{propSize}</p>
+              <p className="mt-1 text-xs sm:text-sm font-bold text-navy truncate">{propSize}</p>
             </div>
           </div>
 
-          {/* Adissia Style circular arrow button */}
+          {/* Circular arrow button */}
           <Link
             to={href}
             onClick={scrollToTop}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-navy text-navy transition-all duration-300 hover:border-orange hover:bg-orange hover:text-white group-hover:border-orange group-hover:bg-orange group-hover:text-white"
+            className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full border-2 border-navy text-navy transition-all duration-300 hover:border-orange hover:bg-orange hover:text-white group-hover:border-orange group-hover:bg-orange group-hover:text-white shadow-2xs"
             aria-label={`View ${item.title} property`}
           >
-            <ArrowRightIcon className="h-5 w-5" />
+            <ArrowRightIcon className="h-4 w-4 sm:h-5 sm:w-5" />
           </Link>
         </div>
 
         {/* Price & Optional Save */}
         <div className="border-t border-slate-100 pt-3 flex items-center justify-between gap-3">
-          <div className="text-xl font-black leading-tight text-navy">{currency(item.price)}</div>
+          <div className="text-xl sm:text-[22px] font-black leading-tight text-navy tracking-tight">
+            {currency(item.price)}
+          </div>
           {onSave && !isSold && (
             <button
               type="button"
               onClick={() => onSave?.(item._id)}
-              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-all duration-300 cursor-pointer ${
                 isSaved
                   ? "bg-red-50 border-red-200 text-red-500 shadow-sm"
-                  : "border-slate-200 bg-white text-slate-400 hover:border-red-200 hover:text-red-500 hover:bg-red-50/30"
+                  : "border-slate-200 bg-white text-slate-400 hover:border-red-200 hover:text-red-500 hover:bg-red-50/30 shadow-2xs"
               }`}
               title={
                 isSaved
@@ -153,7 +160,7 @@ const PropertyCard = memo(({ item, onSave, isSaved, showOwner = true }) => {
                   : t("propertyCard.saveProperty") || "Save property"
               }
             >
-              {isSaved ? <HeartSolidIcon className="h-5 w-5" /> : <HeartIcon className="h-5 w-5" />}
+              {isSaved ? <HeartSolidIcon className="h-4.5 w-4.5" /> : <HeartIcon className="h-4.5 w-4.5" />}
             </button>
           )}
         </div>
