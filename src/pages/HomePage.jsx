@@ -256,7 +256,6 @@ const HomePage = () => {
   const [featuredLoading, setFeaturedLoading] = useState(true);
   const [openShortcutMenu, setOpenShortcutMenu] = useState("");
   const [propertyTypeMenuOpen, setPropertyTypeMenuOpen] = useState(false);
-  const [selectedClientImage, setSelectedClientImage] = useState(null);
 
   const homeStats = useMemo(() => [
     { value: 100, suffix: "+", label: t("home.stats.verifiedListings") || "Verified listings" },
@@ -1320,19 +1319,15 @@ const HomePage = () => {
                 key={client.id}
                 className="group relative flex flex-col h-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-orange/40"
               >
-                {/* Image Frame with Uniform Aspect Ratio */}
-                <div
-                  className="relative w-full aspect-[4/3] sm:aspect-[16/11] overflow-hidden bg-slate-900 cursor-pointer"
-                  onClick={() => setSelectedClientImage(client)}
-                  title={`Click to view full photo of ${client.name}`}
-                >
+                {/* Image Frame with Exact 3:2 Aspect Ratio */}
+                <div className="relative w-full aspect-[3/2] overflow-hidden bg-slate-100">
                   <img
                     src={client.image}
                     alt={`${client.name} - Happy Client of MyHosurProperty`}
-                    className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/25 pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/20 pointer-events-none" />
 
                   {/* Top Floating Badges */}
                   <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
@@ -1345,14 +1340,11 @@ const HomePage = () => {
                     </span>
                   </div>
 
-                  {/* Bottom Image Caption & Zoom prompt */}
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs pointer-events-none">
+                  {/* Bottom Image Location Tag */}
+                  <div className="absolute bottom-3 left-3 flex items-center text-white text-xs pointer-events-none">
                     <span className="font-semibold drop-shadow-sm flex items-center gap-1 text-[11px] text-white">
                       <MapPinIcon className="h-3.5 w-3.5 text-orange" />
                       {client.location}
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-md bg-white/25 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white transition group-hover:bg-orange group-hover:text-white">
-                      View Photo ↗
                     </span>
                   </div>
                 </div>
@@ -1403,52 +1395,6 @@ const HomePage = () => {
             ))}
           </div>
         </div>
-
-        {/* Lightbox Modal for Full Image View */}
-        {selectedClientImage && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
-            onClick={() => setSelectedClientImage(null)}
-          >
-            <div
-              className="relative max-h-[90vh] max-w-3xl w-full overflow-hidden rounded-2xl bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-200"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Modal Header */}
-              <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 bg-slate-50">
-                <div>
-                  <h4 className="text-lg font-bold text-navy">{selectedClientImage.name}</h4>
-                  <p className="text-xs text-orange font-semibold">{selectedClientImage.project}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setSelectedClientImage(null)}
-                  className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition cursor-pointer"
-                  aria-label="Close modal"
-                >
-                  <XMarkIcon className="h-6 w-6" />
-                </button>
-              </div>
-
-              {/* Modal Image */}
-              <div className="max-h-[68vh] overflow-auto bg-slate-950 flex items-center justify-center p-3">
-                <img
-                  src={selectedClientImage.image}
-                  alt={`${selectedClientImage.name} handover document`}
-                  className="max-h-[64vh] w-auto max-w-full rounded-lg object-contain shadow-lg"
-                />
-              </div>
-
-              {/* Modal Footer */}
-              <div className="px-5 py-3.5 bg-white border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
-                <span className="italic max-w-md">"{selectedClientImage.quote}"</span>
-                <span className="font-bold text-emerald-600 shrink-0 flex items-center gap-1">
-                  <CheckBadgeIcon className="h-4 w-4" /> Verified Handover
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
       </section>
 
       {/* ── CTA Banner ── */}
