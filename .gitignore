@@ -35,3 +35,7 @@ cypress/downloads/
 *.sln
 *.sw?
 .env
+
+# Generated SEO files
+/public/sitemap.xml
+/public/robots.txt
