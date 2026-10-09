@@ -20,12 +20,14 @@ import {
   HomeIcon,
   LandIcon,
   HomeModernIcon,
+  MapPinIcon,
   PaintBrushIcon,
   RentIcon,
   ScaleIcon,
   UserGroupIcon,
   VillaIcon,
   WrenchScrewdriverIcon,
+  XMarkIcon,
 } from "../components/AppIcons";
 import CountUpNumber from "../components/CountUpNumber";
 import {
@@ -47,6 +49,9 @@ import alluringRealityImg from "../assets/alluring reality.jpeg";
 import chatGptBannerImage from "../assets/ChatGPT Image Aug 4, 2026, 10_37_17 AM.png";
 import gyesLogo from "../assets/gyes property and constrcution logo.jpeg";
 import oneClickLogo from "../assets/one click logo.png";
+import fiyazImg from "../assets/happy clinets/fiyaz.jpeg";
+import jeevaImg from "../assets/happy clinets/jeeva loganathan.jpeg";
+import pannerImg from "../assets/happy clinets/panner selvam.jpeg";
 import { fetchHomeProperties } from "../services/api/propertyApi";
 import { buildRealEstateAgentSchema, buildWebsiteSchema } from "../utils/seo";
 
@@ -205,11 +210,41 @@ const propertyTypeConfigs = [
   { value: "Agricultural Land", iconKey: "Agricultural Land", titleKey: "home.propertyTypes.agriculture", desc1Key: "home.propertyTypes.agricultureDesc1", desc2Key: "home.propertyTypes.agricultureDesc2" },
 ];
 
-/* Testimonial placeholder data */
-const testimonialPlaceholders = [
-  { id: 1, name: "Mr. Ramesh", role: "Property Buyer" },
-  { id: 2, name: "Mrs. Priya", role: "Plot Owner" },
-  { id: 3, name: "Mr. Karthik", role: "Home Buyer" },
+/* Happy Clients Data */
+const happyClientsData = [
+  {
+    id: "fiyaz",
+    name: "Fiyaz",
+    role: "Property Buyer",
+    project: "VIP Wonder City, Hosur",
+    image: fiyazImg,
+    tag: "Document Handover",
+    location: "Hosur, Tamil Nadu",
+    quote:
+      "Received complete document verification and swift registration handover. The entire property purchase was transparent, verified, and hassle-free.",
+  },
+  {
+    id: "jeeva-loganathan",
+    name: "Jeeva Loganathan",
+    role: "Property Buyer",
+    project: "Legal Nexus Verified Property",
+    image: jeevaImg,
+    tag: "Legal Verification",
+    location: "Hosur, Tamil Nadu",
+    quote:
+      "MyHosurProperty made our site acquisition seamless. From clear title check to final documentation, their team supported us with utmost integrity.",
+  },
+  {
+    id: "panner-selvam",
+    name: "Panner Selvam",
+    role: "Property Buyer",
+    project: "Legal Nexus Verified Property",
+    image: pannerImg,
+    tag: "Registration Handover",
+    location: "Hosur, Tamil Nadu",
+    quote:
+      "Prompt assistance and smooth coordination for site registration and paperwork. Highly recommended for anyone buying verified property in Hosur.",
+  },
 ];
 
 const HomePage = () => {
@@ -221,6 +256,7 @@ const HomePage = () => {
   const [featuredLoading, setFeaturedLoading] = useState(true);
   const [openShortcutMenu, setOpenShortcutMenu] = useState("");
   const [propertyTypeMenuOpen, setPropertyTypeMenuOpen] = useState(false);
+  const [selectedClientImage, setSelectedClientImage] = useState(null);
 
   const homeStats = useMemo(() => [
     { value: 100, suffix: "+", label: t("home.stats.verifiedListings") || "Verified listings" },
@@ -1262,71 +1298,157 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ── */}
+      {/* ── OUR HAPPY CLIENTS ── */}
       <section
         className="home-gsap-section bg-[#eef4fb] px-5 py-16 sm:px-8 lg:px-10"
       >
         <div className="mx-auto max-w-[1440px] text-center">
-          <p className="section-tag">{t("home.testimonials.tag") || "Testimonials"}</p>
+          <p className="section-tag">{t("home.testimonials.tag") || "Our Happy Clients"}</p>
           <h2 className="mt-2 text-3xl font-bold text-navy sm:text-4xl lg:text-5xl">
-            {t("home.testimonials.title") || "Stories That Inspire"}{" "}
-            <span className="text-orange">{t("home.testimonials.titleHighlight") || "Confidence"}</span> !!
+            {t("home.testimonials.title") || "Our Happy"} <span className="text-orange">{t("home.testimonials.titleHighlight") || "Clients"}</span>
           </h2>
-          <p className="home-gsap-copy mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-600">
-            {t("home.testimonials.subtitle") || "Hear from our happy customers who found their perfect property through MyHosurProperty."}
+          <p className="home-gsap-copy mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+            {t("home.testimonials.subtitle") || "Real moments of trust and success as our valued clients receive their verified property documents and site handovers across Hosur."}
           </p>
         </div>
 
-        {/* Testimonial cards */}
+        {/* Happy Client Cards Grid */}
         <div className="mx-auto mt-12 max-w-[1440px]">
-          <div className="grid gap-6 md:grid-cols-3">
-            {testimonialPlaceholders.map((item, idx) => (
+          <div className="grid gap-6 md:grid-cols-3 items-stretch">
+            {happyClientsData.map((client) => (
               <div
-                key={item.id}
-                className={`group relative flex flex-col items-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-xl ${idx === 1 ? "md:-translate-y-4 md:scale-105 ring-2 ring-navy/20" : ""}`}
+                key={client.id}
+                className="group relative flex flex-col h-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-orange/40"
               >
-                {/* Play button area */}
-                <div className="relative flex h-52 w-full items-center justify-center bg-gradient-to-br from-navy to-navy-light">
-                  <div className="absolute inset-0 opacity-10">
-                    <svg viewBox="0 0 400 200" className="h-full w-full" fill="white">
-                      <rect x="50" y="60" width="60" height="140" />
-                      <rect x="130" y="30" width="80" height="170" />
-                      <rect x="230" y="50" width="70" height="150" />
-                      <rect x="320" y="70" width="50" height="130" />
-                    </svg>
+                {/* Image Frame with Uniform Aspect Ratio */}
+                <div
+                  className="relative w-full aspect-[4/3] sm:aspect-[16/11] overflow-hidden bg-slate-900 cursor-pointer"
+                  onClick={() => setSelectedClientImage(client)}
+                  title={`Click to view full photo of ${client.name}`}
+                >
+                  <img
+                    src={client.image}
+                    alt={`${client.name} - Happy Client of MyHosurProperty`}
+                    className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/25 pointer-events-none" />
+
+                  {/* Top Floating Badges */}
+                  <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-600/95 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm backdrop-blur-md">
+                      <CheckBadgeIcon className="h-3.5 w-3.5 text-white" />
+                      Verified Client
+                    </span>
+                    <span className="inline-flex items-center rounded-full bg-navy/85 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm backdrop-blur-md">
+                      {client.tag}
+                    </span>
                   </div>
-                  <button
-                    type="button"
-                    aria-label={`Play testimonial from ${item.name}`}
-                    className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm border-2 border-white text-white transition hover:bg-white hover:text-navy"
-                  >
-                    <svg className="h-7 w-7 translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </button>
-                  <div className="absolute bottom-3 left-3 rounded-md bg-orange px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
-                    {item.name}
+
+                  {/* Bottom Image Caption & Zoom prompt */}
+                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs pointer-events-none">
+                    <span className="font-semibold drop-shadow-sm flex items-center gap-1 text-[11px] text-white">
+                      <MapPinIcon className="h-3.5 w-3.5 text-orange" />
+                      {client.location}
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-md bg-white/25 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white transition group-hover:bg-orange group-hover:text-white">
+                      View Photo ↗
+                    </span>
                   </div>
                 </div>
 
-                <div className="p-5 text-center w-full">
-                  <p className="font-bold text-navy">{item.name}</p>
-                  <p className="mt-1 text-sm text-slate-500">{item.role}</p>
-                  <p className="mt-3 text-sm leading-6 text-slate-600 italic">
-                    "{t("home.testimonials.quote") || "An excellent experience. The team at MyHosurProperty guided us through the entire process."}"
-                  </p>
-                  <div className="mt-3 flex justify-center gap-1 text-orange">
-                    {[1,2,3,4,5].map((s) => (
-                      <svg key={s} className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                      </svg>
-                    ))}
+                {/* Card Body with Equal Height Layout */}
+                <div className="flex flex-1 flex-col justify-between p-5 sm:p-6 text-left">
+                  <div>
+                    {/* Stars & Role */}
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <div className="flex gap-1 text-amber-500">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <svg key={s} className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        ))}
+                      </div>
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        {client.role}
+                      </span>
+                    </div>
+
+                    {/* Client Name */}
+                    <h3 className="text-xl font-extrabold text-navy group-hover:text-orange transition-colors">
+                      {client.name}
+                    </h3>
+                    <p className="mt-0.5 text-xs font-semibold text-orange">
+                      {client.project}
+                    </p>
+
+                    {/* Client Quote */}
+                    <p className="mt-3 text-sm leading-6 text-slate-600 italic">
+                      "{client.quote}"
+                    </p>
+                  </div>
+
+                  {/* Card Bottom Meta */}
+                  <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 text-xs">
+                    <span className="font-semibold text-slate-500">
+                      Hosur Property Handover
+                    </span>
+                    <span className="inline-flex items-center gap-1 font-bold text-emerald-600">
+                      <HandshakeIcon className="h-4 w-4" />
+                      Deal Completed
+                    </span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
+
+        {/* Lightbox Modal for Full Image View */}
+        {selectedClientImage && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+            onClick={() => setSelectedClientImage(null)}
+          >
+            <div
+              className="relative max-h-[90vh] max-w-3xl w-full overflow-hidden rounded-2xl bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 bg-slate-50">
+                <div>
+                  <h4 className="text-lg font-bold text-navy">{selectedClientImage.name}</h4>
+                  <p className="text-xs text-orange font-semibold">{selectedClientImage.project}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedClientImage(null)}
+                  className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition cursor-pointer"
+                  aria-label="Close modal"
+                >
+                  <XMarkIcon className="h-6 w-6" />
+                </button>
+              </div>
+
+              {/* Modal Image */}
+              <div className="max-h-[68vh] overflow-auto bg-slate-950 flex items-center justify-center p-3">
+                <img
+                  src={selectedClientImage.image}
+                  alt={`${selectedClientImage.name} handover document`}
+                  className="max-h-[64vh] w-auto max-w-full rounded-lg object-contain shadow-lg"
+                />
+              </div>
+
+              {/* Modal Footer */}
+              <div className="px-5 py-3.5 bg-white border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
+                <span className="italic max-w-md">"{selectedClientImage.quote}"</span>
+                <span className="font-bold text-emerald-600 shrink-0 flex items-center gap-1">
+                  <CheckBadgeIcon className="h-4 w-4" /> Verified Handover
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* ── CTA Banner ── */}
