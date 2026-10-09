@@ -124,7 +124,7 @@ const Navbar = memo(() => {
       onClick={scrollToTop}
       className={({ isActive }) => {
         const active = isLinkActive(item.to, isActive);
-        return `relative shrink-0 inline-flex items-center px-2 py-1 xl:px-2.5 xl:py-1.5 2xl:px-3.5 2xl:py-2 text-xs xl:text-[13px] 2xl:text-sm font-semibold whitespace-nowrap rounded-lg transition-colors ${
+        return `relative shrink-0 inline-flex items-center px-1.5 py-1 xl:px-2 xl:py-1.5 2xl:px-3 2xl:py-2 text-[11.5px] xl:text-xs 2xl:text-sm font-semibold whitespace-nowrap rounded-lg transition-colors ${
           active
             ? "text-orange bg-orange/5 font-bold"
             : "text-navy hover:text-orange hover:bg-slate-50"
@@ -205,8 +205,8 @@ const Navbar = memo(() => {
           isSticky ? "shadow-md" : "shadow-sm"
         }`}
       >
-        <div className="px-2 sm:px-4 lg:px-6 xl:px-8 py-0.5 sm:py-1.5 lg:py-2">
-          <div className="mx-auto flex w-full max-w-[1536px] items-center justify-between gap-1.5 sm:gap-2 xl:gap-4">
+        <div className="px-2 sm:px-4 lg:px-3 xl:px-4 2xl:px-8 py-0.5 sm:py-1 lg:py-1.5">
+          <div className="mx-auto flex w-full max-w-[1536px] items-center justify-between gap-1.5 sm:gap-2 xl:gap-3">
             {/* Logo */}
             <NavLink
               to="/"
@@ -219,10 +219,10 @@ const Navbar = memo(() => {
               <img
                 src={logoSrc}
                 alt="MyHosurProperty"
-                className="block h-9 sm:h-11 lg:h-12 xl:h-13 w-auto max-w-[120px] sm:max-w-[150px] lg:max-w-[165px] xl:max-w-[185px] object-contain mx-auto transition-all"
-                style={{ maxHeight: "52px", width: "auto" }}
+                className="block h-8 sm:h-10 lg:h-10 xl:h-11 2xl:h-12 w-auto max-w-[110px] sm:max-w-[130px] lg:max-w-[145px] xl:max-w-[155px] 2xl:max-w-[180px] object-contain mx-auto transition-all"
+                style={{ maxHeight: "46px", width: "auto" }}
               />
-              <span className="hidden xl:inline-block text-[10px] font-medium leading-none text-slate-500 whitespace-nowrap text-center">
+              <span className="hidden 2xl:inline-block text-[10px] font-medium leading-none text-slate-500 whitespace-nowrap text-center">
                 {t("nav.poweredBy") || "Powered by"}{" "}
                 <span className="font-bold text-navy">
                   {t("nav.companyName") || "Gyes Property & Construction"}
@@ -231,19 +231,19 @@ const Navbar = memo(() => {
             </NavLink>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden flex-1 items-center justify-center gap-1 xl:gap-1.5 2xl:gap-2.5 lg:flex min-w-0 px-1 overflow-x-auto scrollbar-none">
+            <nav className="hidden flex-1 items-center justify-center gap-0.5 xl:gap-1 2xl:gap-2 lg:flex shrink-0 px-1">
               {desktopNavLinks.map(renderDesktopLink)}
             </nav>
 
             {/* Desktop Actions */}
-            <div className="hidden items-center gap-1.5 xl:gap-2 2xl:gap-3 lg:flex shrink-0">
+            <div className="hidden items-center gap-1 xl:gap-1.5 2xl:gap-2.5 lg:flex shrink-0">
               {isAuthenticated ? (
                 <>
                   <NavLink
                     to={dashboardPath}
                     onClick={scrollToTop}
                     className={({ isActive }) =>
-                      `inline-flex items-center gap-1.5 rounded-lg px-2 xl:px-2.5 2xl:px-3 py-1.5 xl:py-2 text-xs xl:text-[13px] 2xl:text-sm font-semibold transition shrink-0 ${
+                      `inline-flex items-center gap-1.5 rounded-lg px-2 xl:px-2 2xl:px-2.5 py-1.5 text-xs 2xl:text-sm font-semibold transition shrink-0 ${
                         isActive ? "text-orange" : "text-navy hover:text-orange"
                       }`
                     }
@@ -266,7 +266,7 @@ const Navbar = memo(() => {
                       to="/dashboard?tab=saved"
                       onClick={scrollToTop}
                       className={({ isActive }) =>
-                        `inline-flex h-8 w-8 xl:h-9 xl:w-9 shrink-0 items-center justify-center rounded-lg border text-sm font-semibold transition ${
+                        `inline-flex h-7 w-7 xl:h-8 xl:w-8 shrink-0 items-center justify-center rounded-lg border text-xs xl:text-sm font-semibold transition ${
                           isActive
                             ? "border-orange bg-orange/10 text-orange"
                             : "border-slate-200 text-navy hover:border-orange hover:text-orange"
@@ -275,14 +275,14 @@ const Navbar = memo(() => {
                       aria-label={t("nav.savedProperties") || "Saved properties"}
                       title={t("nav.savedProperties") || "Saved properties"}
                     >
-                      <BookmarkIcon className="h-4 w-4" />
+                      <BookmarkIcon className="h-3.5 w-3.5 xl:h-4 xl:w-4" />
                     </NavLink>
                   ) : null}
 
                   <button
                     type="button"
                     onClick={onLogout}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 xl:px-2.5 2xl:px-3 py-1.5 xl:py-2 text-xs xl:text-[13px] 2xl:text-sm font-bold text-slate-700 shadow-2xs transition-all duration-200 hover:border-red-500 hover:bg-red-50 hover:text-red-600 cursor-pointer shrink-0"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 xl:px-2 2xl:px-2.5 py-1.5 text-xs 2xl:text-sm font-bold text-slate-700 shadow-2xs transition-all duration-200 hover:border-red-500 hover:bg-red-50 hover:text-red-600 cursor-pointer shrink-0"
                     title={t("nav.logout") || "Logout"}
                     aria-label={t("nav.logout") || "Logout"}
                   >
@@ -293,9 +293,9 @@ const Navbar = memo(() => {
                   <button
                     type="button"
                     onClick={handlePostFreeProperty}
-                    className="header-btn-adissia px-3 xl:px-4 2xl:px-5 py-1.5 xl:py-2 rounded-lg text-xs xl:text-[13px] 2xl:text-sm transition-all duration-300 font-bold flex items-center gap-1.5 xl:gap-2 relative shrink-0"
+                    className="header-btn-adissia px-2.5 xl:px-3 2xl:px-4 py-1.5 rounded-lg text-xs 2xl:text-sm transition-all duration-300 font-bold flex items-center gap-1.5 relative shrink-0"
                   >
-                    <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white free-blink-badge pointer-events-none uppercase tracking-wider shadow-md">
+                    <span className="absolute -top-2 -right-1.5 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white free-blink-badge pointer-events-none uppercase tracking-wider shadow-md">
                       {t("common.free") || "Free"}
                     </span>
                     <FlagIcon className="h-4 w-4 shrink-0" />
@@ -308,7 +308,7 @@ const Navbar = memo(() => {
                     <button
                       type="button"
                       onClick={() => setLoginDropdownOpen(!loginDropdownOpen)}
-                      className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 xl:px-3 py-1.5 xl:py-2 text-xs xl:text-[13px] 2xl:text-sm font-bold shadow-2xs transition-all duration-200 cursor-pointer shrink-0 ${
+                      className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 xl:px-3 py-1.5 text-xs 2xl:text-sm font-bold shadow-2xs transition-all duration-200 cursor-pointer shrink-0 ${
                         loginDropdownOpen
                           ? "border-orange bg-orange text-white"
                           : "border-slate-200 bg-white text-navy hover:border-orange hover:bg-orange/5 hover:text-orange"
@@ -359,9 +359,9 @@ const Navbar = memo(() => {
                   <button
                     type="button"
                     onClick={handlePostFreeProperty}
-                    className="header-btn-adissia px-3 xl:px-4 2xl:px-5 py-1.5 xl:py-2 rounded-lg text-xs xl:text-[13px] 2xl:text-sm transition-all duration-300 font-bold flex items-center gap-1.5 xl:gap-2 relative shrink-0"
+                    className="header-btn-adissia px-2.5 xl:px-3 2xl:px-4 py-1.5 rounded-lg text-xs 2xl:text-sm transition-all duration-300 font-bold flex items-center gap-1.5 relative shrink-0"
                   >
-                    <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white free-blink-badge pointer-events-none uppercase tracking-wider shadow-md">
+                    <span className="absolute -top-2 -right-1.5 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white free-blink-badge pointer-events-none uppercase tracking-wider shadow-md">
                       {t("common.free") || "Free"}
                     </span>
                     <FlagIcon className="h-4 w-4 shrink-0" />

@@ -44,6 +44,14 @@
       window.salesmaxDataLayer = window.salesmaxDataLayer || {};
       window.salesmaxDataLayer.version = 'v1';
       window.salesmaxDataLayer.account = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzM4NCJ9.eyJqdGkiOiJYQ2hqWG5GakdQMHVYZndtVlNYaG9nIiwic3ViIjoiYmYyMWE0OTQtOGI0OC00ZjRmLWI1MTUtNzYyYWZmZjQyMTBlIiwiaWF0IjoxNzg2MDEyNTI0fQ.smjkpLl_KWRH3h1cCmZmjVL0x_fPPTYjAP3hNhXUjASFkPC3YaM9pJXJOXWdO2sw';
+      if (typeof window.jQuery === 'undefined') {
+        window.jQuery = window.$ = function() {
+          return {
+            on: function() { return this; },
+            ready: function() { return this; }
+          };
+        };
+      }
     </script>
   </head>
   <body>

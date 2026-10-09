@@ -2,7 +2,9 @@ import apiClient, { withAuth } from "./client";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 const logResponse = (label, data) => {
-  console.log(`[authApi] ${label} response:`, data);
+  if (import.meta.env.DEV) {
+    console.log(`[authApi] ${label} response:`, data);
+  }
   return data;
 };
 
@@ -36,7 +38,7 @@ export const loginUser = async (payload) => {
 };
 
 export const verifyOtp = async (payload) => {
-  console.log("[authApi] verifyOtp called with payload:", payload);
+  if (import.meta.env.DEV) console.log("[authApi] verifyOtp called with payload:", payload);
   try {
     const res = await apiClient.post("/api/auth/verify-otp", payload);
     return logResponse("verifyOtp", res.data);
@@ -64,7 +66,7 @@ export const socialLogin = async (payload) => {
 };
 
 export const verifyWidgetToken = async (payload) => {
-  console.log("[authApi] verifyWidgetToken called with payload:", payload);
+  if (import.meta.env.DEV) console.log("[authApi] verifyWidgetToken called with payload:", payload);
   try {
     const res = await apiClient.post("/api/auth/verify-widget-token", payload);
     return logResponse("verifyWidgetToken", res.data);
