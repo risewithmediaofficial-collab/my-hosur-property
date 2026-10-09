@@ -80,7 +80,7 @@ const ContactPage = () => {
                 <span className="h-4 w-1 rounded-full bg-orange block" />
                 {t("contactPage.formTitle") || "Send Us A Message"}
               </h2>
-              <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              <form id="contact-form" name="contact-form" onSubmit={handleSubmit} className="flex flex-col gap-5">
                 {/* Name */}
                 <div>
                   <label htmlFor="contact-name" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-600">
