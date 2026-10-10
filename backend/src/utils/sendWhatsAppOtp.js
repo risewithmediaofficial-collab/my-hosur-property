@@ -58,7 +58,7 @@ const normalizePhone = (phone) => {
  * @param {string} opts.otp        - The OTP code to send
  * @returns {{ provider: string, delivered: boolean, response: any }}
  */
-const sendWhatsAppOtpViaMsg91 = async ({ phone, otp, purpose }) => {
+const sendWhatsAppOtpViaMsg91 = async ({ phone, otp }) => {
   const formattedPhone = normalizePhone(phone);
 
   // Always use the main template name

@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState, memo } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { ClipboardDocumentCheckIcon, CreditCardIcon, TicketIcon, UserCircleIcon, XMarkIcon } from "./AppIcons";
+import {
+  ClipboardDocumentCheckIcon,
+  CreditCardIcon,
+  TicketIcon,
+  UserCircleIcon,
+  XMarkIcon,
+} from "./AppIcons";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import useAuth from "../hooks/useAuth";
@@ -31,66 +37,6 @@ const propertyTypes = [
   "Rental Income Building",
   "Farmland",
   "Agri Land",
-];
-
-const stateOptions = ["Tamil Nadu", "Karnataka", "Andhra Pradesh", "Telangana", "Kerala", "Other (Enter Manually)"];
-const cityOptions = ["Hosur", "Krishnagiri", "Denkanikottai", "Shoolagiri", "Rayakottai", "Kelamangalam", "Bengaluru", "Other (Enter Manually)"];
-const areaOptions = [
-  "Bagalur Road",
-  "Nallur Road",
-  "Avalapalli Road",
-  "Alasanatham Road",
-  "Kelamangalam Road",
-  "Thally Road",
-  "Attibele Road",
-  "Denkanikottai Road",
-  "TVS Road",
-  "Athimugam Road",
-  "Rayakottai Road",
-  "Bagalur",
-  "Mathigiri",
-  "Sipcot",
-  "Kelamangalam",
-  "Rayakottai",
-  "Avalapalli",
-  "Belagondapalli",
-  "Bathalapalli",
-  "Perandapalli",
-  "Zuzuvadi",
-  "Kamaraj Nagar",
-  "Chennathur",
-  "Alasanatham",
-  "Anthivadi",
-  "Nagondapalli",
-  "Uddanapalli",
-  "Shoolagiri",
-  "Berigai",
-  "Thally",
-  "Anchetty",
-  "Other (Enter Manually)"
-];
-
-const districtOptions = [
-  "Krishnagiri",
-  "Hosur",
-  "Denkanikottai",
-  "Shoolagiri",
-  "Rayakottai",
-  "Kelamangalam",
-  "Bengaluru",
-  "Other (Enter Manually)",
-];
-
-const villageOptions = [
-  "Bagalur",
-  "Mathigiri",
-  "Avalapalli",
-  "Kelamangalam",
-  "Rayakottai",
-  "Chennathur",
-  "Nallur",
-  "Alasanatham",
-  "Other (Enter Manually)",
 ];
 
 const landAreaOptions = [
@@ -182,35 +128,7 @@ const agriPriceOptions = [
   "₹1 Crore to ₹2 Crores",
   "₹2 Crores & Above",
 ];
-const pgRentOptions = [
-  "₹2,000 to ₹3,000",
-  "₹3,000 to ₹4,000",
-  "₹4,000 to ₹5,000",
-  "₹5,000 to ₹6,000",
-  "₹6,000 to ₹7,000",
-  "₹7,000 to ₹8,000",
-  "₹8,000 to ₹10,000",
-  "₹10,000 & Above",
-];
-const farmlandAreaOptions = [
-  "10 Cents",
-  "11 Cents",
-  "15 Cents",
-  "22 Cents",
-  "25 Cents",
-  "25 Cents & Above",
-];
-const agriLandAreaOptions = [
-  "20 Cents",
-  "25 Cents",
-  "50 Cents",
-  "75 Cents",
-  "1 Acre",
-  "2 Acres",
-  "3 Acres",
-  "4 Acres",
-  "5 Acres & Above",
-];
+
 const commercialLandAreaUnitOptions = ["Cents", "Acres"];
 const rentalIncomePriceOptions = [
   "₹5,000 to ₹10,000",
@@ -222,18 +140,7 @@ const rentalIncomePriceOptions = [
   "₹1 Lakh to ₹2 Lakhs",
   "₹2 Lakhs & Above",
 ];
-const houseRentOptions = [
-  "₹4,000 to ₹6,000",
-  "₹6,000 to ₹8,000",
-  "₹8,000 to ₹10,000",
-  "₹10,000 to ₹12,000",
-  "₹12,000 to ₹15,000",
-  "₹15,000 to ₹20,000",
-  "₹20,000 to ₹25,000",
-  "₹25,000 to ₹30,000",
-  "₹30,000 to ₹50,000",
-  "₹50,000 & Above",
-];
+
 const carParkingOptions = ["1 Car", "2 Cars", "3 Cars", "4+ Cars"];
 const carParkingYesNoOptions = ["Yes", "No"];
 const waterSourceVillaOptions = ["Borewell", "Layout Water", "Corporation Water"];
@@ -297,7 +204,7 @@ const warehouseApprovalFields = [
   "patta",
   "ecAvailable",
 ];
-const cornerOptions = ["Not Corner", "One Side Corner", "Two Side Corner"];
+
 const roadTypeOptions = ["Thar Road", "Concrete Road", "Mud Road", "Gravel Road", "Highway", "Main Road", "Layout Road", "Other"];
 const priceOptions = ["7.00 L", "10.00 L", "12.00 L", "15.00 L", "25.00 L", "50.00 L", "75.00 L", "1.00 Cr"];
 const facingOptions = ["East", "West", "North", "South", "North East", "North West", "South East", "South West"];
@@ -2632,15 +2539,20 @@ const LocationDropdownOrInput = ({ field, value, options, onChange, placeholder 
 };
 
 const GeoLocationDropdown = ({ field, value, options = [], onChange, placeholder, searchType, context = {} }) => {
-  const [remoteOptions, setRemoteOptions] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState({ key: "", items: [], pending: false });
   const [open, setOpen] = useState(false);
+  const searchValue = String(value || "").trim();
+  const canSearch = open && Boolean(searchType) &&
+    (searchValue.length >= 2 || ["district", "city", "village", "area"].includes(searchType));
+  const queryKey = JSON.stringify([searchType, searchValue, context.state, context.district, context.taluk || context.city, context.village]);
+  const loading = canSearch && (result.key !== queryKey || result.pending);
   const typedValue = String(value || "").trim().toLowerCase();
   const localOptions = useMemo(
     () => options.filter((option) => option !== "Other (Enter Manually)"),
     [options]
   );
   const mergedOptions = useMemo(() => {
+    const remoteOptions = canSearch && result.key === queryKey ? result.items : [];
     const allOptions = [...new Set([...localOptions, ...remoteOptions].filter(Boolean))];
     if (!typedValue) return allOptions;
 
@@ -2656,21 +2568,15 @@ const GeoLocationDropdown = ({ field, value, options = [], onChange, placeholder
         if (bText === typedValue) return 1;
         return a.localeCompare(b);
       });
-  }, [localOptions, remoteOptions, typedValue]);
+  }, [localOptions, canSearch, queryKey, result, typedValue]);
 
   useEffect(() => {
-    const searchValue = String(value || "").trim();
-    const canLoadDefaultOptions = open && ["district", "city", "village", "area"].includes(searchType);
-    if (!searchType || (searchValue.length < 2 && !canLoadDefaultOptions)) {
-      setRemoteOptions([]);
-      setLoading(false);
-      return undefined;
-    }
+    if (!canSearch) return;
 
     let ignore = false;
-    setLoading(true);
 
     const timer = window.setTimeout(() => {
+      setResult({ key: queryKey, items: [], pending: true });
       searchIndiaLocationNames({
         type: searchType,
         search: searchValue,
@@ -2680,13 +2586,10 @@ const GeoLocationDropdown = ({ field, value, options = [], onChange, placeholder
         village: context.village,
       })
         .then((items) => {
-          if (!ignore) setRemoteOptions(items);
+          if (!ignore) setResult({ key: queryKey, items, pending: false });
         })
         .catch(() => {
-          if (!ignore) setRemoteOptions([]);
-        })
-        .finally(() => {
-          if (!ignore) setLoading(false);
+          if (!ignore) setResult({ key: queryKey, items: [], pending: false });
         });
     }, 350);
 
@@ -2694,7 +2597,7 @@ const GeoLocationDropdown = ({ field, value, options = [], onChange, placeholder
       ignore = true;
       window.clearTimeout(timer);
     };
-  }, [context.city, context.district, context.state, context.taluk, context.village, open, searchType, value]);
+  }, [canSearch, context.city, context.district, context.state, context.taluk, context.village, queryKey, searchType, searchValue]);
 
   return (
     <div className="relative">

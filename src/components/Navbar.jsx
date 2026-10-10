@@ -1,17 +1,17 @@
-import { memo, useMemo, useState, useEffect, useCallback } from "react";
+import { memo, useState, useEffect } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import useAuth from "../hooks/useAuth";
+import useScrollToTop from "../hooks/useScrollToTop";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 import { CONTACT_EMAIL, CONTACT_PHONE_NUMBERS } from "../constants/contactInfo";
-import BrandLogo, { logoSrc } from "./BrandLogo";
+import logoSrc from "../assets/myhosurpropertylogo.png";
 import LanguageSelector from "./LanguageSelector";
 import {
   ArrowLeftOnRectangleIcon,
   ArrowRightOnRectangleIcon,
-  Bars3Icon,
   BookmarkIcon,
   BriefcaseIcon,
   BuildingOffice2Icon,
@@ -25,7 +25,6 @@ import {
   PlusCircleIcon,
   Squares2X2Icon,
   Squares2X2SolidIcon,
-  XMarkIcon,
 } from "./AppIcons";
 
 const navIconMap = {
@@ -79,16 +78,7 @@ const Navbar = memo(() => {
 
   const closeMenu = () => setMobileMenuOpen(false);
 
-  const scrollToTop = () => {
-    const htmlElement = document.documentElement;
-    const originalScroll = htmlElement.style.scrollBehavior;
-    htmlElement.style.scrollBehavior = "auto";
-    window.scrollTo(0, 0);
-    document.body.scrollTop = 0;
-    setTimeout(() => {
-      htmlElement.style.scrollBehavior = originalScroll;
-    }, 50);
-  };
+  const scrollToTop = useScrollToTop();
 
   const onLogout = () => {
     logout();
@@ -159,11 +149,11 @@ const Navbar = memo(() => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white">
+    <header className="site-navbar sticky top-0 z-50 bg-white">
 
       {/* Top Bar with Contacts and Language Switcher */}
-      <div className="bg-navy text-white py-1 block">
-        <div className="mx-auto flex max-w-[1536px] items-center justify-between px-3 sm:px-6 lg:px-8 text-xs">
+      <div className="navbar-topbar bg-navy text-white py-1 block">
+        <div className="mx-auto flex max-w-[1536px] items-center justify-between px-4 sm:px-6 lg:px-8 text-xs">
           <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-1">
             <div className="hidden sm:inline-flex flex-wrap items-center gap-x-4 gap-y-1">
               {CONTACT_PHONE_NUMBERS.map((phone) => (
@@ -205,7 +195,7 @@ const Navbar = memo(() => {
           isSticky ? "shadow-md" : "shadow-sm"
         }`}
       >
-        <div className="px-2 sm:px-4 lg:px-3 xl:px-4 2xl:px-8 py-0.5 sm:py-1 lg:py-1.5">
+        <div className="px-4 sm:px-4 lg:px-3 xl:px-4 2xl:px-8 py-1.5 lg:py-1.5">
           <div className="mx-auto flex w-full max-w-[1536px] items-center justify-between gap-1.5 sm:gap-2 xl:gap-3">
             {/* Logo */}
             <NavLink
@@ -380,7 +370,7 @@ const Navbar = memo(() => {
                     scrollToTop();
                     closeMenu();
                   }}
-                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-navy shadow-2xs transition hover:border-orange hover:text-orange"
+                  className="navbar-icon-action inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-navy shadow-2xs transition hover:border-orange hover:text-orange"
                   aria-label={t("nav.savedProperties") || "Saved properties"}
                   title={t("nav.savedProperties") || "Saved properties"}
                 >
@@ -411,9 +401,10 @@ const Navbar = memo(() => {
               {/* Hamburger Button */}
               <button
                 type="button"
-                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-navy shadow-2xs hover:bg-slate-50 hover:border-slate-300 focus:outline-none transition-all duration-200 cursor-pointer"
+                className="navbar-icon-action inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-navy shadow-2xs hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 cursor-pointer"
                 onClick={() => setMobileMenuOpen((value) => !value)}
                 aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={mobileMenuOpen}
               >
                 <div className="relative w-4 h-3.5 flex flex-col justify-between items-center">
                   <span

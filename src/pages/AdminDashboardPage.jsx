@@ -23,7 +23,6 @@ import {
   approveAdminPaymentRequest,
   rejectAdminPaymentRequest,
   updateUserRole,
-  giveUserAllAccess,
   fetchAdminRoleChangeRequests,
   approveAdminRoleChangeRequest,
   rejectAdminRoleChangeRequest,
@@ -136,7 +135,6 @@ const AdminDashboardPage = () => {
 
   // Live Activity Tracker states
   const [activityLogs, setActivityLogs] = useState([]);
-  const [activityLogsTotal, setActivityLogsTotal] = useState(0);
   const [activityLogsLoading, setActivityLogsLoading] = useState(false);
   const [activityActionFilter, setActivityActionFilter] = useState("all");
   const [activityEntityFilter, setActivityEntityFilter] = useState("all");
@@ -206,7 +204,6 @@ const AdminDashboardPage = () => {
     { key: "properties", label: "Properties", value: metrics.properties || propertyListings.length || 0, icon: <HomeModernIcon className="h-5 w-5" /> },
     { key: "payments", label: "Payments", value: metrics.payments || payments.length || 0, icon: <BanknotesIcon className="h-5 w-5" /> },
     { key: "leads", label: "Lead Requests", value: metrics.leads || leads.length || 0, icon: <TicketIcon className="h-5 w-5" /> },
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   ], [metrics, users.length, propertyListings.length, payments.length, leads.length]);
 
   const exportToExcel = () => {
@@ -263,7 +260,6 @@ const AdminDashboardPage = () => {
         limit: 100,
       });
       setActivityLogs(res?.items || []);
-      setActivityLogsTotal(res?.total || 0);
     } catch (err) {
       console.error("[loadActivityLogs] Error:", err);
     } finally {
@@ -704,20 +700,6 @@ const AdminDashboardPage = () => {
     }
   };
 
-  const onGiveAllAccess = async (user) => {
-    if (!window.confirm(`Are you sure you want to GRANT ALL ACCESS to ${user.name}? This will grant full posting access, premium contact unlocks, 999 lead credits, and activate their account.`)) return;
-    try {
-      const res = await giveUserAllAccess(token, user._id);
-      toast.success(res.message || "Full access granted successfully!");
-      if (selectedUser && selectedUser._id === user._id) {
-        setSelectedUser({ ...selectedUser, ...res.user });
-      }
-      load();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to grant access");
-    }
-  };
-
   const onApproveRoleRequest = async (reqId) => {
     try {
       const res = await approveAdminRoleChangeRequest(token, reqId);
@@ -741,7 +723,7 @@ const AdminDashboardPage = () => {
   };
 
   const onDeleteLeadItem = async (type, item) => {
-    const itemName = type === "inquiries" 
+    const itemName = type === "inquiries"
       ? `Inquiry Lead from ${item.userId?.name || item.contactInfo?.name || "N/A"}`
       : type === "requirements"
         ? `Property Request from ${item.customerName || "N/A"}`
@@ -856,7 +838,6 @@ const AdminDashboardPage = () => {
     }
   };
 
-
   const activeLeadView = leadViews.find((item) => item.id === leadView) || leadViews[0];
 
   if (loading) {
@@ -880,12 +861,7 @@ const AdminDashboardPage = () => {
       mainClassName="md:h-full md:overflow-y-auto"
       contentClassName="md:space-y-0 md:flex md:h-full md:min-h-0 md:flex-col md:gap-6 md:overflow-hidden"
       hideLogo={true}
-      stats={[
-        { label: "Users", value: metrics.users || users.length || 0, icon: <UsersIcon className="h-4 w-4" /> },
-        { label: "Posted Properties", value: propertyListings.length || metrics.properties || 0, icon: <HomeModernIcon className="h-4 w-4" /> },
-        { label: "Payments", value: payments.length, icon: <BanknotesIcon className="h-4 w-4" /> },
-        { label: "New Queue", value: leadQueueCount, icon: <TicketIcon className="h-4 w-4" /> },
-      ]}
+
       navItems={tabs.map((tab) => ({
         key: tab.id,
         label: tab.label,
@@ -958,14 +934,14 @@ const AdminDashboardPage = () => {
                 </div>
               </div>
               <div className="flex w-full flex-col gap-2 sm:flex-row">
-                <input 
-                  type="text" 
-                  placeholder="Search users by name, email, phone..." 
+                <input
+                  type="text"
+                  placeholder="Search users by name, email, phone..."
                   className="dashboard-control flex-1 text-sm"
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
                 />
-                <button 
+                <button
                   onClick={() => setShowFilters(!showFilters)}
                   className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all ${showFilters ? "dashboard-primary" : "dashboard-secondary"}`}
                 >
@@ -978,7 +954,7 @@ const AdminDashboardPage = () => {
                 <div className="dashboard-subpanel flex flex-wrap gap-3 p-4">
                   <div className="min-w-[120px] flex-1">
                     <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Filter by Role</label>
-                    <select 
+                    <select
                       className="dashboard-control text-sm"
                       value={filterRole}
                       onChange={(e) => setFilterRole(e.target.value)}
@@ -994,7 +970,7 @@ const AdminDashboardPage = () => {
                   </div>
                   <div className="min-w-[120px] flex-1">
                     <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Filter by Status</label>
-                    <select 
+                    <select
                       className="dashboard-control text-sm"
                       value={filterStatus}
                       onChange={(e) => setFilterStatus(e.target.value)}
@@ -1004,7 +980,7 @@ const AdminDashboardPage = () => {
                       <option value="deactivated">Deactivated</option>
                     </select>
                   </div>
-                  <button 
+                  <button
                     onClick={() => { setFilterRole("all"); setFilterStatus("all"); setUserSearch(""); }}
                     className="self-end px-2 py-1 text-[10px] font-bold text-slate-500 hover:text-slate-900"
                   >

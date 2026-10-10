@@ -1,92 +1,52 @@
-﻿import { useEffect } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect } from "react";
+import useLowMotionDevice from "./useLowMotionDevice";
 
-gsap.registerPlugin(ScrollTrigger);
+// Load the animation engine only on devices that use these effects.
+export const useScrollAnimation = (rootRef = null, refreshKey = 0, prefix = "gsap") => {
+  const lowMotion = useLowMotionDevice();
 
-/**
- * Shared GSAP scroll-animation hook.
- * Pass a rootRef to scope queries to the component subtree (faster than document-wide querySelectorAll).
- *
- * @param {React.RefObject} [rootRef] - optional root element to scope queries
- * @param {any[]} [triggerDeps] - deps that cause animations to re-initialize
- */
-export const useScrollAnimation = (rootRef = null, triggerDeps = []) => {
   useEffect(() => {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduceMotion) return undefined;
+    if (lowMotion) return;
+    let cancelled = false;
+    let context;
+    let timer;
 
-    const ctx = gsap.context(() => {
-      // 1. Hero entrance animations
-      const heroItems = (rootRef?.current ?? document).querySelectorAll(".gsap-hero-item");
-      if (heroItems.length > 0) {
-        gsap.fromTo(
-          heroItems,
-          { opacity: 0, y: 16 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.45,
-            stagger: 0.05,
-            ease: "power2.out",
-            overwrite: "auto",
-            force3D: true,
+    Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(([{ gsap }, { ScrollTrigger }]) => {
+      if (cancelled) return;
+      gsap.registerPlugin(ScrollTrigger);
+      const root = rootRef?.current || document.querySelector("main") || document;
+      const panel = root.querySelector(".listing-results-scroll");
+      context = gsap.context(() => {
+        const heroItems = root.querySelectorAll(`.${prefix}-hero-item`);
+        if (heroItems.length) gsap.fromTo(heroItems, { opacity: 0, y: 16 }, {
+          opacity: 1, y: 0, duration: 0.45, stagger: 0.05, ease: "power2.out", overwrite: "auto",
+        });
+
+        for (const selector of [`.${prefix}-card, .gsap-card`, `.${prefix}-section`]) {
+          const items = Array.from(root.querySelectorAll(selector));
+          for (const scroller of [window, ...(panel ? [panel] : [])]) {
+            const targets = items.filter(item => panel?.contains(item) ? scroller === panel : scroller === window);
+            if (!targets.length) continue;
+            ScrollTrigger.batch(targets, {
+              scroller, start: "top 94%", once: true, interval: 0.04,
+              onEnter: batch => gsap.fromTo(batch, { opacity: 0, y: 16 }, {
+                opacity: 1, y: 0, duration: 0.4, stagger: 0.04, ease: "power2.out", overwrite: "auto",
+              }),
+            });
           }
-        );
-      }
-
-      // 2. Batched card reveal - hardware accelerated
-      ScrollTrigger.batch(".gsap-card", {
-        start: "top 93%",
-        once: true,
-        interval: 0.04,
-        onEnter: (batch) => {
-          gsap.fromTo(
-            batch,
-            { opacity: 0, y: 18, force3D: true },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.4,
-              stagger: 0.04,
-              ease: "power2.out",
-              overwrite: "auto",
-            }
-          );
-        },
-      });
-
-      // 3. Section reveal
-      ScrollTrigger.batch(".gsap-section", {
-        start: "top 94%",
-        once: true,
-        interval: 0.04,
-        onEnter: (batch) => {
-          gsap.fromTo(
-            batch,
-            { opacity: 0, y: 14, force3D: true },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.38,
-              stagger: 0.05,
-              ease: "power2.out",
-              overwrite: "auto",
-            }
-          );
-        },
-      });
-    }, rootRef?.current ?? undefined);
-
-    // Debounced refresh - avoid thrashing layout when images lazy-load
-    const timer = setTimeout(() => ScrollTrigger.refresh(), 200);
+        }
+      }, root);
+      timer = window.setTimeout(() => ScrollTrigger.refresh(), 200);
+    }).catch(() => {
+      // Content remains visible if the optional animation chunk cannot load.
+    });
 
     return () => {
-      clearTimeout(timer);
-      ctx.revert();
+      cancelled = true;
+      window.clearTimeout(timer);
+      context?.revert();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, triggerDeps);
+  }, [rootRef, refreshKey, prefix, lowMotion]);
 };
 
 export default useScrollAnimation;

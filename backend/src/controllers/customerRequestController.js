@@ -22,33 +22,7 @@ const REQUEST_CATEGORIES = [
 
 const PROPERTY_REQUEST_CATEGORIES = ["property_buy", "property_sell", "property_rent"];
 
-const PROPERTY_TYPES = [
-  "Plot",
-  "Villa",
-  "Flat",
-  "Independent House",
-  "Rent",
-  "Apartment",
-  "Warehouse / Industry",
-  "PG",
-  "Commercial Land / Building",
-  "Rental Income Building",
-  "Farmland",
-  "Agri Land",
-  "Commercial Land",
-  "Agricultural Land",
-  "Home",
-  "Office",
-  "Warehouse",
-  "Commercial Land & Building",
-  "Empty Land",
-  "Commercial",
-  "House",
-  "Land",
-  "Industrial Shed",
-  "Farm Land",
-  "Commercial Building",
-];
+
 
 const RENT_PROPERTY_TYPES = [
   "Plot",
@@ -102,71 +76,7 @@ const PROPERTY_MATCH_MAP = {
   "Industrial Shed": ["Industrial Shed", "Warehouse", "Warehouse / Industry"],
 };
 
-const SERVICE_TYPE_OPTIONS = {
-  loan: [
-    "Home Loan",
-    "Plot Loan",
-    "Mortgage Loan",
-    "Commercial Loan",
-    "Agriculture Loan",
-    "Home Loan Balance Transfer",
-    "Private Finance",
-  ],
-  interior: [
-    "Home Interior",
-    "Office Interior",
-    "Interior & Carpentry Work",
-  ],
-  construction: [
-    "House Construction",
-    "Office Construction",
-    "Commercial Building",
-    "Apartment",
-    "Industry & Warehouse",
-    "Approval plans",
-    "2D Plan",
-    "3D Plan",
-    "HNTDA Approval",
-    "RERA Approval",
-    "Building Plan & Approval",
-  ],
-  property_management: [
-    "Home & Apartment Facility AMC Service",
-    "Industry & Warehouse Facility AMC Service",
-    "Land Scaping & Garden Maintenance Property Management Service",
-    "Land scaping & Garden Maintenance Property Management Service",
-    "NRI Property Management Service",
-    "Property Management Service",
-  ],
-  home_office_services: [
-    "Home & Office Cleaning Service - Deep Cleaning",
-    "Home & Office Shifting Service - Packers & Movers",
-    "Home Appliance Service - TV, Fridge, Washing Machine Service",
-    "Electrical & Plumbing Service",
-    "Interior & Carpentry Work",
-    "Pest Control Service",
-    "Tank, Sump & Bathroom Cleaning Service",
-    "Painting Work",
-    "Sofa & Carpet Cleaning",
-  ],
-  property_buy: [
-    "Find your property",
-    "Property guidance for buy sell and rent",
-    "Sale agreement support",
-    "Legal verification support",
-    "Patta transfer",
-    "Land survey",
-    "Sale deed registration",
-  ],
-  property_sell: [
-    "Sell your property",
-    "Property guidance for buy sell and rent",
-  ],
-  property_rent: [
-    "Rent your property",
-    "Property guidance for buy sell and rent",
-  ],
-};
+
 
 const isPropertyRequest = (requestCategory) => PROPERTY_REQUEST_CATEGORIES.includes(requestCategory);
 

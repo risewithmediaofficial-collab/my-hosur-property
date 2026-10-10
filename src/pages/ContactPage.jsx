@@ -21,7 +21,7 @@ import {
 } from "../constants/contactInfo";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
 import useScrollAnimation from "../hooks/useScrollAnimation";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 import { localizeCatalogText } from "../utils/i18nCatalog";
 
 const ContactPage = () => {

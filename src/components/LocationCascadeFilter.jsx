@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import {
   getAreasByVillage,
   getCountries,
@@ -7,7 +7,7 @@ import {
   getTaluksByDistrict,
   getVillagesByTaluk,
 } from "../constants/locationData";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 
 const LocationCascadeFilter = ({ values, update }) => {
   const { t } = useAppLanguage();

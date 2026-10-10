@@ -3,7 +3,6 @@ const DashboardSidebar = ({
   subtitle,
   description,
   navItems = [],
-  stats = [],
   children,
   rootClassName = "",
   asideClassName = "",

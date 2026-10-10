@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
-  ArrowLeftOnRectangleIcon,
   BookmarkIcon,
   ClipboardDocumentListIcon,
   CreditCardIcon,
@@ -17,20 +16,21 @@ import DashboardSidebar from "../components/DashboardSidebar";
 import Loader from "../components/Loader";
 import useAuth from "../hooks/useAuth";
 import { fetchMyProperties } from "../services/api/propertyApi";
-import { fetchMyLeads, unlockInboxLead, updateLeadApproval } from "../services/api/leadApi";
+import { fetchMyLeads, unlockInboxLead } from "../services/api/leadApi";
 import { fetchMyPayments, fetchUserPaymentRequests } from "../services/api/paymentApi";
 import { fetchSavedProperties, toggleSavedProperty } from "../services/api/userApi";
-import { buyLeadPackIntent, verifyLeadPackPayment } from "../services/api/customerRequestApi";
+
 import QrPaymentModal from "../components/QrPaymentModal";
 import RoleChangeModal from "../components/RoleChangeModal";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 
-import { loadExternalScript } from "../utils/loadExternalScript";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
 import { getPropertyImageAlt } from "../utils/seo";
 import { getInquiryHistory } from "../utils/inquiryHistory";
 
 const SELLER_ROLES = ["seller", "agent", "broker", "builder", "admin"];
+
+const VALID_TABS = ["overview", "listings", "leads", "inquiries", "payments", "saved"];
 
 const UserDashboardPage = () => {
   const { t } = useAppLanguage();
@@ -46,9 +46,9 @@ const UserDashboardPage = () => {
   const [selectedPlanForPayment, setSelectedPlanForPayment] = useState(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
-  const [tab, setTab] = useState(searchParams.get("tab") || "overview");
+  const requestedTab = searchParams.get("tab");
+  const tab = VALID_TABS.includes(requestedTab) ? requestedTab : "overview";
   const [loading, setLoading] = useState(true);
-
 
   const canPostProperty = useMemo(
     () => SELLER_ROLES.includes(user?.role) || Boolean(user?.canPostProperty),
@@ -81,20 +81,9 @@ const UserDashboardPage = () => {
     }
   }, [canPostProperty, token]);
 
-
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
-
-  const handleLeadAction = useCallback(async (id, status) => {
-    try {
-      await updateLeadApproval(token, id, status);
-      toast.success(`Request ${status}`);
-      loadDashboard();
-    } catch {
-      toast.error("Action failed");
-    }
-  }, [token, loadDashboard]);
 
   const onUnlockLead = async (id) => {
     try {
@@ -110,41 +99,10 @@ const UserDashboardPage = () => {
     }
   };
 
-  /*
-  const openRazorpayCheckout = async (intent, planName) => {
-    const loaded = await loadExternalScript("https://checkout.razorpay.com/v1/checkout.js");
-    if (!loaded || !window.Razorpay) throw new Error("Unable to load Razorpay checkout");
-
-    return new Promise((resolve, reject) => {
-      const options = {
-        key: intent.keyId || import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: intent.amount,
-        currency: intent.currency || "INR",
-        name: "MyHosurProperty",
-        description: planName,
-        order_id: intent.orderId || intent.razorpay?.orderId,
-        prefill: {
-          name: user?.name || "",
-          email: user?.email || "",
-          contact: user?.phone || "",
-        },
-        handler: (response) => resolve(response),
-        modal: {
-          ondismiss: () => reject(new Error("Payment cancelled")),
-        },
-      };
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
-    });
-  };
-  */
-
   const onBuyPack = async () => {
     setSelectedPlanForPayment({ name: "Lead Pack (5 Credits)", price: 300 });
     setIsPaymentModalOpen(true);
   };
-
 
   const onToggleSaved = useCallback(async (propertyId) => {
     try {
@@ -157,17 +115,10 @@ const UserDashboardPage = () => {
     }
   }, [token]);
 
-  const VALID_TABS = ["overview", "listings", "leads", "inquiries", "payments", "saved"];
-
   const pendingLeads = useMemo(() => incomingLeads.filter((lead) => lead.status === "pending"), [incomingLeads]);
-  const inquiryHistory = useMemo(() => getInquiryHistory(user?._id), [user?._id, myProperties.length, incomingLeads.length]);
-  const sidebarStats = useMemo(() => [
-    { label: "Properties", value: myProperties.length, icon: <HomeModernIcon className="h-4 w-4" /> },
-    { label: "Lead Credits", value: customerLeadCredits, icon: <TicketIcon className="h-4 w-4" /> },
-    { label: "Saved", value: saved.length, icon: <BookmarkIcon className="h-4 w-4" /> },
-  ], [myProperties.length, customerLeadCredits, saved.length]);
+  const inquiryHistory = useMemo(() => getInquiryHistory(user?._id), [user?._id]);
+
   const handleTabSelect = useCallback((newTab) => {
-    setTab(newTab);
     setSearchParams(newTab === "overview" ? {} : { tab: newTab }, { replace: true });
   }, [setSearchParams]);
 
@@ -185,13 +136,6 @@ const UserDashboardPage = () => {
     onClick: handleTabSelect,
   })), [t, myProperties.length, pendingLeadsCount, incomingLeads.length, inquiryHistory.length, payments.length, saved.length, tab, handleTabSelect]);
 
-  useEffect(() => {
-    const queryTab = searchParams.get("tab") || "overview";
-    if (queryTab !== tab && VALID_TABS.includes(queryTab)) {
-      setTab(queryTab);
-    }
-  }, [searchParams]);
-
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-50 pt-6 md:pl-80">
@@ -207,7 +151,7 @@ const UserDashboardPage = () => {
       title={user?.name || "Dashboard"}
       subtitle="My Dashboard"
       description="View all your property activity, leads, payments, and saved listings from one clear workspace."
-      stats={sidebarStats}
+
       navItems={navItems}
       onLogout={logout}
     >
@@ -569,7 +513,6 @@ const UserDashboardPage = () => {
           </div>
         </section>
       )}
-
 
       {tab === "saved" && (
         <section className="space-y-4">

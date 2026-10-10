@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState, memo } from "react";
+import { useMemo, useState, memo } from "react";
 import { motion } from "framer-motion";
 import { ChevronDownIcon } from "./AppIcons";
 import { bankLoans } from "../constants/bankLoans";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 
 const formatCurrency = (value) => {
   if (value >= 10000000) {
@@ -23,15 +23,15 @@ const TENURES = [
 const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
   const { t } = useAppLanguage();
   const [loanAmount, setLoanAmount] = useState(25); // in lakhs
-  const [interestRate, setInterestRate] = useState((bank.minRate + bank.maxRate) / 2);
+  const [rateOverride, setRateOverride] = useState(null);
   const [tenure, setTenure] = useState(180); // 15 years in months
   const [processingFeePercent, setProcessingFeePercent] = useState(0.75);
   const [showAmortization, setShowAmortization] = useState(false);
   const selectedBank = bankLoans.find((item) => item.id === bank?.id) || bankLoans[0];
 
-  useEffect(() => {
-    setInterestRate((selectedBank.minRate + selectedBank.maxRate) / 2);
-  }, [selectedBank.id, selectedBank.minRate, selectedBank.maxRate]);
+  const interestRate = rateOverride?.bankId === selectedBank.id
+    ? rateOverride.value
+    : (selectedBank.minRate + selectedBank.maxRate) / 2;
 
   // Calculate EMI and total interest with processing fee
   const calculations = useMemo(() => {
@@ -144,7 +144,7 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
                   key={bankOption.id}
                   onClick={() => {
                     onBankChange(bankOption);
-                    setInterestRate((bankOption.minRate + bankOption.maxRate) / 2);
+                    setRateOverride(null);
                   }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.98 }}
@@ -207,7 +207,7 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
               max={selectedBank.maxRate}
               step="0.01"
               value={interestRate}
-              onChange={(e) => setInterestRate(Number(e.target.value))}
+              onChange={(e) => setRateOverride({ bankId: selectedBank.id, value: Number(e.target.value) })}
               className="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-green-500"
               style={{
                 background: `linear-gradient(to right, rgb(34, 197, 94) 0%, rgb(34, 197, 94) ${

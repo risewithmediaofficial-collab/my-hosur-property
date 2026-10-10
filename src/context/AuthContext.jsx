@@ -1,24 +1,51 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { getProfile } from "../services/api/authApi";
 import { AuthContext } from "./authContextValue";
 
 const TOKEN_KEY = "mhp_token";
 const USER_KEY = "mhp_user";
 
-export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(localStorage.getItem(TOKEN_KEY) || "");
-  const [user, setUser] = useState(() => {
+const readSession = () => {
+  try {
+    const token = localStorage.getItem(TOKEN_KEY) || "";
     const raw = localStorage.getItem(USER_KEY);
-    return raw ? JSON.parse(raw) : null;
-  });
+    return { token, user: token && raw ? JSON.parse(raw) : null };
+  } catch {
+    return { token: "", user: null };
+  }
+};
+
+const persistSession = (token, user) => {
+  try {
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token);
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+    } else {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+    }
+  } catch {
+    // Keep the current session usable when browser storage is disabled.
+  }
+};
+
+export const AuthProvider = ({ children }) => {
+  const [session, setSession] = useState(readSession);
+  const { token, user } = session;
+  const sessionVersion = useRef(0);
   const [loading, setLoading] = useState(Boolean(token));
 
   const logout = useCallback(() => {
-    setToken("");
-    setUser(null);
+    sessionVersion.current += 1;
+    setSession({ token: "", user: null });
     setLoading(false);
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+    persistSession("", null);
   }, []);
 
   useEffect(() => {
@@ -26,34 +53,40 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    getProfile(token)
+    const controller = new AbortController();
+    const version = sessionVersion.current;
+    const isCurrent = () => !controller.signal.aborted && version === sessionVersion.current;
+    getProfile(token, controller.signal)
       .then((res) => {
-        setUser(res.user);
-        localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+        if (!isCurrent()) return;
+        setSession({ token, user: res.user });
+        persistSession(token, res.user);
       })
-      .catch(() => logout())
-      .finally(() => setLoading(false));
-  }, [token]);
+      .catch(() => { if (isCurrent()) logout(); })
+      .finally(() => { if (isCurrent()) setLoading(false); });
+    return () => controller.abort();
+  }, [token, logout]);
 
   const login = useCallback((payload) => {
-    setToken(payload.token);
-    setUser(payload.user);
+    sessionVersion.current += 1;
+    setSession({ token: payload.token, user: payload.user });
     setLoading(false);
-    localStorage.setItem(TOKEN_KEY, payload.token);
-    localStorage.setItem(USER_KEY, JSON.stringify(payload.user));
+    persistSession(payload.token, payload.user);
   }, []);
 
   const refreshProfile = useCallback(async () => {
     if (!token) return null;
+    const version = sessionVersion.current;
     const res = await getProfile(token);
-    setUser(res.user);
-    localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+    if (version !== sessionVersion.current) return null;
+    setSession({ token, user: res.user });
+    persistSession(token, res.user);
     return res.user;
   }, [token]);
 
   const value = useMemo(
     () => ({ token, user, loading, login, logout, refreshProfile, isAuthenticated: Boolean(token) }),
-    [token, user, loading, refreshProfile]
+    [token, user, loading, login, logout, refreshProfile]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

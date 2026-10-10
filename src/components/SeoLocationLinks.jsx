@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { HOSUR_LOCATIONS, INTENT_MODIFIERS, CORE_SEARCH_PHRASES, HIGH_AUTHORITY_BRANDING_KEYWORDS } from "../constants/seoLocations";
+import { HOSUR_LOCATIONS, CORE_SEARCH_PHRASES, HIGH_AUTHORITY_BRANDING_KEYWORDS } from "../constants/seoLocations";
 import { slugify } from "../utils/format";
 
 const SeoLocationLinks = ({ currentSlug = "", showBrandingTags = true }) => {

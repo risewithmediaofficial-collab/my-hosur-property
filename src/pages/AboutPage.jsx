@@ -16,7 +16,7 @@ import MarketingCard, { IconCircle } from "../components/MarketingCard";
 import PageSection from "../components/PageSection";
 import SeoHead from "../components/SeoHead";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 import { localizeCatalogText } from "../utils/i18nCatalog";
 import useScrollAnimation from "../hooks/useScrollAnimation";
 import founderImage from "../assets/myhosurproperty vijay kumar founder.jpeg";
@@ -127,10 +127,10 @@ const AboutPage = () => {
         schema={[buildRealEstateAgentSchema(), buildBreadcrumbSchema(breadcrumbs)]}
       />
       {/* Our Story */}
-      <PageSection 
-        tag={t("about.ourStoryTag") || "Our Story"} 
-        title={t("about.ourStoryTitle") || "Built on Trust. Driven by Purpose."} 
-        tone="surface" 
+      <PageSection
+        tag={t("about.ourStoryTag") || "Our Story"}
+        title={t("about.ourStoryTitle") || "Built on Trust. Driven by Purpose."}
+        tone="surface"
         className="!pt-6 sm:!pt-8 !pb-14"
       >
         <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center">
@@ -143,7 +143,7 @@ const AboutPage = () => {
             <p className="text-sm leading-7 text-slate-600">
               {t("about.ourStoryDesc") || "We believe every property holds potential – not just in value, but in the life it helps build. That's why we combine local expertise with modern technology to help you find spaces that truly fit your dreams and future."}
             </p>
-            
+
             <div className="grid grid-cols-3 gap-4 mt-4 border-t border-slate-100 pt-6">
               {[
                 { value: 100, suffix: "+", label: t("home.stats.verifiedListings") || "Verified Listings" },
@@ -315,7 +315,7 @@ const AboutPage = () => {
       </PageSection>
 
       {/* ── Our Founder ── */}
-      
+
       <section className="bg-white px-5 py-14 sm:px-8 lg:px-10 gsap-section">
         <div className="mx-auto max-w-[1440px]">
           {/* Section label */}

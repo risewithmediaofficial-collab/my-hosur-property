@@ -737,7 +737,7 @@ const verifyOtp = async (req, res) => {
     try {
       const { sendWelcomeMessage } = require("../services/whatsapp/whatsappEvents.service");
       setImmediate(() => sendWelcomeMessage(user).catch((e) => console.error("[wa] welcome failed:", e.message)));
-    } catch (e) {
+    } catch {
       /* never block signup */
     }
   }
@@ -818,7 +818,7 @@ const socialLogin = async (req, res) => {
       try {
         const { sendWelcomeMessage } = require("../services/whatsapp/whatsappEvents.service");
         setImmediate(() => sendWelcomeMessage(user).catch((e) => console.error("[wa] welcome failed:", e.message)));
-      } catch (e) {
+      } catch {
         /* never block signup */
       }
     }
@@ -909,7 +909,7 @@ const verifyWidgetToken = async (req, res) => {
       try {
         const { sendWelcomeMessage } = require("../services/whatsapp/whatsappEvents.service");
         setImmediate(() => sendWelcomeMessage(user).catch((e) => console.error("[wa] welcome failed:", e.message)));
-      } catch (e) {
+      } catch {
         /* never block signup */
       }
     } else {

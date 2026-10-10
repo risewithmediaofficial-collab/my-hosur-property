@@ -53,10 +53,10 @@ export default {
         card: "12px",
       },
       fontFamily: {
-        sans: ["inherit"],
-        body: ["inherit"],
-        heading: ["inherit"],
-        philosopher: ["Philosopher", "inherit"],
+        sans: ["var(--site-body)"],
+        body: ["var(--site-body)"],
+        heading: ["var(--site-heading)"],
+        philosopher: ["var(--site-heading)"],
       },
       screens: {
         xs: "320px",

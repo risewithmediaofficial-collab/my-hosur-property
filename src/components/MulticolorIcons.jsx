@@ -1,4 +1,4 @@
-import React from "react";
+
 
 /**
  * Premium Multi-color Real SVG Icons for Property Types & Shortcut Categories.

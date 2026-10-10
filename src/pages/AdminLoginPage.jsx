@@ -5,7 +5,6 @@ import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
 import { adminLoginUser } from "../services/api/adminAuthApi";
 import { ShieldCheckIcon } from "../components/AppIcons";
-import { FloatingInput } from "../components/ui/input";
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();

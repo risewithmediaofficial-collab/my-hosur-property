@@ -2,11 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import useScrollAnimation from "../hooks/useScrollAnimation";
+
 import {
   ArrowRightIcon,
-  BanknotesIcon,
   BuildingOffice2Icon,
   BuildingOfficeIcon,
   CheckBadgeIcon,
@@ -14,20 +13,11 @@ import {
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  DocumentTextIcon,
   FlagIcon,
   HandshakeIcon,
   HomeIcon,
-  LandIcon,
-  HomeModernIcon,
   MapPinIcon,
-  PaintBrushIcon,
-  RentIcon,
-  ScaleIcon,
   UserGroupIcon,
-  VillaIcon,
-  WrenchScrewdriverIcon,
-  XMarkIcon,
 } from "../components/AppIcons";
 import CountUpNumber from "../components/CountUpNumber";
 import {
@@ -42,7 +32,7 @@ import SeoHead from "../components/SeoHead";
 import useDebounce from "../hooks/useDebounce";
 import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 import { localizeCatalogText } from "../utils/i18nCatalog";
 import servicesHeroImage from "../assets/house.png";
 import alluringRealityImg from "../assets/alluring reality.jpeg";
@@ -74,10 +64,6 @@ import {
   PropertyManagementMulticolorIcon,
 } from "../components/MulticolorIcons";
 
-gsap.config({ nullTargetWarn: false });
-gsap.registerPlugin(ScrollTrigger);
-
-
 const propertyTypeOptions = [
   { label: "All types", labelKey: "search.allTypes", value: "" },
   { label: "Plot", labelKey: "shortcuts.items.plot", value: "Plot" },
@@ -97,17 +83,6 @@ const propertyTypeIcons = {
   "Commercial Land / Building": CommercialMulticolorIcon,
   "Farm Land": FarmLandMulticolorIcon,
   "Agricultural Land": AgricultureLandMulticolorIcon,
-};
-
-const propertyTypeDescriptions = {
-  Plot: ["Residential & commercial", "plots across Hosur"],
-  "Villa / Flat": ["Gated villas & modern", "apartment residences"],
-  Villa: ["Premium gated", "villa communities"],
-  "Independent House": ["Spacious standalone", "homes with privacy"],
-  Flat: ["Apartments in prime", "Hosur localities"],
-  "Commercial Land / Building": ["Office, retail & commercial", "spaces & land"],
-  "Farm Land": ["Farm land & agro", "plots with water sources"],
-  "Agricultural Land": ["Farm & agricultural", "land listings"],
 };
 
 const shortcutGroups = [
@@ -328,7 +303,7 @@ const HomePage = () => {
   const [localityDropdownOpen, setLocalityDropdownOpen] = useState(false);
   const homeRootRef = useRef(null);
   const heroRef = useRef(null);
-  const heroBgRef = useRef(null);
+
   const heroContentRef = useRef(null);
   const shortcutBarRef = useRef(null);
   const propertyTypeMenuRef = useRef(null);
@@ -337,7 +312,6 @@ const HomePage = () => {
   const [showcaseIndex, setShowcaseIndex] = useState(0);
   // Tracks whether the user has actually interacted with the showcase carousel
   const showcaseInteractedRef = useRef(false);
-
 
   const [search, setSearch] = useState({
     intent: "buy",
@@ -366,10 +340,12 @@ const HomePage = () => {
   const debouncedSearch = useDebounce(search.search, 300);
 
   useEffect(() => {
-    fetchHomeProperties()
-      .then((res) => setFeatured(res.items || []))
-      .catch(() => setFeatured([]))
-      .finally(() => setFeaturedLoading(false));
+    const controller = new AbortController();
+    fetchHomeProperties(controller.signal)
+      .then((res) => { if (!controller.signal.aborted) setFeatured(res.items || []); })
+      .catch(() => { if (!controller.signal.aborted) setFeatured([]); })
+      .finally(() => { if (!controller.signal.aborted) setFeaturedLoading(false); });
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {
@@ -395,93 +371,7 @@ const HomePage = () => {
     };
   }, []);
 
-  // GSAP animations — ultra-smooth, lightweight, and hardware-accelerated.
-  useEffect(() => {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduceMotion) return undefined;
-
-    const ctx = gsap.context(() => {
-      // 1. Smooth hero entrance
-      gsap.fromTo(
-        ".home-gsap-hero-item",
-        { opacity: 0, y: 20 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.55,
-          ease: "power2.out",
-          stagger: 0.05,
-          delay: 0.05,
-          force3D: true,
-          overwrite: "auto",
-        }
-      );
-
-      // 2. High-performance batch scroll trigger for sections
-      ScrollTrigger.batch(".home-gsap-section", {
-        start: "top 92%",
-        once: true,
-        interval: 0.05,
-        onEnter: (batch) => {
-          gsap.fromTo(
-            batch,
-            { opacity: 0, y: 16, force3D: true },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.45,
-              stagger: 0.06,
-              ease: "power2.out",
-              overwrite: "auto",
-            }
-          );
-        },
-      });
-
-      // 3. High-performance batch scroll trigger for cards
-      ScrollTrigger.batch(".home-gsap-card", {
-        start: "top 92%",
-        once: true,
-        interval: 0.05,
-        onEnter: (batch) => {
-          gsap.fromTo(
-            batch,
-            { opacity: 0, y: 18, force3D: true },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.45,
-              stagger: 0.04,
-              ease: "power2.out",
-              overwrite: "auto",
-            }
-          );
-        },
-      });
-    }, homeRootRef);
-
-    const timer = setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 100);
-
-    return () => {
-      clearTimeout(timer);
-      ctx.revert();
-    };
-  }, []);
-
-
-  // When featured properties load, recalculate ScrollTrigger positions
-  // WITHOUT reverting/rebuilding the entire GSAP context (which would jump scroll)
-  useEffect(() => {
-    if (featured.length > 0) {
-      // Small delay to let React render the new property cards first
-      const timer = setTimeout(() => {
-        ScrollTrigger.refresh();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [featured.length]);
+  useScrollAnimation(homeRootRef, featured.length, "home-gsap");
 
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
@@ -1060,7 +950,7 @@ const HomePage = () => {
 
         {/* 2-Column Responsive Layout */}
         <div className="mx-auto grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8 max-w-[1440px]">
-          
+
           {/* Left Column: Properties Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 min-h-[400px]">
             {filteredDiscoverListings.map((item) => (

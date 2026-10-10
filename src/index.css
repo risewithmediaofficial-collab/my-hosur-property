@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Catamaran:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Mukta+Malar:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Noto+Sans+Kannada:wght@400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700;800&family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&display=swap');
-
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
@@ -44,9 +42,17 @@
 html,
 body,
 #root {
-  height: 100%;
   margin: 0;
   padding: 0;
+}
+
+html {
+  height: 100%;
+}
+
+body,
+#root {
+  min-height: 100%;
 }
 
 html,
@@ -66,12 +72,12 @@ body {
 :root {
   color: #1c1c1c;
   background: #ffffff;
-  --font-en: "Poppins", "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-en: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-ta: "Noto Sans Tamil", "Mukta Malar", "Catamaran", system-ui, sans-serif;
   --font-te: "Noto Sans Telugu", system-ui, sans-serif;
   --font-kn: "Noto Sans Kannada", system-ui, sans-serif;
   --font-hi: "Noto Sans Devanagari", "Poppins", system-ui, sans-serif;
-  --site-heading: "Philosopher", sans-serif;
+  --site-heading: "Poppins", var(--font-en);
   --site-body: var(--font-en);
   --site-bg: #ffffff;
   --site-bg-soft: #f7f7f7;
@@ -96,7 +102,7 @@ body {
   --site-brown: #FF9914;
   --site-brown-deep: #274F9A;
   --site-brown-soft: #f7f7f7;
-  --font-body: 15px;
+  --font-body: 16px;
   --font-paragraph: 16px;
 }
 
@@ -463,24 +469,6 @@ td, th, .dashboard-table th, .dashboard-table td, [class*="status"], [class*="ba
 }
 
 
-/* Remove the default browser square focus outline on all interactive elements */
-*:focus {
-  outline: none !important;
-}
-
-*:focus-visible {
-  outline: none !important;
-  box-shadow: 0 0 0 2px rgba(39, 79, 154, 0.3) !important;
-}
-
-input:focus,
-textarea:focus,
-select:focus,
-button:focus {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
 .MuiSvgIcon-root.h-3 {
   width: 0.75rem !important;
   height: 0.75rem !important;
@@ -614,14 +602,14 @@ p {
 @media (min-width: 640px) {
   :root {
     --font-body: 16px;
-    --font-paragraph: 17px;
+    --font-paragraph: 16px;
   }
 }
 
 @media (min-width: 1024px) {
   :root {
-    --font-body: 17px;
-    --font-paragraph: 19px;
+    --font-body: 16px;
+    --font-paragraph: 16px;
   }
 }
 
@@ -864,56 +852,18 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Ensure the page-shell's visible content aligns consistently across pages.
-   Most inner sections already use `mx-auto max-w-[1440px]` and per-section
-   paddings; this ensures a consistent page-level gutter while allowing
-   component-level paddings to remain effective. */
-.page-shell {
-  padding-left: 0;
-  padding-right: 0;
-}
-
-/* Apply a small, consistent horizontal gutter to centered containers inside
-   `.page-shell` so content aligns visually across pages. */
-.page-shell .mx-auto {
-  padding-left: 1.25rem; /* matches px-5 (20px) visually -- adjust if needed */
-  padding-right: 1.25rem;
-}
-
-@media (min-width: 1024px) {
-  .page-shell .mx-auto {
-    padding-left: 2.5rem; /* matches lg:px-10 where used */
-    padding-right: 2.5rem;
-  }
-}
-
-/* Ensure navbar and footer inner containers share the same horizontal gutters */
-header .mx-auto,
-footer .mx-auto {
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-}
-
-@media (min-width: 1024px) {
-  header .mx-auto,
-  footer .mx-auto {
-    padding-left: 2.5rem;
-    padding-right: 2.5rem;
-  }
-}
-
 /* Mobile typography and spacing improvements
    Improve readability and alignment on small screens by reducing
    large heading sizes, increasing line-height, and adjusting card text. */
 @media (max-width: 640px) {
   body {
-    font-size: 15px; /* ensure readable base */
-    line-height: 1.7;
+    font-size: var(--font-body);
+    line-height: 1.6;
   }
 
   p {
-    font-size: 15px;
-    line-height: 1.7;
+    font-size: var(--font-paragraph);
+    line-height: 1.65;
   }
 
   h1 { font-size: 1.75rem; line-height: 1.12; }
@@ -948,17 +898,6 @@ footer .mx-auto {
     padding-bottom: 0.6rem;
   }
 
-  /* Navbar: ensure links wrap and don't overflow */
-  header .mx-auto {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  footer .mx-auto {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
   /* Reduce image/gap sizes in list/grid cards */
   .home-showcase-track .home-showcase-card { min-width: 200px; }
 }
@@ -972,8 +911,8 @@ footer .mx-auto {
   }
 
   .marketing-hero h1, .marketing-hero h2 {
-    font-size: 1.35rem !important;
-    line-height: 1.18 !important;
+    font-size: clamp(1.75rem, 6vw, 2.125rem) !important;
+    line-height: 1.3 !important;
   }
 
   /* Make sure content images scale correctly without overriding header logo sizing */
@@ -992,11 +931,6 @@ footer .mx-auto {
     margin-top: 0.5rem !important;
   }
 
-  /* Footers: compact the link lists to avoid long wrapping lines */
-  footer nav.grid {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-    gap: 0.5rem;
-  }
 }
 
 .site-button-primary,
@@ -1564,38 +1498,24 @@ select:focus-visible {
     border-radius: 1.25rem;
   }
 
-  h1,
-  .text-5xl {
+  h1 {
     font-size: 2.125rem;
     line-height: 1.15;
   }
 
-  h2,
-  .text-4xl {
+  h2 {
     font-size: 1.75rem;
     line-height: 1.2;
   }
 
-  h3,
-  .text-3xl {
+  h3 {
     font-size: 1.375rem;
     line-height: 1.25;
   }
 
-  p,
-  .text-base {
+  p {
     font-size: var(--font-body);
     line-height: 1.6;
-  }
-
-  .text-sm {
-    font-size: 0.8rem;
-    line-height: 1.25rem;
-  }
-
-  .text-xs {
-    font-size: 0.7rem;
-    line-height: 1rem;
   }
 
   .dashboard-display {
@@ -1628,8 +1548,7 @@ select:focus-visible {
   a[role="button"],
   .site-button-primary,
   .site-button-secondary {
-    min-height: 48px;
-    padding: 0.75rem 1rem;
+    min-height: 44px;
   }
 
   .site-input {
@@ -2024,7 +1943,7 @@ body {
   --listing-nav-offset: 7.75rem;
 }
 
-.site-listings-active main {
+.site-listings-active > main {
   overflow: hidden;
   min-height: 0;
 }
@@ -2221,6 +2140,21 @@ body {
 
 /* Mobile: properties first; filters open in left drawer */
 @media (max-width: 767px) {
+  .site-listings-active > main,
+  .listing-page-root,
+  .listing-page-layout,
+  .listing-results,
+  .listing-results-scroll {
+    flex: 1 0 auto;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .site-listings-active > main > div {
+    height: auto;
+  }
+
   .listing-page-layout {
     flex-direction: column;
   }
@@ -2231,14 +2165,12 @@ body {
 
   .listing-results-header {
     padding: 1rem 1rem 0.75rem;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    box-shadow: 0 1px 0 #f1f5f9;
+    position: static;
+    box-shadow: none;
   }
 
   .listing-results-intro h1 {
-    font-size: 1.25rem;
+    font-size: clamp(1.5rem, 6vw, 1.875rem);
     line-height: 1.35;
   }
 
@@ -2252,11 +2184,6 @@ body {
 
   .listing-results-scroll-inner {
     padding: 0.75rem 1rem 1.5rem;
-  }
-
-  .listing-results-scroll {
-    /* iOS needs explicit scroll container below navbar */
-    overflow-y: scroll;
   }
 
   .listing-results .grid {

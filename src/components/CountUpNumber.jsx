@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState, memo } from "react";
+import useLowMotionDevice from "../hooks/useLowMotionDevice";
 
 const CountUpNumber = ({ value = 0, duration = 1200, suffix = "", prefix = "" }) => {
   const [displayValue, setDisplayValue] = useState(0);
   const [started, setStarted] = useState(false);
   const ref = useRef(null);
+  const lowMotionDevice = useLowMotionDevice();
+  const skipAnimation = lowMotionDevice || duration <= 0;
 
   useEffect(() => {
     const node = ref.current;
-    if (!node || started) return undefined;
+    if (!node || started || skipAnimation) return undefined;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -20,10 +23,10 @@ const CountUpNumber = ({ value = 0, duration = 1200, suffix = "", prefix = "" })
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, [started]);
+  }, [started, skipAnimation]);
 
   useEffect(() => {
-    if (!started) return undefined;
+    if (!started || skipAnimation) return undefined;
 
     let frameId;
     const start = performance.now();
@@ -37,12 +40,12 @@ const CountUpNumber = ({ value = 0, duration = 1200, suffix = "", prefix = "" })
 
     frameId = window.requestAnimationFrame(tick);
     return () => window.cancelAnimationFrame(frameId);
-  }, [duration, started, value]);
+  }, [duration, started, value, skipAnimation]);
 
   return (
     <span ref={ref}>
       {prefix}
-      {displayValue.toLocaleString("en-IN")}
+      {(skipAnimation ? value : displayValue).toLocaleString("en-IN")}
       {suffix}
     </span>
   );

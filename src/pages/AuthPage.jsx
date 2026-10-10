@@ -2,13 +2,29 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheckIcon, EnvelopeIcon, LockClosedIcon, PhoneIcon, MapPinIcon, UserIcon, UserCircleIcon, EyeIcon, EyeSlashIcon, SparklesIcon } from "../components/AppIcons";
+import {
+  ShieldCheckIcon,
+  EnvelopeIcon,
+  LockClosedIcon,
+  PhoneIcon,
+  UserIcon,
+  EyeIcon,
+  EyeSlashIcon,
+  SparklesIcon,
+} from "../components/AppIcons";
 import BrandLogo from "../components/BrandLogo";
-import { loginUser, resendOtp, signupUser, verifyOtp as verifyOtpApi, verifyWidgetToken, forgotPassword, resetPassword } from "../services/api/authApi";
+import {
+  loginUser,
+  resendOtp,
+  signupUser,
+  verifyOtp as verifyOtpApi,
+  verifyWidgetToken,
+  forgotPassword,
+  resetPassword,
+} from "../services/api/authApi";
 import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
 import AnimatedOTPInput from "../components/AnimatedOTPInput";
-import loginIllustration from "../assets/Wavy_Gen-01_Single-07.jpg";
 
 const MotionDiv = motion.div;
 const AUTH_FORM = {
@@ -57,35 +73,6 @@ const Field = ({ label, icon: Icon, id, ...props }) => {
           className={`auth-input ${Icon ? "auth-input-with-icon" : ""}`}
           {...props}
         />
-      </div>
-    </MotionDiv>
-  );
-};
-
-const SelectField = ({ label, icon: Icon, id, children, ...props }) => {
-  const defaultId = React.useId();
-  const inputId = id || defaultId;
-  return (
-    <MotionDiv variants={item} className="auth-field-wrap group relative pt-2">
-      <label
-        htmlFor={inputId}
-        className={`origin-start absolute top-[34px] block -translate-y-1/2 cursor-text px-1 text-xs font-semibold text-slate-400 transition-all pointer-events-none z-10
-          group-focus-within:top-2 group-focus-within:text-[10px] group-focus-within:text-navy group-focus-within:font-bold
-          has-[+div>select:not([value=""]):not(:disabled)]:top-2 has-[+div>select:not([value=""]):not(:disabled)]:text-[10px] has-[+div>select:not([value=""]):not(:disabled)]:font-bold has-[+div>select:not([value=""]):not(:disabled)]:text-navy
-          has-[+div>select]:top-2 has-[+div>select]:text-[10px] has-[+div>select]:font-bold has-[+div>select]:text-navy
-          ${Icon ? "left-12" : "left-4"}`}
-      >
-        <span className="inline-flex bg-white px-1.5">{label}</span>
-      </label>
-      <div className="auth-input-shell">
-        {Icon ? <Icon className="auth-input-icon" /> : null}
-        <select
-          id={inputId}
-          className={`auth-input auth-select ${Icon ? "auth-input-with-icon" : ""}`}
-          {...props}
-        >
-          {children}
-        </select>
       </div>
     </MotionDiv>
   );
@@ -181,7 +168,6 @@ const AuthPage = () => {
   const [resendCountdown, setResendCountdown] = useState(0);
   const [otpExpiryCountdown, setOtpExpiryCountdown] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [widgetReady, setWidgetReady] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -209,7 +195,6 @@ const AuthPage = () => {
       if (typeof window.initSendOTP === "function") {
         try {
           window.initSendOTP(window.configuration);
-          setWidgetReady(true);
           console.log("MSG91 widget re-initialized from existing script.");
         } catch (e) {
           console.error("Error re-calling initSendOTP:", e);
@@ -219,7 +204,6 @@ const AuthPage = () => {
           if (typeof window.initSendOTP === "function") {
             try {
               window.initSendOTP(window.configuration);
-              setWidgetReady(true);
               console.log("MSG91 widget initialized after existing script load event.");
             } catch (e) {
               console.error("Error calling initSendOTP after load:", e);
@@ -243,18 +227,17 @@ const AuthPage = () => {
     let index = 0;
     const attemptLoad = () => {
       if (scriptLoaded) return;
-      
+
       const s = document.createElement("script");
       s.src = urls[index];
       s.async = true;
       s.id = "msg91-otp-script";
-      
+
       s.onload = () => {
         scriptLoaded = true;
         if (typeof window.initSendOTP === "function") {
           try {
             window.initSendOTP(window.configuration);
-            setWidgetReady(true);
             console.log("MSG91 widget script loaded and initialized successfully.");
           } catch (e) {
             console.error("Error calling initSendOTP:", e);
@@ -532,7 +515,7 @@ const AuthPage = () => {
       if (otpState?.provider === "msg91_widget" && window.retryOtp) {
         window.retryOtp(
           undefined,
-          (res) => {
+          () => {
             setOtpCode("");
             setResendCountdown(45);
             setOtpExpiryCountdown(300);
@@ -589,8 +572,6 @@ const AuthPage = () => {
         : isSignup
           ? "Create a free account to submit property requirements, request loans & services, and post free property listings."
           : "Sign in to manage your property requests, post free property listings, and connect with genuine buyers and owners.";
-
-  const statusText = isForgot ? "Recovery mode" : isSignup ? "New account" : "Secure access";
 
   return (
     <>
@@ -1233,7 +1214,6 @@ const AuthPage = () => {
                           ) : null}
                         </>
                       )}
-
 
                       <motion.div variants={item}>
                         <button type="submit" className="auth-submit" disabled={submitDisabled}>

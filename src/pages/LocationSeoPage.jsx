@@ -9,9 +9,15 @@ import Loader from "../components/Loader";
 import useScrollAnimation from "../hooks/useScrollAnimation";
 import { getSeoPageBySlug } from "../constants/seoLocations";
 import { fetchProperties } from "../services/api/propertyApi";
-import { slugify } from "../utils/format";
+
 import { absoluteUrl } from "../utils/seo";
-import { PhoneIcon, WhatsAppIcon, CheckBadgeIcon, ShieldCheckIcon, DocumentTextIcon } from "../components/AppIcons";
+import {
+  PhoneIcon,
+  WhatsAppIcon,
+  CheckBadgeIcon,
+  ShieldCheckIcon,
+  DocumentTextIcon,
+} from "../components/AppIcons";
 import { SOCIAL_LINKS, CONTACT_PHONE_NUMBERS } from "../constants/contactInfo";
 
 const LocationSeoPage = () => {
@@ -20,7 +26,7 @@ const LocationSeoPage = () => {
   const [loading, setLoading] = useState(true);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
-  useScrollAnimation(null, [properties.length]);
+  useScrollAnimation(null, properties.length);
 
   // Look up predefined page details or build dynamic fallback based on slug
   const seoConfig = getSeoPageBySlug(slug) || {
@@ -37,7 +43,7 @@ const LocationSeoPage = () => {
   const { title, h1, locationName, category, metaTitle, metaDescription } = seoConfig;
 
   useEffect(() => {
-    let isMounted = true;
+    const controller = new AbortController();
     setLoading(true);
 
     const loadProperties = async () => {
@@ -50,21 +56,21 @@ const LocationSeoPage = () => {
           queryParams.category = category;
         }
 
-        const res = await fetchProperties(queryParams);
-        if (isMounted) {
+        const res = await fetchProperties(queryParams, undefined, controller.signal);
+        if (!controller.signal.aborted) {
           setProperties(res.items || []);
         }
       } catch (err) {
+        if (controller.signal.aborted) return;
+        setProperties([]);
         console.error("Failed to fetch location properties:", err);
       } finally {
-        if (isMounted) setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
 
     loadProperties();
-    return () => {
-      isMounted = false;
-    };
+    return () => controller.abort();
   }, [locationName, category]);
 
   // Schema.org FAQ data for Google Rich Snippets
@@ -139,6 +145,7 @@ const LocationSeoPage = () => {
       <section className="bg-gradient-to-b from-navy via-navy/95 to-navy text-white pt-10 pb-14 px-4 sm:px-6 lg:px-8 shadow-md">
         <div className="mx-auto max-w-7xl">
           <Breadcrumbs
+            tone="dark"
             items={[
               { label: "Home", to: "/" },
               { label: "Listings", to: "/listings" },

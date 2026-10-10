@@ -69,9 +69,12 @@ const EditPropertyPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true);
     const load = async () => {
       try {
-        const res = await fetchPropertyById(id, token);
+        const res = await fetchPropertyById(id, token, controller.signal);
+        if (controller.signal.aborted) return;
         const p = res.property;
         const ownerId = String(p.ownerId?._id || p.ownerId || "");
         const currentUserId = String(user?._id || "");
@@ -179,13 +182,15 @@ const EditPropertyPage = () => {
           documents: p.documents || [],
         });
       } catch {
+        if (controller.signal.aborted) return;
         toast.error("Failed to load property details");
         navigate("/dashboard");
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
     load();
+    return () => controller.abort();
   }, [id, navigate, token, user?._id, user?.role]);
 
   if (loading) {

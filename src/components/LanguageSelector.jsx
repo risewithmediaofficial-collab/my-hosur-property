@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 import { CheckIcon, ChevronDownIcon, GlobeAltIcon } from "./AppIcons";
 
 /**
  * LanguageSelector UI Component
- * Supports variants: 'navbar' (default dropdown), 'topbar', 'mobile' (interactive pill list), 'footer'
+ * Supports navbar, topbar, mobile, footer and footerCompact variants.
  */
 const LanguageSelector = ({ variant = "navbar", className = "" }) => {
   const { currentLanguage, currentLangObj, setLanguage, languages, t } = useAppLanguage();
@@ -25,6 +25,18 @@ const LanguageSelector = ({ variant = "navbar", className = "" }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [variant]);
+
+  if (variant === "footerCompact") {
+    return (
+      <label className={`footer-language-control ${className}`}>
+        <GlobeAltIcon aria-hidden="true" />
+        <span>{t("language.select")}</span>
+        <select value={currentLanguage} onChange={event => setLanguage(event.target.value)} aria-label={t("footer.chooseLanguage")}>
+          {languages.map(lang => <option key={lang.code} value={lang.code}>{lang.nativeName}</option>)}
+        </select>
+      </label>
+    );
+  }
 
   // Mobile Drawer Variant
   if (variant === "mobile") {

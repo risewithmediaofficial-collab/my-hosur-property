@@ -1,25 +1,14 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
-import {
-  ArrowRightIcon,
-  BedIcon,
-  CheckBadgeIcon,
-  InteriorIcon,
-  LandIcon,
-  MapPinIcon,
-  RectangleStackIcon,
-  UserIcon,
-  HeartIcon,
-  HeartSolidIcon,
-} from "./AppIcons";
+import { ArrowRightIcon, MapPinIcon, HeartIcon, HeartSolidIcon } from "./AppIcons";
 import { currency, formatArea } from "../utils/format";
 import { PROPERTY_PLACEHOLDER_IMAGE } from "../constants/propertyMedia";
 import { getPropertyImageAlt, getPropertyPath } from "../utils/seo";
 import useScrollToTop from "../hooks/useScrollToTop";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 import { localizeCatalogText } from "../utils/i18nCatalog";
 
-const PropertyCard = memo(({ item, onSave, isSaved, showOwner = true }) => {
+const PropertyCard = memo(({ item, onSave, isSaved }) => {
   const { t, currentLanguage } = useAppLanguage();
   const href = getPropertyPath(item);
   const scrollToTop = useScrollToTop();
@@ -87,7 +76,7 @@ const PropertyCard = memo(({ item, onSave, isSaved, showOwner = true }) => {
         <div>
           {/* Title */}
           <h3
-            className="font-sans text-base sm:text-[17px] font-bold text-navy leading-snug truncate group-hover:text-orange transition-colors duration-200"
+            className="property-card-title font-heading font-semibold text-navy group-hover:text-orange transition-colors duration-200"
             title={item.title}
           >
             {item.title}
@@ -101,14 +90,14 @@ const PropertyCard = memo(({ item, onSave, isSaved, showOwner = true }) => {
                 {propLocation}, {item.location?.city || "Hosur"}
               </span>
             </div>
-            <div className="text-right shrink-0">
-              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+            {item.bhk ? <div className="text-right shrink-0">
+              <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">
                 {t("propertyCard.totalRooms") || "Total Rooms"}
               </p>
               <p className="text-xs font-extrabold text-navy">
-                {item.bhk ? `${item.bhk} BHK` : t("propertyCard.studio") || "Studio"}
+                {item.bhk} BHK
               </p>
-            </div>
+            </div> : null}
           </div>
         </div>
 
@@ -116,13 +105,13 @@ const PropertyCard = memo(({ item, onSave, isSaved, showOwner = true }) => {
         <div className="flex items-center justify-between gap-3">
           <div className="flex gap-5 sm:gap-6 min-w-0">
             <div>
-              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider border-b-2 border-orange/40 pb-0.5 w-fit">
+              <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide border-b-2 border-orange/40 pb-0.5 w-fit">
                 {t("propertyCard.propertyType") || "Property Type"}
               </p>
               <p className="mt-1 text-xs sm:text-sm font-bold text-navy truncate capitalize">{propType}</p>
             </div>
             <div>
-              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider border-b-2 border-orange/40 pb-0.5 w-fit">
+              <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide border-b-2 border-orange/40 pb-0.5 w-fit">
                 {t("propertyCard.availableSize") || "Available Size"}
               </p>
               <p className="mt-1 text-xs sm:text-sm font-bold text-navy truncate">{propSize}</p>
@@ -159,6 +148,8 @@ const PropertyCard = memo(({ item, onSave, isSaved, showOwner = true }) => {
                   ? t("propertyCard.removeFromSaved") || "Remove from saved"
                   : t("propertyCard.saveProperty") || "Save property"
               }
+              aria-label={isSaved ? `Remove ${item.title} from saved properties` : `Save ${item.title}`}
+              aria-pressed={Boolean(isSaved)}
             >
               {isSaved ? <HeartSolidIcon className="h-4.5 w-4.5" /> : <HeartIcon className="h-4.5 w-4.5" />}
             </button>

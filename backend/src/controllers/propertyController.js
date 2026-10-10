@@ -383,7 +383,7 @@ const getPropertyById = async (req, res) => {
   }
 };
 
-const createProperty = async (req, res) => {
+const createProperty = async (req, res, next) => {
   const user = await User.findById(req.user._id);
   const hasRolePostingAccess = ["seller", "agent", "broker", "builder", "admin"].includes(user.role);
   if (!hasRolePostingAccess && !user.canPostProperty) {
@@ -631,7 +631,9 @@ const deleteProperty = async (req, res) => {
       summary: `${req.user.role === "admin" ? "Admin" : "User"} moved property "${property.title}" to Recycle Bin`,
       details: { title: property.title, price: property.price },
     });
-  } catch (e) {}
+  } catch (error) {
+    console.error("[deleteProperty] Activity logging failed:", error.message);
+  }
 
   cache.flushAll();
   return res.json({ message: "Property moved to Recycle Bin", property });

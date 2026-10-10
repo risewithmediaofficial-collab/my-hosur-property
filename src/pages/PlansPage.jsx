@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { CheckCircleIcon, ShieldCheckIcon } from "../components/AppIcons";
+import { CheckCircleIcon } from "../components/AppIcons";
 import useAuth from "../hooks/useAuth";
 import { fetchPlans, activateFreePlan } from "../services/api/planApi";
 import { fetchMyPayments } from "../services/api/paymentApi";
 import { currency } from "../utils/format";
 import useScrollAnimation from "../hooks/useScrollAnimation";
 import QrPaymentModal from "../components/QrPaymentModal";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 import { localizeCatalogText } from "../utils/i18nCatalog";
 
 const fallbackPlans = [
@@ -141,7 +141,7 @@ const normalizePlan = (plan) => {
 
 const PlansPage = () => {
   const { t, currentLanguage } = useAppLanguage();
-  useScrollAnimation(null, []);
+  useScrollAnimation(null, 0);
   const navigate = useNavigate();
   const { token, user, refreshProfile } = useAuth();
   const [plans, setPlans] = useState([]);
@@ -215,7 +215,6 @@ const PlansPage = () => {
       setBuyingPlanId("");
     }
   };
-
 
   const regularPlans = plans.filter((plan) => plan.category !== "database_access" && Number(plan.price || 0) > 0);
   const dbPacks = plans.filter((plan) => plan.category === "database_access");

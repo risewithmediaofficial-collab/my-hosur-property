@@ -26,16 +26,16 @@ const normalizePropertyResponse = (payload) => ({
   items: (payload?.items || []).map(normalizeProperty),
 });
 
-export const fetchFeaturedProperties = async () =>
-  normalizePropertyResponse((await apiClient.get("/api/properties/featured")).data);
+export const fetchFeaturedProperties = async (signal) =>
+  normalizePropertyResponse((await apiClient.get("/api/properties/featured", { signal })).data);
 
-export const fetchProperties = async (params, token) =>
-  normalizePropertyResponse((await apiClient.get("/api/properties", { params, ...(token ? withAuth(token) : {}) })).data);
+export const fetchProperties = async (params, token, signal) =>
+  normalizePropertyResponse((await apiClient.get("/api/properties", { params, signal, ...(token ? withAuth(token) : {}) })).data);
 
-export const fetchHomeProperties = async () => {
-  const featured = await fetchFeaturedProperties();
+export const fetchHomeProperties = async (signal) => {
+  const featured = await fetchFeaturedProperties(signal);
   if (featured?.items?.length) return featured;
-  return fetchProperties({ limit: 8 });
+  return fetchProperties({ limit: 8 }, undefined, signal);
 };
 
 export const fetchPropertyLocations = async () => {
@@ -47,19 +47,13 @@ export const fetchPropertyLocations = async () => {
   }
 };
 
-export const fetchPropertyById = async (id, token) => {
-  try {
-    const config = token ? withAuth(token) : {};
-    const response = await apiClient.get(`/api/properties/${id}`, config);
-    return {
-      ...response.data,
-      property: normalizeProperty(response.data?.property),
-      similar: (response.data?.similar || []).map(normalizeProperty),
-    };
-  } catch (error) {
-    console.error("Error fetching property:", error.response?.data || error.message);
-    throw error;
-  }
+export const fetchPropertyById = async (id, token, signal) => {
+  const response = await apiClient.get(`/api/properties/${id}`, { ...(token ? withAuth(token) : {}), signal });
+  return {
+    ...response.data,
+    property: normalizeProperty(response.data?.property),
+    similar: (response.data?.similar || []).map(normalizeProperty),
+  };
 };
 
 export const fetchMyProperties = async (token) =>

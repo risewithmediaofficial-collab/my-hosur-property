@@ -4,7 +4,7 @@ import { cn } from "../lib/utils";
 import { OTPInput, OTPInputContext } from "input-otp";
 import { MinusIcon } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 
 // Animation constants
 const EASE_OUT_QUINT_X1 = 0.22;
@@ -96,16 +96,8 @@ function AnimatedInputOTPGroup({
 function AnimatedInputOTPSlot({ index, className }) {
   const inputOTPContext = useContext(OTPInputContext);
   const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {};
-  const [isFilled, setIsFilled] = useState(false);
+  const isFilled = Boolean(char);
   const shouldReduceMotion = useReducedMotion();
-
-  useEffect(() => {
-    if (char && !isFilled) {
-      setIsFilled(true);
-    } else if (!char && isFilled) {
-      setIsFilled(false);
-    }
-  }, [char, isFilled]);
 
   return (
     <motion.div

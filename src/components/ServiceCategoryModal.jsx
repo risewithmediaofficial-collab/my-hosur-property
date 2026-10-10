@@ -3,7 +3,7 @@ import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { Link } from "react-router-dom";
 import { ArrowRightIcon, ChevronDownIcon, XMarkIcon } from "./AppIcons";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 import { localizeCatalogText } from "../utils/i18nCatalog";
 
 const ServiceCategoryModal = ({ category, onClose }) => {

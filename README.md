@@ -26,8 +26,8 @@ A production-style full-stack real estate application inspired by MagicBricks, w
 frontend (root)
   src/
     components/
-      Navbar, Footer, PropertyCard, FilterSidebar,
-      ImageGallery, ContactModal, PlanCard, ProtectedRoute
+      Navbar, Footer, PropertyCard, PropertySearchFilterPanel,
+      Breadcrumbs, ContactModal, ProtectedRoute
     pages/
       HomePage, ListingPage, PropertyDetailPage, AuthPage,
       UserDashboardPage, AgentDashboardPage, AdminDashboardPage,
@@ -202,13 +202,31 @@ npm run dev:full
 - Frontend: `http://localhost:5173`
 - Backend: `http://localhost:5001`
 
+## Validation
+
+```bash
+npm run lint
+npm --prefix backend test
+npm run build --ignore-scripts
+```
+
+The frontend-only build skips SEO file generation. Use `npm run build` when regenerating the sitemap for deployment.
+
+Run `npm run dev:frontend` or `npm run preview -- --host 127.0.0.1 --port 5173` in a separate terminal, then run:
+
+```bash
+npm run cy:run -- --browser electron
+```
+
+Browser checks cover responsive layouts, filters, navigation, saved language preferences, session handling, and property form lookups with mocked API responses. Backend tests run without a database or external services.
+
 ## Notes for Production Hardening
 - Replace simulated payment flows with real providers (Razorpay/Stripe).
 - Configure SMTP for live lead alerts.
 - Add Redis for distributed caching.
 - Add rate limiting, CSRF strategy, audit logs.
 - Move image uploads to object storage (S3/Cloudinary).
-- Add test suites (unit + integration + e2e).
+- Add live database and payment integration tests.
 
 ## Render Deployment
 

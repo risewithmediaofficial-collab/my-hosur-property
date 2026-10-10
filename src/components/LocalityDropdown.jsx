@@ -1,9 +1,15 @@
-import { useEffect, useRef, useState, useMemo, memo } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  memo,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckIcon, ChevronDownIcon } from "./AppIcons";
 import { LOCALITY_SECTIONS } from "../constants/localities";
 import { fetchPropertyLocations } from "../services/api/propertyApi";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 import { localizeCatalogText } from "../utils/i18nCatalog";
 
 const LocalityDropdown = ({ value, onChange, onSelect, onOpenChange }) => {

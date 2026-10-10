@@ -2,10 +2,30 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
 import en from "./locales/en.json";
-import ta from "./locales/ta.json";
-import te from "./locales/te.json";
-import kn from "./locales/kn.json";
-import hi from "./locales/hi.json";
+
+const languageLoaders = {
+  ta: () => import("./locales/ta.json"),
+  te: () => import("./locales/te.json"),
+  kn: () => import("./locales/kn.json"),
+  hi: () => import("./locales/hi.json"),
+};
+
+const catalogLoaders = {
+  ta: () => import("./catalog/ta.json"),
+  te: () => import("./catalog/te.json"),
+  kn: () => import("./catalog/kn.json"),
+  hi: () => import("./catalog/hi.json"),
+};
+
+const languageBackend = {
+  type: "backend",
+  read(language, namespace, callback) {
+    const load = (namespace === "catalog" ? catalogLoaders : languageLoaders)[language];
+    if (!load) return callback(null, {});
+    load().then(({ default: translations }) => callback(null, translations),
+      (error) => callback(error, false));
+  },
+};
 
 export const SUPPORTED_LANGUAGES = [
   {
@@ -59,7 +79,7 @@ const getSavedLanguage = () => {
     if (saved && SUPPORTED_LANGUAGES.some((l) => l.code === saved)) {
       return saved;
     }
-  } catch (e) {
+  } catch  {
     // ignore
   }
   return "en";
@@ -67,14 +87,15 @@ const getSavedLanguage = () => {
 
 const initialLang = getSavedLanguage();
 
-i18n.use(initReactI18next).init({
+export const i18nReady = i18n.use(languageBackend).use(initReactI18next).init({
   resources: {
-    en: { translation: en },
-    ta: { translation: ta },
-    te: { translation: te },
-    kn: { translation: kn },
-    hi: { translation: hi },
+    en: { translation: en, catalog: {} },
   },
+  partialBundledLanguages: true,
+  ns: ["translation", "catalog"],
+  defaultNS: "translation",
+  supportedLngs: SUPPORTED_LANGUAGES.map(({ code }) => code),
+  load: "languageOnly",
   lng: initialLang,
   fallbackLng: "en",
   interpolation: {

@@ -51,7 +51,6 @@ const SeoHead = ({
     const twitterCard = image ? "summary_large_image" : "summary";
 
     document.title = resolvedTitle;
-    document.documentElement.lang = "en";
 
     upsertMeta("name", "description", resolvedDescription);
     upsertMeta("name", "keywords", keywords || SITE_KEYWORDS);

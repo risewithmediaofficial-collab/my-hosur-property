@@ -1,9 +1,11 @@
 import { Navigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import UserDashboardPage from "./UserDashboardPage";
-import AgentDashboardPage from "./AgentDashboardPage";
-import AdminDashboardPage from "./AdminDashboardPage";
-import CustomerDashboardPage from "./CustomerDashboardPage";
+import { lazy } from "react";
+
+const UserDashboardPage = lazy(() => import("./UserDashboardPage"));
+const AgentDashboardPage = lazy(() => import("./AgentDashboardPage"));
+const AdminDashboardPage = lazy(() => import("./AdminDashboardPage"));
+const CustomerDashboardPage = lazy(() => import("./CustomerDashboardPage"));
 
 const DashboardRouterPage = () => {
   const { user } = useAuth();

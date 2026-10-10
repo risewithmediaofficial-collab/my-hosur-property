@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   CONTACT_ADDRESS,
@@ -8,8 +8,11 @@ import {
 } from "../constants/contactInfo";
 import BrandLogo from "./BrandLogo";
 import LanguageSelector from "./LanguageSelector";
-import { useAppLanguage } from "../context/LanguageContext";
+import useMediaQuery from "../hooks/useMediaQuery";
+import useScrollToTop from "../hooks/useScrollToTop";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 import {
+  ChevronDownIcon,
   EnvelopeIcon,
   FacebookIcon,
   InstagramIcon,
@@ -20,267 +23,135 @@ import {
   XIcon,
   YouTubeIcon,
 } from "./AppIcons";
+import "../styles/footer.css";
 
-const scrollToTop = () => {
-  const htmlElement = document.documentElement;
-  const originalScroll = htmlElement.style.scrollBehavior;
-  htmlElement.style.scrollBehavior = "auto";
-  window.scrollTo(0, 0);
-  document.body.scrollTop = 0;
-  setTimeout(() => {
-    htmlElement.style.scrollBehavior = originalScroll;
-  }, 50);
-};
+const socialLinks = [
+  ["instagram", "Instagram", InstagramIcon],
+  ["facebook", "Facebook", FacebookIcon],
+  ["youtube", "YouTube", YouTubeIcon],
+  ["threads", "Threads", ThreadsIcon],
+  ["x", "X (Twitter)", XIcon],
+  ["whatsapp", "WhatsApp", WhatsAppIcon],
+];
+
+const locationLinks = [
+  ["Anand Nagar Plots", "anand-nagar-plots"],
+  ["Bagalur Road Property", "bagalur-road-property"],
+  ["Mathigiri Plots", "mathigiri-plots"],
+  ["Mookandapalli Property", "mookandapalli-property"],
+  ["Zuzuvadi Land", "zuzuvadi-land"],
+  ["Shoolagiri Property", "shoolagiri-property"],
+  ["Rayakottai Road Plots", "rayakottai-road-plots"],
+  ["Hosur SIPCOT Property", "hosur-sipcot-property"],
+  ["TVS Nagar Plots", "tvs-nagar-plots"],
+  ["Titan Township Property", "titan-township-property"],
+  ["Denkanikottai Road Land", "denkanikottai-road-land"],
+  ["Chennathur Plots", "chennathur-plots"],
+  ["Kelamangalam Road Property", "kelamangalam-road-property"],
+  ["Avalapalli Land", "avalapalli-land"],
+  ["DTCP Plots Bagalur Road", "dtcp-plots-bagalur-road"],
+  ["Villas in Mathigiri", "villas-in-mathigiri"],
+  ["Land near SIPCOT Hosur", "land-near-sipcot-hosur"],
+  ["Best Real Estate Company in Hosur", "best-real-estate-company-in-hosur"],
+  ["Trusted Property Dealer in Hosur", "trusted-property-dealer-in-hosur"],
+];
 
 const Footer = () => {
   const { t } = useAppLanguage();
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const [quickLinksOpen, setQuickLinksOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
+  const scrollToTop = useScrollToTop();
+  const quickLinks = [
+    ["nav.home", "Home", "/"],
+    ["nav.services", "Our Services", "/services"],
+    ["nav.bankLoans", "Bank Loans", "/bank-loans"],
+    ["nav.plans", "Plans", "/plans"],
+    ["nav.aboutUs", "About Us", "/about"],
+    ["nav.contact", "Contact Us", "/contact"],
+    ["nav.postFreeProperty", "Post Property", "/post-property"],
+    ["search.tabBuy", "Buy Property", "/listings?intent=buy"],
+    ["search.tabRent", "Rent Property", "/listings?intent=rent"],
+    ["search.tabProjects", "New Projects", "/listings?intent=new-project"],
+  ];
 
   return (
-    <footer className="bg-navy text-white">
-      <div className="px-5 py-12 sm:px-8 lg:px-10">
-        <div className="mx-auto w-full max-w-[1440px]">
-          <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr_1.1fr_0.9fr]">
-            {/* Column 1: Brand & Bio */}
-            <div className="space-y-4 text-left">
-              <div className="flex flex-col items-start text-left gap-1">
-                <BrandLogo className="w-24 sm:w-36 max-w-[100px] sm:max-w-[150px] h-auto object-contain object-left block" />
-                <span className="text-[11px] font-medium leading-none text-white/60 text-left">
-                  {t("nav.poweredBy") || "Powered by"}{" "}
-                  <span className="font-bold text-white">
-                    {t("nav.companyName") || "Gyes Property & Construction"}
-                  </span>
-                </span>
-              </div>
-              <p className="max-w-sm text-sm leading-7 text-white/80">
-                {t("footer.brandBio") ||
-                  "A refined property platform for verified listings, clearer property discovery, and reliable buyer-owner communication in Hosur."}
-              </p>
-              <p className="text-sm font-semibold text-orange">
-                {t("footer.partnerText") || "My Hosur Property - Trusted Real Estate Partner"}
-              </p>
-
-              {/* Social Media Links */}
-              <div className="pt-2">
-                <p className="mb-2.5 text-xs font-bold uppercase tracking-[0.18em] text-white/60">
-                  {t("footer.followUs") || "Follow Us"}
-                </p>
-                <div className="flex flex-wrap items-center gap-2">
-                  <a
-                    href={SOCIAL_LINKS.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 text-white transition hover:bg-orange hover:text-white"
-                    title="Instagram"
-                    aria-label="Instagram"
-                  >
-                    <InstagramIcon className="h-4 w-4" />
-                  </a>
-                  <a
-                    href={SOCIAL_LINKS.facebook}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 text-white transition hover:bg-orange hover:text-white"
-                    title="Facebook"
-                    aria-label="Facebook"
-                  >
-                    <FacebookIcon className="h-4 w-4" />
-                  </a>
-                  <a
-                    href={SOCIAL_LINKS.youtube}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 text-white transition hover:bg-orange hover:text-white"
-                    title="YouTube"
-                    aria-label="YouTube"
-                  >
-                    <YouTubeIcon className="h-4 w-4" />
-                  </a>
-                  <a
-                    href={SOCIAL_LINKS.threads}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 text-white transition hover:bg-orange hover:text-white"
-                    title="Threads"
-                    aria-label="Threads"
-                  >
-                    <ThreadsIcon className="h-4 w-4" />
-                  </a>
-                  <a
-                    href={SOCIAL_LINKS.x}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 text-white transition hover:bg-orange hover:text-white"
-                    title="X (Twitter)"
-                    aria-label="X (Twitter)"
-                  >
-                    <XIcon className="h-4 w-4" />
-                  </a>
-                  <a
-                    href={SOCIAL_LINKS.whatsapp}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-600 text-white transition hover:bg-emerald-500"
-                    title="Chat on WhatsApp"
-                    aria-label="WhatsApp"
-                  >
-                    <WhatsAppIcon className="h-4 w-4" />
-                  </a>
-                </div>
+    <footer className="site-footer">
+      <div className="footer-container">
+        <div className="footer-main">
+          <div className="footer-brand">
+            <div className="footer-brand-heading">
+              <BrandLogo className="footer-logo" />
+              <div>
+                <p className="footer-partner">{t("footer.partnerText")}</p>
+                <p className="footer-powered">{t("nav.poweredBy")} {t("nav.companyName")}</p>
               </div>
             </div>
-
-            {/* Column 2: Quick Links */}
-            <div className="space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">
-                {t("footer.quickLinks") || "Quick links"}
-              </h4>
-              <nav className="grid grid-cols-2 gap-x-4 gap-y-3" aria-label="Footer navigation">
-                {[
-                  { label: t("nav.home") || "Home", to: "/" },
-                  { label: t("nav.services") || "Our Services", to: "/services" },
-                  { label: t("nav.bankLoans") || "Bank Loans", to: "/bank-loans" },
-                  { label: t("nav.plans") || "Plans", to: "/plans" },
-                  { label: t("nav.aboutUs") || "About Us", to: "/about" },
-                  { label: t("nav.contact") || "Contact Us", to: "/contact" },
-                  { label: t("nav.postFreeProperty") || "Post Property", to: "/post-property" },
-                  { label: t("search.tabBuy") || "Buy Property", to: "/listings?intent=buy" },
-                  { label: t("search.tabRent") || "Rent Property", to: "/listings?intent=rent" },
-                  { label: t("search.tabProjects") || "New Projects", to: "/listings?intent=new-project" },
-                ].map((link) => (
-                  <NavLink
-                    key={link.to + link.label}
-                    to={link.to}
-                    onClick={scrollToTop}
-                    className="text-sm text-white/80 transition hover:text-orange"
-                  >
-                    {link.label}
-                  </NavLink>
-                ))}
-              </nav>
-            </div>
-
-            {/* Column 3: Contact */}
-            <div className="space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">
-                {t("footer.contactInfo") || "Contact"}
-              </h4>
-              <div className="space-y-3.5 text-sm text-white/90">
-                <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center gap-3 transition hover:text-orange">
-                  <EnvelopeIcon className="h-4 w-4 flex-shrink-0 text-orange" />
-                  <span className="leading-5">{CONTACT_EMAIL}</span>
+            <p className="footer-bio">{t("footer.brandBio")}</p>
+            <nav className="footer-socials" aria-label={t("footer.followUs")}>
+              {socialLinks.map(([key, label, Icon]) => (
+                <a key={key} href={SOCIAL_LINKS[key]} target="_blank" rel="noopener noreferrer" title={label} aria-label={label}>
+                  <Icon aria-hidden="true" />
                 </a>
-                {CONTACT_PHONE_NUMBERS.map((phone) => (
-                  <a key={phone.tel} href={`tel:${phone.tel}`} className="flex items-center gap-3 transition hover:text-orange">
-                    <PhoneIcon className="h-4 w-4 flex-shrink-0 text-orange" />
-                    <span className="leading-5">{phone.display}</span>
-                  </a>
-                ))}
-                <div className="flex items-start gap-3">
-                  <MapPinIcon className="mt-1 h-4 w-4 flex-shrink-0 text-orange" />
-                  <span className="leading-5">{CONTACT_ADDRESS}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Column 4: WhatsApp Support & Language Selector */}
-            <div className="space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-orange">
-                {t("common.whatsApp") || "WhatsApp Support"}
-              </h4>
-              <div className="rounded-xl border border-white/15 bg-white/5 p-4 text-center">
-                <p className="text-xs font-medium text-white/80 mb-2.5">
-                  Chat with our team directly on WhatsApp for quick support.
-                </p>
-                <a
-                  href={SOCIAL_LINKS.whatsapp}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white transition hover:bg-emerald-500 w-full justify-center"
-                >
-                  <WhatsAppIcon className="h-4 w-4" />
-                  {t("common.whatsApp") || "Direct WhatsApp Chat"}
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* SEO Location Links Matrix for Google Crawling */}
-          <div className="mt-10 border-t border-white/10 pt-8">
-            <h5 className="text-xs font-bold uppercase tracking-[0.18em] text-orange mb-3">
-              Popular Hosur Property Locations &amp; Guides
-            </h5>
-            <div className="flex flex-wrap gap-2 text-xs text-white/70">
-              {[
-                { name: "Anand Nagar Plots", slug: "anand-nagar-plots" },
-                { name: "Bagalur Road Property", slug: "bagalur-road-property" },
-                { name: "Mathigiri Plots", slug: "mathigiri-plots" },
-                { name: "Mookandapalli Property", slug: "mookandapalli-property" },
-                { name: "Zuzuvadi Land", slug: "zuzuvadi-land" },
-                { name: "Shoolagiri Property", slug: "shoolagiri-property" },
-                { name: "Rayakottai Road Plots", slug: "rayakottai-road-plots" },
-                { name: "Hosur SIPCOT Property", slug: "hosur-sipcot-property" },
-                { name: "TVS Nagar Plots", slug: "tvs-nagar-plots" },
-                { name: "Titan Township Property", slug: "titan-township-property" },
-                { name: "Denkanikottai Road Land", slug: "denkanikottai-road-land" },
-                { name: "Chennathur Plots", slug: "chennathur-plots" },
-                { name: "Kelamangalam Road Property", slug: "kelamangalam-road-property" },
-                { name: "Avalapalli Land", slug: "avalapalli-land" },
-                { name: "DTCP Plots Bagalur Road", slug: "dtcp-plots-bagalur-road" },
-                { name: "Villas in Mathigiri", slug: "villas-in-mathigiri" },
-                { name: "Land near SIPCOT Hosur", slug: "land-near-sipcot-hosur" },
-                { name: "Best Real Estate Company in Hosur", slug: "best-real-estate-company-in-hosur" },
-                { name: "Trusted Property Dealer in Hosur", slug: "trusted-property-dealer-in-hosur" },
-              ].map((loc) => (
-                <NavLink
-                  key={loc.slug}
-                  to={`/location/${loc.slug}`}
-                  onClick={scrollToTop}
-                  className="rounded bg-white/10 px-2.5 py-1 transition hover:bg-orange hover:text-white"
-                >
-                  {loc.name}
-                </NavLink>
               ))}
-            </div>
+            </nav>
           </div>
 
-          {/* Footer Bottom Language Picker & Copyright */}
-          <div className="mt-10 border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <LanguageSelector variant="footer" />
-            <p className="text-xs text-white/60 text-center md:text-right">
-              {t("footer.serving") || "Serving Hosur, Bangalore Border, Krishnagiri & surrounding regions."}
-            </p>
-          </div>
+          <details className="footer-quick-links" open={isDesktop || quickLinksOpen} onToggle={event => {
+            if (!isDesktop) setQuickLinksOpen(event.currentTarget.open);
+          }}>
+            <summary><span>{t("footer.quickLinks")}</span><ChevronDownIcon aria-hidden="true" /></summary>
+            <nav className="footer-link-grid" aria-label="Footer navigation">
+              {quickLinks.map(([key, fallback, to]) => (
+                <NavLink key={to} to={to} onClick={scrollToTop}>{t(key, { defaultValue: fallback })}</NavLink>
+              ))}
+            </nav>
+          </details>
 
-          <div className="mt-6 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-white sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p>Copyright 2026 MyHosurProperty. {t("footer.allRightsReserved") || "All rights reserved."}</p>
-              <p className="mt-1 text-[11px] text-white/70">
-                Developed with{" "}
-                <a
-                  href="https://risewithmedia.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-bold text-orange hover:underline transition"
-                >
-                  risewithmedia.com
-                </a>
-              </p>
+          <details className="footer-contact" open={isDesktop || contactOpen} onToggle={event => {
+            if (!isDesktop) setContactOpen(event.currentTarget.open);
+          }}>
+            <summary><span>{t("nav.contact")}</span><ChevronDownIcon aria-hidden="true" /></summary>
+            <div className="footer-contact-content">
+              <a href={`mailto:${CONTACT_EMAIL}`} className="footer-email"><EnvelopeIcon aria-hidden="true" /><span>{CONTACT_EMAIL}</span></a>
+              <div className="footer-phones">
+                {CONTACT_PHONE_NUMBERS.map(phone => (
+                  <a key={phone.tel} href={`tel:${phone.tel}`} title={phone.role}><PhoneIcon aria-hidden="true" /><span>{phone.display}</span></a>
+                ))}
+              </div>
+              <address><MapPinIcon aria-hidden="true" /><span>{CONTACT_ADDRESS}</span></address>
+              <a className="footer-whatsapp" href={SOCIAL_LINKS.whatsapp} target="_blank" rel="noopener noreferrer" title="Chat with our team directly on WhatsApp for quick support.">
+                <WhatsAppIcon aria-hidden="true" />{t("common.whatsApp")}
+                <span>{t("footer.whatsAppSupport", { defaultValue: "Chat with our team" })}</span>
+              </a>
             </div>
-            <div className="flex flex-wrap gap-4">
-              <NavLink to="/about" onClick={scrollToTop} className="transition hover:text-orange">
-                {t("nav.aboutUs") || "About Us"}
-              </NavLink>
-              <NavLink to="/contact" onClick={scrollToTop} className="transition hover:text-orange">
-                {t("nav.contact") || "Contact"}
-              </NavLink>
-              <NavLink to="/listings" onClick={scrollToTop} className="transition hover:text-orange">
-                {t("hero.exploreProperties") || "Browse Listings"}
-              </NavLink>
-              <NavLink to="/auth" onClick={scrollToTop} className="transition hover:text-orange">
-                {t("nav.login") || "Sign In"}
-              </NavLink>
-            </div>
+          </details>
+        </div>
+
+        <details className="footer-locations">
+          <summary><span>Hosur locations &amp; property guides</span><ChevronDownIcon aria-hidden="true" /></summary>
+          <nav className="footer-location-grid" aria-label="Hosur property locations">
+            {locationLinks.map(([name, slug]) => (
+              <NavLink key={slug} to={`/location/${slug}`} onClick={scrollToTop}>{name}</NavLink>
+            ))}
+          </nav>
+        </details>
+
+        <div className="footer-preferences">
+          <LanguageSelector variant="footerCompact" className="footer-language" />
+          <p>{t("footer.serving")}</p>
+        </div>
+
+        <div className="footer-bottom">
+          <div className="footer-credits">
+            <p>Copyright {new Date().getFullYear()} MyHosurProperty. {t("footer.allRightsReserved")}</p>
+            <p>Developed with <a href="https://risewithmedia.com" target="_blank" rel="noopener noreferrer">risewithmedia.com</a></p>
           </div>
+          <nav aria-label="Footer account and information">
+            {[["nav.aboutUs", "/about"], ["nav.contact", "/contact"], ["hero.exploreProperties", "/listings"], ["nav.login", "/auth"]].map(([key, to]) => (
+              <NavLink key={to} to={to} onClick={scrollToTop}>{t(key)}</NavLink>
+            ))}
+          </nav>
         </div>
       </div>
     </footer>

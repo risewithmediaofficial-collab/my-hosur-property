@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { Link, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -20,6 +26,7 @@ import PropertySearchFilterPanel from "../components/PropertySearchFilterPanel";
 import { SORT_OPTIONS } from "../constants/propertyFilterConfig";
 import SeoHead from "../components/SeoHead";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
+import useMediaQuery from "../hooks/useMediaQuery";
 import useAuth from "../hooks/useAuth";
 import useScrollAnimation from "../hooks/useScrollAnimation";
 import { fetchProperties } from "../services/api/propertyApi";
@@ -28,7 +35,6 @@ import {
   buildFilterChips,
   clearCategoryFields,
   clientRefineProperties,
-  createDefaultFilterState,
   filtersToApiParams,
   getCategoryLabel,
   parseFiltersFromSearchParams,
@@ -37,7 +43,7 @@ import {
   serializeFiltersToSearchParams,
 } from "../utils/propertyFilters";
 import { buildCanonicalListingQuery } from "../utils/seo";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 
 const ListingSkeleton = ({ isSidebarOpen }) => (
   <div className={`grid gap-6 ${isSidebarOpen ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"}`}>
@@ -65,13 +71,21 @@ const QUICK_CATEGORIES = [
 
 const ListingPage = () => {
   const { t } = useAppLanguage();
+  const isDesktop = useMediaQuery("(min-width: 768px)");
   const [params, setParams] = useSearchParams();
   const { token, isAuthenticated } = useAuth();
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [desktopFilterOpen, setDesktopFilterOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState(() => parseFiltersFromSearchParams(params));
-  const [applied, setApplied] = useState(() => parseFiltersFromSearchParams(params));
+  const applied = useMemo(() => parseFiltersFromSearchParams(params), [params]);
+  const setApplied = useCallback((update) => {
+    setParams((previousParams) => {
+      const previous = parseFiltersFromSearchParams(previousParams);
+      const next = typeof update === "function" ? update(previous) : update;
+      return serializeFiltersToSearchParams(next);
+    }, { replace: true });
+  }, [setParams]);
   const [data, setData] = useState({ items: [], totalPages: 0, page: 1, total: 0 });
   const [savedIds, setSavedIds] = useState(new Set());
   const [searchInput, setSearchInput] = useState(
@@ -79,12 +93,17 @@ const ListingPage = () => {
   );
 
   useEffect(() => {
+    setDraft(applied);
+  }, [applied]);
+
+  useEffect(() => {
     setSearchInput(applied.location || applied.locality || "");
   }, [applied.location, applied.locality]);
 
-  useScrollAnimation(null, [data.items.length]);
+  useScrollAnimation(null, data.items.length);
   const sentinelRef = useRef(null);
   const resultsScrollRef = useRef(null);
+  const requestVersionRef = useRef(0);
 
   useBodyScrollLock(mobileFilterOpen);
 
@@ -142,29 +161,35 @@ const ListingPage = () => {
   }, [data.items]);
 
   const loadProperties = useCallback(
-    async (query, append = false) => {
-      setLoading(!append);
+    async (query, append = false, signal) => {
+      const requestVersion = ++requestVersionRef.current;
+      setLoading(true);
       try {
-        const res = await fetchProperties(query, token);
+        const res = await fetchProperties(query, token, signal);
+        if (signal?.aborted || requestVersion !== requestVersionRef.current) return;
         const refined = clientRefineProperties(res.items || [], applied);
         setData((prev) => ({
           ...res,
-          items: append ? [...prev.items, ...refined] : refined,
+          items: append
+            ? Array.from(new Map([...prev.items, ...refined].map((item) => [item._id, item])).values())
+            : refined,
           total: append ? res.total : refined.length,
         }));
       } catch {
+        if (signal?.aborted || requestVersion !== requestVersionRef.current) return;
         setData({ items: [], totalPages: 0, page: 1, total: 0 });
       } finally {
-        setLoading(false);
+        if (!signal?.aborted && requestVersion === requestVersionRef.current) setLoading(false);
       }
     },
     [applied, token]
   );
 
   useEffect(() => {
-    setParams(serializeFiltersToSearchParams(applied), { replace: true });
-    loadProperties(apiQuery, applied.page > 1);
-  }, [apiQuery, applied.page, loadProperties, setParams]);
+    const controller = new AbortController();
+    loadProperties(apiQuery, applied.page > 1, controller.signal);
+    return () => controller.abort();
+  }, [apiQuery, applied.page, loadProperties]);
 
   useEffect(() => {
     if (!token) {
@@ -189,14 +214,14 @@ const ListingPage = () => {
       },
       {
         threshold: 0.25,
-        root: scrollRoot,
+        root: isDesktop ? scrollRoot : null,
         rootMargin: "120px",
       }
     );
 
     observer.observe(sentinelRef.current);
     return () => observer.disconnect();
-  }, [data.page, data.totalPages, loading, data.items.length]);
+  }, [data.page, data.totalPages, loading, data.items.length, isDesktop, setApplied]);
 
   const handleCategoryChange = (categoryId) => {
     setDraft((prev) => {
@@ -302,10 +327,10 @@ const ListingPage = () => {
         </aside>
 
         {/* Right: properties — own scrollbar, independent from filters */}
-        <section className="listing-results flex min-h-0 flex-1 flex-col gsap-section" aria-label="Property results">
+        <section className="listing-results flex min-h-0 flex-1 flex-col" aria-label="Property results">
           <div className="listing-results-header bg-white border-b border-slate-200 px-4 sm:px-6 py-4 space-y-3.5">
             {/* Row 1: Title, Count Badge, Subtitle & Request Property CTA */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div className="listing-results-intro flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-[11px] font-extrabold uppercase tracking-wider text-orange font-sans">
@@ -317,10 +342,10 @@ const ListingPage = () => {
                     {loading ? (t("common.loading") || "Loading...") : `${data.total || data.items.length} ${t("search.propertiesFound") || "properties found"}`}
                   </span>
                 </div>
-                <h1 className="mt-1 font-sans text-2xl sm:text-3xl font-black text-navy tracking-tight leading-tight">
+                <h1 className="listing-title mt-2 text-2xl sm:text-3xl font-bold text-navy tracking-tight leading-tight">
                   {applied.category
-                    ? `${getCategoryLabel(applied.category)} Properties in Hosur`
-                    : "All Properties in Hosur"}
+                    ? `${getCategoryLabel(applied.category)} Properties in ${applied.location || "Hosur"}`
+                    : `All Properties in ${applied.location || "Hosur"}`}
                 </h1>
                 <p className="mt-1 font-sans text-xs sm:text-sm text-slate-500 max-w-2xl">
                   {loading
@@ -428,7 +453,7 @@ const ListingPage = () => {
             </div>
 
             {/* Row 3: Quick Category Navigation Pills Bar */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 scrollbar-none">
+            <div className="listing-categories" role="group" aria-label="Property categories">
               {QUICK_CATEGORIES.map((cat) => {
                 const isSelected = (applied.category || "") === cat.id;
                 const Icon = cat.icon;
@@ -437,7 +462,8 @@ const ListingPage = () => {
                     key={cat.id || "all"}
                     type="button"
                     onClick={() => handleQuickCategoryChange(cat.id)}
-                    className={`inline-flex items-center gap-1.5 shrink-0 rounded-full px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-[13px] font-bold transition-all duration-200 cursor-pointer select-none whitespace-nowrap font-sans ${
+                    aria-pressed={isSelected}
+                    className={`listing-category inline-flex items-center gap-1.5 shrink-0 rounded-full px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-[13px] font-semibold transition-all duration-200 cursor-pointer select-none font-sans ${
                       isSelected
                         ? "bg-navy text-white shadow-sm ring-2 ring-navy/20"
                         : "bg-white border border-slate-200 text-slate-600 hover:border-orange hover:text-orange hover:bg-orange/5 shadow-2xs"
@@ -484,7 +510,7 @@ const ListingPage = () => {
             data-scroll-panel="properties"
           >
             <div className="listing-results-scroll-inner">
-            <div className="mt-4 md:mt-6">
+            <div>
               {loading && !data.items.length ? (
                 <ListingSkeleton isSidebarOpen={desktopFilterOpen} />
               ) : data.items.length ? (

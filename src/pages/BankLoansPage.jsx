@@ -5,7 +5,7 @@ import { ArrowRightIcon, CheckCircleIcon, ChevronDownIcon } from "../components/
 import SeoHead from "../components/SeoHead";
 import LoanCalculator from "../components/LoanCalculator";
 import { bankLoans } from "../constants/bankLoans";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 import { localizeCatalogText } from "../utils/i18nCatalog";
 
 const BankLoansPage = () => {

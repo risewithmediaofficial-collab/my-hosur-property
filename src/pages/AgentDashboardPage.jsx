@@ -18,15 +18,8 @@ import { fetchUserPaymentRequests } from "../services/api/paymentApi";
 import QrPaymentModal from "../components/QrPaymentModal";
 import RoleChangeModal from "../components/RoleChangeModal";
 
-import {
-  buyLeadPackIntent,
-  fetchCustomerRequestsForAgents,
-  sendMatchNotification,
-  unlockCustomerLeadIntent,
-  verifyCustomerLeadUnlock,
-  verifyLeadPackPayment,
-} from "../services/api/customerRequestApi";
-import { loadExternalScript } from "../utils/loadExternalScript";
+import { fetchCustomerRequestsForAgents, sendMatchNotification, unlockCustomerLeadIntent } from "../services/api/customerRequestApi";
+
 import DashboardSidebar from "../components/DashboardSidebar";
 import Loader from "../components/Loader";
 import PropertyCard from "../components/PropertyCard";
@@ -37,20 +30,7 @@ import { getPropertyImageAlt } from "../utils/seo";
 const fmt = (value) =>
   new Date(value).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 
-const StatusBadge = ({ status }) => {
-  const styles = {
-    approved: "bg-green-100 text-green-700",
-    pending: "bg-amber-100 text-amber-700",
-    rejected: "bg-red-100 text-red-700",
-    expired: "bg-slate-200 text-slate-700",
-  };
-
-  return (
-    <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${styles[status] || "bg-slate-100 text-slate-600"}`}>
-      {status}
-    </span>
-  );
-};
+const VALID_TABS = ["overview", "listings", "leads", "saved", "payments", "requests"];
 
 const AgentDashboardPage = () => {
   const navigate = useNavigate();
@@ -67,9 +47,10 @@ const AgentDashboardPage = () => {
   const [selectedPlanForPayment, setSelectedPlanForPayment] = useState(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
-  const [leadUnlockPrice] = useState(200);
+  const leadUnlockPrice = 200;
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState(searchParams.get("tab") || "overview");
+  const requestedTab = searchParams.get("tab");
+  const tab = VALID_TABS.includes(requestedTab) ? requestedTab : "overview";
 
   const loadAll = useCallback(async () => {
     try {
@@ -139,36 +120,6 @@ const AgentDashboardPage = () => {
     }
   };
 
-  /*
-  const openRazorpayCheckout = async (intent, planName) => {
-    const loaded = await loadExternalScript("https://checkout.razorpay.com/v1/checkout.js");
-    if (!loaded || !window.Razorpay) throw new Error("Unable to load Razorpay checkout");
-
-    return new Promise((resolve, reject) => {
-      const options = {
-        key: intent.keyId || import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: intent.amount,
-        currency: intent.currency || "INR",
-        name: "MyHosurProperty",
-        description: planName,
-        order_id: intent.orderId || intent.razorpay?.orderId,
-        prefill: {
-          name: user?.name || "",
-          email: user?.email || "",
-          contact: user?.phone || "",
-        },
-        handler: (response) => resolve(response),
-        modal: {
-          ondismiss: () => reject(new Error("Payment cancelled")),
-        },
-      };
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
-    });
-  };
-  */
-
   const onUnlockCustomerRequest = async (id) => {
     try {
       const response = await unlockCustomerLeadIntent(token, id);
@@ -231,7 +182,6 @@ const AgentDashboardPage = () => {
     */
   };
 
-
   const onToggleSaved = useCallback(async (propertyId) => {
     try {
       await toggleSavedProperty(token, { propertyId });
@@ -253,22 +203,7 @@ const AgentDashboardPage = () => {
     ...(isBroker ? [{ key: "requests", label: "Requests", icon: <ClipboardDocumentListIcon className="h-4 w-4" />, badge: customerRequests.length }] : []),
   ], [pendingLeadsCount, properties.length, leads.length, saved.length, paymentRequests.length, isBroker, customerRequests.length]);
 
-  const sidebarStats = useMemo(() => [
-    { label: "Total Listings", value: properties.length, icon: <HomeModernIcon className="h-4 w-4" /> },
-    { label: "Active Leads", value: leads.length, icon: <UserGroupIcon className="h-4 w-4" /> },
-    { label: "Lead Credits", value: customerLeadCredits, icon: <TicketIcon className="h-4 w-4" /> },
-    { label: "Saved", value: saved.length, icon: <BookmarkIcon className="h-4 w-4" /> },
-  ], [properties.length, leads.length, customerLeadCredits, saved.length]);
-
-  useEffect(() => {
-    const queryTab = searchParams.get("tab") || "overview";
-    if (queryTab !== tab) {
-      setTab(queryTab);
-    }
-  }, [searchParams]);
-
   const handleTabSelect = useCallback((newTab) => {
-    setTab(newTab);
     setSearchParams(newTab === "overview" ? {} : { tab: newTab }, { replace: true });
   }, [setSearchParams]);
 
@@ -287,7 +222,7 @@ const AgentDashboardPage = () => {
       title={user?.name || "Agent"}
       subtitle="Agent / Developer Panel"
       description="Manage your listings, leads, and customer requirements from a cleaner, easier-to-access workspace."
-      stats={sidebarStats}
+
       navItems={tabs.map((item) => ({
         ...item,
         active: tab === item.key,
@@ -691,4 +626,3 @@ const AgentDashboardPage = () => {
 };
 
 export default AgentDashboardPage;
-

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { ShieldCheckIcon, PhotoIcon, XMarkIcon } from "./AppIcons";
+import { PhotoIcon, XMarkIcon } from "./AppIcons";
 import toast from "react-hot-toast";
 import { submitPaymentRequest } from "../services/api/paymentApi";
 import qrCodeImage from "../assets/payment qr code .jpeg";
@@ -114,7 +114,7 @@ const QrPaymentModal = ({ open, onClose, selectedPlan, user, token, onSuccess })
       {/* Main modal alignment container */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <DialogPanel className="modal-panel-white flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-2xl transition-all">
-          
+
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
             <div>
@@ -135,7 +135,7 @@ const QrPaymentModal = ({ open, onClose, selectedPlan, user, token, onSuccess })
 
           {/* Body */}
           <div className="overflow-y-auto px-6 py-6 space-y-6">
-            
+
             {/* QR Code and instructions */}
             <div className="flex flex-col items-center gap-4 rounded-2xl border border-blue-50 bg-blue-50/30 p-5 text-center">
               <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-md max-w-[220px] transition-transform duration-300 hover:scale-105">

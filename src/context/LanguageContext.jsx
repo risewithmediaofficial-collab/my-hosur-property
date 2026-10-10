@@ -1,18 +1,13 @@
-import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import i18n, { SUPPORTED_LANGUAGES, LANGUAGE_STORAGE_KEY } from "../i18n/i18n";
 
-const LanguageContext = createContext({
-  currentLanguage: "en",
-  currentLangObj: SUPPORTED_LANGUAGES[0],
-  setLanguage: () => {},
-  languages: SUPPORTED_LANGUAGES,
-  t: (key) => key,
-});
+import { LanguageContext } from "./languageContextValue";
 
 export const LanguageProvider = ({ children }) => {
   const { t } = useTranslation();
-  const [currentLanguage, setCurrentLanguageState] = useState(() => i18n.language || "en");
+  const currentLanguage = i18n.resolvedLanguage || "en";
+  const languageRequest = useRef(0);
 
   const syncDocumentAttributes = useCallback((lang) => {
     if (typeof document === "undefined") return;
@@ -29,21 +24,21 @@ export const LanguageProvider = ({ children }) => {
     }
   }, []);
 
-  const setLanguage = useCallback((langCode) => {
+  const setLanguage = useCallback(async (langCode) => {
     const validLang = SUPPORTED_LANGUAGES.some((l) => l.code === langCode) ? langCode : "en";
-    i18n.changeLanguage(validLang).then(() => {
-      setCurrentLanguageState(validLang);
-      try {
-        localStorage.setItem(LANGUAGE_STORAGE_KEY, validLang);
-      } catch (e) {
-        // ignore
-      }
-      syncDocumentAttributes(validLang);
-    });
-  }, [syncDocumentAttributes]);
+    const request = ++languageRequest.current;
+    await i18n.loadLanguages(validLang);
+    // A slower download must not override the user's latest selection.
+    if (request === languageRequest.current) await i18n.changeLanguage(validLang);
+  }, []);
 
   useEffect(() => {
     syncDocumentAttributes(currentLanguage);
+    try {
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, currentLanguage);
+    } catch {
+      // Language switching still works when browser storage is disabled.
+    }
   }, [currentLanguage, syncDocumentAttributes]);
 
   const currentLangObj = useMemo(() => {
@@ -63,13 +58,3 @@ export const LanguageProvider = ({ children }) => {
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 };
-
-export const useAppLanguage = () => {
-  const context = useContext(LanguageContext);
-  if (!context) {
-    throw new Error("useAppLanguage must be used within a LanguageProvider");
-  }
-  return context;
-};
-
-export default LanguageContext;

@@ -9,7 +9,7 @@ import {
   splitValues,
   toggleCheckboxValue,
 } from "../utils/propertyFilters";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 import { localizeCatalogText } from "../utils/i18nCatalog";
 
 const PropertySearchFilterPanel = ({

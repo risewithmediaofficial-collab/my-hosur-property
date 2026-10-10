@@ -8,6 +8,7 @@ const useBodyScrollLock = (locked) => {
     if (!locked || typeof document === "undefined") return undefined;
 
     const { body, documentElement } = document;
+    const lockedPath = window.location.pathname;
     const activeLocks = Number(body.dataset[LOCK_COUNT_KEY] || "0");
 
     if (activeLocks === 0) {
@@ -40,11 +41,8 @@ const useBodyScrollLock = (locked) => {
         documentElement.style.overflow = "";
         documentElement.style.overscrollBehavior = "";
 
-        // Only restore scroll if we're still on the same page (no navigation happened).
-        // We detect navigation by checking if the document is still the active one
-        // and whether a scroll-to-top was requested (body.dataset flag set by router).
-        if (!body.dataset.routeChanged) {
-          window.scrollTo(0, savedScrollY);
+        if (window.location.pathname === lockedPath) {
+          window.scrollTo({ top: savedScrollY, behavior: "instant" });
         }
       } else {
         body.dataset[LOCK_COUNT_KEY] = String(remainingLocks);

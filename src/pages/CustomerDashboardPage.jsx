@@ -20,7 +20,7 @@ import { PROPERTY_REQUEST_TYPES } from "../constants/serviceRequests";
 import PropertyCard from "../components/PropertyCard";
 import RoleChangeModal from "../components/RoleChangeModal";
 import { getInquiryHistory } from "../utils/inquiryHistory";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 
 const STATUS_CONFIG = {
   open: { label: "Open", cls: "bg-slate-100 text-slate-700" },
@@ -57,6 +57,8 @@ const formatRequestTitle = (item) => {
   return item.propertyType || "Property Requirement";
 };
 
+const VALID_TABS = ["overview", "requests", "matches", "notifications", "saved", "inquiries"];
+
 const CustomerDashboardPage = () => {
   const { t } = useAppLanguage();
   const navigate = useNavigate();
@@ -71,7 +73,8 @@ const CustomerDashboardPage = () => {
   const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
-  const [tab, setTab] = useState(searchParams.get("tab") || "overview");
+  const requestedTab = searchParams.get("tab");
+  const tab = VALID_TABS.includes(requestedTab) ? requestedTab : "overview";
 
   const loadAll = useCallback(async () => {
     setLoading(true);
@@ -129,7 +132,7 @@ const CustomerDashboardPage = () => {
   }, [token]);
 
   const unreadCount = useMemo(() => notifications.filter((item) => !item.readAt).length, [notifications]);
-  const inquiryHistory = useMemo(() => getInquiryHistory(user?._id), [user?._id, requests.length, notifications.length]);
+  const inquiryHistory = useMemo(() => getInquiryHistory(user?._id), [user?._id]);
   const openCount = useMemo(() => requests.filter((item) => item.status === "open").length, [requests]);
   const matchedCount = useMemo(() => requests.filter((item) => item.status === "matched").length, [requests]);
   const matchNotifications = useMemo(() => notifications.filter((item) => item.type === "match"), [notifications]);
@@ -139,27 +142,9 @@ const CustomerDashboardPage = () => {
     [requests]
   );
 
-  const allowedTabs = ["overview", "requests", "matches", "notifications", "saved", "inquiries"];
-
-  useEffect(() => {
-    const queryTab = searchParams.get("tab") || "overview";
-    if (queryTab !== tab && allowedTabs.includes(queryTab)) {
-      setTab(queryTab);
-    }
-  }, [searchParams]);
-
   const handleTabSelect = useCallback((newTab) => {
-    setTab(newTab);
     setSearchParams(newTab === "overview" ? {} : { tab: newTab }, { replace: true });
   }, [setSearchParams]);
-
-  const sidebarStats = useMemo(() => [
-    { label: "Requirements", value: requests.length, icon: <ClipboardDocumentListIcon className="h-4 w-4" /> },
-    { label: "Open", value: openCount, icon: <Squares2X2Icon className="h-4 w-4" /> },
-    { label: "Matches", value: matchedCount, icon: <HomeModernIcon className="h-4 w-4" /> },
-    { label: "Unread", value: unreadCount, icon: <BellIcon className="h-4 w-4" /> },
-    { label: "Saved", value: saved.length, icon: <BookmarkIcon className="h-4 w-4" /> },
-  ], [requests.length, openCount, matchedCount, unreadCount, saved.length]);
 
   const navItems = useMemo(() => [
     { key: "overview", label: t("dashboard.title") || "Overview", icon: <Squares2X2Icon className="h-4 w-4" /> },
@@ -189,7 +174,7 @@ const CustomerDashboardPage = () => {
       title={user?.name || "Customer"}
       subtitle="Customer Dashboard"
       description="Track your requirements, receive property-side responses, and manage dashboard activity from one cleaner workspace."
-      stats={sidebarStats}
+
       navItems={navItems}
     >
       {tab === "overview" && (
@@ -216,7 +201,7 @@ const CustomerDashboardPage = () => {
                 >
                   🔄 Request Role / User Type Change
                 </button>
-                <button onClick={() => setTab("requests")} className="dashboard-primary px-5 py-2.5 text-xs">
+                <button onClick={() => handleTabSelect("requests")} className="dashboard-primary px-5 py-2.5 text-xs">
                   Manage Requirements
                 </button>
               </div>
@@ -254,7 +239,7 @@ const CustomerDashboardPage = () => {
                   <h3 className="dashboard-display text-2xl font-semibold text-slate-900">Recent requirements</h3>
                   <p className="dashboard-muted mt-1 text-sm">Your latest submitted property requirements.</p>
                 </div>
-                <button onClick={() => setTab("requests")} className="dashboard-secondary px-4 py-2 text-xs">
+                <button onClick={() => handleTabSelect("requests")} className="dashboard-secondary px-4 py-2 text-xs">
                   View all
                 </button>
               </div>
@@ -300,7 +285,7 @@ const CustomerDashboardPage = () => {
                   <h3 className="dashboard-display text-2xl font-semibold text-slate-900">Property-side responses</h3>
                   <p className="dashboard-muted mt-1 text-sm">Agents and owners responding to your requirements.</p>
                 </div>
-                <button onClick={() => setTab("matches")} className="dashboard-secondary px-4 py-2 text-xs">
+                <button onClick={() => handleTabSelect("matches")} className="dashboard-secondary px-4 py-2 text-xs">
                   Open matches
                 </button>
               </div>

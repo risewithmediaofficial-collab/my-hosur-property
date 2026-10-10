@@ -6,14 +6,14 @@ import SeoHead from "../components/SeoHead";
 import { serviceCategories, serviceQuickLinks } from "../constants/serviceCatalog";
 import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo";
 import useScrollAnimation from "../hooks/useScrollAnimation";
-import { useAppLanguage } from "../context/LanguageContext";
+import { useAppLanguage } from "../hooks/useAppLanguage";
 import { localizeCatalogText } from "../utils/i18nCatalog";
 
 import buySellImg from "../assets/property buy guideance.jpg";
 import loanImg from "../assets/Home loan.jpg";
 import registrationImg from "../assets/Sale deed registration.jpg";
 import searchImg from "../assets/plot search.jpg";
-import interiorImg from "../assets/interiros.jpg";
+
 import constHouseImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.03 AM (1).jpeg";
 
 const ServicesPage = () => {
@@ -114,7 +114,7 @@ const ServicesPage = () => {
       })
     : serviceCategories;
 
-  useScrollAnimation(null, [filteredServices.length]);
+  useScrollAnimation(null, filteredServices.length);
 
   return (
     <main className="page-shell w-full">
