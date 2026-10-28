@@ -83,7 +83,7 @@ const PropertyCard = memo(({ item, onSave, isSaved }) => {
           </h3>
 
           {/* Location & BHK Details */}
-          <div className="mt-2.5 flex items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div className="mt-2.5 flex items-center justify-between gap-2 border-b border-slate-100 pb-3 min-h-[38px]">
             <div className="flex items-center gap-1.5 min-w-0">
               <MapPinIcon className="h-4 w-4 text-orange shrink-0" />
               <span className="text-xs sm:text-sm font-semibold text-slate-600 truncate">
@@ -102,7 +102,7 @@ const PropertyCard = memo(({ item, onSave, isSaved }) => {
         </div>
 
         {/* Property Type, Size details and action circular arrow */}
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3 min-h-[44px]">
           <div className="flex gap-5 sm:gap-6 min-w-0">
             <div>
               <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide border-b-2 border-orange/40 pb-0.5 w-fit">
@@ -130,7 +130,7 @@ const PropertyCard = memo(({ item, onSave, isSaved }) => {
         </div>
 
         {/* Price & Optional Save */}
-        <div className="border-t border-slate-100 pt-3 flex items-center justify-between gap-3">
+        <div className="border-t border-slate-100 pt-3 flex items-center justify-between gap-3 min-h-[44px]">
           <div className="text-xl sm:text-[22px] font-black leading-tight text-navy tracking-tight">
             {currency(item.price)}
           </div>

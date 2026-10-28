@@ -109,14 +109,14 @@ const AppShell = () => {
   return (
     <MotionConfig reducedMotion={lowMotionDevice ? "always" : "never"}>
       <div
-        className={`site-app-shell flex min-h-screen flex-col ${isDashboardRoute ? "site-dashboard-app md:h-screen md:overflow-hidden" : ""} ${isListingsRoute ? "site-listings-active md:h-dvh md:max-h-dvh md:overflow-hidden" : ""}`}
+        className={`site-app-shell flex min-h-screen flex-col ${isDashboardRoute ? "site-dashboard-app md:h-screen md:overflow-hidden" : ""} ${isListingsRoute ? "site-listings-active" : ""}`}
       >
         <Toaster position="top-right" toastOptions={{ duration: 2500 }} />
         <ScrollNavigationButtons />
         {isPrivatePath ? <PrivateRouteSeo title="Account" /> : null}
         {!hideNavbar && <Navbar />}
         <main
-          className={`flex-1 ${isFullHeight || hideNavbar || isHomeRoute ? "" : "pb-12"} ${isListingsRoute ? "flex min-h-0 flex-col md:overflow-hidden" : ""} ${isDashboardRoute ? "flex min-h-0 flex-col overflow-hidden" : ""}`}
+          className={`flex-1 ${isFullHeight || hideNavbar || isHomeRoute ? "" : "pb-12"} ${isListingsRoute ? "flex min-h-0 flex-col" : ""} ${isDashboardRoute ? "flex min-h-0 flex-col overflow-hidden" : ""}`}
         >
           <PageBreadcrumbs />
           <Suspense fallback={<RouteFallback />}>
