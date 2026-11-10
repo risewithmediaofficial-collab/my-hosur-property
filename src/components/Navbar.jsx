@@ -7,7 +7,7 @@ import useScrollToTop from "../hooks/useScrollToTop";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
 import { useAppLanguage } from "../hooks/useAppLanguage";
 import { CONTACT_EMAIL, CONTACT_PHONE_NUMBERS } from "../constants/contactInfo";
-import logoSrc from "../assets/myhosurpropertylogo.png";
+import logoSrc from "../assets/myhosurpropertylogo.webp";
 import LanguageSelector from "./LanguageSelector";
 import {
   ArrowLeftOnRectangleIcon,
@@ -114,7 +114,7 @@ const Navbar = memo(() => {
       onClick={scrollToTop}
       className={({ isActive }) => {
         const active = isLinkActive(item.to, isActive);
-        return `relative shrink-0 inline-flex items-center px-1.5 py-1 xl:px-2 xl:py-1.5 2xl:px-3 2xl:py-2 text-[11.5px] xl:text-xs 2xl:text-sm font-semibold whitespace-nowrap rounded-lg transition-colors ${
+        return `relative shrink-0 inline-flex items-center px-1.5 py-1 xl:px-2 xl:py-1.5 2xl:px-3 2xl:py-2 text-[11px] xl:text-xs 2xl:text-sm font-semibold whitespace-nowrap rounded-lg transition-colors ${
           active
             ? "text-orange bg-orange/5 font-bold"
             : "text-navy hover:text-orange hover:bg-slate-50"
@@ -153,37 +153,36 @@ const Navbar = memo(() => {
 
       {/* Top Bar with Contacts and Language Switcher */}
       <div className="navbar-topbar bg-navy text-white py-1 block">
-        <div className="mx-auto flex max-w-[1536px] items-center justify-between px-4 sm:px-6 lg:px-8 text-xs">
-          <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-1">
-            <div className="hidden sm:inline-flex flex-wrap items-center gap-x-4 gap-y-1">
-              {CONTACT_PHONE_NUMBERS.map((phone) => (
+        <div className="mx-auto flex max-w-[1536px] items-center justify-between gap-2 px-3 sm:px-5 lg:px-6 xl:px-8 text-xs">
+          <div className="flex min-w-0 items-center gap-x-4 xl:gap-x-6">
+            <div className="inline-flex min-w-0 items-center gap-x-4 xl:gap-x-5">
+              {CONTACT_PHONE_NUMBERS.map((phone, index) => (
                 <a
                   key={phone.tel}
                   href={`tel:${phone.tel}`}
-                  className="inline-flex items-center gap-2 transition hover:text-orange"
+                  className={`items-center gap-1.5 whitespace-nowrap transition hover:text-orange ${
+                    index === 0
+                      ? "inline-flex text-[11px] sm:text-xs"
+                      : index === 1
+                        ? "hidden lg:inline-flex"
+                        : "hidden xl:inline-flex"
+                  }`}
                 >
                   <PhoneIcon className="h-3.5 w-3.5 flex-shrink-0 text-orange" />
-                  {phone.display}
+                  <span>{phone.display}</span>
                 </a>
               ))}
             </div>
             <a
-              href={`tel:${CONTACT_PHONE_NUMBERS[0]?.tel}`}
-              className="sm:hidden inline-flex items-center gap-1.5 transition hover:text-orange text-[11px]"
-            >
-              <PhoneIcon className="h-3.5 w-3.5 flex-shrink-0 text-orange" />
-              {CONTACT_PHONE_NUMBERS[0]?.display}
-            </a>
-            <a
               href={`mailto:${CONTACT_EMAIL}`}
-              className="hidden md:inline-flex items-center gap-2 transition hover:text-orange"
+              className="hidden md:inline-flex items-center gap-1.5 whitespace-nowrap transition hover:text-orange"
             >
               <EnvelopeIcon className="h-3.5 w-3.5 flex-shrink-0 text-orange" />
-              {CONTACT_EMAIL}
+              <span>{CONTACT_EMAIL}</span>
             </a>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex shrink-0 items-center gap-2">
             <LanguageSelector variant="topbar" />
           </div>
         </div>
@@ -195,7 +194,7 @@ const Navbar = memo(() => {
           isSticky ? "shadow-md" : "shadow-sm"
         }`}
       >
-        <div className="px-4 sm:px-4 lg:px-3 xl:px-4 2xl:px-8 py-1.5 lg:py-1.5">
+        <div className="px-3 sm:px-5 lg:px-5 xl:px-6 2xl:px-8 py-2">
           <div className="mx-auto flex w-full max-w-[1536px] items-center justify-between gap-1.5 sm:gap-2 xl:gap-3">
             {/* Logo */}
             <NavLink
@@ -209,6 +208,9 @@ const Navbar = memo(() => {
               <img
                 src={logoSrc}
                 alt="MyHosurProperty"
+                width={480}
+                height={354}
+                decoding="async"
                 className="block h-8 sm:h-10 lg:h-10 xl:h-11 2xl:h-12 w-auto max-w-[110px] sm:max-w-[130px] lg:max-w-[145px] xl:max-w-[155px] 2xl:max-w-[180px] object-contain mx-auto transition-all"
                 style={{ maxHeight: "46px", width: "auto" }}
               />
@@ -221,7 +223,7 @@ const Navbar = memo(() => {
             </NavLink>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden flex-1 items-center justify-center gap-0.5 xl:gap-1 2xl:gap-2 lg:flex shrink-0 px-1">
+            <nav className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 xl:gap-1 2xl:gap-2 lg:flex overflow-x-auto scrollbar-none px-1">
               {desktopNavLinks.map(renderDesktopLink)}
             </nav>
 
@@ -285,7 +287,7 @@ const Navbar = memo(() => {
                     onClick={handlePostFreeProperty}
                     className="header-btn-adissia px-2.5 xl:px-3 2xl:px-4 py-1.5 rounded-lg text-xs 2xl:text-sm transition-all duration-300 font-bold flex items-center gap-1.5 relative shrink-0"
                   >
-                    <span className="absolute -top-2 -right-1.5 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white free-blink-badge pointer-events-none uppercase tracking-wider shadow-md">
+                    <span className="absolute -top-1.5 -right-1 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white free-blink-badge pointer-events-none uppercase tracking-wider shadow-md">
                       {t("common.free") || "Free"}
                     </span>
                     <FlagIcon className="h-4 w-4 shrink-0" />
@@ -351,7 +353,7 @@ const Navbar = memo(() => {
                     onClick={handlePostFreeProperty}
                     className="header-btn-adissia px-2.5 xl:px-3 2xl:px-4 py-1.5 rounded-lg text-xs 2xl:text-sm transition-all duration-300 font-bold flex items-center gap-1.5 relative shrink-0"
                   >
-                    <span className="absolute -top-2 -right-1.5 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white free-blink-badge pointer-events-none uppercase tracking-wider shadow-md">
+                    <span className="absolute -top-1.5 -right-1 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white free-blink-badge pointer-events-none uppercase tracking-wider shadow-md">
                       {t("common.free") || "Free"}
                     </span>
                     <FlagIcon className="h-4 w-4 shrink-0" />

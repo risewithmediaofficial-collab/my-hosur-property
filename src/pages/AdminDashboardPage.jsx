@@ -856,10 +856,10 @@ const AdminDashboardPage = () => {
       title="Admin Panel"
       subtitle="Platform Control"
       description="Manage users, listings, leads, payments, and settings from one clean control center."
-      rootClassName="md:h-full md:min-h-0 md:overflow-hidden"
-      asideClassName="md:top-0 md:h-full md:overflow-hidden"
-      mainClassName="md:h-full md:overflow-y-auto"
-      contentClassName="md:space-y-0 md:flex md:h-full md:min-h-0 md:flex-col md:gap-6 md:overflow-hidden"
+      rootClassName="lg:h-full lg:min-h-0 lg:overflow-hidden"
+      asideClassName="lg:top-0 lg:h-full lg:overflow-hidden"
+      mainClassName="lg:h-full lg:overflow-y-auto"
+      contentClassName="lg:space-y-0 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:gap-6 lg:overflow-hidden"
       hideLogo={true}
 
       navItems={tabs.map((tab) => ({
@@ -922,7 +922,7 @@ const AdminDashboardPage = () => {
             <div className="mb-4 space-y-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="inline-flex items-center gap-2 text-lg font-bold text-slate-900"><UsersIcon className="h-5 w-5 text-slate-700" />Registered Users ({metrics.users || users.length})</h2>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <button onClick={() => openEmailModal("all")} className="dashboard-primary px-3 py-2 text-xs">
                     <EnvelopeIcon className="h-4 w-4" />
                     Broadcast Email
@@ -989,7 +989,7 @@ const AdminDashboardPage = () => {
                 </div>
               )}
             </div>
-            <div className="min-h-0 overflow-y-auto rounded-[1.5rem] border border-slate-200/70">
+            <div className="min-h-0 overflow-auto rounded-[1.5rem] border border-slate-200/70">
               <table className="dashboard-table min-w-full text-left text-sm">
                 <thead className="whitespace-nowrap">
                   <tr>
@@ -1068,7 +1068,7 @@ const AdminDashboardPage = () => {
               </div>
             </div>
 
-            <div className="mt-5 min-h-0 flex-1 overflow-y-auto rounded-[1.5rem] border border-slate-200/70">
+            <div className="mt-5 min-h-0 flex-1 overflow-auto rounded-[1.5rem] border border-slate-200/70">
               <table className="dashboard-table min-w-full text-left text-sm">
                 <thead className="whitespace-nowrap">
                   <tr>
@@ -1186,7 +1186,7 @@ const AdminDashboardPage = () => {
               )}
             </div>
 
-            <div className="mt-4 min-h-0 overflow-y-auto rounded-[1.5rem] border border-slate-200/70 text-sm">
+            <div className="mt-4 min-h-0 overflow-auto rounded-[1.5rem] border border-slate-200/70 text-sm">
               <table className="dashboard-table min-w-full text-left">
                 <thead className="whitespace-nowrap">
                   <tr className="border-b border-clay">
@@ -1342,7 +1342,7 @@ const AdminDashboardPage = () => {
                 )}
               </div>
             </div>
-            <div className="mt-3 min-h-0 overflow-y-auto rounded-[1.5rem] border border-slate-200/70 text-sm">
+            <div className="mt-3 min-h-0 overflow-auto rounded-[1.5rem] border border-slate-200/70 text-sm">
               <table className="dashboard-table min-w-full text-left">
                 <thead className="whitespace-nowrap">
                   <tr className="border-b border-clay">
@@ -1503,7 +1503,7 @@ const AdminDashboardPage = () => {
               </div>
             </div>
 
-            <div className="mt-4 min-h-0 overflow-y-auto rounded-[1.5rem] border border-slate-200/70">
+            <div className="mt-4 min-h-0 overflow-auto rounded-[1.5rem] border border-slate-200/70">
               <table className="dashboard-table min-w-full text-left text-sm">
                 <thead className="whitespace-nowrap bg-slate-50 border-b border-slate-200">
                   <tr>
@@ -2237,7 +2237,7 @@ const AdminDashboardPage = () => {
           <div className="modal-panel-white dashboard-modal flex max-h-[90dvh] w-full max-w-2xl flex-col overflow-hidden rounded-t-[2rem] sm:max-h-[calc(100dvh-2rem)] sm:rounded-[2rem]" style={{ background: "#ffffff" }}>
             <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-5">
               <h3 className="dashboard-display text-2xl font-semibold">User Details</h3>
-              <button onClick={() => setSelectedUser(null)} className="text-slate-400 transition hover:text-slate-900">
+              <button onClick={() => setSelectedUser(null)} className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-900">
                 <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
@@ -2307,7 +2307,7 @@ const AdminDashboardPage = () => {
                   {!editingNotes ? (
                     <button onClick={() => setEditingNotes(true)} className="text-[10px] font-bold text-slate-700 hover:underline">Edit</button>
                   ) : (
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <button onClick={() => { setEditingNotes(false); setTempNotes(selectedUser.adminNotes || ""); }} className="text-[10px] font-bold text-ink/60 hover:underline">Cancel</button>
                       <button onClick={onSaveNotes} className="text-[10px] font-bold text-slate-700 hover:underline">Save</button>
                     </div>
@@ -2337,7 +2337,7 @@ const AdminDashboardPage = () => {
                           <p className="text-[10px] text-ink/50">Rs. {Number(p.price || 0).toLocaleString("en-IN")}</p>
                           <p className="text-[10px] text-ink/60">{p.location?.city || "Hosur"} - {p.status} · Posted {formatAdminDate(p.createdAt)}</p>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                           <button onClick={() => { setSelectedUser(null); openProperty(p); }} className="dashboard-secondary px-2 py-1 text-[10px]">
                             View Property
                           </button>
@@ -2363,7 +2363,7 @@ const AdminDashboardPage = () => {
                   ? "User is currently restricted from logging in and accessing the platform."
                   : "If this user is cheating or misbehaving, you can deactivate their account."}
               </p>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <button onClick={() => { setSelectedUser(null); openEmailModal(selectedUser._id); }} className="dashboard-secondary px-4 py-2 text-sm">
                   Send Email
                 </button>
@@ -2399,7 +2399,7 @@ const AdminDashboardPage = () => {
                 </h3>
                 <p className="mt-1 text-sm text-slate-500">Full record view for admin review.</p>
               </div>
-              <button onClick={() => setSelectedLeadItem(null)} className="text-slate-400 transition hover:text-slate-900">
+              <button onClick={() => setSelectedLeadItem(null)} className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-900">
                 <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
@@ -2610,7 +2610,7 @@ const AdminDashboardPage = () => {
           <div className="modal-panel-white dashboard-modal flex max-h-[90dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-[2rem] sm:max-h-[calc(100dvh-2rem)] sm:rounded-[2rem]" style={{ background: "#ffffff" }}>
             <div className="flex items-center justify-between border-b border-slate-200/80 px-6 pb-4 pt-6">
               <h2 className="dashboard-display text-2xl font-semibold">{emailTarget === "all" ? "Broadcast Email to All" : "Send Email to User"}</h2>
-              <button onClick={() => setEmailModalOpen(false)} className="text-slate-400 transition hover:text-slate-900">
+              <button onClick={() => setEmailModalOpen(false)} className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-900">
                 <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
@@ -2656,7 +2656,7 @@ const AdminDashboardPage = () => {
           <div className="modal-panel-white dashboard-modal flex max-h-[90dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-[2rem] sm:max-h-[calc(100dvh-2rem)] sm:rounded-[2rem]" style={{ background: "#ffffff" }}>
             <div className="flex items-center justify-between border-b border-slate-200/80 px-6 pb-4 pt-6">
               <h2 className="dashboard-display text-xl font-bold text-slate-900">Approve Payment Request</h2>
-              <button onClick={() => { setShowApproveModal(false); setModeratingPaymentRequest(null); }} className="text-slate-400 transition hover:text-slate-900">
+              <button onClick={() => { setShowApproveModal(false); setModeratingPaymentRequest(null); }} className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-900">
                 <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
@@ -2747,7 +2747,7 @@ const AdminDashboardPage = () => {
           <div className="modal-panel-white dashboard-modal flex max-h-[90dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-[2rem] sm:max-h-[calc(100dvh-2rem)] sm:rounded-[2rem]" style={{ background: "#ffffff" }}>
             <div className="flex items-center justify-between border-b border-slate-200/80 px-6 pb-4 pt-6">
               <h2 className="dashboard-display text-xl font-bold text-slate-900">Reject Payment Request</h2>
-              <button onClick={() => { setShowRejectModal(false); setModeratingPaymentRequest(null); }} className="text-slate-400 transition hover:text-slate-900">
+              <button onClick={() => { setShowRejectModal(false); setModeratingPaymentRequest(null); }} className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-900">
                 <XMarkIcon className="h-6 w-6" />
               </button>
             </div>

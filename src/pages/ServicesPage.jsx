@@ -9,12 +9,12 @@ import useScrollAnimation from "../hooks/useScrollAnimation";
 import { useAppLanguage } from "../hooks/useAppLanguage";
 import { localizeCatalogText } from "../utils/i18nCatalog";
 
-import buySellImg from "../assets/property buy guideance.jpg";
-import loanImg from "../assets/Home loan.jpg";
-import registrationImg from "../assets/Sale deed registration.jpg";
-import searchImg from "../assets/plot search.jpg";
+import buySellImg from "../assets/property buy guideance.webp";
+import loanImg from "../assets/Home loan.webp";
+import registrationImg from "../assets/Sale deed registration.webp";
+import searchImg from "../assets/plot search.webp";
 
-import constHouseImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.03 AM (1).jpeg";
+import constHouseImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.03 AM (1).webp";
 
 const ServicesPage = () => {
   const { t, currentLanguage } = useAppLanguage();
@@ -205,7 +205,7 @@ const ServicesPage = () => {
                 <article
                   key={category.key}
                   id={`service-${category.key}`}
-                  className="group relative flex h-full min-h-[520px] w-full min-w-0 scroll-mt-32 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card transition duration-300 hover:-translate-y-1 hover:border-orange hover:shadow-[0_18px_42px_rgba(0,66,162,0.12)] gsap-card"
+                  className="group relative flex h-full md:min-h-[520px] w-full min-w-0 scroll-mt-32 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card transition duration-300 hover:-translate-y-1 hover:border-orange hover:shadow-[0_18px_42px_rgba(0,66,162,0.12)] gsap-card"
                 >
                   <div className="h-1.5 w-full bg-gradient-to-r from-orange via-orange to-navy" />
 
@@ -327,6 +327,8 @@ const ServicesPage = () => {
                     <img
                       src={service.image}
                       alt={service.title}
+                      width={900}
+                      height={600}
                       loading="lazy"
                       decoding="async"
                       className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"

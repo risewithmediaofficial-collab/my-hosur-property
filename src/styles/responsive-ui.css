@@ -325,7 +325,7 @@
   grid-column: 1 / -1;
 }
 
-@media (min-width: 375px) {
+@media (min-width: 540px) {
   .property-details-highlights { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
@@ -348,6 +348,32 @@
   width: 44px;
   height: 44px;
   padding: 0;
+}
+
+/* Remove double chevron on custom-icon Listing sort select across all breakpoints */
+.listing-results-header select.listing-sort-select {
+  background-image: none !important;
+  padding-right: 2.25rem !important;
+}
+
+/* ServiceRequest fixed height only when viewport is wide & tall enough */
+@media (min-width: 1024px) and (min-height: 740px) {
+  .service-request-layout {
+    height: calc(100dvh - 120px);
+    max-height: calc(100dvh - 120px);
+  }
+}
+
+@media (max-width: 1023px) {
+  .listing-results-scroll {
+    overscroll-behavior: auto;
+    touch-action: auto;
+  }
+
+  .service-request-scroll {
+    overflow-y: visible;
+    overscroll-behavior: auto;
+  }
 }
 
 @media (max-width: 767px) {
@@ -384,7 +410,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    min-height: 44px;
+    min-height: 40px;
     white-space: nowrap;
     font-weight: 500;
   }
@@ -398,7 +424,7 @@
 
   .breadcrumbs-compact .breadcrumbs-parent .breadcrumbs-link {
     min-width: 0;
-    padding-block: 0.75rem;
+    padding-block: 0.5rem;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -419,41 +445,38 @@
   }
 
   .listing-results-header {
-    padding: 1.25rem 1rem 1rem;
+    padding: 1rem 1rem 0.875rem;
   }
 
+  /* Compact single-row horizontal swipe category pills on mobile */
   .listing-categories {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 0.45rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .listing-categories::-webkit-scrollbar {
+    display: none;
   }
 
   .listing-category {
-    min-height: 44px;
-    padding: 0.625rem 0.5rem;
-    border-radius: 0.75rem;
-    font-size: 0.8125rem;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    min-height: 36px;
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
   }
 
   .listing-results-header input,
   .listing-results-header select {
-    min-height: 44px;
-    font-size: 1rem;
-  }
-
-  .listing-results-header select {
-    background-image: none !important;
-  }
-
-  .listing-results-header form > button {
-    width: 44px;
-    height: 44px;
-    padding: 0;
-  }
-
-  .listing-results-scroll {
-    overscroll-behavior: auto;
-    touch-action: auto;
+    min-height: 40px;
+    font-size: 0.9375rem;
   }
 
   .property-detail-page > section {
@@ -468,14 +491,14 @@
   }
 
   .property-detail-actions button {
-    padding: 0.75rem 0.5rem;
-    font-size: 0.875rem;
+    padding: 0.65rem 0.5rem;
+    font-size: 0.8125rem;
   }
 
   .property-detail-actions svg {
     flex-shrink: 0;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
   }
 
   .property-detail-actions button:first-child:nth-last-child(3) {
@@ -483,17 +506,12 @@
   }
 
   .site-navbar .navbar-topbar {
-    padding-block: 0;
+    padding-block: 0.125rem;
   }
 
   .navbar-topbar button {
-    padding: 0.5rem;
-    min-height: 40px;
-  }
-
-  .service-request-scroll {
-    overflow-y: visible;
-    overscroll-behavior: auto;
+    padding: 0.25rem 0.5rem;
+    min-height: 30px;
   }
 }
 

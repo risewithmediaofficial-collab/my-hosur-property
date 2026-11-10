@@ -75,7 +75,7 @@ const ContactPage = () => {
           <div className="grid gap-6 lg:gap-10 lg:grid-cols-2 lg:items-start">
 
             {/* LEFT – Contact Form */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-card gsap-card">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-8 shadow-card gsap-card">
               <h2 className="text-2xl font-bold text-navy mb-6 flex items-center gap-2">
                 <span className="h-4 w-1 rounded-full bg-orange block" />
                 {t("contactPage.formTitle") || "Send Us A Message"}
@@ -120,8 +120,8 @@ const ContactPage = () => {
                   <label htmlFor="contact-phone" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-600">
                     {t("contactPage.phone") || "Phone Number"} <span className="text-orange">*</span>
                   </label>
-                  <div className="flex items-center rounded-xl border border-slate-200 bg-white px-3.5 py-2 shadow-xs focus-within:border-orange focus-within:ring-2 focus-within:ring-orange/20 transition-all">
-                    <span className="text-sm font-bold text-slate-500 mr-2 flex-shrink-0">🇮🇳 +91 •</span>
+                  <div className="flex items-center rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-xs focus-within:border-orange focus-within:ring-2 focus-within:ring-orange/20 transition-all">
+                    <span className="text-xs sm:text-sm font-bold text-slate-500 mr-1.5 flex-shrink-0">🇮🇳 +91 •</span>
                     <input
                       id="contact-phone"
                       type="tel"
@@ -130,7 +130,7 @@ const ContactPage = () => {
                       onChange={handleChange}
                       placeholder={t("contactPage.phonePlaceholder") || "Enter 10-digit phone number"}
                       required
-                      className="w-full border-0 bg-transparent py-1 text-sm font-medium text-navy outline-none placeholder:text-slate-400"
+                      className="min-w-0 flex-1 border-0 bg-transparent py-1 text-[13px] sm:text-sm font-medium text-navy outline-none placeholder:text-slate-400"
                     />
                   </div>
                 </div>
@@ -166,7 +166,7 @@ const ContactPage = () => {
             </div>
 
             {/* RIGHT – Get In Touch Section Card with Inline Scroll */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-8 shadow-card flex flex-col gap-5 lg:max-h-[640px] lg:overflow-y-auto custom-scrollbar">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-8 shadow-card flex flex-col gap-5 lg:max-h-[640px] lg:overflow-y-auto custom-scrollbar">
               {/* Header */}
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange">
@@ -195,7 +195,7 @@ const ContactPage = () => {
                       <span className="block text-xs uppercase tracking-[0.24em] text-slate-500 mb-2">
                         {localizeCatalogText(phone.role, currentLanguage)}
                       </span>
-                      <span className="inline-flex items-center gap-2 text-sm font-semibold text-navy">
+                      <span className="inline-flex items-center gap-2 min-w-0 max-w-full text-xs sm:text-sm font-semibold text-navy break-all">
                         <PhoneIcon className="h-4 w-4 text-orange flex-shrink-0" />
                         {phone.display}
                       </span>
@@ -209,7 +209,7 @@ const ContactPage = () => {
                   <span className="block text-xs uppercase tracking-[0.24em] text-slate-500 mb-2">
                     {t("contactPage.email") || "Email"}
                   </span>
-                  <span className="inline-flex items-center gap-2 text-sm font-semibold text-navy">
+                  <span className="inline-flex items-center gap-2 min-w-0 max-w-full text-xs sm:text-sm font-semibold text-navy break-all">
                     <EnvelopeIcon className="h-4 w-4 text-orange flex-shrink-0" />
                     {CONTACT_EMAIL}
                   </span>

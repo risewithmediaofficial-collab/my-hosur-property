@@ -3,7 +3,7 @@ import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { PhotoIcon, XMarkIcon } from "./AppIcons";
 import toast from "react-hot-toast";
 import { submitPaymentRequest } from "../services/api/paymentApi";
-import qrCodeImage from "../assets/payment qr code .jpeg";
+import qrCodeImage from "../assets/payment qr code .webp";
 
 const QrPaymentModal = ({ open, onClose, selectedPlan, user, token, onSuccess }) => {
   const [phone, setPhone] = useState(user?.phone || "");
@@ -112,29 +112,31 @@ const QrPaymentModal = ({ open, onClose, selectedPlan, user, token, onSuccess })
       <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm" aria-hidden="true" />
 
       {/* Main modal alignment container */}
-      <div className="fixed inset-0 flex items-center justify-center p-4">
+      <div className="fixed inset-0 flex items-center justify-center p-3 sm:p-4">
         <DialogPanel className="modal-panel-white flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-2xl transition-all">
 
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-            <div>
+          <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3.5 sm:px-6 sm:py-4">
+            <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
                 Payment Gate (Manual)
               </p>
-              <DialogTitle className="text-lg font-bold text-slate-900">
+              <DialogTitle className="text-base sm:text-lg font-bold text-slate-900 truncate">
                 Buy Plan - {selectedPlan.name}
               </DialogTitle>
             </div>
             <button
+              type="button"
               onClick={onClose}
-              className="rounded-full p-1 text-slate-400 hover:bg-slate-50 hover:text-slate-700"
+              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-50 hover:text-slate-700"
+              aria-label="Close payment modal"
             >
               <XMarkIcon className="h-5 w-5" />
             </button>
           </div>
 
           {/* Body */}
-          <div className="overflow-y-auto px-6 py-6 space-y-6">
+          <div className="overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 space-y-5 sm:space-y-6">
 
             {/* QR Code and instructions */}
             <div className="flex flex-col items-center gap-4 rounded-2xl border border-blue-50 bg-blue-50/30 p-5 text-center">
@@ -142,6 +144,10 @@ const QrPaymentModal = ({ open, onClose, selectedPlan, user, token, onSuccess })
                 <img
                   src={qrCodeImage}
                   alt="Payment QR Code"
+                  width={720}
+                  height={1326}
+                  loading="lazy"
+                  decoding="async"
                   className="h-full w-full object-contain rounded-lg"
                 />
               </div>
@@ -314,9 +320,10 @@ const QrPaymentModal = ({ open, onClose, selectedPlan, user, token, onSuccess })
                             setScreenshot(null);
                             setScreenshotPreview(null);
                           }}
-                          className="absolute -top-2 -right-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
+                          className="absolute -top-2 -right-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-red-500 text-white shadow-sm hover:bg-red-600"
+                          aria-label="Remove screenshot"
                         >
-                          <XMarkIcon className="h-3 w-3" />
+                          <XMarkIcon className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     ) : (
@@ -335,7 +342,7 @@ const QrPaymentModal = ({ open, onClose, selectedPlan, user, token, onSuccess })
               </div>
 
               {/* Submit Buttons */}
-              <div className="border-t border-slate-100 pt-5 flex justify-end gap-3">
+              <div className="border-t border-slate-100 pt-5 flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 sm:gap-3">
                 <button
                   type="button"
                   disabled={submitting}

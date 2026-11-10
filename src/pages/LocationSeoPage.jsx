@@ -231,14 +231,14 @@ const LocationSeoPage = () => {
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 space-y-12">
         {/* Available Properties Grid */}
         <section>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-navy">Properties in {locationName} &amp; Nearby Hosur Hubs</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-navy">Properties in {locationName} &amp; Nearby Hosur Hubs</h2>
               <p className="text-xs text-slate-500 mt-1">Live verified property listings in {locationName}</p>
             </div>
             <Link
               to="/listings"
-              className="text-xs font-bold text-orange hover:underline transition"
+              className="shrink-0 text-xs font-bold text-orange hover:underline transition"
             >
               View All Listings &rarr;
             </Link>

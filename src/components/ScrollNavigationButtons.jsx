@@ -11,7 +11,7 @@ const getScrollTarget = () => {
 };
 
 const ScrollNavigationButtons = () => {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
   const { pathname } = useLocation();
   const [scrollProgress, setScrollProgress] = useState({
     isAtTop: true,
@@ -78,7 +78,7 @@ const ScrollNavigationButtons = () => {
 
   return (
     <div
-      className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-40 hidden md:flex flex-col items-center gap-1 p-1 rounded-2xl bg-white/95 backdrop-blur-md shadow-lg border border-slate-200/90 transition-all duration-300 hover:shadow-2xl hover:border-slate-300"
+      className="fixed bottom-4 right-4 xl:bottom-6 xl:right-6 z-40 hidden lg:flex flex-col items-center gap-1 p-1 rounded-2xl bg-white/95 backdrop-blur-md shadow-lg border border-slate-200/90 transition-all duration-300 hover:shadow-2xl hover:border-slate-300"
       role="navigation"
       aria-label="Scroll controls"
     >

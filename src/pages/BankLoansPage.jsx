@@ -22,7 +22,7 @@ const BankLoansPage = () => {
       />
 
       {/* Static Hero Section */}
-      <section className="px-5 py-8 sm:px-8 lg:px-10 bg-white border-b border-slate-200/80">
+      <section className="px-3.5 py-6 sm:px-8 sm:py-8 lg:px-10 bg-white border-b border-slate-200/80">
         <div className="mx-auto max-w-[1440px] flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
             <h1 className="text-3xl font-black leading-tight sm:text-4xl lg:text-5xl text-navy">
@@ -53,12 +53,12 @@ const BankLoansPage = () => {
       </section>
 
       {/* Main Content Section */}
-      <section className="px-5 py-10 sm:px-8 lg:px-10 bg-slate-50 min-h-[calc(100vh-220px)] flex items-center">
+      <section className="px-3 py-6 sm:px-8 sm:py-10 lg:px-10 bg-slate-50 min-h-[calc(100vh-220px)] flex items-center">
         <div className="mx-auto w-full max-w-[1440px]">
           <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1.9fr] gap-8 items-start">
             {/* Left Column: Bank Selection & Details */}
             <div className="space-y-6">
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
+              <div className="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-6 shadow-sm">
                 <label className="block text-sm font-bold text-slate-800 mb-2">
                   {t("bankLoans.chooseBank") || "Choose Bank"}
                 </label>
@@ -118,7 +118,7 @@ const BankLoansPage = () => {
               </div>
 
               {/* Bank Details Card */}
-              <div className="rounded-2xl border border-slate-200/80 p-6 bg-white shadow-sm space-y-5">
+              <div className="rounded-2xl border border-slate-200/80 p-4 sm:p-6 bg-white shadow-sm space-y-5">
                 <div className="flex items-center gap-4">
                   <span className="text-4xl bg-slate-100 w-16 h-16 rounded-xl flex items-center justify-center border border-slate-200/40">
                     {selectedBank.logo}
@@ -191,7 +191,7 @@ const BankLoansPage = () => {
             </div>
 
             {/* Right Column: Loan Calculator */}
-            <div className="rounded-2xl border border-slate-200/80 p-1 bg-white shadow-sm">
+            <div className="rounded-2xl border border-slate-200/80 p-0 sm:p-1 bg-white shadow-sm">
               <LoanCalculator bank={selectedBank} onBankChange={setSelectedBank} showBankSelector={false} />
             </div>
           </div>

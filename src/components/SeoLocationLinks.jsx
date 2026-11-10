@@ -27,11 +27,11 @@ const SeoLocationLinks = ({ currentSlug = "", showBrandingTags = true }) => {
 
       {/* Main Target Area Links */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between mb-4">
           <h4 className="text-base font-bold text-navy">Top Verified Property Areas in Hosur</h4>
-          <span className="text-xs font-medium text-slate-500">Ready to Register Plots &amp; Lands</span>
+          <span className="shrink-0 text-xs font-medium text-slate-500">Ready to Register Plots &amp; Lands</span>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-7 gap-2.5">
           {HOSUR_LOCATIONS.map((loc) => {
             const areaSlug = slugify(`${loc.name} ${loc.defaultType}`);
             const isActive = currentSlug === areaSlug;

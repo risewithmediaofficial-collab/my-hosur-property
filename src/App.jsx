@@ -109,7 +109,7 @@ const AppShell = () => {
   return (
     <MotionConfig reducedMotion={lowMotionDevice ? "always" : "never"}>
       <div
-        className={`site-app-shell flex min-h-screen flex-col ${isDashboardRoute ? "site-dashboard-app md:h-screen md:overflow-hidden" : ""} ${isListingsRoute ? "site-listings-active" : ""}`}
+        className={`site-app-shell flex min-h-screen flex-col ${isDashboardRoute ? "site-dashboard-app lg:h-screen lg:overflow-hidden" : ""} ${isListingsRoute ? "site-listings-active" : ""}`}
       >
         <Toaster position="top-right" toastOptions={{ duration: 2500 }} />
         <ScrollNavigationButtons />

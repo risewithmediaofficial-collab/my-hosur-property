@@ -52,47 +52,58 @@ import {
   VEHICLE_ACCESS_OPTIONS,
   WATER_SOURCE_OPTIONS,
 } from "../constants/serviceRequests";
-import oneClickLogo from "../assets/one click logo.png";
+const loadOneClickLogo = () => import("../assets/one click logo.webp");
 
-// Import service images from assets
-import buyGuidanceImg from "../assets/property buy guideance.jpg";
-import sellGuidanceImg from "../assets/property sell guidance.jpg";
-import houseImg from "../assets/house.png";
-import commercialImg from "../assets/commerical.jpg";
-import plotSearchImg from "../assets/plot search.jpg";
-import homeLoanImg from "../assets/Home loan.jpg";
-import plotLoanImg from "../assets/Plot loa.jpg";
-import agricultureLoanImg from "../assets/Agriculture loan.jpg";
-import registrationImg from "../assets/Sale deed registration.jpg";
-import pattaImg from "../assets/patta.jpg";
-import landSurveyImg from "../assets/Land survey.jpg";
-import interiorsImg from "../assets/interiros.jpg";
-import applianceServiceImg from "../assets/service-ai/home-appliance-service.png";
-import cleaningServiceImg from "../assets/service-ai/home-office-deep-cleaning.png";
-import carpentryServiceImg from "../assets/shreya-interior-work-govindpura-bhopal-carpenters-5e67m81n6x.avif";
-import houseShiftingImg from "../assets/service-ai/home-office-shifting.png";
-import paintingServiceImg from "../assets/painting_service.png";
-import pestControlImg from "../assets/pest_control.png";
-import contractsWorksImg from "../assets/contarcts works.jpg";
-import nriPropertyMgmtImg from "../assets/nri property managment.png";
-import officeInteriorImg from "../assets/office_interior.png";
-import electricalPlumbingServiceImg from "../assets/service-ai/electrical-plumbing-service.jpg";
-import tankSumpBathroomCleaningImg from "../assets/service-ai/tank-sump-bathroom-cleaning.jpg";
-import sofaCarpetCleaningImg from "../assets/service-ai/sofa-carpet-cleaning.jpg";
-import mortgagePrivateFinanceImg from "../assets/service-ai/mortgage-private-finance.jpg";
-import approvalPlansBlueprintsImg from "../assets/service-ai/approval-plans-blueprints.jpg";
-import homeApartmentAmcImg from "../assets/service-ai/home-apartment-amc.jpg";
-import landscapingGardenMaintenanceImg from "../assets/service-ai/landscaping-garden-maintenance.jpg";
-import officeRentalServiceImg from "../assets/service-ai/office-rental-service.jpg";
-import warehouseRentalServiceImg from "../assets/service-ai/warehouse-rental-service.jpg";
-import landRentalServiceImg from "../assets/service-ai/land-rental-service.jpg";
-
-// Construction images from src/assets/construction images
-import constHouseImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.03 AM (1).jpeg";
-import constCommercialImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.03 AM (2).jpeg";
-import constOfficeImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.03 AM.jpeg";
-import constApartmentImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.04 AM (1).jpeg";
-import constWarehouseImg from "../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.04 AM (2).jpeg";
+// Lazy loaders so ServiceRequestPage only fetches the active service/category preview image
+const SERVICE_IMAGE_LOADERS = {
+  buyGuidance: () => import("../assets/property buy guideance.webp"),
+  sellGuidance: () => import("../assets/property sell guidance.webp"),
+  house: () => import("../assets/house.webp"),
+  commercial: () => import("../assets/commerical.webp"),
+  plotSearch: () => import("../assets/plot search.webp"),
+  homeLoan: () => import("../assets/Home loan.webp"),
+  plotLoan: () => import("../assets/Plot loa.webp"),
+  agricultureLoan: () => import("../assets/Agriculture loan.webp"),
+  registration: () => import("../assets/Sale deed registration.webp"),
+  patta: () => import("../assets/patta.webp"),
+  landSurvey: () => import("../assets/Land survey.webp"),
+  interiors: () => import("../assets/interiros.webp"),
+  applianceService: () => import("../assets/service-ai/home-appliance-service.webp"),
+  cleaningService: () => import("../assets/service-ai/home-office-deep-cleaning.webp"),
+  carpentryService: () =>
+    import("../assets/shreya-interior-work-govindpura-bhopal-carpenters-5e67m81n6x.avif"),
+  houseShifting: () => import("../assets/service-ai/home-office-shifting.webp"),
+  paintingService: () => import("../assets/painting_service.webp"),
+  pestControl: () => import("../assets/pest_control.webp"),
+  contractsWorks: () => import("../assets/contarcts works.webp"),
+  nriPropertyMgmt: () => import("../assets/nri property managment.webp"),
+  officeInterior: () => import("../assets/office_interior.webp"),
+  electricalPlumbingService: () =>
+    import("../assets/service-ai/electrical-plumbing-service.webp"),
+  tankSumpBathroomCleaning: () =>
+    import("../assets/service-ai/tank-sump-bathroom-cleaning.webp"),
+  sofaCarpetCleaning: () => import("../assets/service-ai/sofa-carpet-cleaning.webp"),
+  mortgagePrivateFinance: () => import("../assets/service-ai/mortgage-private-finance.webp"),
+  approvalPlansBlueprints: () =>
+    import("../assets/service-ai/approval-plans-blueprints.webp"),
+  homeApartmentAmc: () => import("../assets/service-ai/home-apartment-amc.webp"),
+  landscapingGardenMaintenance: () =>
+    import("../assets/service-ai/landscaping-garden-maintenance.webp"),
+  officeRentalService: () => import("../assets/service-ai/office-rental-service.webp"),
+  warehouseRentalService: () =>
+    import("../assets/service-ai/warehouse-rental-service.webp"),
+  landRentalService: () => import("../assets/service-ai/land-rental-service.webp"),
+  constHouse: () =>
+    import("../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.03 AM (1).webp"),
+  constCommercial: () =>
+    import("../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.03 AM (2).webp"),
+  constOffice: () =>
+    import("../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.03 AM.webp"),
+  constApartment: () =>
+    import("../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.04 AM (1).webp"),
+  constWarehouse: () =>
+    import("../assets/construction images/WhatsApp Image 2026-08-01 at 10.48.04 AM (2).webp"),
+};
 
 const CITY_OPTIONS = [
   "Hosur",
@@ -129,21 +140,21 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
         pType.includes("villa")
       ) {
         return {
-          image: constHouseImg,
+          imageKey: "constHouse",
           badge: "House Construction",
           caption: "Quality House Construction Services in Hosur",
         };
       }
       if (sType.includes("commercial building") || pType.includes("commercial")) {
         return {
-          image: constCommercialImg,
+          imageKey: "constCommercial",
           badge: "Commercial Construction",
           caption: "Commercial Building Construction & Contracting",
         };
       }
       if (sType.includes("office")) {
         return {
-          image: constOfficeImg,
+          imageKey: "constOffice",
           badge: "Office Construction",
           caption: "Modern Office Construction & Setup",
         };
@@ -154,14 +165,14 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
         pType.includes("apartment")
       ) {
         return {
-          image: constApartmentImg,
+          imageKey: "constApartment",
           badge: "Apartment Construction",
           caption: "Multi-Storey Apartment Construction Solutions",
         };
       }
       if (sType.includes("industry") || sType.includes("warehouse")) {
         return {
-          image: constWarehouseImg,
+          imageKey: "constWarehouse",
           badge: "Industrial & Warehouse Construction",
           caption: "Industrial Shed & Warehouse Construction",
         };
@@ -175,13 +186,13 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
         sType.includes("approval")
       ) {
         return {
-          image: approvalPlansBlueprintsImg,
+          imageKey: "approvalPlansBlueprints",
           badge: "Approval Plans & Blueprints",
           caption: "HNTDA & RERA Approval Plans & 2D/3D Drawings",
         };
       }
       return {
-        image: contractsWorksImg,
+        imageKey: "contractsWorks",
         badge: "Construction Services",
         caption: "Quality House & Commercial Building Construction",
       };
@@ -189,14 +200,14 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
     case "home_office_services":
       if (sType.includes("deep cleaning")) {
         return {
-          image: cleaningServiceImg,
+          imageKey: "cleaningService",
           badge: "Deep Cleaning Service",
           caption: "Professional Home & Office Deep Cleaning",
         };
       }
       if (sType.includes("shifting") || sType.includes("packers") || sType.includes("movers")) {
         return {
-          image: houseShiftingImg,
+          imageKey: "houseShifting",
           badge: "Packers & Movers",
           caption: "Hassle-Free Home & Office Shifting",
         };
@@ -208,55 +219,55 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
         sType.includes("washing")
       ) {
         return {
-          image: applianceServiceImg,
+          imageKey: "applianceService",
           badge: "Appliance Service",
           caption: "Expert TV, Fridge & Washing Machine Repair",
         };
       }
       if (sType.includes("electrical") || sType.includes("plumbing")) {
         return {
-          image: electricalPlumbingServiceImg,
+          imageKey: "electricalPlumbingService",
           badge: "Electrical & Plumbing",
           caption: "Certified Electrical & Plumbing Maintenance",
         };
       }
       if (sType.includes("interior") || sType.includes("carpentry")) {
         return {
-          image: carpentryServiceImg,
+          imageKey: "carpentryService",
           badge: "Carpentry & Woodwork",
           caption: "Custom Carpentry & Furniture Repair",
         };
       }
       if (sType.includes("pest")) {
         return {
-          image: pestControlImg,
+          imageKey: "pestControl",
           badge: "Pest Control",
           caption: "Safe & Effective Pest Control Solutions",
         };
       }
       if (sType.includes("tank") || sType.includes("sump") || sType.includes("bathroom")) {
         return {
-          image: tankSumpBathroomCleaningImg,
+          imageKey: "tankSumpBathroomCleaning",
           badge: "Tank, Sump & Bathroom Cleaning",
           caption: "Hygienic Sump & Overhead Tank Cleaning",
         };
       }
       if (sType.includes("painting")) {
         return {
-          image: paintingServiceImg,
+          imageKey: "paintingService",
           badge: "Painting Work",
           caption: "Interior & Exterior House Painting",
         };
       }
       if (sType.includes("sofa") || sType.includes("carpet")) {
         return {
-          image: sofaCarpetCleaningImg,
+          imageKey: "sofaCarpetCleaning",
           badge: "Sofa & Carpet Cleaning",
           caption: "Sanitized Sofa & Upholstery Cleaning",
         };
       }
       return {
-        image: cleaningServiceImg,
+        imageKey: "cleaningService",
         badge: "Home & Office Care",
         caption: "Reliable Support for Home & Office Spaces",
       };
@@ -264,41 +275,41 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
     case "loan":
       if (sType.includes("home loan balance transfer")) {
         return {
-          image: homeLoanImg,
+          imageKey: "homeLoan",
           badge: "Balance Transfer",
           caption: "Home Loan Balance Transfer with Lower Rates",
         };
       }
       if (sType.includes("plot")) {
         return {
-          image: plotLoanImg,
+          imageKey: "plotLoan",
           badge: "Plot Loan",
           caption: "Instant Approval Plot Purchase Financing",
         };
       }
       if (sType.includes("mortgage") || sType.includes("finance")) {
         return {
-          image: mortgagePrivateFinanceImg,
+          imageKey: "mortgagePrivateFinance",
           badge: "Mortgage Loan",
           caption: "Loan Against Property & Flexible Financing",
         };
       }
       if (sType.includes("commercial")) {
         return {
-          image: commercialImg,
+          imageKey: "commercial",
           badge: "Commercial Loan",
           caption: "High Value Commercial Property Financing",
         };
       }
       if (sType.includes("agriculture")) {
         return {
-          image: agricultureLoanImg,
+          imageKey: "agricultureLoan",
           badge: "Agriculture Loan",
           caption: "Low Interest Agri & Farm Land Financing",
         };
       }
       return {
-        image: homeLoanImg,
+        imageKey: "homeLoan",
         badge: "Home Loan Assistance",
         caption: "Quick & Easy Home Loan Approvals in Hosur",
       };
@@ -306,13 +317,13 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
     case "interior":
       if (sType.includes("office")) {
         return {
-          image: officeInteriorImg,
+          imageKey: "officeInterior",
           badge: "Office Interiors",
           caption: "Modern Ergonomic Office Interior Setup",
         };
       }
       return {
-        image: interiorsImg,
+        imageKey: "interiors",
         badge: "Home Interiors",
         caption: "Luxury Residential Interior Design & Furnishing",
       };
@@ -320,7 +331,7 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
     case "property_buy":
       if (pType.includes("plot") || pType.includes("land")) {
         return {
-          image: plotSearchImg,
+          imageKey: "plotSearch",
           badge: "Verified Plots",
           caption: "Find Approved Plots for Sale in Hosur",
         };
@@ -331,7 +342,7 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
         pType.includes("warehouse")
       ) {
         return {
-          image: commercialImg,
+          imageKey: "commercial",
           badge: "Commercial Spaces",
           caption: "Buy High-Yield Commercial Property in Hosur",
         };
@@ -342,27 +353,27 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
         sType.includes("agreement")
       ) {
         return {
-          image: registrationImg,
+          imageKey: "registration",
           badge: "Legal & Documentation",
           caption: "Legal Verification & Sale Agreement Support",
         };
       }
       if (sType.includes("patta")) {
         return {
-          image: pattaImg,
+          imageKey: "patta",
           badge: "Patta Transfer",
           caption: "Fast & Hassle-Free Patta Name Transfer",
         };
       }
       if (sType.includes("survey")) {
         return {
-          image: landSurveyImg,
+          imageKey: "landSurvey",
           badge: "Land Survey",
           caption: "Government Approved Land Measurement Survey",
         };
       }
       return {
-        image: buyGuidanceImg,
+        imageKey: "buyGuidance",
         badge: "Property Buy Guidance",
         caption: "Expert Consultation for Property Buyers",
       };
@@ -370,20 +381,20 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
     case "property_sell":
       if (pType.includes("plot") || pType.includes("land")) {
         return {
-          image: plotSearchImg,
+          imageKey: "plotSearch",
           badge: "Plot Sale",
           caption: "Sell Your Plot to Direct Verified Buyers",
         };
       }
       if (pType.includes("commercial")) {
         return {
-          image: commercialImg,
+          imageKey: "commercial",
           badge: "Commercial Sale",
           caption: "Sell Commercial Land & Buildings",
         };
       }
       return {
-        image: sellGuidanceImg,
+        imageKey: "sellGuidance",
         badge: "Property Sell Assistance",
         caption: "Get Best Valuation & Fast Property Sale",
       };
@@ -391,27 +402,27 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
     case "property_rent":
       if (pType.includes("warehouse") || pType.includes("industrial")) {
         return {
-          image: warehouseRentalServiceImg,
+          imageKey: "warehouseRentalService",
           badge: "Warehouse Rental",
           caption: "Rent Warehouses & Industrial Sheds",
         };
       }
       if (pType.includes("land")) {
         return {
-          image: landRentalServiceImg,
+          imageKey: "landRentalService",
           badge: "Land Rental",
           caption: "Rent Empty Land with Road Access",
         };
       }
       if (pType.includes("commercial") || pType.includes("office")) {
         return {
-          image: officeRentalServiceImg,
+          imageKey: "officeRentalService",
           badge: "Commercial Rental",
           caption: "Rent Offices & Commercial Spaces",
         };
       }
       return {
-        image: houseImg,
+        imageKey: "house",
         badge: "Residential Rental",
         caption: "Find Houses & Apartments for Rent in Hosur",
       };
@@ -419,34 +430,34 @@ const getServiceImageDetails = (category, serviceType = "", propertyType = "") =
     case "property_management":
       if (sType.includes("garden") || sType.includes("land")) {
         return {
-          image: landscapingGardenMaintenanceImg,
+          imageKey: "landscapingGardenMaintenance",
           badge: "Landscaping & Garden",
           caption: "Professional Lawn & Garden Care",
         };
       }
       if (sType.includes("warehouse") || sType.includes("industry")) {
         return {
-          image: warehouseRentalServiceImg,
+          imageKey: "warehouseRentalService",
           badge: "Facility AMC",
           caption: "Industrial & Warehouse Maintenance AMC",
         };
       }
       if (sType.includes("nri")) {
         return {
-          image: nriPropertyMgmtImg,
+          imageKey: "nriPropertyMgmt",
           badge: "NRI Property Care",
           caption: "Dedicated Property Asset Care for NRIs",
         };
       }
       return {
-        image: homeApartmentAmcImg,
+        imageKey: "homeApartmentAmc",
         badge: "Property Management",
         caption: "Facility AMC & Complete Maintenance Services",
       };
 
     default:
       return {
-        image: buyGuidanceImg,
+        imageKey: "buyGuidance",
         badge: "Property Service",
         caption: "Trusted Real Estate Services in Hosur",
       };
@@ -539,6 +550,8 @@ const ServiceRequestPage = () => {
   const [propertyType, setPropertyType] = useState(defaultPropertyType);
   const [serviceType, setServiceType] = useState(defaultServiceType);
   const [submitting, setSubmitting] = useState(false);
+  const [loadedImages, setLoadedImages] = useState({});
+  const [oneClickLogoSrc, setOneClickLogoSrc] = useState("");
 
   const bankFromQuery = searchParams.get("bank") || "";
 
@@ -603,6 +616,37 @@ const ServiceRequestPage = () => {
     () => getServiceImageDetails(requestCategory, serviceType, propertyType),
     [requestCategory, serviceType, propertyType]
   );
+
+  const activeServiceImage = loadedImages[imageDetails.imageKey] || "";
+
+  useEffect(() => {
+    const key = imageDetails.imageKey;
+    if (!key || loadedImages[key]) return;
+    const loader = SERVICE_IMAGE_LOADERS[key];
+    if (!loader) return;
+    let cancelled = false;
+    loader().then((mod) => {
+      if (!cancelled && mod?.default) {
+        setLoadedImages((prev) => (prev[key] ? prev : { ...prev, [key]: mod.default }));
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [imageDetails.imageKey, loadedImages]);
+
+  useEffect(() => {
+    if (requestCategory !== "home_office_services" || oneClickLogoSrc) return;
+    let cancelled = false;
+    loadOneClickLogo().then((mod) => {
+      if (!cancelled && mod?.default) {
+        setOneClickLogoSrc(mod.default);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [requestCategory, oneClickLogoSrc]);
 
   const handleSpecChange = (field, value) => {
     setSpecs((prev) => ({ ...prev, [field]: value }));
@@ -737,7 +781,7 @@ const ServiceRequestPage = () => {
         description={`Submit your ${categoryTitle.toLowerCase()} request on MyHosurProperty and let our verified team and property partners contact you with exact matches in Hosur.`}
       />
 
-      <section className="grid gap-6 lg:grid-cols-[0.80fr_1.20fr] items-stretch lg:h-[calc(100dvh-115px)] lg:max-h-[calc(100dvh-115px)]">
+      <section className="service-request-layout grid gap-6 lg:grid-cols-[0.80fr_1.20fr] items-stretch">
         {/* Left Column: Visual Guide & Partner Info */}
         <div className="marketing-card p-5 sm:p-6 flex flex-col justify-between overflow-y-auto service-request-scroll gap-4">
           <div className="space-y-4">
@@ -756,14 +800,19 @@ const ServiceRequestPage = () => {
 
             <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
               <div className="relative h-56 sm:h-64 lg:h-72 w-full overflow-hidden bg-slate-100">
-                <img
-                  key={imageDetails.image}
-                  src={imageDetails.image}
-                  alt={`${categoryTitle} Service`}
-                  loading="lazy"
-                  decoding="async"
-                  className="h-full w-full object-cover transition-all duration-500 hover:scale-105"
-                />
+                {activeServiceImage ? (
+                  <img
+                    key={activeServiceImage}
+                    src={activeServiceImage}
+                    alt={`${categoryTitle} Service`}
+                    width={900}
+                    height={600}
+                    decoding="async"
+                    className="h-full w-full object-cover transition-all duration-500 hover:scale-105"
+                  />
+                ) : (
+                  <div className="h-full w-full animate-pulse bg-slate-200" aria-hidden="true" />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-navy/95 via-navy/40 to-transparent flex flex-col justify-end p-4 sm:p-5 text-white">
                   <span className="inline-block rounded-md bg-orange px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white shadow-sm mb-1.5 w-fit">
                     {imageDetails.badge}
@@ -793,11 +842,17 @@ const ServiceRequestPage = () => {
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-2xs flex items-center justify-center">
-                    <img
-                      src={oneClickLogo}
-                      alt="OneClick 2 Serve"
-                      className="h-full w-full object-contain"
-                    />
+                    {oneClickLogoSrc ? (
+                      <img
+                        src={oneClickLogoSrc}
+                        alt="OneClick 2 Serve"
+                        width={640}
+                        height={161}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-contain"
+                      />
+                    ) : null}
                   </div>
                   <div className="min-w-0">
                     <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-orange">
@@ -830,13 +885,13 @@ const ServiceRequestPage = () => {
         </div>
 
         {/* Right Column: Professional Dynamic Request Form with Inline Scroll */}
-        <div className="marketing-card p-5 sm:p-6 md:p-7 flex flex-col h-full min-h-0 overflow-hidden">
+        <div className="marketing-card p-4 sm:p-6 md:p-7 flex flex-col h-full min-h-0 overflow-visible xl:overflow-hidden">
           {/* Category Navigation Pills - Fixed at Top */}
           <div className="shrink-0 pb-3.5 border-b border-slate-100">
             <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">
               Select Requirement Category
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="grid grid-cols-1 min-[380px]:grid-cols-2 sm:grid-cols-4 gap-2">
               {SERVICE_REQUEST_CATEGORY_LIST.map((item) => {
                 const IconComponent = CATEGORY_ICONS[item.requestCategory] || HomeIcon;
                 const isSelected = requestCategory === item.requestCategory;

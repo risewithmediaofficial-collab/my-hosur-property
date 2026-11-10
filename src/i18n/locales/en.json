@@ -419,7 +419,9 @@
     "featuredPlan": "Basic Plan",
     "premiumPlan": "Pro Agent Plan",
     "choosePlan": "Get Started",
-    "popular": "Most Popular"
+    "popular": "Most Popular",
+    "benefitsTag": "Membership benefits",
+    "benefitsHeading": "More visibility, stronger lead access, and simpler plan control."
   },
   "footer": {
     "brandBio": "A refined property platform for verified listings, clearer property discovery, and reliable buyer-owner communication in Hosur.",

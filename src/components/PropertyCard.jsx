@@ -8,6 +8,11 @@ import useScrollToTop from "../hooks/useScrollToTop";
 import { useAppLanguage } from "../hooks/useAppLanguage";
 import { localizeCatalogText } from "../utils/i18nCatalog";
 
+const handlePropertyImageError = (event) => {
+  event.currentTarget.onerror = null;
+  event.currentTarget.src = PROPERTY_PLACEHOLDER_IMAGE;
+};
+
 const PropertyCard = memo(({ item, onSave, isSaved }) => {
   const { t, currentLanguage } = useAppLanguage();
   const href = getPropertyPath(item);
@@ -50,14 +55,14 @@ const PropertyCard = memo(({ item, onSave, isSaved }) => {
         <img
           src={item.images?.[0] || PROPERTY_PLACEHOLDER_IMAGE}
           alt={getPropertyImageAlt(item)}
+          width={400}
+          height={300}
           className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${
             isSold ? "grayscale opacity-60" : ""
           }`}
           loading="lazy"
           decoding="async"
-          onError={(event) => {
-            event.currentTarget.src = PROPERTY_PLACEHOLDER_IMAGE;
-          }}
+          onError={handlePropertyImageError}
         />
         {isSold && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 z-10">
@@ -103,14 +108,14 @@ const PropertyCard = memo(({ item, onSave, isSaved }) => {
 
         {/* Property Type, Size details and action circular arrow */}
         <div className="flex items-center justify-between gap-3 min-h-[44px]">
-          <div className="flex gap-5 sm:gap-6 min-w-0">
-            <div>
+          <div className="flex gap-3 sm:gap-5 min-w-0 flex-1">
+            <div className="min-w-0 flex-1">
               <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide border-b-2 border-orange/40 pb-0.5 w-fit">
                 {t("propertyCard.propertyType") || "Property Type"}
               </p>
               <p className="mt-1 text-xs sm:text-sm font-bold text-navy truncate capitalize">{propType}</p>
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide border-b-2 border-orange/40 pb-0.5 w-fit">
                 {t("propertyCard.availableSize") || "Available Size"}
               </p>
@@ -131,7 +136,7 @@ const PropertyCard = memo(({ item, onSave, isSaved }) => {
 
         {/* Price & Optional Save */}
         <div className="border-t border-slate-100 pt-3 flex items-center justify-between gap-3 min-h-[44px]">
-          <div className="text-xl sm:text-[22px] font-black leading-tight text-navy tracking-tight">
+          <div className="min-w-0 truncate text-xl sm:text-[22px] font-black leading-tight text-navy tracking-tight">
             {currency(item.price)}
           </div>
           {onSave && !isSold && (

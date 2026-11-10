@@ -231,20 +231,20 @@ const PlansPage = () => {
     return (
       <article
         key={plan._id || plan.name}
-        className={`relative flex h-full flex-col rounded-xl border p-6 shadow-card md:p-7 gsap-card ${
+        className={`relative flex h-full flex-col rounded-xl border p-5 shadow-card sm:p-6 md:p-7 gsap-card ${
           isRecommended
             ? "border-navy bg-navy text-white shadow-[0_12px_32px_rgba(0,66,162,0.2)]"
             : "border-slate-200 bg-white text-navy"
         }`}
       >
-        <div className="flex items-start justify-between gap-4">
-          <div>
+        <div className="flex flex-wrap items-start justify-between gap-2 sm:gap-4">
+          <div className="min-w-0 flex-1">
             <p className={`text-[11px] font-bold uppercase tracking-[0.22em] ${isRecommended ? "text-slate-400" : "text-slate-500"}`}>
               {isDbPack
                 ? localizeCatalogText("Database package", currentLanguage)
                 : localizeCatalogText("Subscription plan", currentLanguage)}
             </p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight">
+            <h2 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight">
               {localizeCatalogText(plan.name, currentLanguage)}
             </h2>
             <p className={`mt-2 text-sm leading-6 ${isRecommended ? "text-slate-300" : "text-slate-600"}`}>
@@ -252,15 +252,15 @@ const PlansPage = () => {
             </p>
           </div>
           {isRecommended ? (
-            <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-white">
+            <span className="shrink-0 whitespace-nowrap rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-white">
               {localizeCatalogText("Recommended", currentLanguage)}
             </span>
           ) : null}
         </div>
 
-        <div className="mt-8 flex items-end gap-2">
-          <span className="text-5xl font-extrabold tracking-tight">{plan.price > 0 ? currency(plan.price) : (t("common.free") || "Free")}</span>
-          {plan.billingLabel ? <span className={`pb-2 text-base font-semibold ${isRecommended ? "text-slate-300" : "text-slate-500"}`}>{plan.billingLabel}</span> : null}
+        <div className="mt-6 sm:mt-8 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+          <span className="whitespace-nowrap text-3xl min-[400px]:text-4xl sm:text-5xl font-extrabold tracking-tight">{plan.price > 0 ? currency(plan.price) : (t("common.free") || "Free")}</span>
+          {plan.billingLabel ? <span className={`shrink-0 text-sm sm:text-base font-semibold ${isRecommended ? "text-slate-300" : "text-slate-500"}`}>{plan.billingLabel}</span> : null}
         </div>
 
         <div className={`mt-6 rounded-[24px] border p-4 ${isRecommended ? "border-white/15 bg-black/10" : "border-slate-200 bg-slate-50"}`}>
@@ -334,7 +334,7 @@ const PlansPage = () => {
   return (
     <main className="page-shell w-full space-y-10 px-4 py-8 sm:px-5 md:py-12 lg:px-6">
       <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] gsap-section">
-        <div className="marketing-hero bg-white rounded-xl p-8 md:p-10 gsap-hero-item">
+        <div className="marketing-hero bg-white rounded-xl p-5 sm:p-8 md:p-10 gsap-hero-item">
           <p className="section-tag">{t("plans.badge") || "Pricing and access"}</p>
           <h1 className="mt-4 text-3xl font-bold md:text-4xl lg:text-5xl text-[#0042a2]">
             {t("plans.title") || "Choose the plan that matches your property activity."}
@@ -344,7 +344,7 @@ const PlansPage = () => {
           </p>
         </div>
 
-        <div className="marketing-card p-8 md:p-10 gsap-card">
+        <div className="marketing-card p-5 sm:p-8 md:p-10 gsap-card">
           <p className="section-tag">{t("plans.benefitsTag") || "Membership benefits"}</p>
           <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl">
             {t("plans.benefitsHeading") || "More visibility, stronger lead access, and simpler plan control."}
@@ -378,7 +378,7 @@ const PlansPage = () => {
 
       {dbPacks.length ? (
         <section className="space-y-6 gsap-section">
-          <div className="marketing-card p-6 md:p-8 gsap-card">
+          <div className="marketing-card p-5 sm:p-6 md:p-8 gsap-card">
             <p className="section-tag">Add-on packages</p>
             <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl">Database access packages</h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">

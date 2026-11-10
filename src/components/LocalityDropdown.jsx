@@ -166,7 +166,7 @@ const LocalityDropdown = ({ value, onChange, onSelect, onOpenChange }) => {
               </div>
             </div>
 
-            <div className="max-h-[420px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+            <div className="max-h-[min(360px,55vh)] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
               {totalResults > 0 ? (
                 <div className="py-2">
                   {filteredSections.map((section, sectionIndex) => (

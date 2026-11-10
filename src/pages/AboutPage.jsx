@@ -19,8 +19,8 @@ import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo"
 import { useAppLanguage } from "../hooks/useAppLanguage";
 import { localizeCatalogText } from "../utils/i18nCatalog";
 import useScrollAnimation from "../hooks/useScrollAnimation";
-import founderImage from "../assets/myhosurproperty vijay kumar founder.jpeg";
-import directorImage from "../assets/director 1.jpeg";
+import founderImage from "../assets/myhosurproperty vijay kumar founder.webp";
+import directorImage from "../assets/director 1.webp";
 
 const VisionIcon = () => (
   <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-8 w-8">
@@ -144,17 +144,17 @@ const AboutPage = () => {
               {t("about.ourStoryDesc") || "We believe every property holds potential – not just in value, but in the life it helps build. That's why we combine local expertise with modern technology to help you find spaces that truly fit your dreams and future."}
             </p>
 
-            <div className="grid grid-cols-3 gap-4 mt-4 border-t border-slate-100 pt-6">
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-4 border-t border-slate-100 pt-6">
               {[
                 { value: 100, suffix: "+", label: t("home.stats.verifiedListings") || "Verified Listings" },
                 { value: 100, suffix: "+", label: t("home.trustStats.happyClients") || "Happy Clients" },
                 { value: 8, suffix: "+", label: t("about.yearsOfTrust") || "Years of Trust" }
               ].map((item) => (
-                <div key={item.label} className="text-left">
-                  <p className="text-2xl font-bold text-navy sm:text-3xl">
+                <div key={item.label} className="min-w-0 text-left">
+                  <p className="text-xl font-bold text-navy sm:text-3xl">
                     <CountUpNumber value={item.value} suffix={item.suffix} />
                   </p>
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">{item.label}</p>
+                  <p className="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">{item.label}</p>
                 </div>
               ))}
             </div>
@@ -162,8 +162,10 @@ const AboutPage = () => {
 
           <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card gsap-card">
             <img
-              src="https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=1200&q=80"
+              src="https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=900&q=80&fm=webp"
               alt="Premium villa representing Gyes Construction"
+              width={900}
+              height={380}
               className="h-[320px] w-full object-cover sm:h-[380px]"
               loading="lazy"
               decoding="async"
@@ -241,7 +243,7 @@ const AboutPage = () => {
             {vmcData.map(({ Icon, accent, title, paragraph, bullets, coreValues }) => (
               <div
                 key={title}
-                className="flex flex-col rounded-2xl border border-slate-200 bg-white p-8 shadow-card gsap-card hover:shadow-lg transition-shadow duration-300"
+                className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 sm:p-8 shadow-card gsap-card hover:shadow-lg transition-shadow duration-300"
               >
                 {/* Icon badge */}
                 <div className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${accent} text-white shadow-md mb-6`}>
@@ -278,7 +280,7 @@ const AboutPage = () => {
                 ) : null}
 
                 {coreValues ? (
-                  <div className="mt-5 grid grid-cols-2 gap-3 w-full">
+                  <div className="mt-5 grid grid-cols-1 min-[380px]:grid-cols-2 gap-2.5 sm:gap-3 w-full">
                     {coreValues.map(({ label, emoji }) => (
                       <div
                         key={label}
@@ -373,7 +375,9 @@ const AboutPage = () => {
               <img
                 src={founderImage}
                 alt="Founder of MyHosurProperty — Mr. Vijaykumar"
-                className="h-[520px] w-full object-cover object-center sm:h-[560px]"
+                width={413}
+                height={413}
+                className="h-[280px] min-[420px]:h-[340px] sm:h-[420px] lg:h-[480px] w-full object-cover object-top"
                 loading="lazy"
                 decoding="async"
               />
@@ -399,7 +403,9 @@ const AboutPage = () => {
               <img
                 src={directorImage}
                 alt="Director of MyHosurProperty — Mr. Raja"
-                className="h-[520px] w-full object-cover object-center sm:h-[560px]"
+                width={614}
+                height={900}
+                className="h-[280px] min-[420px]:h-[340px] sm:h-[420px] lg:h-[480px] w-full object-cover object-top"
                 loading="lazy"
                 decoding="async"
               />

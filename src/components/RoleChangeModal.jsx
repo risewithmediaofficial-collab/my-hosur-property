@@ -56,8 +56,10 @@ const RoleChangeModal = ({ open, onClose, onSuccess }) => {
             <p className="text-xs text-slate-500">Selected wrong role? Request admin to change your account type.</p>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
+            aria-label="Close modal"
           >
             <XMarkIcon className="h-5 w-5" />
           </button>

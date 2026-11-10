@@ -34,14 +34,14 @@ import useAuth from "../hooks/useAuth";
 import useScrollToTop from "../hooks/useScrollToTop";
 import { useAppLanguage } from "../hooks/useAppLanguage";
 import { localizeCatalogText } from "../utils/i18nCatalog";
-import servicesHeroImage from "../assets/house.png";
-import alluringRealityImg from "../assets/alluring reality.jpeg";
-import chatGptBannerImage from "../assets/ChatGPT Image Aug 4, 2026, 10_37_17 AM.png";
-import gyesLogo from "../assets/gyes property and constrcution logo.jpeg";
-import oneClickLogo from "../assets/one click logo.png";
-import fiyazImg from "../assets/happy clinets/fiyaz.jpeg";
-import jeevaImg from "../assets/happy clinets/jeeva loganathan.jpeg";
-import pannerImg from "../assets/happy clinets/panner selvam.jpeg";
+import servicesHeroImage from "../assets/house.webp";
+import alluringRealityImg from "../assets/alluring reality.webp";
+import chatGptBannerImage from "../assets/ChatGPT Image Aug 4, 2026, 10_37_17 AM.webp";
+import gyesLogo from "../assets/gyes property and constrcution logo.webp";
+import oneClickLogo from "../assets/one click logo.webp";
+import fiyazImg from "../assets/happy clinets/fiyaz.webp";
+import jeevaImg from "../assets/happy clinets/jeeva loganathan.webp";
+import pannerImg from "../assets/happy clinets/panner selvam.webp";
 import { fetchHomeProperties } from "../services/api/propertyApi";
 import { buildRealEstateAgentSchema, buildWebsiteSchema } from "../utils/seo";
 
@@ -261,35 +261,35 @@ const HomePage = () => {
       title: t("home.showcase.sellTitle") || "Sell Property",
       description: t("home.showcase.sellDesc") || "Quick and verified sales",
       icon: SellCategoryMulticolorIcon,
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80",
+      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=75&fm=webp",
       to: "/post-property",
     },
     {
       title: t("home.showcase.rentTitle") || "Rent Property",
       description: t("home.showcase.rentDesc") || "Lease verified homes",
       icon: RentCategoryMulticolorIcon,
-      image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+      image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=75&fm=webp",
       to: "/listings?intent=rent",
     },
     {
       title: t("home.showcase.commercialTitle") || "Commercial",
       description: t("home.showcase.commercialDesc") || "Office & retail spaces",
       icon: CommercialMulticolorIcon,
-      image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+      image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=75&fm=webp",
       to: "/listings?intent=buy&propertyType=Commercial%20Land",
     },
     {
       title: t("home.showcase.landTitle") || "Land Sale",
       description: t("home.showcase.landDesc") || "Agricultural & residential land",
       icon: PlotMulticolorIcon,
-      image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
+      image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=75&fm=webp",
       to: "/listings?intent=buy&propertyType=Plot",
     },
     {
       title: t("home.showcase.interiorTitle") || "Interior Design",
       description: t("home.showcase.interiorDesc") || "Customized interiors",
       icon: InteriorCategoryMulticolorIcon,
-      image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80",
+      image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=600&q=75&fm=webp",
       to: "/request-service?category=interior",
     },
   ], [t]);
@@ -300,7 +300,7 @@ const HomePage = () => {
     { value: 50, suffix: "+", label: t("home.trustStats.trustedPartners") || "Trusted Partners", icon: CheckBadgeIcon },
     { value: 100, suffix: "%", label: t("home.trustStats.verifiedDeals") || "Verified Deals", icon: HandshakeIcon },
   ], [t]);
-  const [localityDropdownOpen, setLocalityDropdownOpen] = useState(false);
+  // Locality dropdown floats over hero content without shifting layout height.
   const homeRootRef = useRef(null);
   const heroRef = useRef(null);
 
@@ -446,7 +446,7 @@ const HomePage = () => {
   }, [showcaseIndex]);
 
   return (
-    <main ref={homeRootRef} className="min-w-0 page-shell w-full overflow-hidden">
+    <main ref={homeRootRef} className="min-w-0 page-shell w-full overflow-x-clip">
       <SeoHead
         title="Verified Property Listings in Hosur"
         description="Explore verified property listings, real-estate services, and professional local property support through My Hosur Property."
@@ -460,7 +460,7 @@ const HomePage = () => {
       <section
         ref={heroRef}
         className="relative min-h-[380px] sm:min-h-[460px] lg:min-h-[500px]"
-        style={{ zIndex: 1 }}
+        style={{ zIndex: 30 }}
       >
         {/* Background: white base with animated DotField pattern */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none bg-white border-b border-slate-200/60">
@@ -493,7 +493,7 @@ const HomePage = () => {
 
           {/* ── 1. SHORTCUT CATEGORY DROPDOWNS BAR (TOP LEVEL CATEGORY NAVIGATION) ── */}
           <div ref={shortcutBarRef} className="home-gsap-hero-item relative z-30 mt-6 flex flex-wrap justify-center gap-2.5 sm:gap-3 w-full max-w-5xl">
-            {shortcutGroups.map((group) => {
+            {shortcutGroups.map((group, groupIndex) => {
               const CategoryIcon = group.icon;
               const groupLabel = t(group.key) || group.label;
               return (
@@ -507,13 +507,13 @@ const HomePage = () => {
                   <button
                     type="button"
                     onClick={() => setOpenShortcutMenu((current) => (current === group.label ? "" : group.label))}
-                    className={`inline-flex min-h-[46px] items-center justify-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-bold transition-all duration-200 shadow-sm ${
+                    className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-3.5 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold transition-all duration-200 shadow-sm ${
                       openShortcutMenu === group.label
                         ? "bg-navy text-white shadow-md scale-105"
                         : "bg-white border border-slate-200 text-navy hover:bg-slate-50 hover:border-slate-300 hover:shadow"
                     }`}
                   >
-                    {CategoryIcon && <CategoryIcon className="h-6 w-6 flex-shrink-0" />}
+                    {CategoryIcon && <CategoryIcon className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />}
                     <span>{groupLabel}</span>
                     <ChevronDownIcon className={`h-4 w-4 transition duration-300 max-sm:!hidden sm:block ${openShortcutMenu === group.label ? "rotate-180" : ""}`} />
                   </button>
@@ -521,8 +521,8 @@ const HomePage = () => {
                   {/* Desktop dropdown */}
                   {openShortcutMenu === group.label && (
                     <motion.div
-                      className="absolute left-0 top-full hidden pt-2 sm:block"
-                      style={{ zIndex: 99999, minWidth: "320px" }}
+                      className={`absolute top-full hidden pt-2 sm:block w-[min(320px,calc(100vw-2rem))] ${groupIndex >= Math.floor(shortcutGroups.length / 2) ? "right-0" : "left-0"}`}
+                      style={{ zIndex: 99999 }}
                       initial={{ opacity: 0, y: -8, scale: 0.98 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -8, scale: 0.98 }}
@@ -589,7 +589,7 @@ const HomePage = () => {
           <div className="home-gsap-hero-item relative z-20 mt-6 w-full max-w-5xl text-left">
             <div
               className={`rounded-2xl border border-slate-200 bg-white p-5 shadow-xl transition-all duration-300 sm:p-6 ${
-                localityDropdownOpen ? "pb-[22rem] sm:pb-[26rem]" : ""
+                ""
               }`}
             >
               <p className="mb-4 text-xs font-bold uppercase tracking-wider text-navy sm:text-sm">
@@ -599,7 +599,7 @@ const HomePage = () => {
                 <LocalityDropdown
                   value={search.search}
                   onChange={(value) => setSearch((prev) => ({ ...prev, search: value }))}
-                  onOpenChange={setLocalityDropdownOpen}
+                  /* dropdown floats above lower hero elements */
                   onSelect={() => {
                     scrollToTop();
                     navigate(`/listings?${queryString || "intent=buy"}`);
@@ -808,7 +808,7 @@ const HomePage = () => {
           </div>
 
           <div className="home-services-image-wrap home-gsap-card">
-            <img src={servicesHeroImage} alt="Modern villa property in Hosur" loading="lazy" />
+            <img src={servicesHeroImage} alt="Modern villa property in Hosur" width={900} height={900} loading="lazy" decoding="async" />
           </div>
         </div>
       </section>
@@ -833,6 +833,8 @@ const HomePage = () => {
           <img
             src={chatGptBannerImage}
             alt="Hosur Locality Map & Service Coverage"
+            width={900}
+            height={600}
             className="w-full h-auto max-h-[420px] object-contain mx-auto block"
             loading="lazy"
             decoding="async"
@@ -875,7 +877,7 @@ const HomePage = () => {
             </div>
           </div>
 
-          <div className="mt-10 overflow-hidden">
+          <div className="mt-8 sm:mt-10">
             <div ref={showcaseTrackRef} className="home-showcase-track">
               {showcaseItems.map((service) => {
                 const Icon = service.icon;
@@ -884,8 +886,17 @@ const HomePage = () => {
                     key={service.title}
                     to={service.to}
                     className="home-showcase-card home-gsap-card"
-                    style={{ backgroundImage: `url(${service.image})` }}
                   >
+                    <img
+                      src={service.image}
+                      alt=""
+                      aria-hidden="true"
+                      width={600}
+                      height={360}
+                      loading="lazy"
+                      decoding="async"
+                      className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
+                    />
                     <div className="home-showcase-card-content">
                       <div className="home-showcase-card-icon">
                         <Icon className="h-5 w-5" />
@@ -987,18 +998,18 @@ const HomePage = () => {
           </div>
 
           {/* Right Column: Discover Properties Sidebar */}
-          <div className="bg-slate-50 rounded-2xl border border-slate-200/60 p-8 flex flex-col justify-between relative overflow-hidden min-h-[460px] shadow-sm">
+          <div className="bg-slate-50 rounded-2xl border border-slate-200/60 p-5 sm:p-8 flex flex-col justify-between relative overflow-hidden min-h-[340px] lg:min-h-[460px] shadow-sm">
             {/* Background design elements */}
             <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-orange/10 via-transparent to-transparent rounded-bl-full pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-navy/5 via-transparent to-transparent rounded-tr-full pointer-events-none" />
 
             <div className="relative z-10">
-              <h2 className="text-5xl sm:text-6xl font-black text-navy leading-tight tracking-tight">
+              <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] xl:text-5xl font-black text-navy leading-tight tracking-tight">
                 {t("home.featured.discoverTitle") || "Discover Properties"}
               </h2>
 
               {/* Navigation Tabs */}
-              <div className="flex border-b border-slate-200 mt-6 gap-6 text-sm font-semibold">
+              <div className="flex flex-wrap border-b border-slate-200 mt-6 gap-x-6 gap-y-2 text-sm font-semibold">
                 {[
                   { key: "Ongoing", label: t("home.featured.tabOngoing") || "Ongoing" },
                   { key: "Upcoming", label: t("home.featured.tabUpcoming") || "Upcoming" },
@@ -1065,21 +1076,23 @@ const HomePage = () => {
         </div>
 
         {/* Partner Brand Cards Display */}
-        <div className="mx-auto mt-12 grid max-w-[1200px] grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mx-auto mt-10 sm:mt-12 grid max-w-[1200px] grid-cols-1 min-[380px]:grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
           {/* Card: Gyes Property & Construction */}
-          <div className="group relative flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition duration-200 hover:border-orange hover:shadow-md home-gsap-card">
-            <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 transition duration-200 group-hover:bg-orange group-hover:text-white group-hover:shadow-xs">
+          <div className="group relative flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 text-center shadow-xs transition duration-200 hover:border-orange hover:shadow-md home-gsap-card">
+            <span className="self-end mb-1.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 transition duration-200 group-hover:bg-orange group-hover:text-white group-hover:shadow-xs">
               {t("home.partners.clickHere") || "Click Here ↗"}
             </span>
             <a
               href="https://gyesproperty.com/"
               target="_blank"
               rel="noreferrer noopener"
-              className="flex h-28 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
+              className="flex h-24 sm:h-28 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
             >
               <img
                 src={gyesLogo}
                 alt="Gyes Property & Construction"
+                width={400}
+                height={400}
                 className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
                 decoding="async"
@@ -1096,19 +1109,21 @@ const HomePage = () => {
           </div>
 
           {/* Card: Gyes Traders */}
-          <div className="group relative flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition duration-200 hover:border-orange hover:shadow-md home-gsap-card">
-            <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 transition duration-200 group-hover:bg-orange group-hover:text-white group-hover:shadow-xs">
+          <div className="group relative flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 text-center shadow-xs transition duration-200 hover:border-orange hover:shadow-md home-gsap-card">
+            <span className="self-end mb-1.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 transition duration-200 group-hover:bg-orange group-hover:text-white group-hover:shadow-xs">
               {t("home.partners.clickHere") || "Click Here ↗"}
             </span>
             <a
               href="https://www.gyestraders.com/"
               target="_blank"
               rel="noreferrer noopener"
-              className="flex h-28 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
+              className="flex h-24 sm:h-28 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
             >
               <img
                 src={gyesLogo}
                 alt="Gyes Traders"
+                width={400}
+                height={400}
                 className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
                 decoding="async"
@@ -1126,8 +1141,8 @@ const HomePage = () => {
           </div>
 
           {/* Card: OneClick */}
-          <div className="group relative flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition duration-200 hover:border-orange hover:shadow-md home-gsap-card">
-            <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 transition duration-200 group-hover:bg-orange group-hover:text-white group-hover:shadow-xs">
+          <div className="group relative flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 text-center shadow-xs transition duration-200 hover:border-orange hover:shadow-md home-gsap-card">
+            <span className="self-end mb-1.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 transition duration-200 group-hover:bg-orange group-hover:text-white group-hover:shadow-xs">
               {t("home.partners.clickHere") || "Click Here ↗"}
             </span>
             <a
@@ -1139,6 +1154,8 @@ const HomePage = () => {
               <img
                 src={oneClickLogo}
                 alt="OneClick Office & Home Service"
+                width={640}
+                height={161}
                 className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
                 decoding="async"
@@ -1156,19 +1173,21 @@ const HomePage = () => {
           </div>
 
           {/* Card: Alluring Realty */}
-          <div className="group relative flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-5 text-center shadow-xs transition duration-200 hover:border-orange hover:shadow-md home-gsap-card">
-            <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 transition duration-200 group-hover:bg-orange group-hover:text-white group-hover:shadow-xs">
+          <div className="group relative flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 text-center shadow-xs transition duration-200 hover:border-orange hover:shadow-md home-gsap-card">
+            <span className="self-end mb-1.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 transition duration-200 group-hover:bg-orange group-hover:text-white group-hover:shadow-xs">
               {t("home.partners.clickHere") || "Click Here ↗"}
             </span>
             <a
               href="https://alluringrealty.com/"
               target="_blank"
               rel="noreferrer noopener"
-              className="flex h-28 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
+              className="flex h-24 sm:h-28 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2"
             >
               <img
                 src={alluringRealityImg}
                 alt="Alluring Realty"
+                width={400}
+                height={400}
                 className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
                 decoding="async"
@@ -1203,7 +1222,7 @@ const HomePage = () => {
 
         {/* Happy Client Cards Grid */}
         <div className="mx-auto mt-12 max-w-[1440px]">
-          <div className="grid gap-6 md:grid-cols-3 items-stretch">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-stretch">
             {happyClientsData.map((client) => (
               <div
                 key={client.id}
@@ -1216,6 +1235,7 @@ const HomePage = () => {
                     alt={`${client.name} - Happy Client of MyHosurProperty`}
                     className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/20 pointer-events-none" />
 

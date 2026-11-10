@@ -129,16 +129,16 @@ const LanguageSelector = ({ variant = "navbar", className = "" }) => {
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-xs font-semibold text-white/90 hover:bg-white/10 hover:text-white transition cursor-pointer"
+          className="inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 rounded-md px-2 py-0.5 text-xs font-semibold text-white/90 hover:bg-white/10 hover:text-white transition cursor-pointer"
           aria-expanded={isOpen}
           aria-haspopup="true"
         >
-          <span className="flex h-4 w-4 items-center justify-center rounded text-[10px] font-black bg-orange text-white">
+          <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded text-[10px] font-black bg-orange text-white">
             {currentLangObj.scriptBadge}
           </span>
-          <span>{currentLangObj.nativeName}</span>
+          <span className="whitespace-nowrap">{currentLangObj.nativeName}</span>
           <ChevronDownIcon
-            className={`h-3 w-3 text-white/70 transition-transform duration-200 ${
+            className={`h-3 w-3 shrink-0 text-white/70 transition-transform duration-200 ${
               isOpen ? "rotate-180" : ""
             }`}
           />
@@ -151,7 +151,7 @@ const LanguageSelector = ({ variant = "navbar", className = "" }) => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -6, scale: 0.96 }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className="absolute left-0 top-full z-[100] mt-1.5 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl ring-1 ring-black/5"
+              className="absolute right-0 top-full z-[100] mt-1.5 w-52 max-w-[calc(100vw-1rem)] rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl ring-1 ring-black/5"
             >
               <div className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1">
                 {t("language.select") || "Select Language"}

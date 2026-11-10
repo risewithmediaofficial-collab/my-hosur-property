@@ -11,9 +11,9 @@ const DashboardSidebar = ({
   onLogout,
 }) => {
   return (
-    <div className={`flex min-h-[calc(100vh-4rem)] flex-col overflow-x-hidden bg-slate-50/50 md:min-h-0 md:flex-row ${rootClassName}`}>
-      {/* ── Desktop Sidebar ── */}
-      <aside className={`sticky top-20 z-10 hidden h-[calc(100vh-5rem)] w-[21rem] shrink-0 overflow-y-auto px-4 pb-6 pt-4 md:flex md:min-h-0 md:flex-col ${asideClassName}`}>
+    <div className={`flex min-h-[calc(100vh-4rem)] flex-col overflow-x-hidden bg-slate-50/50 lg:min-h-0 lg:flex-row ${rootClassName}`}>
+      {/* ── Desktop Sidebar (>=1024px) ── */}
+      <aside className={`sticky top-20 z-10 hidden h-[calc(100vh-5rem)] w-[19rem] xl:w-[21rem] shrink-0 overflow-y-auto px-4 pb-6 pt-4 lg:flex lg:min-h-0 lg:flex-col ${asideClassName}`}>
         <div className="dashboard-shell flex h-full min-h-0 flex-col gap-6 p-6 bg-white border border-slate-200/80 rounded-3xl shadow-sm">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">{subtitle}</p>
@@ -59,9 +59,9 @@ const DashboardSidebar = ({
         </div>
       </aside>
 
-      {/* ── Mobile Top Bar ── */}
-      <div className="md:hidden w-full shrink-0">
-        <div className="sticky top-[44px] z-20 w-full bg-white/95 backdrop-blur-md shadow-sm">
+      {/* ── Mobile & Tablet Top Bar (<1024px) ── */}
+      <div className="lg:hidden w-full shrink-0 border-b border-slate-200 bg-white">
+        <div className="w-full bg-white">
           {/* Profile + Logout row */}
           <div className="flex items-center justify-between gap-2 border-b border-slate-100 px-3 py-1">
             <div className="flex items-center gap-2 min-w-0">
@@ -111,8 +111,8 @@ const DashboardSidebar = ({
       </div>
 
       {/* ── Main Content ── */}
-      <main className={`min-w-0 flex-1 overflow-x-hidden overflow-y-visible md:h-full md:min-h-0 md:overflow-y-auto ${mainClassName}`}>
-        <div className="mx-auto min-h-full max-w-6xl px-3 py-4 md:px-6 md:py-8 xl:px-8">
+      <main className={`min-w-0 flex-1 overflow-x-hidden overflow-y-visible lg:h-full lg:min-h-0 lg:overflow-y-auto ${mainClassName}`}>
+        <div className="mx-auto min-h-full max-w-6xl px-3 py-4 sm:px-4 md:px-6 lg:py-8 xl:px-8">
           <section className={`space-y-6 ${contentClassName}`}>{children}</section>
         </div>
       </main>

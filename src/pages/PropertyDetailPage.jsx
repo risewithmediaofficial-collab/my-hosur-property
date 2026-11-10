@@ -253,7 +253,7 @@ const PropertyDetailPage = () => {
   if (loading) {
     return (
       <main className="page-shell w-full px-5 py-16 sm:px-8 lg:px-10">
-        <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-center rounded-2xl bg-white p-20 shadow-sm border border-slate-200">
+        <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-center rounded-2xl bg-white p-8 sm:p-16 lg:p-20 shadow-sm border border-slate-200">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-orange border-t-transparent" />
           <p className="mt-4 text-sm font-bold text-navy">Loading property details...</p>
         </div>
@@ -394,14 +394,14 @@ const PropertyDetailPage = () => {
               <button
                 type="button"
                 onClick={() => handleToggleSaved(p._id)}
-                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition border ${
+                className={`inline-flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap rounded-xl px-2.5 sm:px-4 py-2.5 text-xs sm:text-sm font-bold transition border ${
                   isSaved
                     ? "bg-navy text-white border-navy"
                     : "bg-white border-slate-300 text-navy hover:bg-slate-50"
                 }`}
               >
-                <BookmarkIcon className="h-4.5 w-4.5" />
-                {isSaved ? (t("propertyCard.saved") || "Saved") : (t("propertyCard.saveProperty") || "Save Property")}
+                <BookmarkIcon className="h-4 w-4 sm:h-4.5 sm:w-4.5 shrink-0" />
+                <span>{isSaved ? (t("propertyCard.saved") || "Saved") : (t("propertyCard.saveProperty") || "Save Property")}</span>
               </button>
 
               <button
@@ -414,10 +414,10 @@ const PropertyDetailPage = () => {
                     toast.success("Property link copied!");
                   }
                 }}
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-navy hover:bg-slate-50 transition"
+                className="inline-flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap rounded-xl border border-slate-300 bg-white px-2.5 sm:px-4 py-2.5 text-xs sm:text-sm font-bold text-navy hover:bg-slate-50 transition"
               >
-                <ShareIcon className="h-4.5 w-4.5" />
-                {t("propertyDetail.share") || "Share"}
+                <ShareIcon className="h-4 w-4 sm:h-4.5 sm:w-4.5 shrink-0" />
+                <span>{t("propertyDetail.share") || "Share"}</span>
               </button>
             </div>
           </div>
@@ -504,18 +504,18 @@ const PropertyDetailPage = () => {
                 />
 
                 {/* Bottom-left: Eyeball Views Overlay Badge */}
-                <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2 rounded-full bg-slate-900/80 backdrop-blur-md px-3.5 py-1.5 text-xs font-bold text-white shadow-lg border border-white/10">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-white">
-                    <EyeIcon className="h-3 w-3" />
+                <div className="absolute bottom-2.5 left-2.5 sm:bottom-4 sm:left-4 z-10 flex max-w-[calc(100%-4.5rem)] items-center gap-1.5 sm:gap-2 rounded-full bg-slate-900/80 backdrop-blur-md px-2.5 py-1 sm:px-3.5 sm:py-1.5 text-[11px] sm:text-xs font-bold text-white shadow-lg border border-white/10">
+                  <span className="flex h-4 w-4 sm:h-5 sm:w-5 shrink-0 items-center justify-center rounded-full bg-rose-500 text-white">
+                    <EyeIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                   </span>
-                  <span>{propertyViewLabel}</span>
+                  <span className="truncate">{propertyViewLabel}</span>
                 </div>
 
                 {/* Bottom-right: Zoom Fullscreen Button */}
                 <button
                   type="button"
                   onClick={() => setIsFullscreenImage(true)}
-                  className="absolute bottom-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-slate-900/80 text-white backdrop-blur-md transition hover:bg-orange shadow-lg"
+                  className="absolute bottom-2.5 right-2.5 sm:bottom-4 sm:right-4 z-10 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-slate-900/80 text-white backdrop-blur-md transition hover:bg-orange shadow-lg"
                   title="View Fullscreen"
                 >
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

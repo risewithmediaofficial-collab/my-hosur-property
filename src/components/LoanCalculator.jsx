@@ -126,7 +126,7 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
   }, [calculations, tenure, interestRate]);
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-2 sm:px-4">
+    <div className="w-full max-w-4xl mx-auto px-0 sm:px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -165,7 +165,7 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
         )}
 
         {/* Calculator Body */}
-        <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 bg-white">
+        <div className="p-3.5 sm:p-6 md:p-8 space-y-6 sm:space-y-8 bg-white">
           {/* Loan Amount Slider */}
           <div className="space-y-4">
             <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-end">
@@ -411,7 +411,7 @@ const LoanCalculator = ({ bank, onBankChange, showBankSelector = true }) => {
             onClick={() => setShowAmortization(!showAmortization)}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full bg-gradient-to-r from-slate-200 to-slate-100 hover:from-slate-300 hover:to-slate-200 text-slate-900 py-4 px-6 rounded-xl font-semibold flex items-center justify-between transition-all duration-300 border border-slate-300"
+            className="w-full bg-gradient-to-r from-slate-200 to-slate-100 hover:from-slate-300 hover:to-slate-200 text-slate-900 py-3.5 px-4 sm:py-4 sm:px-6 text-sm sm:text-base rounded-xl font-semibold flex items-center justify-between transition-all duration-300 border border-slate-300"
           >
             <span>
               {showAmortization ? "Hide" : "View"} Detailed Payment Schedule

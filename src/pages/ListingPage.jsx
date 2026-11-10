@@ -71,7 +71,7 @@ const QUICK_CATEGORIES = [
 
 const ListingPage = () => {
   const { t } = useAppLanguage();
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
   const [params, setParams] = useSearchParams();
   const { token, isAuthenticated } = useAuth();
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
@@ -311,7 +311,7 @@ const ListingPage = () => {
 
       <div className={`listing-page-layout mx-auto flex min-h-0 w-full max-w-[1440px] flex-1 flex-col ${desktopFilterOpen ? "is-sidebar-open" : ""}`}>
         {/* Left: filters — own scrollbar, never tied to properties */}
-        <aside className={desktopFilterOpen ? "listing-filter-aside hidden md:flex" : "hidden"} aria-label="Property filters">
+        <aside className={desktopFilterOpen ? "listing-filter-aside hidden lg:flex" : "hidden"} aria-label="Property filters">
           <div className="listing-filter-shell">
             <div className="listing-filter-scroll" data-scroll-panel="filters">
               <PropertySearchFilterPanel
@@ -358,7 +358,7 @@ const ListingPage = () => {
               <div className="shrink-0 pt-1 md:pt-0">
                 <Link
                   to="/request-service?category=property_buy&type=Find%20your%20property"
-                  className="h-10 sm:h-11 inline-flex items-center justify-center gap-2 rounded-xl border border-orange bg-orange/10 hover:bg-orange text-orange hover:text-white px-4 text-xs sm:text-sm font-bold shadow-xs hover:shadow transition-all duration-200 whitespace-nowrap font-sans leading-none"
+                  className="min-h-10 sm:min-h-11 inline-flex items-center justify-center gap-2 rounded-xl border border-orange bg-orange/10 hover:bg-orange text-orange hover:text-white px-4 py-2 text-xs sm:text-sm font-bold shadow-xs hover:shadow transition-all duration-200 whitespace-normal sm:whitespace-nowrap text-center font-sans leading-tight"
                   title="Can't find what you are looking for? Request your custom property requirement"
                 >
                   <PropertySearchIcon className="h-4 w-4 shrink-0" />
@@ -376,14 +376,14 @@ const ListingPage = () => {
                   type="text"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
-                  placeholder="Search area, locality, or keyword..."
+                  placeholder="Search area or locality..."
                   className="h-10 sm:h-11 w-full rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white py-0 pl-10 pr-9 text-xs sm:text-sm font-medium text-navy placeholder:text-slate-400 focus:border-orange focus:outline-none focus:ring-2 focus:ring-orange/15 transition-all font-sans"
                 />
                 {searchInput ? (
                   <button
                     type="button"
                     onClick={handleClearSearch}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-navy cursor-pointer p-0.5"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-7 w-7 items-center justify-center rounded-md text-slate-400 hover:text-navy cursor-pointer"
                     aria-label="Clear search"
                   >
                     <XMarkIcon className="h-4 w-4" />
@@ -392,13 +392,13 @@ const ListingPage = () => {
               </form>
 
               {/* Sort & Filter Controls */}
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex flex-wrap min-[360px]:flex-nowrap items-center gap-2 shrink-0">
                 {/* Sort Dropdown */}
                 <div className="relative flex-1 sm:flex-initial">
                   <select
                     value={applied.sort || "latest"}
                     onChange={(e) => handleSortChange(e.target.value)}
-                    className="h-10 sm:h-11 w-full sm:w-auto appearance-none rounded-xl border border-slate-200 bg-white py-0 pl-3.5 pr-9 text-xs sm:text-sm font-semibold text-navy shadow-xs hover:border-slate-300 focus:border-orange focus:outline-none focus:ring-2 focus:ring-orange/15 cursor-pointer transition-all font-sans"
+                    className="listing-sort-select !bg-none h-10 sm:h-11 w-full sm:w-auto appearance-none rounded-xl border border-slate-200 bg-white py-0 pl-3 pr-8 text-xs sm:text-sm font-semibold text-navy shadow-xs hover:border-slate-300 focus:border-orange focus:outline-none focus:ring-2 focus:ring-orange/15 cursor-pointer transition-all font-sans"
                     aria-label="Sort properties"
                   >
                     {SORT_OPTIONS.map((opt) => (
@@ -414,7 +414,7 @@ const ListingPage = () => {
                 <button
                   type="button"
                   onClick={openDesktopFilters}
-                  className={`hidden md:inline-flex h-10 sm:h-11 items-center justify-center gap-2 rounded-xl border px-4 text-xs sm:text-sm font-bold shadow-xs transition-all duration-200 cursor-pointer whitespace-nowrap font-sans leading-none ${
+                  className={`hidden lg:inline-flex h-10 sm:h-11 items-center justify-center gap-2 rounded-xl border px-4 text-xs sm:text-sm font-bold shadow-xs transition-all duration-200 cursor-pointer whitespace-nowrap font-sans leading-none ${
                     desktopFilterOpen
                       ? "border-orange bg-orange text-white shadow-sm"
                       : "border-slate-200 bg-white text-navy hover:border-orange hover:text-orange hover:bg-orange/5"
@@ -436,7 +436,7 @@ const ListingPage = () => {
                 <button
                   type="button"
                   onClick={openMobileFilters}
-                  className="inline-flex md:hidden h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 text-xs font-bold text-navy shadow-xs hover:border-orange hover:text-orange transition-all cursor-pointer whitespace-nowrap font-sans leading-none"
+                  className="inline-flex lg:hidden h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 text-xs font-bold text-navy shadow-xs hover:border-orange hover:text-orange transition-all cursor-pointer whitespace-nowrap font-sans leading-none"
                   aria-label="Open filters"
                   title="Filter properties"
                   aria-expanded={mobileFilterOpen}
@@ -554,7 +554,7 @@ const ListingPage = () => {
       {/* Mobile: filters slide in from the left; properties stay visible behind backdrop */}
       {mobileFilterOpen && typeof document !== "undefined"
         ? createPortal(
-            <div className="property-filter-drawer-root md:hidden" role="dialog" aria-modal="true" aria-label="Property filters">
+            <div className="property-filter-drawer-root lg:hidden" role="dialog" aria-modal="true" aria-label="Property filters">
               <button
                 type="button"
                 className="property-filter-drawer-backdrop"

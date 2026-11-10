@@ -161,8 +161,8 @@ const CustomerDashboardPage = () => {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-50 pt-6 md:pl-80">
-        <div className="mx-auto max-w-7xl px-4 py-8 md:px-8">
+      <main className="min-h-screen bg-slate-50 pt-6">
+        <div className="mx-auto max-w-7xl px-4 py-8 lg:px-8">
           <Loader text="Loading your customer dashboard..." />
         </div>
       </main>
