@@ -41,6 +41,10 @@ services:
         sync: false
       - key: RAZORPAY_KEY_SECRET
         sync: false
+      - key: SALESDADDY_API_KEY
+        sync: false
+      - key: SALESDADDY_LEAD_SOURCE
+        value: website
 
   - type: web
     name: my-hosur-property-frontend

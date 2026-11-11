@@ -23,6 +23,7 @@ import { buildBreadcrumbSchema, buildRealEstateAgentSchema } from "../utils/seo"
 import useScrollAnimation from "../hooks/useScrollAnimation";
 import { useAppLanguage } from "../hooks/useAppLanguage";
 import { localizeCatalogText } from "../utils/i18nCatalog";
+import { submitContactEnquiry } from "../services/api/contactApi";
 
 const ContactPage = () => {
   const { t, currentLanguage } = useAppLanguage();
@@ -38,18 +39,45 @@ const ContactPage = () => {
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.phone) {
+    if (submitting) return;
+
+    const trimmedName = form.name.trim();
+    const trimmedEmail = form.email.trim();
+    const trimmedPhone = form.phone.trim();
+    const trimmedMessage = form.message.trim();
+    const phoneDigits = trimmedPhone.replace(/\D/g, "");
+
+    if (!trimmedName || !trimmedEmail || !trimmedPhone) {
       toast.error(t("contactPage.fillRequired") || "Please fill in all required fields.");
       return;
     }
+
+    if (phoneDigits.length < 7 || phoneDigits.length > 15) {
+      toast.error("Please enter a valid 10-digit phone number.");
+      return;
+    }
+
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
-      toast.success(t("contactPage.thankYou") || "Thank you! We'll connect with you shortly.");
+    try {
+      const data = await submitContactEnquiry({
+        name: trimmedName,
+        email: trimmedEmail,
+        phone: trimmedPhone,
+        message: trimmedMessage,
+      });
+      toast.success(data?.message || t("contactPage.thankYou") || "Thank you! We'll connect with you shortly.");
       setForm({ name: "", email: "", phone: "", message: "" });
-    }, 250);
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.errorDetails?.[0] ||
+        "Unable to send your message right now. Please try again or call us directly.";
+      toast.error(errorMessage);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
