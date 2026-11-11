@@ -42,7 +42,9 @@ import oneClickLogo from "../assets/one click logo.webp";
 import fiyazImg from "../assets/happy clinets/fiyaz.webp";
 import jeevaImg from "../assets/happy clinets/jeeva loganathan.webp";
 import pannerImg from "../assets/happy clinets/panner selvam.webp";
-import { fetchHomeProperties } from "../services/api/propertyApi";
+import karanImg from "../assets/happy clinets/karan.jpeg";
+import aginivermaImg from "../assets/happy clinets/aginiverma perumal.jpeg";
+import { fetchHomeProperties, getCachedHomeProperties } from "../services/api/propertyApi";
 import { buildRealEstateAgentSchema, buildWebsiteSchema } from "../utils/seo";
 
 import {
@@ -220,6 +222,30 @@ const happyClientsData = [
     quote:
       "Prompt assistance and smooth coordination for site registration and paperwork. Highly recommended for anyone buying verified property in Hosur.",
   },
+  {
+    id: "karna-natarajan-s",
+    name: "Karna Natarajan S",
+    role: "Property Buyer",
+    project: "VIP City, Jeemangalam",
+    imageClass: "object-[35%_center]",
+    image: karanImg,
+    tag: "Plot Purchase",
+    location: "Jeemangalam, Hosur",
+    quote:
+      "Smooth plot purchase experience at VIP City, Jeemangalam. Clear documentation, prompt coordination, and complete registration support throughout.",
+  },
+  {
+    id: "aginiverma-perumal",
+    name: "Aginiverma Perumal",
+    role: "Plot Buyer",
+    project: "Concord Mist Valley",
+    imageClass: "object-[50%_18%]",
+    image: aginivermaImg,
+    tag: "Plot Purchase",
+    location: "Hosur, Tamil Nadu",
+    quote:
+      "Seamless plot buying and registration experience at Concord Mist Valley. Transparent guidance and timely support at every step.",
+  },
 ];
 
 const HomePage = () => {
@@ -227,8 +253,8 @@ const HomePage = () => {
   const navigate = useNavigate();
   const scrollToTop = useScrollToTop();
   const { isAuthenticated } = useAuth();
-  const [featured, setFeatured] = useState([]);
-  const [featuredLoading, setFeaturedLoading] = useState(true);
+  const [featured, setFeatured] = useState(() => getCachedHomeProperties()?.items || []);
+  const [featuredLoading, setFeaturedLoading] = useState(() => !getCachedHomeProperties());
   const [openShortcutMenu, setOpenShortcutMenu] = useState("");
   const [propertyTypeMenuOpen, setPropertyTypeMenuOpen] = useState(false);
 
@@ -303,8 +329,6 @@ const HomePage = () => {
   // Locality dropdown floats over hero content without shifting layout height.
   const homeRootRef = useRef(null);
   const heroRef = useRef(null);
-
-  const heroContentRef = useRef(null);
   const shortcutBarRef = useRef(null);
   const propertyTypeMenuRef = useRef(null);
   const leaveTimeoutRef = useRef(null);
@@ -340,6 +364,7 @@ const HomePage = () => {
   const debouncedSearch = useDebounce(search.search, 300);
 
   useEffect(() => {
+    if (getCachedHomeProperties()) return undefined;
     const controller = new AbortController();
     fetchHomeProperties(controller.signal)
       .then((res) => { if (!controller.signal.aborted) setFeatured(res.items || []); })
@@ -477,7 +502,7 @@ const HomePage = () => {
           />
         </div>
 
-        <div ref={heroContentRef} className="relative mx-auto flex max-w-[1440px] flex-col items-center px-5 py-10 text-center will-change-transform sm:px-8 sm:py-14 lg:px-10 lg:py-16" style={{ zIndex: 20 }}>
+        <div className="relative mx-auto flex max-w-[1440px] flex-col items-center px-5 py-10 text-center sm:px-8 sm:py-14 lg:px-10 lg:py-16" style={{ zIndex: 20 }}>
           <p className="home-gsap-hero-item section-tag !text-navy">
             {t("nav.tagline") || "Verified real estate platform"}
           </p>
@@ -1222,30 +1247,30 @@ const HomePage = () => {
 
         {/* Happy Client Cards Grid */}
         <div className="mx-auto mt-12 max-w-[1440px]">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-stretch">
+          <div className="flex flex-wrap justify-center items-stretch gap-6">
             {happyClientsData.map((client) => (
               <div
                 key={client.id}
-                className="group relative flex flex-col h-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-orange/40"
+                className="group relative flex w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-orange/40"
               >
                 {/* Image Frame with Exact 3:2 Aspect Ratio */}
                 <div className="relative w-full aspect-[3/2] overflow-hidden bg-slate-100">
                   <img
                     src={client.image}
                     alt={`${client.name} - Happy Client of MyHosurProperty`}
-                    className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                    className={`h-full w-full object-cover ${client.imageClass || "object-center"} transition-transform duration-500 group-hover:scale-105`}
                     loading="lazy"
                     decoding="async"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/20 pointer-events-none" />
 
                   {/* Top Floating Badges */}
-                  <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-600/95 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm backdrop-blur-md">
+                  <div className="absolute top-2.5 left-2.5 right-2.5 flex flex-wrap items-center justify-between gap-1 pointer-events-none">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-600/95 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm backdrop-blur-md">
                       <CheckBadgeIcon className="h-3.5 w-3.5 text-white" />
                       Verified Client
                     </span>
-                    <span className="inline-flex items-center rounded-full bg-navy/85 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm backdrop-blur-md">
+                    <span className="inline-flex items-center rounded-full bg-navy/85 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur-md">
                       {client.tag}
                     </span>
                   </div>
@@ -1291,7 +1316,7 @@ const HomePage = () => {
                   </div>
 
                   {/* Card Bottom Meta */}
-                  <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 text-xs">
+                  <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-4 text-xs">
                     <span className="font-semibold text-slate-500">
                       Hosur Property Handover
                     </span>

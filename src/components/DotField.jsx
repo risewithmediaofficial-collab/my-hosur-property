@@ -38,6 +38,19 @@ const DotField = memo(({
     const ctx = canvas.getContext('2d', { alpha: true });
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let resizeTimer;
+    let cachedGradient = null;
+    let cachedGradFrom = '';
+    let cachedGradTo = '';
+
+    function updateGradient(w, h) {
+      const p = propsRef.current;
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, p.gradientFrom);
+      grad.addColorStop(1, p.gradientTo);
+      cachedGradient = grad;
+      cachedGradFrom = p.gradientFrom;
+      cachedGradTo = p.gradientTo;
+    }
 
     function resize() {
       clearTimeout(resizeTimer);
@@ -45,6 +58,7 @@ const DotField = memo(({
     }
 
     function doResize() {
+      if (!canvas.parentElement) return;
       const rect = canvas.parentElement.getBoundingClientRect();
       const w = rect.width;
       const h = rect.height;
@@ -62,6 +76,7 @@ const DotField = memo(({
         offsetY: rect.top + window.scrollY,
       };
 
+      updateGradient(w, h);
       buildDots(w, h);
     }
 
@@ -116,8 +131,22 @@ const DotField = memo(({
       }
     }, { threshold: 0.05 });
 
+    const resizeObserver = typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(() => {
+          if (!canvas.parentElement) return;
+          const rect = canvas.parentElement.getBoundingClientRect();
+          if (Math.abs(rect.width - sizeRef.current.w) > 0.5 || Math.abs(rect.height - sizeRef.current.h) > 0.5) {
+            doResize();
+            if (isVisible && !rafRef.current) {
+              rafRef.current = requestAnimationFrame(tick);
+            }
+          }
+        })
+      : null;
+
     if (canvas.parentElement) {
       observer.observe(canvas.parentElement);
+      resizeObserver?.observe(canvas.parentElement);
     }
 
     let frameCount = 0;
@@ -153,10 +182,10 @@ const DotField = memo(({
 
       ctx.clearRect(0, 0, w, h);
 
-      const grad = ctx.createLinearGradient(0, 0, w, h);
-      grad.addColorStop(0, p.gradientFrom);
-      grad.addColorStop(1, p.gradientTo);
-      ctx.fillStyle = grad;
+      if (!cachedGradient || cachedGradFrom !== p.gradientFrom || cachedGradTo !== p.gradientTo) {
+        updateGradient(w, h);
+      }
+      ctx.fillStyle = cachedGradient;
 
       const cr = p.cursorRadius;
       const crSq = cr * cr;
@@ -244,11 +273,15 @@ const DotField = memo(({
 
     rebuildRef.current = () => {
       const { w, h } = sizeRef.current;
-      if (w > 0 && h > 0) buildDots(w, h);
+      if (w > 0 && h > 0) {
+        updateGradient(w, h);
+        buildDots(w, h);
+      }
     };
 
     return () => {
       observer.disconnect();
+      resizeObserver?.disconnect();
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       clearTimeout(resizeTimer);
       window.removeEventListener('resize', resize);

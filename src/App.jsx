@@ -16,8 +16,8 @@ import PageBreadcrumbs from "./components/PageBreadcrumbs";
 import { PrivateRouteSeo } from "./components/SeoHead";
 import ProtectedRoute from "./components/ProtectedRoute";
 import useLowMotionDevice from "./hooks/useLowMotionDevice";
+import HomePage from "./pages/HomePage";
 
-const HomePage = lazy(() => import("./pages/HomePage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
 const ServicesPage = lazy(() => import("./pages/ServicesPage"));
@@ -62,7 +62,11 @@ const PRIVATE_PATHS = [
   "/request-service",
 ];
 
-const RouteFallback = () => <Loader text="Loading page..." size={44} />;
+const RouteFallback = () => (
+  <div className="min-h-[75vh] grid place-items-center">
+    <Loader text="Loading page..." size={44} />
+  </div>
+);
 
 // Disable browser scroll restoration so refreshing always starts at the top
 if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
@@ -121,7 +125,6 @@ const AppShell = () => {
           <PageBreadcrumbs />
           <Suspense fallback={<RouteFallback />}>
             <div
-              key={location.pathname}
               className={
                 isListingsRoute || isDashboardRoute
                   ? "flex h-full min-h-0 flex-1 flex-col"

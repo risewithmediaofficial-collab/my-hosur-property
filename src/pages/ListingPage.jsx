@@ -26,7 +26,6 @@ import PropertySearchFilterPanel from "../components/PropertySearchFilterPanel";
 import { SORT_OPTIONS } from "../constants/propertyFilterConfig";
 import SeoHead from "../components/SeoHead";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
-import useMediaQuery from "../hooks/useMediaQuery";
 import useAuth from "../hooks/useAuth";
 import useScrollAnimation from "../hooks/useScrollAnimation";
 import { fetchProperties } from "../services/api/propertyApi";
@@ -71,7 +70,6 @@ const QUICK_CATEGORIES = [
 
 const ListingPage = () => {
   const { t } = useAppLanguage();
-  const isDesktop = useMediaQuery("(min-width: 1024px)");
   const [params, setParams] = useSearchParams();
   const { token, isAuthenticated } = useAuth();
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
@@ -102,7 +100,6 @@ const ListingPage = () => {
 
   useScrollAnimation(null, data.items.length);
   const sentinelRef = useRef(null);
-  const resultsScrollRef = useRef(null);
   const requestVersionRef = useRef(0);
 
   useBodyScrollLock(mobileFilterOpen);
@@ -203,8 +200,8 @@ const ListingPage = () => {
   }, [token]);
 
   useEffect(() => {
-    const scrollRoot = resultsScrollRef.current;
-    if (!scrollRoot || !sentinelRef.current) return undefined;
+
+    if (!sentinelRef.current) return undefined;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -214,14 +211,14 @@ const ListingPage = () => {
       },
       {
         threshold: 0.25,
-        root: isDesktop ? scrollRoot : null,
+        root: null,
         rootMargin: "120px",
       }
     );
 
     observer.observe(sentinelRef.current);
     return () => observer.disconnect();
-  }, [data.page, data.totalPages, loading, data.items.length, isDesktop, setApplied]);
+  }, [data.page, data.totalPages, loading, data.items.length, setApplied]);
 
   const handleCategoryChange = (categoryId) => {
     setDraft((prev) => {
@@ -505,7 +502,6 @@ const ListingPage = () => {
           </div>
 
           <div
-            ref={resultsScrollRef}
             className="listing-results-scroll min-h-0 flex-1"
             data-scroll-panel="properties"
           >
