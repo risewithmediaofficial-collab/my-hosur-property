@@ -54,7 +54,7 @@ const ContactPage = () => {
       return;
     }
 
-    if (phoneDigits.length < 7 || phoneDigits.length > 15) {
+    if (phoneDigits.length < 10 || phoneDigits.length > 15) {
       toast.error("Please enter a valid 10-digit phone number.");
       return;
     }
@@ -67,6 +67,11 @@ const ContactPage = () => {
         phone: trimmedPhone,
         message: trimmedMessage,
       });
+      console.info("[SalesDaddy CRM] Lead synced:", {
+        ok: Boolean(data?.ok ?? true),
+        leadId: data?.leadId || null,
+        duplicate: Boolean(data?.duplicate),
+      });
       toast.success(data?.message || t("contactPage.thankYou") || "Thank you! We'll connect with you shortly.");
       setForm({ name: "", email: "", phone: "", message: "" });
     } catch (error) {
@@ -74,6 +79,10 @@ const ContactPage = () => {
         error?.response?.data?.message ||
         error?.response?.data?.errorDetails?.[0] ||
         "Unable to send your message right now. Please try again or call us directly.";
+      console.error("[SalesDaddy CRM] Lead sync failed:", {
+        status: error?.response?.status || null,
+        message: errorMessage,
+      });
       toast.error(errorMessage);
     } finally {
       setSubmitting(false);

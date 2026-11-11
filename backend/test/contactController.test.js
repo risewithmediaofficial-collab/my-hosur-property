@@ -170,3 +170,54 @@ test("submitContactForm returns upstream error status cleanly if Sales Daddy rej
     else process.env.SALESDADDY_API_KEY = prevKey;
   }
 });
+
+test("createSalesDaddyLead maps invalid_mobile to friendly message for both HTTP 422 and HTTP 200 ok:false", async (t) => {
+  const prevKey = process.env.SALESDADDY_API_KEY;
+  process.env.SALESDADDY_API_KEY = "sd_live_test_token";
+
+  try {
+    t.mock.method(axios, "post", async () => {
+      const err = new Error("Unprocessable");
+      err.response = {
+        status: 422,
+        data: { ok: false, error: "invalid_mobile", message: "invalid_mobile" },
+      };
+      throw err;
+    });
+
+    await assert.rejects(
+      () =>
+        salesDaddyService.createSalesDaddyLead({
+          name: "Test User",
+          email: "test@example.com",
+          phone: "9876543210",
+        }),
+      (err) =>
+        err.statusCode === 422 &&
+        err.code === "invalid_mobile" &&
+        err.message === "Please enter a valid 10-digit mobile number."
+    );
+
+    t.mock.restoreAll();
+
+    t.mock.method(axios, "post", async () => ({
+      data: { ok: false, error: "invalid_mobile", message: "invalid_mobile" },
+    }));
+
+    await assert.rejects(
+      () =>
+        salesDaddyService.createSalesDaddyLead({
+          name: "Test User",
+          email: "test@example.com",
+          phone: "9876543210",
+        }),
+      (err) =>
+        err.statusCode === 422 &&
+        err.code === "invalid_mobile" &&
+        err.message === "Please enter a valid 10-digit mobile number."
+    );
+  } finally {
+    if (prevKey === undefined) delete process.env.SALESDADDY_API_KEY;
+    else process.env.SALESDADDY_API_KEY = prevKey;
+  }
+});

@@ -105,9 +105,18 @@ const createSalesDaddyLead = async (leadInput) => {
 
     const data = response?.data || {};
     if (data.ok === false) {
-      const apiErr = new Error(data.message || "Unable to register contact enquiry in CRM.");
+      const code = data.error || "SALESDADDY_REJECTED";
+      const isInvalidMobile =
+        code === "invalid_mobile" ||
+        code === "invalid_number" ||
+        /invalid_mobile/i.test(String(data.message || ""));
+      const apiErr = new Error(
+        isInvalidMobile
+          ? "Please enter a valid 10-digit mobile number."
+          : data.message || "Unable to register contact enquiry in CRM."
+      );
       apiErr.statusCode = 422;
-      apiErr.code = data.error || "SALESDADDY_REJECTED";
+      apiErr.code = code;
       throw apiErr;
     }
 
@@ -122,8 +131,12 @@ const createSalesDaddyLead = async (leadInput) => {
     const upstreamCode = upstreamData.error || "SALESDADDY_API_ERROR";
 
     if (upstreamStatus === 400 || upstreamStatus === 422) {
+      const isInvalidMobile =
+        upstreamCode === "invalid_mobile" ||
+        upstreamCode === "invalid_number" ||
+        /invalid_mobile/i.test(String(upstreamData.message || ""));
       const validationErr = new Error(
-        upstreamCode === "invalid_number"
+        isInvalidMobile
           ? "Please enter a valid 10-digit mobile number."
           : upstreamData.message || "Invalid contact details submitted."
       );
