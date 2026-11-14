@@ -17,6 +17,7 @@ export const HOSUR_LOCATIONS = [
   { id: "anand-nagar", name: "Anand Nagar", defaultType: "plots", areaName: "Anand Nagar" },
   { id: "bagalur-road", name: "Bagalur Road", defaultType: "property", areaName: "Bagalur Road" },
   { id: "mathigiri", name: "Mathigiri", defaultType: "plots", areaName: "Mathigiri" },
+  { id: "alasanatham", name: "Alasanatham", defaultType: "property", areaName: "Alasanatham" },
   { id: "mookandapalli", name: "Mookandapalli", defaultType: "property", areaName: "Mookandapalli" },
   { id: "zuzuvadi", name: "Zuzuvadi", defaultType: "land", areaName: "Zuzuvadi" },
   { id: "shoolagiri", name: "Shoolagiri", defaultType: "property", areaName: "Shoolagiri" },
@@ -26,6 +27,7 @@ export const HOSUR_LOCATIONS = [
   { id: "titan-township", name: "Titan Township", defaultType: "property", areaName: "Titan Township" },
   { id: "denkanikottai-road", name: "Denkanikottai Road", defaultType: "land", areaName: "Denkanikottai Road" },
   { id: "chennathur", name: "Chennathur", defaultType: "plots", areaName: "Chennathur" },
+  { id: "kelamangalam", name: "Kelamangalam", defaultType: "property", areaName: "Kelamangalam" },
   { id: "kelamangalam-road", name: "Kelamangalam Road", defaultType: "property", areaName: "Kelamangalam Road" },
   { id: "avalapalli", name: "Avalapalli", defaultType: "land", areaName: "Avalapalli" },
 ];
@@ -70,6 +72,14 @@ export const CORE_SEARCH_PHRASES = [
   { phrase: "Verified property for sale Hosur", slug: "verified-property-for-sale-hosur", category: "all", intent: "verified" },
   { phrase: "Genuine land deals Hosur", slug: "genuine-land-deals-hosur", category: "land", intent: "verified" },
   { phrase: "Direct owner properties Hosur", slug: "direct-owner-properties-hosur", category: "all", intent: "direct-owner" },
+  { phrase: "Plots for Sale in Bagalur Road", slug: "plots-for-sale-in-bagalur-road", category: "plot", location: "Bagalur Road" },
+  { phrase: "Property for Sale in Mathigiri", slug: "property-for-sale-in-mathigiri", category: "all", location: "Mathigiri" },
+  { phrase: "Land for Sale in Shoolagiri", slug: "land-for-sale-in-shoolagiri", category: "land", location: "Shoolagiri" },
+  { phrase: "Property for Sale in Alasanatham", slug: "property-for-sale-in-alasanatham", category: "all", location: "Alasanatham" },
+  { phrase: "Plots for Sale in Rayakottai Road", slug: "plots-for-sale-in-rayakottai-road", category: "plot", location: "Rayakottai Road" },
+  { phrase: "Land for Sale in Avalapalli", slug: "land-for-sale-in-avalapalli", category: "land", location: "Avalapalli" },
+  { phrase: "Plots for Sale in Kelamangalam", slug: "plots-for-sale-in-kelamangalam", category: "plot", location: "Kelamangalam" },
+  { phrase: "Land for Sale in Denkanikottai Road", slug: "land-for-sale-in-denkanikottai-road", category: "land", location: "Denkanikottai Road" },
   { phrase: "Resale plots Hosur", slug: "resale-plots-hosur", category: "plot", intent: "resale" },
 ];
 

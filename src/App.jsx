@@ -41,6 +41,9 @@ const ServiceRequestPage = lazy(
 );
 const BankLoansPage = lazy(() => import("./pages/BankLoansPage"));
 const LocationSeoPage = lazy(() => import("./pages/LocationSeoPage"));
+const CategoryLandingPage = lazy(() => import("./pages/CategoryLandingPage"));
+const BlogIndexPage = lazy(() => import("./pages/BlogIndexPage"));
+const BlogPostPage = lazy(() => import("./pages/BlogPostPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
 // Pages that manage their own full-height layout (sidebars etc.)
@@ -140,6 +143,44 @@ const AppShell = () => {
                 <Route path="/properties" element={<ListingPage />} />
                 <Route path="/listings" element={<ListingPage />} />
                 <Route path="/location/:slug" element={<LocationSeoPage />} />
+                <Route
+                  path="/hosur-real-estate"
+                  element={<CategoryLandingPage pageSlug="hosur-real-estate" />}
+                />
+                <Route
+                  path="/plots-for-sale-in-hosur"
+                  element={<CategoryLandingPage pageSlug="plots-for-sale-in-hosur" />}
+                />
+                <Route
+                  path="/land-for-sale-in-hosur"
+                  element={<CategoryLandingPage pageSlug="land-for-sale-in-hosur" />}
+                />
+                <Route
+                  path="/villas-for-sale-in-hosur"
+                  element={<CategoryLandingPage pageSlug="villas-for-sale-in-hosur" />}
+                />
+                <Route
+                  path="/houses-for-sale-in-hosur"
+                  element={<CategoryLandingPage pageSlug="houses-for-sale-in-hosur" />}
+                />
+                <Route
+                  path="/commercial-property-hosur"
+                  element={<CategoryLandingPage pageSlug="commercial-property-hosur" />}
+                />
+                <Route
+                  path="/commercial-property-in-hosur"
+                  element={<CategoryLandingPage pageSlug="commercial-property-hosur" />}
+                />
+                <Route
+                  path="/farm-land-near-hosur"
+                  element={<CategoryLandingPage pageSlug="farm-land-near-hosur" />}
+                />
+                <Route
+                  path="/property-for-rent-in-hosur"
+                  element={<CategoryLandingPage pageSlug="property-for-rent-in-hosur" />}
+                />
+                <Route path="/blog" element={<BlogIndexPage />} />
+                <Route path="/blog/:slug" element={<BlogPostPage />} />
                 <Route
                   path="/property/:id/:slug?"
                   element={<PropertyDetailPage />}

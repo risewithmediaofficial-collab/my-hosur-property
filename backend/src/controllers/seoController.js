@@ -2,9 +2,9 @@ const Property = require("../models/Property");
 const { getPublicSiteUrl, getPropertyPath, xmlEscape } = require("../utils/seo");
 
 const LOCATIONS = [
-  "anand-nagar", "bagalur-road", "mathigiri", "mookandapalli", "zuzuvadi",
+  "anand-nagar", "bagalur-road", "mathigiri", "alasanatham", "mookandapalli", "zuzuvadi",
   "shoolagiri", "rayakottai-road", "hosur-sipcot", "tvs-nagar", "titan-township",
-  "denkanikottai-road", "chennathur", "kelamangalam-road", "avalapalli"
+  "denkanikottai-road", "chennathur", "kelamangalam", "kelamangalam-road", "avalapalli"
 ];
 
 const INTENTS = [
@@ -22,7 +22,32 @@ const CORE_PHRASE_SLUGS = [
   "luxury-villas-hosur", "approved-residential-layouts-hosur", "future-growth-areas-in-hosur",
   "land-with-clear-documents-hosur", "verified-property-for-sale-hosur", "genuine-land-deals-hosur",
   "direct-owner-properties-hosur", "resale-plots-hosur", "dtcp-plots-bagalur-road",
-  "villas-in-mathigiri", "land-near-sipcot-hosur"
+  "villas-in-mathigiri", "land-near-sipcot-hosur",
+  "plots-for-sale-in-bagalur-road", "property-for-sale-in-mathigiri", "land-for-sale-in-shoolagiri",
+  "property-for-sale-in-alasanatham", "plots-for-sale-in-rayakottai-road", "land-for-sale-in-avalapalli",
+  "plots-for-sale-in-kelamangalam", "land-for-sale-in-denkanikottai-road"
+];
+
+const CATEGORY_LANDING_PATHS = [
+  "/hosur-real-estate",
+  "/plots-for-sale-in-hosur",
+  "/land-for-sale-in-hosur",
+  "/villas-for-sale-in-hosur",
+  "/houses-for-sale-in-hosur",
+  "/commercial-property-hosur",
+  "/farm-land-near-hosur",
+  "/property-for-rent-in-hosur",
+];
+
+const BLOG_PATHS = [
+  "/blog",
+  "/blog/best-areas-to-buy-property-in-hosur",
+  "/blog/complete-guide-to-buying-residential-plots-in-hosur",
+  "/blog/hosur-real-estate-investment-guide",
+  "/blog/things-to-check-before-buying-land-in-hosur",
+  "/blog/best-residential-locations-near-hosur",
+  "/blog/dtcp-vs-hntda-approved-plots-what-buyers-should-know",
+  "/blog/is-hosur-a-good-location-for-property-investment",
 ];
 
 const generateLocationSlugs = () => {
@@ -49,6 +74,8 @@ const STATIC_PATHS = [
   "/services",
   "/bank-loans",
   "/listings",
+  ...CATEGORY_LANDING_PATHS,
+  ...BLOG_PATHS,
   ...locationSlugs.map((s) => `/location/${s}`),
 ];
 
@@ -57,8 +84,8 @@ const buildSitemapXml = (siteUrl, properties = []) => {
     ...STATIC_PATHS.map((path) => ({
       loc: `${siteUrl}${path}`,
       lastmod: new Date().toISOString(),
-      changefreq: path === "/" ? "daily" : "weekly",
-      priority: path === "/" ? "1.0" : path.startsWith("/location/") ? "0.9" : "0.8",
+      changefreq: path === "/" || CATEGORY_LANDING_PATHS.includes(path) ? "daily" : "weekly",
+      priority: path === "/" ? "1.0" : CATEGORY_LANDING_PATHS.includes(path) || path === "/blog" ? "0.9" : path.startsWith("/location/") ? "0.8" : "0.7",
     })),
     ...properties.map((property) => ({
       loc: `${siteUrl}${getPropertyPath(property)}`,

@@ -34,24 +34,37 @@ const socialLinks = [
   ["whatsapp", "WhatsApp", WhatsAppIcon],
 ];
 
+const categoryLinks = [
+  ["Hosur Real Estate", "/hosur-real-estate"],
+  ["Plots for Sale in Hosur", "/plots-for-sale-in-hosur"],
+  ["Land for Sale in Hosur", "/land-for-sale-in-hosur"],
+  ["Villas for Sale in Hosur", "/villas-for-sale-in-hosur"],
+  ["Houses for Sale in Hosur", "/houses-for-sale-in-hosur"],
+  ["Commercial Property Hosur", "/commercial-property-hosur"],
+  ["Farm Land Near Hosur", "/farm-land-near-hosur"],
+  ["Property for Rent in Hosur", "/property-for-rent-in-hosur"],
+];
+
 const locationLinks = [
-  ["Anand Nagar Plots", "anand-nagar-plots"],
   ["Bagalur Road Property", "bagalur-road-property"],
+  ["Plots for Sale in Bagalur Road", "plots-for-sale-in-bagalur-road"],
   ["Mathigiri Plots", "mathigiri-plots"],
+  ["Property for Sale in Mathigiri", "property-for-sale-in-mathigiri"],
+  ["Alasanatham Property", "alasanatham-property"],
   ["Mookandapalli Property", "mookandapalli-property"],
   ["Zuzuvadi Land", "zuzuvadi-land"],
-  ["Shoolagiri Property", "shoolagiri-property"],
   ["Rayakottai Road Plots", "rayakottai-road-plots"],
+  ["Shoolagiri Property", "shoolagiri-property"],
+  ["Land for Sale in Shoolagiri", "land-for-sale-in-shoolagiri"],
+  ["Kelamangalam Property", "kelamangalam-road-property"],
+  ["Denkanikottai Road Land", "denkanikottai-road-land"],
+  ["Avalapalli Land", "avalapalli-land"],
   ["Hosur SIPCOT Property", "hosur-sipcot-property"],
   ["TVS Nagar Plots", "tvs-nagar-plots"],
   ["Titan Township Property", "titan-township-property"],
-  ["Denkanikottai Road Land", "denkanikottai-road-land"],
   ["Chennathur Plots", "chennathur-plots"],
-  ["Kelamangalam Road Property", "kelamangalam-road-property"],
-  ["Avalapalli Land", "avalapalli-land"],
-  ["DTCP Plots Bagalur Road", "dtcp-plots-bagalur-road"],
+  ["Anand Nagar Plots", "anand-nagar-plots"],
   ["Villas in Mathigiri", "villas-in-mathigiri"],
-  ["Land near SIPCOT Hosur", "land-near-sipcot-hosur"],
   ["Best Real Estate Company in Hosur", "best-real-estate-company-in-hosur"],
   ["Trusted Property Dealer in Hosur", "trusted-property-dealer-in-hosur"],
 ];
@@ -70,6 +83,7 @@ const Footer = () => {
     ["nav.aboutUs", "About Us", "/about"],
     ["nav.contact", "Contact Us", "/contact"],
     ["nav.postFreeProperty", "Post Property", "/post-property"],
+    ["nav.blog", "Blog & Guides", "/blog"],
     ["search.tabBuy", "Buy Property", "/listings?intent=buy"],
     ["search.tabRent", "Rent Property", "/listings?intent=rent"],
     ["search.tabProjects", "New Projects", "/listings?intent=new-project"],
@@ -129,12 +143,29 @@ const Footer = () => {
         </div>
 
         <details className="footer-locations">
-          <summary><span>Hosur locations &amp; property guides</span><ChevronDownIcon aria-hidden="true" /></summary>
-          <nav className="footer-location-grid" aria-label="Hosur property locations">
-            {locationLinks.map(([name, slug]) => (
-              <NavLink key={slug} to={`/location/${slug}`} onClick={scrollToTop}>{name}</NavLink>
-            ))}
-          </nav>
+          <summary><span>Hosur Property Categories, Localities &amp; Guides</span><ChevronDownIcon aria-hidden="true" /></summary>
+          <div className="footer-seo-links-container" style={{ display: "flex", flexDirection: "column", gap: "12px", paddingTop: "12px" }}>
+            <div>
+              <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.1em", color: "#F97316", marginBottom: "8px" }}>
+                Property Categories
+              </p>
+              <nav className="footer-location-grid" aria-label="Hosur property categories">
+                {categoryLinks.map(([name, url]) => (
+                  <NavLink key={url} to={url} onClick={scrollToTop}>{name}</NavLink>
+                ))}
+              </nav>
+            </div>
+            <div>
+              <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.1em", color: "#F97316", marginBottom: "8px" }}>
+                Hosur Locations &amp; Corridors
+              </p>
+              <nav className="footer-location-grid" aria-label="Hosur property locations">
+                {locationLinks.map(([name, slug]) => (
+                  <NavLink key={slug} to={`/location/${slug}`} onClick={scrollToTop}>{name}</NavLink>
+                ))}
+              </nav>
+            </div>
+          </div>
         </details>
 
         <div className="footer-preferences">

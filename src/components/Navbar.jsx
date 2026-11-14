@@ -16,6 +16,7 @@ import {
   BriefcaseIcon,
   BuildingOffice2Icon,
   ChevronDownIcon,
+  DocumentTextIcon,
   EnvelopeIcon,
   FlagIcon,
   HomeIcon,
@@ -35,6 +36,7 @@ const navIconMap = {
   "/bank-loans": LoanIcon,
   "/plans": LoanIcon,
   "/about": InformationCircleIcon,
+  "/blog": DocumentTextIcon,
   "/contact": PhoneIcon,
   "/post-property": PlusCircleIcon,
 };
@@ -45,6 +47,7 @@ const desktopNavLinks = [
   { labelKey: "nav.services", defaultLabel: "Our Services", to: "/services" },
   { labelKey: "nav.bankLoans", defaultLabel: "Bank Loans", to: "/bank-loans" },
   { labelKey: "nav.plans", defaultLabel: "Plans", to: "/plans" },
+  { labelKey: "nav.blog", defaultLabel: "Blog", to: "/blog" },
   { labelKey: "nav.aboutUs", defaultLabel: "About Us", to: "/about" },
   { labelKey: "nav.contact", defaultLabel: "Contact", to: "/contact" },
 ];

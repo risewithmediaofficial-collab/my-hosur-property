@@ -1,5 +1,6 @@
 export { default as AdjustmentsHorizontalIcon } from "@mui/icons-material/TuneOutlined";
 export { default as ArrowDownTrayIcon } from "@mui/icons-material/FileDownloadOutlined";
+export { default as ArrowLeftIcon } from "@mui/icons-material/ArrowBackOutlined";
 export { default as ArrowLeftOnRectangleIcon } from "@mui/icons-material/LogoutOutlined";
 export { default as ArrowRightIcon } from "@mui/icons-material/ArrowForwardOutlined";
 export { default as ArrowRightOnRectangleIcon } from "@mui/icons-material/LoginOutlined";
@@ -27,6 +28,7 @@ export { default as ChevronLeftIcon } from "@mui/icons-material/ChevronLeftOutli
 export { default as ChevronRightIcon } from "@mui/icons-material/ChevronRightOutlined";
 export { default as ClipboardDocumentCheckIcon } from "@mui/icons-material/FactCheckOutlined";
 export { default as ClipboardDocumentListIcon } from "@mui/icons-material/AssignmentOutlined";
+export { default as ClockIcon } from "@mui/icons-material/AccessTimeOutlined";
 export { default as Cog6ToothIcon } from "@mui/icons-material/SettingsOutlined";
 export { default as CreditCardIcon } from "@mui/icons-material/CreditCardOutlined";
 export { default as CurrencyRupeeIcon } from "@mui/icons-material/CurrencyRupeeOutlined";

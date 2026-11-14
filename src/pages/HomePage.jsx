@@ -473,9 +473,9 @@ const HomePage = () => {
   return (
     <main ref={homeRootRef} className="min-w-0 page-shell w-full overflow-x-clip">
       <SeoHead
-        title="Verified Property Listings in Hosur"
-        description="Explore verified property listings, real-estate services, and professional local property support through My Hosur Property."
-        keywords="Hosur property listings, verified property in Hosur, buy property Hosur, rent property Hosur, real estate services Hosur, Hosur Land, Land Hosur, Hosur Plots, Plot for Sale in Hosur, Hosur Plots for Sale, Land for Sale in Hosur, Property Listing Site in Hosur, Property Buying Platform in Hosur, Property Selling Platform in Hosur, Budget Friendly Lands in Hosur, Hosur Rental Property, Hosur Land Media, Hosur Duplex Villas, Hosur Commercial Property, Hosur Resale Plots, Hosur Resale House, Hosur Commercial Land"
+        title="Hosur Real Estate | Buy Plots, Lands, Villas &amp; Properties – MyHosurProperty"
+        description="Looking for the best properties in Hosur? Explore verified plots, lands, villas, houses, apartments and commercial properties for sale and rent. Find your ideal property in Hosur with MyHosurProperty.com."
+        keywords="Hosur Real Estate, Real Estate in Hosur, Property for Sale in Hosur, Properties in Hosur, Plots for Sale in Hosur, Land for Sale in Hosur, Houses for Sale in Hosur, Villas for Sale in Hosur, Property Dealers in Hosur, Commercial Property in Hosur, Property for Rent in Hosur, Residential Plots in Hosur, Farm Land Near Hosur, Hosur property listings, DTCP plots in Hosur, MyHosurProperty"
         canonicalPath="/"
         schema={[buildWebsiteSchema(), buildRealEstateAgentSchema()]}
       />
@@ -507,8 +507,8 @@ const HomePage = () => {
             {t("nav.tagline") || "Verified real estate platform"}
           </p>
           <h1 className="home-gsap-hero-item hero-title mt-3 w-full max-w-4xl text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-navy break-words" style={{ lineHeight: 1.2 }}>
-            {t("hero.homeTitlePrefix") || "Verified property listings in"}{" "}
-            <span className="text-orange">{t("hero.homeTitleCity") || "Hosur"}</span>
+            Hosur Real Estate –{" "}
+            <span className="text-orange">Buy Plots, Lands, Villas &amp; Properties</span>
           </h1>
 
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
@@ -1328,6 +1328,122 @@ const HomePage = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SEO EXPLORER SECTION: CATEGORIES, LOCATIONS & GUIDES ── */}
+      <section className="home-gsap-section bg-slate-50 border-t border-slate-200 px-5 py-16 sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-[1440px]">
+          <div className="max-w-3xl mb-10">
+            <span className="section-tag !text-orange">Hosur Real Estate Marketplace</span>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-extrabold text-navy">
+              Explore Hosur Properties, Prime Localities &amp; Buying Guides
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">
+              Browse verified real estate across Hosur's key residential, industrial, and agricultural corridors. Backed by legal document verification and transparent pricing.
+            </p>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {/* Column 1: Core Property Categories */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
+              <h3 className="text-base font-bold text-navy flex items-center gap-2 mb-4">
+                <span className="h-2 w-2 rounded-full bg-orange" />
+                Featured Property Categories
+              </h3>
+              <div className="flex flex-col gap-2.5 text-xs sm:text-sm">
+                {[
+                  { label: "Hosur Real Estate Overview", to: "/hosur-real-estate" },
+                  { label: "Plots for Sale in Hosur (DTCP Approved)", to: "/plots-for-sale-in-hosur" },
+                  { label: "Land for Sale in Hosur (Commercial & Industrial)", to: "/land-for-sale-in-hosur" },
+                  { label: "Villas for Sale in Hosur (Gated Communities)", to: "/villas-for-sale-in-hosur" },
+                  { label: "Houses for Sale in Hosur (Independent Duplex)", to: "/houses-for-sale-in-hosur" },
+                  { label: "Commercial Property in Hosur (Offices & Retail)", to: "/commercial-property-hosur" },
+                  { label: "Farm Land Near Hosur (Agricultural Acres)", to: "/farm-land-near-hosur" },
+                  { label: "Property for Rent in Hosur (1, 2, 3 BHK)", to: "/property-for-rent-in-hosur" },
+                ].map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className="flex items-center justify-between rounded-lg p-2 font-medium text-slate-700 hover:bg-orange/10 hover:text-orange transition-colors"
+                  >
+                    <span>{item.label}</span>
+                    <ArrowRightIcon className="h-3 w-3 text-slate-400 group-hover:text-orange" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Column 2: Key Hosur Localities */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
+              <h3 className="text-base font-bold text-navy flex items-center gap-2 mb-4">
+                <span className="h-2 w-2 rounded-full bg-orange" />
+                Top Hosur Localities
+              </h3>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                {[
+                  { label: "Bagalur Road", to: "/location/bagalur-road-property" },
+                  { label: "Mathigiri", to: "/location/mathigiri-plots" },
+                  { label: "Alasanatham", to: "/location/alasanatham-property" },
+                  { label: "Rayakottai Road", to: "/location/rayakottai-road-plots" },
+                  { label: "Avalapalli", to: "/location/avalapalli-land" },
+                  { label: "Mookandapalli (SIPCOT)", to: "/location/mookandapalli-property" },
+                  { label: "Zuzuvadi (Border)", to: "/location/zuzuvadi-land" },
+                  { label: "Kelamangalam", to: "/location/kelamangalam-road-property" },
+                  { label: "Shoolagiri (NH44)", to: "/location/shoolagiri-property" },
+                  { label: "Denkanikottai Road", to: "/location/denkanikottai-road-land" },
+                  { label: "TVS Nagar", to: "/location/tvs-nagar-plots" },
+                  { label: "Titan Township", to: "/location/titan-township-property" },
+                ].map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className="rounded-lg border border-slate-100 bg-slate-50 p-2.5 font-medium text-slate-800 hover:border-orange hover:bg-orange/5 hover:text-orange transition text-center"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+              <div className="mt-4 pt-3 border-t border-slate-100 text-center">
+                <Link to="/listings" className="text-xs font-bold text-orange hover:underline">
+                  View all 14+ Hosur neighborhoods &rarr;
+                </Link>
+              </div>
+            </div>
+
+            {/* Column 3: Real Estate Buying & Legal Guides */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-bold text-navy flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-orange" />
+                  Property Guides &amp; Insights
+                </h3>
+                <Link to="/blog" className="text-xs font-bold text-orange hover:underline">
+                  View All Blog
+                </Link>
+              </div>
+              <div className="flex flex-col gap-2.5 text-xs sm:text-sm">
+                {[
+                  { label: "Best Areas to Buy Property in Hosur", to: "/blog/best-areas-to-buy-property-in-hosur" },
+                  { label: "Guide to Buying Residential Plots in Hosur", to: "/blog/complete-guide-to-buying-residential-plots-in-hosur" },
+                  { label: "Hosur Real Estate Investment Guide", to: "/blog/hosur-real-estate-investment-guide" },
+                  { label: "10 Things to Check Before Buying Land", to: "/blog/things-to-check-before-buying-land-in-hosur" },
+                  { label: "Best Residential Locations Near Hosur", to: "/blog/best-residential-locations-near-hosur" },
+                  { label: "DTCP vs HNTDA Approved Plots Explained", to: "/blog/dtcp-vs-hntda-approved-plots-what-buyers-should-know" },
+                  { label: "Is Hosur Good for Property Investment?", to: "/blog/is-hosur-a-good-location-for-property-investment" },
+                ].map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className="flex items-center justify-between rounded-lg p-2 font-medium text-slate-700 hover:bg-orange/10 hover:text-orange transition-colors"
+                  >
+                    <span className="line-clamp-1">{item.label}</span>
+                    <ArrowRightIcon className="h-3 w-3 text-slate-400 shrink-0" />
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>

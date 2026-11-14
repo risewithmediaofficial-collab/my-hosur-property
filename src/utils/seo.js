@@ -78,7 +78,11 @@ export const absoluteUrl = (path = "/") => {
   return `${getSiteUrl()}${path.startsWith("/") ? path : `/${path}`}`;
 };
 
-export const buildPageTitle = (title) => (title ? `${title} | ${SITE_TITLE_SUFFIX}` : SITE_NAME);
+export const buildPageTitle = (title) => {
+  if (!title) return SITE_NAME;
+  if (title.includes(SITE_TITLE_SUFFIX) || title.includes("MyHosurProperty")) return title;
+  return `${title} | ${SITE_TITLE_SUFFIX}`;
+};
 
 export const truncateText = (text = "", limit = 160) => {
   const normalized = String(text).replace(/\s+/g, " ").trim();
@@ -169,6 +173,63 @@ export const buildRealEstateAgentSchema = () => ({
     addressCountry: "IN",
   },
   sameAs: [getSiteUrl()],
+});
+
+export const buildOrganizationSchema = () => ({
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: SITE_NAME,
+  url: getSiteUrl(),
+  logo: absoluteUrl(DEFAULT_OG_IMAGE),
+  contactPoint: [
+    {
+      "@type": "ContactPoint",
+      telephone: SITE_CONTACT_PHONE,
+      contactType: "customer service",
+      areaServed: "IN",
+      availableLanguage: ["English", "Tamil", "Telugu", "Kannada", "Hindi"],
+    },
+  ],
+  sameAs: [
+    "https://facebook.com/myhosurproperty",
+    "https://instagram.com/myhosurproperty",
+    "https://youtube.com/@myhosurproperty",
+  ],
+});
+
+export const buildArticleSchema = ({
+  title,
+  description,
+  url,
+  image = DEFAULT_OG_IMAGE,
+  datePublished = "2026-01-15T09:00:00+05:30",
+  dateModified = "2026-11-14T10:00:00+05:30",
+  authorName = "MyHosurProperty Editorial Team",
+} = {}) => ({
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: title,
+  description,
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": absoluteUrl(url),
+  },
+  image: absoluteUrl(image),
+  datePublished,
+  dateModified,
+  author: {
+    "@type": "Organization",
+    name: authorName,
+    url: getSiteUrl(),
+  },
+  publisher: {
+    "@type": "Organization",
+    name: SITE_NAME,
+    logo: {
+      "@type": "ImageObject",
+      url: absoluteUrl(DEFAULT_OG_IMAGE),
+    },
+  },
 });
 
 export const buildFaqSchema = (questions = []) => ({
