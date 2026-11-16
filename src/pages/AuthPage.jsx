@@ -1132,7 +1132,7 @@ const AuthPage = () => {
                             <ShieldCheckIcon className="auth-free-badge-icon" />
                             <span>
                               OTP expires in <strong>{Math.max(0, otpExpiryCountdown)} seconds</strong>.
-                              {!isSignup ? " This keeps your account sign-in protected." : (otpState?.channel === "whatsapp" ? " WeΓÇÖll activate your account right after WhatsApp verification." : " WeΓÇÖll activate your account right after email verification.")}
+                              {!isSignup ? " This keeps your account sign-in protected." : (otpState?.channel === "whatsapp" ? " We'll activate your account right after WhatsApp verification." : " We'll activate your account right after email verification.")}
                               {otpState?.developmentOtp ? (
                                 <>
                                   {" "}
@@ -1309,3 +1309,4 @@ const AuthPage = () => {
 };
 
 export default AuthPage;
+
