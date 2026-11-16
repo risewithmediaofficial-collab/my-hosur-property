@@ -39,3 +39,6 @@ cypress/downloads/
 # Generated SEO files
 /public/sitemap.xml
 /public/robots.txt
+
+# Playwright MCP
+.playwright-mcp/

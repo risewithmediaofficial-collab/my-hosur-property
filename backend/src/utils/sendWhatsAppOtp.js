@@ -7,10 +7,11 @@ const axios = require("axios");
  */
 
 // NOTE: .env must define MSG91_WHATSAPP_AUTH_KEY (or MSG91_AUTH_KEY as fallback)
-const MSG91_WHATSAPP_AUTH_KEY =
+const MSG91_WHATSAPP_AUTH_KEY = String(
   process.env.MSG91_WHATSAPP_AUTH_KEY ||
   process.env.MSG91_AUTH_KEY ||
-  "";
+  ""
+).trim();
 
 const MSG91_WHATSAPP_INTEGRATED_NUMBER =
   process.env.MSG91_WHATSAPP_INTEGRATED_NUMBER || "918110952245";
@@ -122,13 +123,23 @@ const sendWhatsAppOtpViaMsg91 = async ({ phone, otp }) => {
     console.error("[whatsapp-otp] ❌ MSG91 HTTP error status :", httpStatus);
     console.error("[whatsapp-otp] ❌ MSG91 HTTP error body   :", JSON.stringify(errBody, null, 2));
 
-    const userMsg =
-      errBody?.message ||
-      errBody?.error ||
-      errBody?.description ||
-      (typeof errBody === "string" ? errBody : null) ||
-      axiosErr.message ||
-      "MSG91 WhatsApp API request failed";
+    const apiError = errBody?.apiError || errBody?.errors || errBody?.error || errBody?.message;
+    let userMsg = "";
+
+    if (String(errBody?.apiError) === "418" || /ip.*not.*whitelisted/i.test(String(apiError)) || /ip.*whitelist/i.test(String(errBody?.errors))) {
+      userMsg = "Server IP is not whitelisted in MSG91 dashboard (Error 418). Please whitelist server IP (e.g. 82.29.166.169) or disable IP restrictions in your MSG91 Authkey settings.";
+    } else if (httpStatus === 401) {
+      userMsg = errBody?.errors || errBody?.message || "MSG91 authentication failed (HTTP 401). Please verify your MSG91 Authkey or IP whitelist.";
+    } else {
+      userMsg =
+        errBody?.message ||
+        errBody?.errors ||
+        errBody?.error ||
+        errBody?.description ||
+        (typeof errBody === "string" ? errBody : null) ||
+        axiosErr.message ||
+        "MSG91 WhatsApp API request failed";
+    }
 
     const err = new Error(`MSG91 WhatsApp API error (HTTP ${httpStatus || "?"}): ${userMsg}`);
     err.statusCode = 502;
@@ -144,15 +155,27 @@ const sendWhatsAppOtpViaMsg91 = async ({ phone, otp }) => {
   const isApiError =
     resData?.type === "error" ||
     resData?.status === "error" ||
+    resData?.status === "fail" ||
+    resData?.hasError === true ||
     resData?.code === "error" ||
+    resData?.msgType === "error" ||
+    String(resData?.msg) === "418" ||
+    String(resData?.apiError) === "418" ||
     (typeof resData === "string" && resData.toLowerCase().startsWith("error"));
 
   if (isApiError) {
-    const apiErrMsg =
-      resData?.message ||
-      resData?.error ||
-      resData?.description ||
-      (typeof resData === "string" ? resData : "MSG91 returned an error response");
+    let apiErrMsg = "";
+    if (String(resData?.msg) === "418" || String(resData?.apiError) === "418") {
+      apiErrMsg = "Server IP is not whitelisted in MSG91 dashboard (Error 418). Please whitelist server IP (e.g. 82.29.166.169) or disable IP restrictions in your MSG91 Authkey settings.";
+    } else {
+      apiErrMsg =
+        resData?.message ||
+        resData?.errors ||
+        resData?.error ||
+        resData?.description ||
+        resData?.msg ||
+        (typeof resData === "string" ? resData : "MSG91 returned an error response");
+    }
     console.error("[whatsapp-otp] ❌ MSG91 API-level error:", apiErrMsg);
     const err = new Error(`MSG91 WhatsApp API error: ${apiErrMsg}`);
     err.statusCode = 502;

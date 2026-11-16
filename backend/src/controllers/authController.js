@@ -240,6 +240,7 @@ const buildOtpResponse = (user, meta = {}) => {
     resendAvailableInSeconds,
     provider: meta.provider || (isWhatsApp ? "msg91_whatsapp" : EMAIL_OTP_PROVIDER),
     channel: isWhatsApp ? "whatsapp" : "email",
+    ...(meta.fallbackFromWhatsApp ? { fallbackFromWhatsApp: true } : {}),
     ...(meta.developmentOtp ? { developmentOtp: meta.developmentOtp } : {}),
   };
 };
@@ -309,6 +310,7 @@ const createOtpChallenge = async (user, purpose, options = {}) => {
 
   let delivery;
   let channel = "email";
+  let fallbackFromWhatsApp = false;
 
   // forceChannel = "phone"  → always WhatsApp to loginPhone (or user.phone fallback)
   // forceChannel = "email"  → always email even if user has a phone stored
@@ -327,11 +329,27 @@ const createOtpChallenge = async (user, purpose, options = {}) => {
   } else if (forceChannel === "phone" || (forceChannel === undefined && targetPhone)) {
     channel = "whatsapp";
     console.log(`[otp] Sending WhatsApp OTP to phone: ${targetPhone}, purpose: ${purpose}`);
-    delivery = await sendWhatsAppOtp({
-      phone: targetPhone,
-      otp,
-      purpose,
-    });
+    try {
+      delivery = await sendWhatsAppOtp({
+        phone: targetPhone,
+        otp,
+        purpose,
+      });
+    } catch (waErr) {
+      if (user.email && String(user.email).trim().length > 0) {
+        console.warn(`[otp] WhatsApp OTP failed: ${waErr.message}. Automatically falling back to Email OTP for: ${user.email}`);
+        channel = "email";
+        delivery = await sendEmailOtp({
+          email: user.email,
+          name: user.name,
+          otp,
+          purpose,
+        });
+        fallbackFromWhatsApp = true;
+      } else {
+        throw waErr;
+      }
+    }
   } else {
     channel = "email";
     console.log(`[otp] Sending Email OTP to: ${user.email}, purpose: ${purpose}`);
@@ -350,6 +368,7 @@ const createOtpChallenge = async (user, purpose, options = {}) => {
     channel,
     provider: delivery.provider,
     developmentOtp: delivery.provider === "development" ? otp : "",
+    fallbackFromWhatsApp,
   });
 
   console.log("[otp] OTP challenge response sent to frontend:", JSON.stringify(otpResponse, null, 2));
@@ -631,9 +650,12 @@ const forgotPassword = async (req, res) => {
     const destination = challenge.channel === "whatsapp"
       ? "registered WhatsApp number"
       : "registered email address";
+    const fallbackNote = challenge.fallbackFromWhatsApp
+      ? " (WhatsApp service is temporarily unavailable; OTP was sent to your registered email)"
+      : "";
     return res.status(202).json({
       ...challenge,
-      message: `OTP sent to your ${destination}. Verify to reset your password.`,
+      message: `OTP sent to your ${destination}.${fallbackNote} Verify to reset your password.`,
     });
   } catch (otpErr) {
     console.error("[forgotPassword] OTP send failed:", otpErr.message);

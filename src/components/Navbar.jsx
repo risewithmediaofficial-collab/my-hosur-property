@@ -47,7 +47,6 @@ const desktopNavLinks = [
   { labelKey: "nav.services", defaultLabel: "Our Services", to: "/services" },
   { labelKey: "nav.bankLoans", defaultLabel: "Bank Loans", to: "/bank-loans" },
   { labelKey: "nav.plans", defaultLabel: "Plans", to: "/plans" },
-  { labelKey: "nav.blog", defaultLabel: "Blog", to: "/blog" },
   { labelKey: "nav.aboutUs", defaultLabel: "About Us", to: "/about" },
   { labelKey: "nav.contact", defaultLabel: "Contact", to: "/contact" },
 ];
@@ -110,6 +109,11 @@ const Navbar = memo(() => {
     return false;
   };
 
+  const getNavLabel = (item) => {
+    const val = t(item.labelKey);
+    return val && val !== item.labelKey ? val : item.defaultLabel;
+  };
+
   const renderDesktopLink = (item) => (
     <NavLink
       key={item.to}
@@ -124,7 +128,7 @@ const Navbar = memo(() => {
         }`;
       }}
     >
-      {t(item.labelKey) || item.defaultLabel}
+      {getNavLabel(item)}
     </NavLink>
   );
 
@@ -146,7 +150,7 @@ const Navbar = memo(() => {
         }}
       >
         <Icon className="h-5 w-5" />
-        <span>{t(item.labelKey) || item.defaultLabel}</span>
+        <span>{getNavLabel(item)}</span>
       </NavLink>
     );
   };
